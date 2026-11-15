@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Randomised Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Randomness inside the structure</p>
       <h1>Treaps</h1>
       <p class="lesson-lede">Give each key a random priority, keep heap order on the priorities, and get the tree a random insertion order would have built whatever order you use.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Two invariants at once, and they determine the tree</li><li>Uniqueness makes the insertion order irrelevant</li><li>The shape is the shape of a randomly built tree, and there is no balance rule</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A random order the structure supplies itself</h2>
-      <article class="prose reading"><p>Binary Search Trees showed a tree's cost depending on something the structure does not choose: twelve keys arriving in sorted order give a path of height 11, and the same twelve arriving shuffled give a height of 4. Rotations and the AVL Invariant fixed that by adding a rule the structure enforces on every insertion. This lesson fixes it differently &mdash; by making the shape depend on coins instead of on the arrival order.</p><div class="defbox"><span class="label">Definition &middot; A treap</span><p>A <strong>treap</strong> is a binary tree in which each node holds a <strong>key</strong> and a <strong>priority</strong>. It satisfies the search property on the keys &mdash; every key in a left subtree is smaller, every key in a right subtree is larger &mdash; and the heap property on the priorities: every node's priority is smaller than its children's.</p></div><div class="thm"><span class="label">Theorem &middot; Uniqueness</span><p>For any finite set of pairs with distinct keys and distinct priorities, exactly one treap contains them.</p></div><div class="proof"><p>Induct on the number of pairs. With none, the empty tree is the only one. Otherwise the heap property forces the pair with the smallest priority to be at the root: any other node with that pair would have an ancestor of larger priority.</p><p>The search property then forces the partition of the remaining pairs: every key smaller than the root's goes into the left subtree and every larger key into the right. Neither subtree has a choice about which pairs it contains.</p><p>Each subtree is itself a treap on a strictly smaller set with distinct keys and distinct priorities, so by induction each is unique. The whole tree is therefore unique.</p><p><span class="qed">&#9633;</span></p></div><p>The lab does not argue this, it checks it. Both panels are built from the same priority assignment and compared node for node, and the verdict reads the same tree, node for node or words that would refute the claim. Priorities are ranked rather than taken raw so that no two can collide; a tie would leave the shape undetermined and the claim would fail for a reason with nothing to do with treaps.</p><div class="example"><span class="label">Example &middot; Twelve keys, one priority assignment, two insertion orders</span><p>The keys are <span class="math" data-say="10, 20, and so on, 120">10, 20, …, 120</span> and the seed assigns priorities <span class="math" data-say="10, 6, 20, 3, 30, 1, 40, 10, 50, 12, 60, 7, 70, 2, 80, 11, 90, 9, 100, 5, 110, 4, 120, 8">10:6  20:3  30:1  40:10  50:12  60:7  70:2  80:11  90:9  100:5  110:4  120:8</span>. Priority 1 belongs to key 30, so 30 is the root. Inserting in sorted order costs 8 rotations; inserting in a shuffled order costs 11. Both produce a tree of height 5 with mean depth <span class="math" data-say="5 over 2">5/2</span>, and the two trees are identical. A plain search tree on the same sorted order has height 11 and mean depth <span class="math" data-say="11 over 2">11/2</span>.</p></div><p>Height 5 against 11, and mean depth <span class="math" data-say="5 over 2">5/2</span> against <span class="math" data-say="11 over 2">11/2</span>: the treap is less than half as deep on average, on the input that is worst for a plain tree. And it got there without any rule about heights &mdash; the only thing being maintained is heap order on twelve numbers the structure generated itself.</p><h3>Insertion, and what a rotation is for here</h3><p>To insert a key, give it a random priority, place it as a leaf by the ordinary search-tree rule, and then rotate it upwards while its priority is smaller than its parent's. A rotation preserves the search property &mdash; Rotations and the AVL Invariant proves that, and the in-order sequence is what it preserves &mdash; so the search property is never in danger, and the loop stops exactly when heap order is restored.</p><p>That is the whole implementation, and it is worth noticing what is absent. No height is stored, no balance factor is computed, no case analysis over four shapes. Deletion is the same idea in reverse: rotate the node down until it is a leaf, then remove it. The panel's rotation counts, 8 and 11 for the two orders, are the only work the structure did beyond the searches.</p><h3>What the guarantee is, and what the printed 2 ln n is not</h3><p>The depth of a treap is a random variable, and its expectation is the expected depth of a search tree built from a uniformly random insertion order &mdash; which is <span class="math" data-say="2 times the natural log of n plus big O of 1">2 ln n + O(1)</span> for the mean depth, and <span class="math" data-say="big O of log n">O(log n)</span> for the height. Both of those are <strong>stated</strong> on this path: The Shape Problem and Random BSTs states them, Randomised Quicksort derives the recurrence they come from, because a random root and a random pivot are the same object, and no lesson in this library carries the full argument.</p><p>So the panel prints <span class="math" data-say="2 times the natural log of n">2 ln n</span> in its own row, labelled asymptotic, and it is about 15 per cent wrong about the tree in front of you. At <span class="math" data-say="n equals 12">n = 12</span> it reads <span class="math" data-say="4.970">4.970</span> while the counted mean depth is <span class="math" data-say="2.500">2.500</span> and the counted height is <span class="math" data-say="5">5</span>. Three numbers, three meanings: one asymptote, one exact mean of integers, one count. Reading them as estimates of each other is the failure mode of this page, and it is why each is labelled where it is printed.</p><p>The guarantee is also in expectation and not always. Over seeds 1 to 12 at twelve keys the treap's height came out <span class="math" data-say="5, 6, 4, 5, 5, 6, 6, 5, 5, 4, 6, 5">5, 6, 4, 5, 5, 6, 6, 5, 5, 4, 6, 5</span> &mdash; never 11, and never 3 either. Move the priority seed and watch it move. An AVL tree's height at twelve keys is bounded by a rule the structure enforces; a treap's is a random variable whose bad cases are unlikely rather than impossible.</p><p>That is the trade, and it is the same trade a random pivot makes. The input is arbitrary, possibly chosen by someone who wants the structure to perform badly, and the coins are the structure's own, so no input can be bad for it &mdash; only an unlucky draw can, and the draw is not the adversary's to make. Universal Hashing bought the same thing for a hash table with the same manoeuvre.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Treaps: a random priority instead of a balance rule</h2></div><p>The shape is the one a random insertion order would have built, whatever order you use</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A random order the structure supplies itself</h2><div class="prose reading"><p>Binary Search Trees showed a tree's cost depending on something the structure does not choose: twelve keys arriving in sorted order give a path of height 11, and the same twelve arriving shuffled give a height of 4. Rotations and the AVL Invariant fixed that by adding a rule the structure enforces on every insertion. This lesson fixes it differently &mdash; by making the shape depend on coins instead of on the arrival order.</p><div class="defbox"><span class="label">Definition &middot; A treap</span><p>A <strong>treap</strong> is a binary tree in which each node holds a <strong>key</strong> and a <strong>priority</strong>. It satisfies the search property on the keys &mdash; every key in a left subtree is smaller, every key in a right subtree is larger &mdash; and the heap property on the priorities: every node's priority is smaller than its children's.</p></div><div class="thm"><span class="label">Theorem &middot; Uniqueness</span><p>For any finite set of pairs with distinct keys and distinct priorities, exactly one treap contains them.</p></div><div class="proof"><p>Induct on the number of pairs. With none, the empty tree is the only one. Otherwise the heap property forces the pair with the smallest priority to be at the root: any other node with that pair would have an ancestor of larger priority.</p><p>The search property then forces the partition of the remaining pairs: every key smaller than the root's goes into the left subtree and every larger key into the right. Neither subtree has a choice about which pairs it contains.</p><p>Each subtree is itself a treap on a strictly smaller set with distinct keys and distinct priorities, so by induction each is unique. The whole tree is therefore unique.</p><p><span class="qed">&#9633;</span></p></div><p>The lab does not argue this, it checks it. Both panels are built from the same priority assignment and compared node for node, and the verdict reads the same tree, node for node or words that would refute the claim. Priorities are ranked rather than taken raw so that no two can collide; a tie would leave the shape undetermined and the claim would fail for a reason with nothing to do with treaps.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Treaps: a random priority instead of a balance rule</h2></div><p>The shape is the one a random insertion order would have built, whatever order you use</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The same keys, the same priorities, two insertion orders</strong><span>a search tree on the keys and a heap on the priorities, which fixes the shape</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the first order</span><span class="tone-muted"><i class="legend-swatch"></i>priorities above each node</span></div>
@@ -1406,10 +1449,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tpTable"></table></div>
       <div class="status-banner" id="tpStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Insert the same keys and priorities in two different orders</h3>
-          <p>Both trees are built from one priority assignment, so uniqueness says they must come out identical and the panel checks it node for node. The plain search tree on the same order is in the third row, and the <span class="math" data-say="2 times the natural log of n">2 ln n</span> in the fourth is an asymptote rather than a prediction about either tree above it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Insert the same keys and priorities in two different orders</h3>
+            <p>Both trees are built from one priority assignment, so uniqueness says they must come out identical and the panel checks it node for node. The plain search tree on the same order is in the third row, and the <span class="math" data-say="2 times the natural log of n">2 ln n</span> in the fourth is an asymptote rather than a prediction about either tree above it.</p>
         <div class="field" id="tpPresetField">
           <label for="tpPreset">Worked example</label>
           <select id="tpPreset"><option value="sorted-against-shuffled" selected>sorted against a shuffle of the same keys</option><option value="two-shuffles">a shuffle against the reverse of the same keys</option><option value="larger">twenty keys</option></select>
@@ -1442,12 +1485,15 @@
         </div>
         <p class="small-copy" id="tpHint" style="margin:0;">Priorities are ranked rather than taken raw, so no two keys share one &mdash; a tie would leave the shape undetermined and the claim would fail for a reason that has nothing to do with treaps. 2 ln n is labelled because it is an asymptote for the mean depth, not a prediction of either height above it.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; Twelve keys, one priority assignment, two insertion orders</span><p>The keys are <span class="math" data-say="10, 20, and so on, 120">10, 20, …, 120</span> and the seed assigns priorities <span class="math" data-say="10, 6, 20, 3, 30, 1, 40, 10, 50, 12, 60, 7, 70, 2, 80, 11, 90, 9, 100, 5, 110, 4, 120, 8">10:6  20:3  30:1  40:10  50:12  60:7  70:2  80:11  90:9  100:5  110:4  120:8</span>. Priority 1 belongs to key 30, so 30 is the root. Inserting in sorted order costs 8 rotations; inserting in a shuffled order costs 11. Both produce a tree of height 5 with mean depth <span class="math" data-say="5 over 2">5/2</span>, and the two trees are identical. A plain search tree on the same sorted order has height 11 and mean depth <span class="math" data-say="11 over 2">11/2</span>.</p></div><p>Height 5 against 11, and mean depth <span class="math" data-say="5 over 2">5/2</span> against <span class="math" data-say="11 over 2">11/2</span>: the treap is less than half as deep on average, on the input that is worst for a plain tree. And it got there without any rule about heights &mdash; the only thing being maintained is heap order on twelve numbers the structure generated itself.</p><h3>Insertion, and what a rotation is for here</h3><p>To insert a key, give it a random priority, place it as a leaf by the ordinary search-tree rule, and then rotate it upwards while its priority is smaller than its parent's. A rotation preserves the search property &mdash; Rotations and the AVL Invariant proves that, and the in-order sequence is what it preserves &mdash; so the search property is never in danger, and the loop stops exactly when heap order is restored.</p><p>That is the whole implementation, and it is worth noticing what is absent. No height is stored, no balance factor is computed, no case analysis over four shapes. Deletion is the same idea in reverse: rotate the node down until it is a leaf, then remove it. The panel's rotation counts, 8 and 11 for the two orders, are the only work the structure did beyond the searches.</p><h3>What the guarantee is, and what the printed 2 ln n is not</h3><p>The depth of a treap is a random variable, and its expectation is the expected depth of a search tree built from a uniformly random insertion order &mdash; which is <span class="math" data-say="2 times the natural log of n plus big O of 1">2 ln n + O(1)</span> for the mean depth, and <span class="math" data-say="big O of log n">O(log n)</span> for the height. Both of those are <strong>stated</strong> on this path: The Shape Problem and Random BSTs states them, Randomised Quicksort derives the recurrence they come from, because a random root and a random pivot are the same object, and no lesson in this library carries the full argument.</p><p>So the panel prints <span class="math" data-say="2 times the natural log of n">2 ln n</span> in its own row, labelled asymptotic, and it is about 15 per cent wrong about the tree in front of you. At <span class="math" data-say="n equals 12">n = 12</span> it reads <span class="math" data-say="4.970">4.970</span> while the counted mean depth is <span class="math" data-say="2.500">2.500</span> and the counted height is <span class="math" data-say="5">5</span>. Three numbers, three meanings: one asymptote, one exact mean of integers, one count. Reading them as estimates of each other is the failure mode of this page, and it is why each is labelled where it is printed.</p><p>The guarantee is also in expectation and not always. Over seeds 1 to 12 at twelve keys the treap's height came out <span class="math" data-say="5, 6, 4, 5, 5, 6, 6, 5, 5, 4, 6, 5">5, 6, 4, 5, 5, 6, 6, 5, 5, 4, 6, 5</span> &mdash; never 11, and never 3 either. Move the priority seed and watch it move. An AVL tree's height at twelve keys is bounded by a rule the structure enforces; a treap's is a random variable whose bad cases are unlikely rather than impossible.</p><p>That is the trade, and it is the same trade a random pivot makes. The input is arbitrary, possibly chosen by someone who wants the structure to perform badly, and the coins are the structure's own, so no input can be bad for it &mdash; only an unlucky draw can, and the draw is not the adversary's to make. Universal Hashing bought the same thing for a hash table with the same manoeuvre.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working with a structure that randomises itself</h2></div><p>Find the root before anything else; the rest of the tree is forced.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the smallest priority: that is the root</h3><p>Then partition the remaining keys by comparison with it and recurse. This is the uniqueness proof used as an algorithm, and it builds the tree without reference to any insertion order at all.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Change the insertion order and expect nothing to happen</h3><p>Swap the two order menus. The rotation counts change and the trees do not. If they ever differed, the priorities would be the thing to check first &mdash; a tie breaks uniqueness and nothing else does.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Change the priority seed to see the real variability</h3><p>This is the knob that matters. Heights at twelve keys range over 4, 5 and 6 across the first dozen seeds. That spread is the guarantee's actual content: bad shapes are unlikely, not impossible.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Keep the three depth numbers apart</h3><p>The counted height, the exact mean depth as a fraction, and the <span class="math" data-say="2 times the natural log of n">2 ln n</span> asymptote. At twelve keys they are <span class="math" data-say="5">5</span>, <span class="math" data-say="5 over 2">5/2</span> and <span class="math" data-say="4.970">4.970</span>. Only the first two are about this tree, and the panel labels all three.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working with a structure that randomises itself</h2>
+      <p class="lead-in">Find the root before anything else; the rest of the tree is forced.</p>
+      <ol class="key-ideas method"><li><strong>Find the smallest priority: that is the root.</strong> Then partition the remaining keys by comparison with it and recurse. This is the uniqueness proof used as an algorithm, and it builds the tree without reference to any insertion order at all.</li><li><strong>Change the insertion order and expect nothing to happen.</strong> Swap the two order menus. The rotation counts change and the trees do not. If they ever differed, the priorities would be the thing to check first &mdash; a tie breaks uniqueness and nothing else does.</li><li><strong>Change the priority seed to see the real variability.</strong> This is the knob that matters. Heights at twelve keys range over 4, 5 and 6 across the first dozen seeds. That spread is the guarantee's actual content: bad shapes are unlikely, not impossible.</li><li><strong>Keep the three depth numbers apart.</strong> The counted height, the exact mean depth as a fraction, and the <span class="math" data-say="2 times the natural log of n">2 ln n</span> asymptote. At twelve keys they are <span class="math" data-say="5">5</span>, <span class="math" data-say="5 over 2">5/2</span> and <span class="math" data-say="4.970">4.970</span>. Only the first two are about this tree, and the panel labels all three.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1522,16 @@ treap height at n = 12 over priority seeds 1..12
   5  6  4  5  5  6  6  5  5  4  6  5      never 11, never 3</div><p>Build the top two levels from the priority row by hand before looking at the drawing: root 30, then 20 on the left and 70 on the right. Nothing about the insertion order entered that reasoning, which is exactly the claim &mdash; the priorities determine the tree and the order determines only the rotations.</p><p>The rotation counts are the one place the two runs differ, 8 against 11. That is real work and it is the price of the guarantee: a plain tree on the sorted order does no rotations at all and ends up with height 11. Paying eight rotations to halve the depth is the trade, and it is cheaper than the AVL case analysis it replaces.</p><p>For a faded rehearsal, set the priority seed to 3 and predict the height before the panel redraws. The supplied first move is this: the seed changes the priorities and therefore the tree, and the first dozen seeds give heights between 4 and 6. Say what the smallest and largest heights a twelve-key treap can possibly have are, and then say why neither extreme showed up in twelve seeds.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the insertion order to matter</strong><span>It changes the rotations and nothing else. A reader who has just come from Binary Search Trees, where the order decided everything, will look for its effect on the shape and find none &mdash; which is the result, not a failure of the experiment. The knob that changes the shape is the priority seed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading 2 ln n as the tree&#x27;s depth</strong><span>At twelve keys it reads <span class="math" data-say="4.970">4.970</span> and the counted mean depth is <span class="math" data-say="2.500">2.500</span>. It is an asymptote for the expected mean depth of a randomly built tree, with constants suppressed, and this library states it rather than proving it. Quoting it as a prediction about a small tree is quoting a growth rate as a value.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a height bound</strong><span>There is none. A treap can be a path, with probability <span class="math" data-say="1 over n factorial">1/n!</span> for a given path shape, and nothing in the structure prevents it. If a bound that holds always is required, AVL Insertion is the structure that provides one and it pays for it with stored heights and a case analysis.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the treap from a priority list without being told the insertion order.</strong><p>You should be able to state both invariants, prove uniqueness by induction on the smallest priority, describe insertion as a leaf placement plus upward rotations, and say which of the panel's depth figures is counted, which is exact and which is an asymptote.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A treap keeps the coins in the priorities and the structure in the tree. &ldquo;Skip Lists&rdquo; keeps the coins in the structure itself: each element chooses how many express lanes it appears in by flipping until it stops, nothing is ever rebalanced or rebuilt, and the search cost is counted by walking rather than derived from a height.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting the insertion order to matter</strong><span>It changes the rotations and nothing else. A reader who has just come from Binary Search Trees, where the order decided everything, will look for its effect on the shape and find none &mdash; which is the result, not a failure of the experiment. The knob that changes the shape is the priority seed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading 2 ln n as the tree&#x27;s depth</strong><span>At twelve keys it reads <span class="math" data-say="4.970">4.970</span> and the counted mean depth is <span class="math" data-say="2.500">2.500</span>. It is an asymptote for the expected mean depth of a randomly built tree, with constants suppressed, and this library states it rather than proving it. Quoting it as a prediction about a small tree is quoting a growth rate as a value.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a height bound</strong><span>There is none. A treap can be a path, with probability <span class="math" data-say="1 over n factorial">1/n!</span> for a given path shape, and nothing in the structure prevents it. If a bound that holds always is required, AVL Insertion is the structure that provides one and it pays for it with stored heights and a case analysis.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the treap from a priority list without being told the insertion order.</strong><p>You should be able to state both invariants, prove uniqueness by induction on the smallest priority, describe insertion as a leaf placement plus upward rotations, and say which of the panel's depth figures is counted, which is exact and which is an asymptote.</p></div></div><div class="note"><strong>Note:</strong> A treap keeps the coins in the priorities and the structure in the tree. &ldquo;Skip Lists&rdquo; keeps the coins in the structure itself: each element chooses how many express lanes it appears in by flipping until it stops, nothing is ever rebalanced or rebuilt, and the search cost is counted by walking rather than derived from a height.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Two invariants at once, and they determine the tree</summary><p>A <strong>treap</strong> holds a key and a priority at each node, is a binary search tree on the keys, and is a min-heap on the priorities. If all the keys and all the priorities are distinct, exactly one such tree exists: the minimum priority must be at the root, the keys below it split by the search property, and the same argument applies recursively. The lab's opening instance has the key with priority 1 at the root, and there is nothing to choose.</p></details><details class="recall"><summary>Uniqueness makes the insertion order irrelevant</summary><p>Two different insertion orders of the same key&ndash;priority pairs must end at the same tree, because there is only one tree they could end at. The panel builds it twice &mdash; sorted on the left, a shuffle on the right &mdash; and reports the same tree, node for node, while the rotation counts differ, 8 against 11. Different work, identical result.</p></details><details class="recall"><summary>The shape is the shape of a randomly built tree, and there is no balance rule</summary><p>A treap on keys with priorities in random order is exactly the tree a plain search tree would have if the keys had arrived in the order of those priorities. So its expected depth is the expected depth of a randomly built search tree, which The Shape Problem and Random BSTs measured: <span class="math" data-say="2 times the natural log of n">2 ln n</span> asymptotically. Nothing checks a height, nothing checks a balance factor, and the rotations here restore heap order only.</p></details></div>
+      <h3>Summary</h3>
       <p>A search tree's shape is decided by the insertion order, which the structure does not control. A treap gives every key a random priority and keeps heap order on the priorities as well as search order on the keys; the resulting tree is unique, so the insertion order cannot reach it. Twelve keys inserted in sorted order give a plain tree of height 11 and a treap of height 5, and inserting the same keys and priorities in a shuffled order gives the same treap, node for node.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Two invariants at once, and they determine the tree.</strong> A <strong>treap</strong> holds a key and a priority at each node, is a binary search tree on the keys, and is a min-heap on the priorities. If all the keys and all the priorities are distinct, exactly one such tree exists: the minimum priority must be at the root, the keys below it split by the search property, and the same argument applies recursively. The lab's opening instance has the key with priority 1 at the root, and there is nothing to choose.</li><li><strong>Uniqueness makes the insertion order irrelevant.</strong> Two different insertion orders of the same key&ndash;priority pairs must end at the same tree, because there is only one tree they could end at. The panel builds it twice &mdash; sorted on the left, a shuffle on the right &mdash; and reports the same tree, node for node, while the rotation counts differ, 8 against 11. Different work, identical result.</li><li><strong>The shape is the shape of a randomly built tree, and there is no balance rule.</strong> A treap on keys with priorities in random order is exactly the tree a plain search tree would have if the keys had arrived in the order of those priorities. So its expected depth is the expected depth of a randomly built search tree, which The Shape Problem and Random BSTs measured: <span class="math" data-say="2 times the natural log of n">2 ln n</span> asymptotically. Nothing checks a height, nothing checks a balance factor, and the rotations here restore heap order only.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a treap is a search tree on the keys AND a heap on the priorities. for distinct keys and distinct priorities that tree is UNIQUE. so the insertion order cannot change it, only the priorities can. twelve keys sorted, plain tree height 11, treap height 5. mean depth 5 over 2, counted, 2 times the natural log of n reads 4.970 and is an ASYMPTOTE. rotations restore heap order only, there is no balance invariant anywhere" tabindex="0" role="region" aria-label="Mathematical notation">a treap is a search tree on the keys AND a heap on the priorities
 for distinct keys and distinct priorities that tree is UNIQUE
 so the insertion order cannot change it — only the priorities can
@@ -2907,11 +2952,40 @@ rotations restore heap order only: there is no balance invariant anywhere</div><
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2979,7 +3053,7 @@ rotations restore heap order only: there is no balance invariant anywhere</div><
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

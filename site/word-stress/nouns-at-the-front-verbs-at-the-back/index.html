@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Word Stress</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Where the strong part falls</p>
       <h1>Nouns at the Front, Verbs at the Back</h1>
       <p class="lesson-lede">For a word of two parts, the word class picks the strong part, and the rule is right nine times in ten.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>One part of every word is the strong part</li><li>The word class picks the strong part</li><li>A rule is scored on the words it can be tried on</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The words that break the rule</h2>
-      <article class="prose reading"><p>Say <em>money</em>. Then say <em>decide</em>. Both have two parts, and in each one part is stronger. In <em>money</em> it is the first. In <em>decide</em> it is the second. A listener uses the strong part to find the word, so a student who puts it in the wrong place is often not understood, even when every sound in the word is right.</p><h3>A part, and the strong part</h3><p>A <dfn>part</dfn> is one beat of a word. <em>Money</em> has two, <em>decide</em> has two and <em>tomorrow</em> has three. In every word of two or more parts, one part is said longer, louder and higher than the others. This course calls it the strong part. A pronouncing <dfn>dictionary</dfn>, a book that says how every word is said, marks it, and the page uses one.</p><h3>The rule</h3><ul><li>A <strong>noun</strong> of two parts is strong on the <strong>first</strong> part: <em>action</em>, <em>brother</em>, <em>country</em>, <em>kitchen</em>.</li><li>A <strong>verb</strong> of two parts is strong on the <strong>second</strong> part: <em>accept</em>, <em>agree</em>, <em>explain</em>, <em>enjoy</em>.</li><li>An <strong><dfn>adjective</dfn></strong> of two parts, a word that tells a quality, is strong on the <strong>first</strong> part, as a noun is: <em>angry</em>, <em>famous</em>, <em>lazy</em>. It is the weakest of the three rules.</li></ul><h3>How often the rule is right</h3><p>The lab takes the words of two parts that the build step found to be only a noun, only a verb or only an adjective, and checks each against the dictionary. Counted on this page, the noun rule is right for 207 of 231 words, 89.6%. The verb rule is right for 134 of 150, 89.3%. The adjective rule is right for 35 of 47, 74.5%.</p><p>Nine in ten is a good rule for a thing you do in every sentence. Three in four for adjectives is a weaker one, and the lab says so. Which words are only a noun, only a verb or only an adjective was decided once, from a printed word list, and is not on the page. The words that have more than one class, such as <em>answer</em>, are not scored, and the setting called <em>the words set aside</em> shows them.</p><h3>The 24 nouns that break the rule</h3><p>The noun rule says first, and these are said with the push somewhere else. They sort into three kinds.</p><ul><li><strong>A noun made from a verb</strong>: <em>advice</em>, <em>belief</em>, <em>complaint</em>, <em>constraint</em>, <em>defense</em>, <em>device</em>, <em>offense</em>, <em>relief</em>, <em>response</em> and <em>success</em>. Each is the verb's word in a new form: <em>advise</em>, <em>believe</em>, <em>complain</em>, <em>constrain</em>, <em>defend</em>, <em>devise</em>, <em>offend</em>, <em>relieve</em>, <em>respond</em>, <em>succeed</em>. The verb is strong at the back, and the noun keeps it there. Ten of the 24.</li><li><strong>A number or a month</strong>: <em>eighteen</em>, <em>fifteen</em> and <em>July</em>. The numbers that end in <em>-teen</em> take the push at the end, and that is how a listener tells <em>fifteen</em> from <em>fifty</em>. Three of the 24.</li><li><strong>A word that sits alone</strong>: <em>affair</em>, <em>decade</em>, <em>disease</em>, <em>estate</em>, <em>event</em>, <em>exam</em>, <em>extent</em>, <em>guitar</em>, <em>hello</em>, <em>hotel</em> and <em>technique</em>. Most of these came into English from French, which puts the push at the end of a word, and they kept it there. <em>Exam</em> is cut from <em>examination</em> and keeps that word's beat, and <em>hello</em> is a call, not a thing. Learn these as a list. Eleven of the 24.</li></ul><h3>The 16 verbs that break the rule</h3><p>The verb rule says second. Ten of the 16 are verbs whose second part is a weak ending: <em>alter</em>, <em>differ</em>, <em>enter</em>, <em>frighten</em>, <em>govern</em>, <em>listen</em>, <em>reckon</em>, <em>strengthen</em>, <em>suffer</em> and <em>threaten</em>. Say them and the second part is only a flat sound and a consonant, too light to carry the push, so it stays on the first. The other six are <em>argue</em>, <em>injure</em>, <em>license</em>, <em>locate</em>, <em>marry</em> and <em>premise</em>. <em>Argue</em>, <em>injure</em> and <em>marry</em> also end in a light second part. <em>License</em> and <em>premise</em> are nouns first and verbs second, and keep the noun's push. <em>Locate</em> is said both ways, and the dictionary's first reading is the American one. The last lesson of this course is about the flat sound.</p><h3>The 12 adjectives that break the rule</h3><p>The adjective rule says first, and every one of its 12 misses begins with a front piece that takes no push. Six begin with <em>a-</em> or <em>un-</em>: <em>afraid</em>, <em>alive</em>, <em>ashamed</em>, <em>aware</em>, <em>unclear</em> and <em>unlike</em>. The other six begin with a front piece that came with the word from Latin: <em>distinct</em>, <em>intense</em>, <em>precise</em>, <em>remote</em>, <em>severe</em> and <em>toward</em>. When a two-part adjective starts with a piece like these, the push is on the second part, and the rule for adjectives is best read as: first, unless the word begins with a front piece.</p><h3>Words that are both</h3><p>The lab also lists 49 words that the build step found to be both a noun and a verb, and for which the dictionary gives two readings, strong on different parts. They include <em>address</em>, <em>contract</em>, <em>increase</em>, <em>object</em>, <em>permit</em>, <em>present</em>, <em>produce</em>, <em>project</em>, <em>protest</em>, <em>record</em>, <em>refuse</em>, <em>subject</em> and <em>survey</em>. Take <em>present</em>: <em>a present</em> is strong on the first part, and <em>to present</em> on the second. Say each one in a sentence, and check yourself by asking which class you meant.</p><p>Two limits. The sounds are American, from the dictionary's first reading of each word, and a British speaker may put the push elsewhere in a few of them. And the rule tells you where the strong part is, not what the word means.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Where the strong part falls</h2></div><p>Each rule reads a word&#x27;s class or ending; the dictionary says which part is strong</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The words that break the rule</h2><div class="prose reading"><p>Say <em>money</em>. Then say <em>decide</em>. Both have two parts, and in each one part is stronger. In <em>money</em> it is the first. In <em>decide</em> it is the second. A listener uses the strong part to find the word, so a student who puts it in the wrong place is often not understood, even when every sound in the word is right.</p><h3>A part, and the strong part</h3><p>A <dfn>part</dfn> is one beat of a word. <em>Money</em> has two, <em>decide</em> has two and <em>tomorrow</em> has three. In every word of two or more parts, one part is said longer, louder and higher than the others. This course calls it the strong part. A pronouncing <dfn>dictionary</dfn>, a book that says how every word is said, marks it, and the page uses one.</p><h3>The rule</h3><ul><li>A <strong>noun</strong> of two parts is strong on the <strong>first</strong> part: <em>action</em>, <em>brother</em>, <em>country</em>, <em>kitchen</em>.</li><li>A <strong>verb</strong> of two parts is strong on the <strong>second</strong> part: <em>accept</em>, <em>agree</em>, <em>explain</em>, <em>enjoy</em>.</li><li>An <strong><dfn>adjective</dfn></strong> of two parts, a word that tells a quality, is strong on the <strong>first</strong> part, as a noun is: <em>angry</em>, <em>famous</em>, <em>lazy</em>. It is the weakest of the three rules.</li></ul><h3>How often the rule is right</h3><p>The lab takes the words of two parts that the build step found to be only a noun, only a verb or only an adjective, and checks each against the dictionary. Counted on this page, the noun rule is right for 207 of 231 words, 89.6%. The verb rule is right for 134 of 150, 89.3%. The adjective rule is right for 35 of 47, 74.5%.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Where the strong part falls</h2></div><p>Each rule reads a word&#x27;s class or ending; the dictionary says which part is strong</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>the rule</span><strong id="stRule">&mdash;</strong></div><div class="kpi"><span>words scored</span><strong id="stN">&mdash;</strong></div><div class="kpi"><span>the rule is right</span><strong id="stHit">&mdash;</strong></div><div class="kpi"><span>share right</span><strong id="stPct">&mdash;</strong></div><div class="kpi"><span>wrong</span><strong id="stMiss">&mdash;</strong></div><div class="kpi"><span>the words it gets wrong</span><strong id="stFirst">&mdash;</strong></div><div class="kpi"><span>words said both ways</span><strong id="stCount">&mdash;</strong></div></div><div class="kpi-grid"><div class="kpi"><span>weak parts with the flat vowel</span><strong id="stSchwa">&mdash;</strong></div><div class="kpi"><span>the flat vowel with r</span><strong id="stEr">&mdash;</strong></div><div class="kpi"><span>the vowel of sit</span><strong id="stIh">&mdash;</strong></div><div class="kpi"><span>the vowel of see</span><strong id="stIy">&mdash;</strong></div></div><p class="small-copy" id="stLimit"></p><div class="table-wrap" style="max-height:22rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="stTable"><thead><tr id="stCols"></tr></thead><tbody id="stBody"></tbody></table></div><details><summary>Where the sounds come from</summary><p class="small-copy">Every sound, part count and strong part here is read from the first pronunciation in CMUdict, the Carnegie Mellon University Pronouncing Dictionary, which records American speech. Its licence asks that this notice travel with anything made from it:</p><pre class="small-copy" style="white-space:pre-wrap;">Copyright (C) 1993-2015 Carnegie Mellon University. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -1430,17 +1473,20 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Score the rule for each kind of word</h3>
-          <p>Choose a kind of word. The page takes every word of that kind that has two parts, puts the strong part where the rule says, and checks it against the strong part a pronouncing dictionary marks. The setting called <em>the words set aside</em> shows which words were not scored, and why. The sounds are American, from the dictionary's first reading of each word.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Score the rule for each kind of word</h3>
+            <p>Choose a kind of word. The page takes every word of that kind that has two parts, puts the strong part where the rule says, and checks it against the strong part a pronouncing dictionary marks. The setting called <em>the words set aside</em> shows which words were not scored, and why. The sounds are American, from the dictionary's first reading of each word.</p>
 <label for="stPreset">Rule</label> <select id="stPreset"><option value="nouns2" selected="selected">two-part nouns: strong at the front</option><option value="verbs2">two-part verbs: strong at the back</option><option value="adj2">two-part adjectives: strong at the front</option><option value="pairs">words that are both, said both ways</option></select> <label for="stShow">List</label> <select id="stShow"><option value="misses" selected="selected">the words the rule gets wrong</option><option value="all">every word scored</option><option value="aside">the words set aside, and why</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Nine in ten is a good rule for a thing you do in every sentence. Three in four for adjectives is a weaker one, and the lab says so. Which words are only a noun, only a verb or only an adjective was decided once, from a printed word list, and is not on the page. The words that have more than one class, such as <em>answer</em>, are not scored, and the setting called <em>the words set aside</em> shows them.</p><h3>The 24 nouns that break the rule</h3><p>The noun rule says first, and these are said with the push somewhere else. They sort into three kinds.</p><ul><li><strong>A noun made from a verb</strong>: <em>advice</em>, <em>belief</em>, <em>complaint</em>, <em>constraint</em>, <em>defense</em>, <em>device</em>, <em>offense</em>, <em>relief</em>, <em>response</em> and <em>success</em>. Each is the verb's word in a new form: <em>advise</em>, <em>believe</em>, <em>complain</em>, <em>constrain</em>, <em>defend</em>, <em>devise</em>, <em>offend</em>, <em>relieve</em>, <em>respond</em>, <em>succeed</em>. The verb is strong at the back, and the noun keeps it there. Ten of the 24.</li><li><strong>A number or a month</strong>: <em>eighteen</em>, <em>fifteen</em> and <em>July</em>. The numbers that end in <em>-teen</em> take the push at the end, and that is how a listener tells <em>fifteen</em> from <em>fifty</em>. Three of the 24.</li><li><strong>A word that sits alone</strong>: <em>affair</em>, <em>decade</em>, <em>disease</em>, <em>estate</em>, <em>event</em>, <em>exam</em>, <em>extent</em>, <em>guitar</em>, <em>hello</em>, <em>hotel</em> and <em>technique</em>. Most of these came into English from French, which puts the push at the end of a word, and they kept it there. <em>Exam</em> is cut from <em>examination</em> and keeps that word's beat, and <em>hello</em> is a call, not a thing. Learn these as a list. Eleven of the 24.</li></ul><h3>The 16 verbs that break the rule</h3><p>The verb rule says second. Ten of the 16 are verbs whose second part is a weak ending: <em>alter</em>, <em>differ</em>, <em>enter</em>, <em>frighten</em>, <em>govern</em>, <em>listen</em>, <em>reckon</em>, <em>strengthen</em>, <em>suffer</em> and <em>threaten</em>. Say them and the second part is only a flat sound and a consonant, too light to carry the push, so it stays on the first. The other six are <em>argue</em>, <em>injure</em>, <em>license</em>, <em>locate</em>, <em>marry</em> and <em>premise</em>. <em>Argue</em>, <em>injure</em> and <em>marry</em> also end in a light second part. <em>License</em> and <em>premise</em> are nouns first and verbs second, and keep the noun's push. <em>Locate</em> is said both ways, and the dictionary's first reading is the American one. The last lesson of this course is about the flat sound.</p><h3>The 12 adjectives that break the rule</h3><p>The adjective rule says first, and every one of its 12 misses begins with a front piece that takes no push. Six begin with <em>a-</em> or <em>un-</em>: <em>afraid</em>, <em>alive</em>, <em>ashamed</em>, <em>aware</em>, <em>unclear</em> and <em>unlike</em>. The other six begin with a front piece that came with the word from Latin: <em>distinct</em>, <em>intense</em>, <em>precise</em>, <em>remote</em>, <em>severe</em> and <em>toward</em>. When a two-part adjective starts with a piece like these, the push is on the second part, and the rule for adjectives is best read as: first, unless the word begins with a front piece.</p><h3>Words that are both</h3><p>The lab also lists 49 words that the build step found to be both a noun and a verb, and for which the dictionary gives two readings, strong on different parts. They include <em>address</em>, <em>contract</em>, <em>increase</em>, <em>object</em>, <em>permit</em>, <em>present</em>, <em>produce</em>, <em>project</em>, <em>protest</em>, <em>record</em>, <em>refuse</em>, <em>subject</em> and <em>survey</em>. Take <em>present</em>: <em>a present</em> is strong on the first part, and <em>to present</em> on the second. Say each one in a sentence, and check yourself by asking which class you meant.</p><p>Two limits. The sounds are American, from the dictionary's first reading of each word, and a British speaker may put the push elsewhere in a few of them. And the rule tells you where the strong part is, not what the word means.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Putting the strong part in a new word</h2></div><p>Four steps, then a check.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the parts</h3><p>Say the word slowly and tap once for each beat. <em>Money</em> has two. If the word has one part, there is nothing to choose.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask what the word is doing in your sentence</h3><p>A thing, or an action? <em>I need advice</em> uses a noun. <em>I will believe it</em> uses a verb.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Noun: strong part first. Verb: strong part second</h3><p><em>Action</em>, <em>brother</em>, <em>country</em>. <em>Accept</em>, <em>agree</em>, <em>explain</em>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If the word is both, say it the way the sentence uses it</h3><p><em>Record</em> is strong on the first part as a noun and on the second part as a verb. The table lists 49 words like it.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check the short lists of words that break the rule</h3><p>Each miss has a reason, and the reasons are below.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Putting the strong part in a new word</h2>
+      <p class="lead-in">Four steps, then a check.</p>
+      <ol class="key-ideas method"><li><strong>Count the parts.</strong> Say the word slowly and tap once for each beat. <em>Money</em> has two. If the word has one part, there is nothing to choose.</li><li><strong>Ask what the word is doing in your sentence.</strong> A thing, or an action? <em>I need advice</em> uses a noun. <em>I will believe it</em> uses a verb.</li><li><strong>Noun: strong part first. Verb: strong part second.</strong> <em>Action</em>, <em>brother</em>, <em>country</em>. <em>Accept</em>, <em>agree</em>, <em>explain</em>.</li><li><strong>If the word is both, say it the way the sentence uses it.</strong> <em>Record</em> is strong on the first part as a noun and on the second part as a verb. The table lists 49 words like it.</li><li><strong>Check the short lists of words that break the rule.</strong> Each miss has a reason, and the reasons are below.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1458,17 +1504,16 @@ hotel   a noun    rule: first    said: second
 207 of 231 nouns, 134 of 150 verbs</div><p><em>Money</em> and <em>decide</em> are the usual case. The rule says where the strong part is, and the dictionary agrees.</p><p><em>Hotel</em> is a noun, so the rule says first, but it is said <em>ho</em>-<em>tel</em> with the push on the second part. It is one of the 11 nouns that sit alone, and the lab lists it with them. A rule counted on a list is a pattern, and a pattern has words outside it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the strong part has no rule</strong><span>To someone learning it looks like something to memorise one word at a time. For nouns and verbs of two parts there is a rule, and it is right 207 times of 231 and 134 times of 150, about nine times in ten.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the strong part on the same part in a noun and its verb</strong><span><em>I need a permit</em> and <em>they permit it</em> are different words to the ear. The noun is strong on the first part and the verb on the second. A listener hears the class before the sentence is finished.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using the rule for every word</strong><span>It covers words of two parts. A word of three parts such as <em>family</em> or <em>important</em> has its own patterns, and the next two lessons give the ones with an ending.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which part of a word of two parts is strong from the word class alone, and name the words that break the rule.</strong><p>You should be able to put the strong part first for a noun of two parts and second for a verb of two parts, read both rules' scores off the table, sort the words each rule misses into kinds, and say <em>record</em> both ways.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> <em>Record</em> is the clearest case of the rule at work. As a noun, <em>a record</em> is strong on the first part. As a verb, <em>to record</em> is strong on the second. The spelling is the same. The strong part tells the listener which word it is.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the strong part has no rule</strong><span>To someone learning it looks like something to memorise one word at a time. For nouns and verbs of two parts there is a rule, and it is right 207 times of 231 and 134 times of 150, about nine times in ten.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the strong part on the same part in a noun and its verb</strong><span><em>I need a permit</em> and <em>they permit it</em> are different words to the ear. The noun is strong on the first part and the verb on the second. A listener hears the class before the sentence is finished.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using the rule for every word</strong><span>It covers words of two parts. A word of three parts such as <em>family</em> or <em>important</em> has its own patterns, and the next two lessons give the ones with an ending.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say which part of a word of two parts is strong from the word class alone, and name the words that break the rule.</strong><p>You should be able to put the strong part first for a noun of two parts and second for a verb of two parts, read both rules' scores off the table, sort the words each rule misses into kinds, and say <em>record</em> both ways.</p></div></div><div class="note"><strong>Note:</strong> <em>Record</em> is the clearest case of the rule at work. As a noun, <em>a record</em> is strong on the first part. As a verb, <em>to record</em> is strong on the second. The spelling is the same. The strong part tells the listener which word it is.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>One part of every word is the strong part</summary><p>Say <em>money</em> slowly. The first part is longer, louder and higher than the second. That is the strong part. Every word of two or more parts has one, and the other parts are weak. A dictionary marks it, so the page can check any rule about it.</p></details><details class="recall"><summary>The word class picks the strong part</summary><p>A noun of two parts is strong on the first part: the first part of <em>money</em> or <em>action</em>. A verb of two parts is strong on the second: the second part of <em>decide</em> or <em>believe</em>. You do not learn each word. You ask what kind of word it is.</p></details><details class="recall"><summary>A rule is scored on the words it can be tried on</summary><p>Many common words are a noun and a verb at once, such as <em>answer</em> and <em>water</em>. For them the rule has nothing to say, because it needs one class. The table scores only the words that have one class, and keeps the words that have both on a list of their own.</p></details></div>
+      <h3>Summary</h3>
       <p>In a word of two parts, one part is said stronger than the other. Which one is not luck. A noun of two parts is strong on the first part, and a verb of two parts is strong on the second. The table scores both rules: each is right for about nine words in ten. Forty-nine words are both, and are said both ways.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>One part of every word is the strong part.</strong> Say <em>money</em> slowly. The first part is longer, louder and higher than the second. That is the strong part. Every word of two or more parts has one, and the other parts are weak. A dictionary marks it, so the page can check any rule about it.</li><li><strong>The word class picks the strong part.</strong> A noun of two parts is strong on the first part: the first part of <em>money</em> or <em>action</em>. A verb of two parts is strong on the second: the second part of <em>decide</em> or <em>believe</em>. You do not learn each word. You ask what kind of word it is.</li><li><strong>A rule is scored on the words it can be tried on.</strong> Many common words are a noun and a verb at once, such as <em>answer</em> and <em>water</em>. For them the rule has nothing to say, because it needs one class. The table scores only the words that have one class, and keeps the words that have both on a list of their own.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="noun of two parts, first, 207 of 231. verb of two parts, second, 134 of 150. adjective of two parts, first 35 of 47. money, action, decide, believe. 49 words are said both ways" tabindex="0" role="region" aria-label="Mathematical notation">noun of two parts: first    207 of 231
 verb of two parts: second   134 of 150
 adjective of two parts: first 35 of 47
@@ -2038,11 +2083,40 @@ var bSetText = function (id, text) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2110,7 +2184,7 @@ var bSetText = function (id, text) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

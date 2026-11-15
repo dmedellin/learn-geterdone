@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,63 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Software Craftsmanship</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 32 · Self-Documenting Code</p>
       <h1>Self-Documenting Code</h1>
       <p class="lesson-lede">Most of a program&#x27;s documentation is its style, and a comment earns its place by saying what the code cannot, at the level of summary or intent.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Self-documenting code</li><li>Kinds of comment</li><li>Comment density</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument, then two routines with comments</h2>
-      <article class="prose reading"><p><strong>Chapter 32, Key Points, p. 817.</strong> &ldquo;Comments should say things about the code that the code can’t say about itself—at the summary level or the intent level.&rdquo; Chapter 32, Self-Documenting Code, runs from page 777 to page 817. Read Sections 32.1 to 32.4 in your own copy before going on; Section 32.5 is a catalogue of techniques to keep beside you.</p><p>What, in the end, documents a program? The chapter's first answer is not comments. Section 32.1 (p. 777) sets aside the documentation kept outside the code, unit development folders and detailed-design documents, which on large, formal projects hold most of it. Section 32.2 (p. 778) then argues that the main contributor to documentation at the level of the code is programming style: good structure, straightforward approaches, good names for variables and routines, named constants in place of literals, clear layout, and as little complexity in control flow and data as the problem allows. Code that carries most of its own explanation in these ways is what McConnell calls self-documenting, and in such code the comments come last, as a finishing touch.</p><p>Section 32.3 (p. 781), To Comment or Not to Comment, is written as a dialogue, the Commento, set at the end of a team's daily stand-up, with characters given ancient Greek names. Its voices are not all McConnell's, and the section is easy to misquote if you forget it. Thrasymachus, a green purist, wants a standard that requires comments, and states the principle the chapter flags: good comments do not repeat the code but clarify its intent. Callicles, the veteran, holds that comments make code harder to read, are less precise than code, and go out of date. Glaucon, the young hot-shot, says that refactoring removes most of his comments. Ismene, a senior programmer who maintains other people's code, agrees that comments which repeat the code do not help, and says that she scans the comments to find the part she needs, as she would the headings of a technical book, and that a comment that is hard to write is a sign the code is not understood. Socrates closes by siding with her: encourage comments without being naive about them, and use reviews to learn which ones help. Ismene's is the position the rest of the chapter develops; Callicles' objections are the ones it answers.</p><p>Section 32.4 (p. 785) opens with three short routines, each with a comment. One comment is wrong, one repeats its code a statement at a time, and one, which names the method its routine uses, is the only one that earns its place. McConnell's conclusion is blunt: a poor comment is worse than none. He then sorts comments into six kinds (pp. 786&ndash;788):</p><ul><li>A repeat of the code says what the code says, in other words, and gives the reader more to read and nothing more to know.</li><li>An explanation of the code explains something complicated or tricky; the chapter's advice is usually to make the code clearer instead.</li><li>A marker is a note that the work is unfinished, to be removed before release; the book asks for one agreed marker, so that a search finds them all.</li><li>A summary distils a few lines into a sentence a reader can scan faster than the code.</li><li>A description of intent says what the code is for, in the problem's terms rather than the solution's.</li><li>Information the code cannot express: copyright and version notes, references to requirements, the source of an algorithm, notes for documentation tools.</li></ul><p>The three the chapter accepts in finished code are the last three: summary, intent, and what the code cannot express (p. 788). Why intent above all? The book cites a six-month study at IBM, published by Fjelstad and Hamlen in 1979, in which maintenance programmers said the hardest problem was understanding what the original programmer meant. The section then turns to cost. Comments need not be slow to write: choose a style that is easy to keep up to date, write the comments first as pseudocode, the method of the lesson “The Pseudocode Programming Process”, and do not skip them for speed, since a build step can strip them. On how many, the book reports (p. 792) that studies at IBM, as Capers Jones described them in 2000, found clarity peaked at about one comment for every ten statements, with fewer and with more both reducing it. That is a finding from other people's programs, reported at second hand, and McConnell warns against turning it into a quota: attend to whether each comment earns its place, and the number will look after itself.</p><p>Section 32.5 (p. 792) works through the techniques level by level: single lines (avoid comments at the end of a line, which are hard to maintain and tend to be cryptic), paragraphs of code (say why rather than how, and document surprises), data declarations (give units and allowed ranges), control structures, routines (keep the comment near the code, and document parameters where they are declared), and classes, files and whole programs. One piece of advice runs against a common habit (p. 801): do not comment tricky code, rewrite it, which the book takes from Kernighan and Plauger. Section 32.6 (p. 813) points to the IEEE standards for documentation beyond the source.</p><p>Now the code. The lab's size view counts a listing's lines by the rules printed under it. Lines is every line. Code lines are those with code outside comments, braces included. Statement lines are code lines that hold more than braces and semicolons, so a routine's header is one. Comment lines carry a comment, alone or after code; Blank lines are empty; Parameters are the routine's. Comment lines per statement line is the density, comment lines over statement lines, because the study the book reports counted comments per statement. Here is the <code>comments-repeat</code> preset:</p><pre class="codeblock" data-say="line 1, comment, Computes the average.. line 2, double average of array of double values. line 3, comment, set sum to zero. line 4, double sum is set to 0.0. line 5, comment, loop over the values. line 6, for int i is set to 0, i is less than values dot length, i is incremented. line 7, comment, add the value to the sum. line 8, sum is set to sum plus values at index i. line 10, comment, divide the sum by the length. line 11, return sum divided by values dot length" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Computes the average.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument, then two routines with comments</h2><div class="prose reading"><p><strong>Chapter 32, Key Points, p. 817.</strong> &ldquo;Comments should say things about the code that the code can’t say about itself—at the summary level or the intent level.&rdquo; Chapter 32, Self-Documenting Code, runs from page 777 to page 817. Read Sections 32.1 to 32.4 in your own copy before going on; Section 32.5 is a catalogue of techniques to keep beside you.</p><p>What, in the end, documents a program? The chapter's first answer is not comments. Section 32.1 (p. 777) sets aside the documentation kept outside the code, unit development folders and detailed-design documents, which on large, formal projects hold most of it. Section 32.2 (p. 778) then argues that the main contributor to documentation at the level of the code is programming style: good structure, straightforward approaches, good names for variables and routines, named constants in place of literals, clear layout, and as little complexity in control flow and data as the problem allows. Code that carries most of its own explanation in these ways is what McConnell calls self-documenting, and in such code the comments come last, as a finishing touch.</p><p>Section 32.3 (p. 781), To Comment or Not to Comment, is written as a dialogue, the Commento, set at the end of a team's daily stand-up, with characters given ancient Greek names. Its voices are not all McConnell's, and the section is easy to misquote if you forget it. Thrasymachus, a green purist, wants a standard that requires comments, and states the principle the chapter flags: good comments do not repeat the code but clarify its intent. Callicles, the veteran, holds that comments make code harder to read, are less precise than code, and go out of date. Glaucon, the young hot-shot, says that refactoring removes most of his comments. Ismene, a senior programmer who maintains other people's code, agrees that comments which repeat the code do not help, and says that she scans the comments to find the part she needs, as she would the headings of a technical book, and that a comment that is hard to write is a sign the code is not understood. Socrates closes by siding with her: encourage comments without being naive about them, and use reviews to learn which ones help. Ismene's is the position the rest of the chapter develops; Callicles' objections are the ones it answers.</p><p>Section 32.4 (p. 785) opens with three short routines, each with a comment. One comment is wrong, one repeats its code a statement at a time, and one, which names the method its routine uses, is the only one that earns its place. McConnell's conclusion is blunt: a poor comment is worse than none. He then sorts comments into six kinds (pp. 786&ndash;788):</p><ul><li>A repeat of the code says what the code says, in other words, and gives the reader more to read and nothing more to know.</li><li>An explanation of the code explains something complicated or tricky; the chapter's advice is usually to make the code clearer instead.</li><li>A marker is a note that the work is unfinished, to be removed before release; the book asks for one agreed marker, so that a search finds them all.</li><li>A summary distils a few lines into a sentence a reader can scan faster than the code.</li><li>A description of intent says what the code is for, in the problem's terms rather than the solution's.</li><li>Information the code cannot express: copyright and version notes, references to requirements, the source of an algorithm, notes for documentation tools.</li></ul><p>The three the chapter accepts in finished code are the last three: summary, intent, and what the code cannot express (p. 788). Why intent above all? The book cites a six-month study at IBM, published by Fjelstad and Hamlen in 1979, in which maintenance programmers said the hardest problem was understanding what the original programmer meant. The section then turns to cost. Comments need not be slow to write: choose a style that is easy to keep up to date, write the comments first as pseudocode, the method of the lesson “The Pseudocode Programming Process”, and do not skip them for speed, since a build step can strip them. On how many, the book reports (p. 792) that studies at IBM, as Capers Jones described them in 2000, found clarity peaked at about one comment for every ten statements, with fewer and with more both reducing it. That is a finding from other people's programs, reported at second hand, and McConnell warns against turning it into a quota: attend to whether each comment earns its place, and the number will look after itself.</p><p>Section 32.5 (p. 792) works through the techniques level by level: single lines (avoid comments at the end of a line, which are hard to maintain and tend to be cryptic), paragraphs of code (say why rather than how, and document surprises), data declarations (give units and allowed ranges), control structures, routines (keep the comment near the code, and document parameters where they are declared), and classes, files and whole programs. One piece of advice runs against a common habit (p. 801): do not comment tricky code, rewrite it, which the book takes from Kernighan and Plauger. Section 32.6 (p. 813) points to the IEEE standards for documentation beyond the source.</p><p>Now the code. The lab's size view counts a listing's lines by the rules printed under it. Lines is every line. Code lines are those with code outside comments, braces included. Statement lines are code lines that hold more than braces and semicolons, so a routine's header is one. Comment lines carry a comment, alone or after code; Blank lines are empty; Parameters are the routine's. Comment lines per statement line is the density, comment lines over statement lines, because the study the book reports counted comments per statement. Here is the <code>comments-repeat</code> preset:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>lines, statements, comments and parameters</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>lines, statements, comments and parameters</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>This view counts lines: code, statement, comment and blank lines, the routine's parameters, and comment lines over statement lines.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Lines, statements and comments</h3>
+            <p>A count over code, by the rules stated below the listing. The density is comment lines over statement lines. The lab cannot read a comment: sorting them by kind is yours to do. Load a preset, or paste a routine of your own.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="comments-repeat" selected>average: a comment over every statement</option><option value="comments-intent">mean: one comment stating its precondition</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Lines</span><strong id="coLines">&mdash;</strong></div>
+          <div class="kpi"><span>Code lines (braces included)</span><strong id="coCode">&mdash;</strong></div>
+          <div class="kpi"><span>Statement lines</span><strong id="coStatements">&mdash;</strong></div>
+          <div class="kpi"><span>Comment lines</span><strong id="coComment">&mdash;</strong></div>
+          <div class="kpi"><span>Blank lines</span><strong id="coBlank">&mdash;</strong></div>
+          <div class="kpi"><span>Parameters</span><strong id="coParams">&mdash;</strong></div>
+          <div class="kpi"><span>Comment lines per statement line</span><strong id="coDensity">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, Computes the average.. line 2, double average of array of double values. line 3, comment, set sum to zero. line 4, double sum is set to 0.0. line 5, comment, loop over the values. line 6, for int i is set to 0, i is less than values dot length, i is incremented. line 7, comment, add the value to the sum. line 8, sum is set to sum plus values at index i. line 10, comment, divide the sum by the length. line 11, return sum divided by values dot length" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Computes the average.</span>
 <span class="cl">double average(double[] values) {</span>
 <span class="cl">    // set sum to zero</span>
 <span class="cl">    double sum = 0.0;</span>
@@ -1467,55 +1556,12 @@
 <span class="cl">boolean isLeapYear(int year) {</span>
 <span class="cl">    // divisible by 4, except centuries, except every fourth century</span>
 <span class="cl">    return (year % 4 == 0 &amp;&amp; year % 100 != 0) || year % 400 == 0;</span>
-<span class="cl">}</span></code></pre><p>Without the lab, count <span class="math" data-say="is leap year">isLeapYear</span>'s statement lines and comment lines by the rules above, compute the density, and mark each comment as a repeat of the code, an explanation, a summary or a statement of intent. Then set its density beside the comments-repeat preset's and say what the comparison does not tell you. The lab will check your counts afterwards; one of the quiz questions gives the answer.</p><p>Whether a comment gets written, and kept true, is a habit. The next lesson, “Personal Character”, reads Chapter 33 on the habits and traits McConnell thinks matter most.</p></article>
+<span class="cl">}</span></code></pre><p>Without the lab, count <span class="math" data-say="is leap year">isLeapYear</span>'s statement lines and comment lines by the rules above, compute the density, and mark each comment as a repeat of the code, an explanation, a summary or a statement of intent. Then set its density beside the comments-repeat preset's and say what the comparison does not tell you. The lab will check your counts afterwards; one of the quiz questions gives the answer.</p><p>Whether a comment gets written, and kept true, is a habit. The next lesson, “Personal Character”, reads Chapter 33 on the habits and traits McConnell thinks matter most.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>lines, statements, comments and parameters</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>lines, statements, comments and parameters</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>This view counts lines: code, statement, comment and blank lines, the routine's parameters, and comment lines over statement lines.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Lines, statements and comments</h3>
-          <p>A count over code, by the rules stated below the listing. The density is comment lines over statement lines. The lab cannot read a comment: sorting them by kind is yours to do. Load a preset, or paste a routine of your own.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="comments-repeat" selected>average: a comment over every statement</option><option value="comments-intent">mean: one comment stating its precondition</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Lines</span><strong id="coLines">&mdash;</strong></div>
-          <div class="kpi"><span>Code lines (braces included)</span><strong id="coCode">&mdash;</strong></div>
-          <div class="kpi"><span>Statement lines</span><strong id="coStatements">&mdash;</strong></div>
-          <div class="kpi"><span>Comment lines</span><strong id="coComment">&mdash;</strong></div>
-          <div class="kpi"><span>Blank lines</span><strong id="coBlank">&mdash;</strong></div>
-          <div class="kpi"><span>Parameters</span><strong id="coParams">&mdash;</strong></div>
-          <div class="kpi"><span>Comment lines per statement line</span><strong id="coDensity">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring and sorting a routine&#x27;s comments</h2></div><p>Five steps, the last on a routine of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the statement lines</h3><p>Count the lines with code outside comments that hold more than braces and semicolons. The routine's header is one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the comment lines</h3><p>Count every line that carries a comment, alone or after code.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the density</h3><p>Divide comment lines by statement lines. It says how many comments there are per statement and nothing about what they say.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Sort each comment by kind</h3><p>Mark each one as a repeat of the code, an explanation, a marker, a summary, a statement of intent, or information the code cannot express. The last three are the ones the chapter keeps in finished code.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Measure a routine of your own</h3><p>Paste a routine of yours into the lab and note the Comment lines count and the density. Mark each comment by kind, and write down how many repeat the code and what one comment the routine is missing would say.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring and sorting a routine&#x27;s comments</h2>
+      <p class="lead-in">Five steps, the last on a routine of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the statement lines.</strong> Count the lines with code outside comments that hold more than braces and semicolons. The routine's header is one.</li><li><strong>Count the comment lines.</strong> Count every line that carries a comment, alone or after code.</li><li><strong>Compute the density.</strong> Divide comment lines by statement lines. It says how many comments there are per statement and nothing about what they say.</li><li><strong>Sort each comment by kind.</strong> Mark each one as a repeat of the code, an explanation, a marker, a summary, a statement of intent, or information the code cannot express. The last three are the ones the chapter keeps in finished code.</li><li><strong>Measure a routine of your own.</strong> Paste a routine of yours into the lab and note the Comment lines count and the density. Mark each comment by kind, and write down how many repeat the code and what one comment the routine is missing would say.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1533,17 +1579,16 @@ density: 1/5, which is 20 percent
 repeats of the code: 5 of 5, and 0 of 1</div><p>The routine with five times the density says less: every one of its comments repeats the code, and the one comment in the other states a precondition the code cannot.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more comments mean better documentation</strong><span>On the lesson's illustration the density of comments-repeat is five times that of comments-intent, 100% against 20%, and every one of its comments repeats the code; the one comment in comments-intent states a precondition the code cannot. A routine can match that density with every comment earning its place, and the count would not tell you; the exercise asks you to find out which kind isLeapYear is. The chapter's argument (pp. 785&ndash;788) is that a comment is judged by its kind: a repeat of the code adds reading and no knowledge, a wrong comment does harm, and only summary, intent and what the code cannot express earn a place. The count is not the test.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Commenting tricky code to make it safe</strong><span>A warning comment over a delicate passage feels responsible. The chapter calls it exactly the wrong approach (p. 801): a comment cannot rescue difficult code, and the advice it takes from Kernighan and Plauger is to rewrite the code. It makes one exception, for code you are maintaining and have no latitude to rewrite.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating one comment in ten as a quota</strong><span>The figure is from IBM studies, as Jones reports it. McConnell warns that such research gets turned into standards like a comment every five lines, which treat the symptom and not the cause (p. 792). His advice is to ask of each comment whether it earns its place and let the number follow.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Count, compute and sort a routine&#x27;s comments</strong><p>For a routine such as the exercise's isLeapYear, count its statement lines and comment lines, compute the density, and mark each comment by the chapter's kinds. You meet the standard when your counts match the lab's and you can say, for each comment, what it tells a reader that the code does not.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts lines; it cannot read a comment. It cannot tell a comment that repeats the code from one that states intent, or a true comment from a stale one, and both presets would print the same densities if every comment in them were wrong. The kinds are your judgement, made with the chapter's categories. The one-in-ten figure is from IBM studies, as Jones reports it; your own code reviews are the better test of whether your comments help.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more comments mean better documentation</strong><span>On the lesson's illustration the density of comments-repeat is five times that of comments-intent, 100% against 20%, and every one of its comments repeats the code; the one comment in comments-intent states a precondition the code cannot. A routine can match that density with every comment earning its place, and the count would not tell you; the exercise asks you to find out which kind isLeapYear is. The chapter's argument (pp. 785&ndash;788) is that a comment is judged by its kind: a repeat of the code adds reading and no knowledge, a wrong comment does harm, and only summary, intent and what the code cannot express earn a place. The count is not the test.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Commenting tricky code to make it safe</strong><span>A warning comment over a delicate passage feels responsible. The chapter calls it exactly the wrong approach (p. 801): a comment cannot rescue difficult code, and the advice it takes from Kernighan and Plauger is to rewrite the code. It makes one exception, for code you are maintaining and have no latitude to rewrite.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating one comment in ten as a quota</strong><span>The figure is from IBM studies, as Jones reports it. McConnell warns that such research gets turned into standards like a comment every five lines, which treat the symptom and not the cause (p. 792). His advice is to ask of each comment whether it earns its place and let the number follow.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Count, compute and sort a routine&#x27;s comments</strong><p>For a routine such as the exercise's isLeapYear, count its statement lines and comment lines, compute the density, and mark each comment by the chapter's kinds. You meet the standard when your counts match the lab's and you can say, for each comment, what it tells a reader that the code does not.</p></div></div><div class="note"><strong>Note:</strong> The lab counts lines; it cannot read a comment. It cannot tell a comment that repeats the code from one that states intent, or a true comment from a stale one, and both presets would print the same densities if every comment in them were wrong. The kinds are your judgement, made with the chapter's categories. The one-in-ten figure is from IBM studies, as Jones reports it; your own code reviews are the better test of whether your comments help.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Self-documenting code</summary><p>Code whose structure, names, named constants and layout carry most of its explanation. McConnell calls it the main contributor to documentation at the level of the code, and treats comments as the finishing touch on it.</p></details><details class="recall"><summary>Kinds of comment</summary><p>The chapter's six: a repeat of the code, an explanation of it, a marker of unfinished work, a summary, a description of intent, and information the code cannot express. Only the last three belong in finished code.</p></details><details class="recall"><summary>Comment density</summary><p>Comment lines over statement lines. The lab computes it because the study the book reports counted comments per statement; it measures how many comments there are, not what any of them says.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 32 argues that good code is its own best documentation and that a comment should say what the code cannot. Count a routine's comment lines against its statement lines, sort each comment by the chapter's kinds, and see why a density cannot tell a useful comment from a useless one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Self-documenting code.</strong> Code whose structure, names, named constants and layout carry most of its explanation. McConnell calls it the main contributor to documentation at the level of the code, and treats comments as the finishing touch on it.</li><li><strong>Kinds of comment.</strong> The chapter's six: a repeat of the code, an explanation of it, a marker of unfinished work, a summary, a description of intent, and information the code cannot express. Only the last three belong in finished code.</li><li><strong>Comment density.</strong> Comment lines over statement lines. The lab computes it because the study the book reports counted comments per statement; it measures how many comments there are, not what any of them says.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="style documents more than comments. density is comment lines divided by statement lines. repeating the code adds nothing. keep summary, intent, what code cannot say. the kind of comment matters, not the count" tabindex="0" role="region" aria-label="Mathematical notation">style documents more than comments
 density is comment lines / statement lines
 repeating the code adds nothing
@@ -2534,11 +2579,40 @@ the kind of comment matters, not the count</div><figcaption>Chapter 32 in five l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2606,7 +2680,7 @@ the kind of comment matters, not the count</div><figcaption>Chapter 32 in five l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

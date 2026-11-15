@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Accelerate and Measuring Performance</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · Measuring Performance</p>
       <h1>High, Medium and Low Performers</h1>
       <p class="lesson-lede">Cluster analysis groups teams by their four answers with no notion of good or bad, and finds that the groups differ on all four at once.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Cluster analysis</li><li>Ward&#x27;s method</li><li>Fusion coefficient</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Groups that the data draw, and what the authors found</h2>
-      <article class="prose reading"><p>Having chosen four measures, the authors needed a way to say who performs well on them. They use cluster analysis, which sorts responses into groups whose members resemble one another more than they resemble anyone outside. The four answers are four axes; the method sees only how far apart responses lie, and cannot know that one answer is better than another. That, they say, lets the industry's groups emerge without a prior view of what good looks like. The coding of answers into numbers and the distance used are the lab's, not the book's.</p><p>Appendix C gives the method. They tried five hierarchical methods, Ward's among them, and compared the solutions by the change in fusion coefficients, by the number in each cluster (solutions with tiny clusters were set aside) and by univariate F-statistics; Ward's gave the best solution. They chose a hierarchical method because it shows how clusters join, because they had no theory about how many groups to expect and wanted the data to say, and because the dataset was not too large for it. Chapter 12 has a short box, What Is Clustering?, on the same choice, and the chapter&rsquo;s own footnote sends the reader on to an appendix.</p><p>The result, which the authors report for each of the four years: there were significantly different categories of delivery performance, all four measures were good classifiers, and the high, medium and low groups differed significantly on every one. In their account of the 2017 data, high performers deploy on demand, have lead times and times to restore under an hour and change fail rates of 0 to 15 percent, while the low performers deploy between once a week and once a month and take between a day and a week to restore, with change fail rates of 31 to 45 percent. The book flags that the low and medium groups shared a median on two measures, deployment frequency and lead time, and that the low group was worse on average at a statistically significant level. The tables are the book&rsquo;s; the lesson&rsquo;s sample is not drawn from them.</p><p>Then the authors&rsquo; headline: &ldquo;Astonishingly, these results demonstrate that there is no tradeoff between improving performance and achieving higher levels of stability and quality&rdquo;. The better groups are better on tempo and on stability together, which is what Agile and Lean predict, and which they set against the view that moving faster means giving up something else. Fowler&rsquo;s foreword states it as speed depending on stability. Note what it says and no more: in their survey, the groups that are quick are also the groups that recover quickly and fail less. It is a description of the groups, and the authors take up why in later chapters.</p><p>They also report the trend. High performers in 2017 maintained or improved on 2016. Low performers kept the same throughput from 2014 to 2016 and began to speed up in 2017, but lost ground on stability, which the authors suspect is the result of pushing harder without tackling what is in the way: rearchitecture, process improvement, automation. So the groups are not fixed targets. What counted as strong three years earlier, they write, is not good enough now, and the clusters are redrawn from each year&rsquo;s data.</p><p>One box in the chapter, headed Surprise!, is the honest part. In 2016 the medium performers did worse than the low performers on change fail rate, the first year of any inconsistency across the measures. The research does not explain it conclusively. The authors suggest that medium performers were in the middle of large rearchitecture work, and recall that in the same year they spent more time on unplanned rework than the low group, because they spent more on new work, perhaps at the expense of rework and so with technical debt and more fragile systems. It is offered as a possible reason, and the lesson does not claim more for it.</p><p>Now the method, by hand and in the lab. Take each team as a point whose coordinates are its four answers, coded 1 for the best option to 6. Start with every team on its own. At each step, merge the two groups for which the merger raises the within-group sum of squares least: for groups of sizes <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> that is <span class="math" data-say="A times b over the quantity A plus b">a·b/(a + b)</span> times the squared distance between their centres, and for two single teams it is half their squared distance. That increase is the fusion coefficient. Ties are broken in favour of the earlier team in the list. The lab prints the merges in order, the groups at the number you ask for, and each group&rsquo;s median on each measure in the book&rsquo;s own words.</p><p>The preset <code>ten-teams</code> is ten invented teams, coded on deployment frequency, lead time, time to restore and change fail rate, with three groups asked for. The nine merges cost 1/2, 5/6, 1, 3/2, 5/3, 5/3, 23/6, 25/2 and 63; the early ones join near neighbours and cost less than 2. Three groups remain after the 23/6 merge, which joined <code>T08</code> to <code>T09</code> and <code>T10</code>, and the next merge, the lab shows, would cost 25/2. The total within-group sum of squares is 11. Group G1, <code>T01</code> to <code>T04</code>, has median codes 1, 1, 2 and 2: deploying on demand, lead times under an hour, restoring within a day, and change fail rates of 16 to 30 percent. G2, <code>T05</code> to <code>T07</code>, has 3, 3, 3 and 3, between a day and a week on the first three and 31 to 45 percent. G3, <code>T08</code> to <code>T10</code>, has 5, 5, 5 and 4, between a month and six months and 46 to 60 percent. Whether to call one group high is for the reader, who reads the medians; the lab does not know.</p><p>The preset <code>two-groups</code> asks for two groups from the same ten teams. The hierarchy is the same, carried one merge further: G2 and G3 become one group, at a cost of 25/2, which raises the total within-group sum of squares from 11 to 23.5, and its medians are all 4, between a week and a month on the first three and 46 to 60 percent on the last. That is the use of the fusion coefficients in Appendix C. The costs of reaching three, two and one groups are 23/6, 25/2 and 63, and each jump says that more unlike groups are being forced together. The sample cannot say which cut is right, because that is a judgement the authors also made with other criteria. Nor was it written to show a trade-off either way: it was written so that groups come out, and the book&rsquo;s finding is about its own survey.</p><h3>Exercise</h3><p>Four teams, coded on deployment frequency, lead time, time to restore and change fail rate: <span class="math" data-say="quay">Quay</span> 1, 1, 1, 2; <span class="math" data-say="ridge">Ridge</span> 1, 2, 1, 2; <span class="math" data-say="shoal">Shoal</span> 4, 4, 3, 3; <span class="math" data-say="tarn">Tarn</span> 5, 4, 3, 4.</p><p>Find the squared distance between each pair of teams, then the first merge and its fusion coefficient, then the groups for two clusters. Type the teams into the lab to check, and then change <span class="math" data-say="tarn">Tarn</span> to 1, 1, 1, 2 and say what happens to the merges.</p><p>The next lesson, Delivery and Organizational Performance, asks the question that gives the groups their point: whether the high performers' organizations do better.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Delivery performance</h2></div><p>Ward&#x27;s hierarchical clustering of coded answers</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Groups that the data draw, and what the authors found</h2><div class="prose reading"><p>Having chosen four measures, the authors needed a way to say who performs well on them. They use cluster analysis, which sorts responses into groups whose members resemble one another more than they resemble anyone outside. The four answers are four axes; the method sees only how far apart responses lie, and cannot know that one answer is better than another. That, they say, lets the industry's groups emerge without a prior view of what good looks like. The coding of answers into numbers and the distance used are the lab's, not the book's.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Delivery performance</h2></div><p>Ward&#x27;s hierarchical clustering of coded answers</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Delivery performance</strong><span>Ward's hierarchical clustering of coded answers</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="adeTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="adeTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each team is a point of four codes, 1 to 6, one per measure. Ward's method starts with every team alone and merges, at each step, the two groups whose merge adds least to the total within-group sum of squares (squared Euclidean distance of each team from its group's mean, summed); that increase, nA·nB/(nA + nB) times the squared distance between the two means, is the merge's fusion coefficient, an exact fraction. The clustering does not know which end of a scale is better; it groups by distance alone. Groups are kept in the order of their earliest team in the input, and a tie between merges goes to the pair whose first group comes earliest, then whose second does. Groups are named G1, G2, … in that order at k. A group's median on a measure is the middle code, or the mean of the two middle codes, decoded to the book's option (a half code shows both neighbours). The table runs every merge down to one group.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which teams the clustering groups together</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which teams the clustering groups together</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="adePreset">Worked example</label>
           <select id="adePreset"><option value="ten-teams" selected>Ten invented teams, three groups</option><option value="two-groups">The same ten teams, two groups</option></select>
@@ -1436,12 +1479,15 @@
           <div class="kpi"><span>Fusion coefficient of the next merge (to k − 1)</span><strong id="adeNextCoef">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Appendix C gives the method. They tried five hierarchical methods, Ward's among them, and compared the solutions by the change in fusion coefficients, by the number in each cluster (solutions with tiny clusters were set aside) and by univariate F-statistics; Ward's gave the best solution. They chose a hierarchical method because it shows how clusters join, because they had no theory about how many groups to expect and wanted the data to say, and because the dataset was not too large for it. Chapter 12 has a short box, What Is Clustering?, on the same choice, and the chapter&rsquo;s own footnote sends the reader on to an appendix.</p><p>The result, which the authors report for each of the four years: there were significantly different categories of delivery performance, all four measures were good classifiers, and the high, medium and low groups differed significantly on every one. In their account of the 2017 data, high performers deploy on demand, have lead times and times to restore under an hour and change fail rates of 0 to 15 percent, while the low performers deploy between once a week and once a month and take between a day and a week to restore, with change fail rates of 31 to 45 percent. The book flags that the low and medium groups shared a median on two measures, deployment frequency and lead time, and that the low group was worse on average at a statistically significant level. The tables are the book&rsquo;s; the lesson&rsquo;s sample is not drawn from them.</p><p>Then the authors&rsquo; headline: &ldquo;Astonishingly, these results demonstrate that there is no tradeoff between improving performance and achieving higher levels of stability and quality&rdquo;. The better groups are better on tempo and on stability together, which is what Agile and Lean predict, and which they set against the view that moving faster means giving up something else. Fowler&rsquo;s foreword states it as speed depending on stability. Note what it says and no more: in their survey, the groups that are quick are also the groups that recover quickly and fail less. It is a description of the groups, and the authors take up why in later chapters.</p><p>They also report the trend. High performers in 2017 maintained or improved on 2016. Low performers kept the same throughput from 2014 to 2016 and began to speed up in 2017, but lost ground on stability, which the authors suspect is the result of pushing harder without tackling what is in the way: rearchitecture, process improvement, automation. So the groups are not fixed targets. What counted as strong three years earlier, they write, is not good enough now, and the clusters are redrawn from each year&rsquo;s data.</p><p>One box in the chapter, headed Surprise!, is the honest part. In 2016 the medium performers did worse than the low performers on change fail rate, the first year of any inconsistency across the measures. The research does not explain it conclusively. The authors suggest that medium performers were in the middle of large rearchitecture work, and recall that in the same year they spent more time on unplanned rework than the low group, because they spent more on new work, perhaps at the expense of rework and so with technical debt and more fragile systems. It is offered as a possible reason, and the lesson does not claim more for it.</p><p>Now the method, by hand and in the lab. Take each team as a point whose coordinates are its four answers, coded 1 for the best option to 6. Start with every team on its own. At each step, merge the two groups for which the merger raises the within-group sum of squares least: for groups of sizes <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> that is <span class="math" data-say="A times b over the quantity A plus b">a·b/(a + b)</span> times the squared distance between their centres, and for two single teams it is half their squared distance. That increase is the fusion coefficient. Ties are broken in favour of the earlier team in the list. The lab prints the merges in order, the groups at the number you ask for, and each group&rsquo;s median on each measure in the book&rsquo;s own words.</p><p>The preset <code>ten-teams</code> is ten invented teams, coded on deployment frequency, lead time, time to restore and change fail rate, with three groups asked for. The nine merges cost 1/2, 5/6, 1, 3/2, 5/3, 5/3, 23/6, 25/2 and 63; the early ones join near neighbours and cost less than 2. Three groups remain after the 23/6 merge, which joined <code>T08</code> to <code>T09</code> and <code>T10</code>, and the next merge, the lab shows, would cost 25/2. The total within-group sum of squares is 11. Group G1, <code>T01</code> to <code>T04</code>, has median codes 1, 1, 2 and 2: deploying on demand, lead times under an hour, restoring within a day, and change fail rates of 16 to 30 percent. G2, <code>T05</code> to <code>T07</code>, has 3, 3, 3 and 3, between a day and a week on the first three and 31 to 45 percent. G3, <code>T08</code> to <code>T10</code>, has 5, 5, 5 and 4, between a month and six months and 46 to 60 percent. Whether to call one group high is for the reader, who reads the medians; the lab does not know.</p><p>The preset <code>two-groups</code> asks for two groups from the same ten teams. The hierarchy is the same, carried one merge further: G2 and G3 become one group, at a cost of 25/2, which raises the total within-group sum of squares from 11 to 23.5, and its medians are all 4, between a week and a month on the first three and 46 to 60 percent on the last. That is the use of the fusion coefficients in Appendix C. The costs of reaching three, two and one groups are 23/6, 25/2 and 63, and each jump says that more unlike groups are being forced together. The sample cannot say which cut is right, because that is a judgement the authors also made with other criteria. Nor was it written to show a trade-off either way: it was written so that groups come out, and the book&rsquo;s finding is about its own survey.</p><h3>Exercise</h3><p>Four teams, coded on deployment frequency, lead time, time to restore and change fail rate: <span class="math" data-say="quay">Quay</span> 1, 1, 1, 2; <span class="math" data-say="ridge">Ridge</span> 1, 2, 1, 2; <span class="math" data-say="shoal">Shoal</span> 4, 4, 3, 3; <span class="math" data-say="tarn">Tarn</span> 5, 4, 3, 4.</p><p>Find the squared distance between each pair of teams, then the first merge and its fusion coefficient, then the groups for two clusters. Type the teams into the lab to check, and then change <span class="math" data-say="tarn">Tarn</span> to 1, 1, 1, 2 and say what happens to the merges.</p><p>The next lesson, Delivery and Organizational Performance, asks the question that gives the groups their point: whether the high performers' organizations do better.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Clustering by hand</h2></div><p>Four steps, the last of them on teams you know.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Code every team</h3><p>Put each team's four answers on the 1 to 6 scales, 1 the best option on each, and write them as four numbers.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the cheapest merge</h3><p>For every pair of groups compute the cost of joining them, and merge the cheapest. Repeat until one group is left, writing down each cost.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Cut the tree</h3><p>Pick the number of groups, look at where the costs jump, and read each group's median on each measure in words.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on teams you know</h3><p>Code five or six teams near you, type them in, and compare the groups with your own idea of which teams are alike.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Clustering by hand</h2>
+      <p class="lead-in">Four steps, the last of them on teams you know.</p>
+      <ol class="key-ideas method"><li><strong>Code every team.</strong> Put each team's four answers on the 1 to 6 scales, 1 the best option on each, and write them as four numbers.</li><li><strong>Find the cheapest merge.</strong> For every pair of groups compute the cost of joining them, and merge the cheapest. Repeat until one group is left, writing down each cost.</li><li><strong>Cut the tree.</strong> Pick the number of groups, look at where the costs jump, and read each group's median on each measure in words.</li><li><strong>Do it on teams you know.</strong> Code five or six teams near you, type them in, and compare the groups with your own idea of which teams are alike.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1506,16 @@ squared distance: 0 + 0 + 1 + 0.25 = 1.25
 T04 joins at (2 · 1 / 3) · 1.25 = 5/6</div><p>Each merge is the cheapest available, which the lab found by trying every pair. The later merges, 1, 3/2, 5/3, 5/3, 23/6, 25/2 and 63, are the same arithmetic on larger groups' centres.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the clustering tells you which group is high performing</strong><span>The method sees distances and nothing else. We call a group high performing because we read its medians afterwards and see that they are the best options. The lab prints the medians so that the reading is yours.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading no trade-off as proof that speed causes stability</strong><span>The authors report that the high group is better on all four measures in their survey, which is evidence against the idea that speed must be bought with quality. Why the measures go together is a question for the later chapters on practices, and the lesson's invented teams were written to cluster, and show nothing about it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the groups as fixed bands every team can be placed in</strong><span>The groups are drawn from each year's responses, and the authors report that the high group kept pulling away and that last year's good was not enough. A cluster is a description of one sample in one year.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a fusion coefficient costs.</strong><p>Given teams coded on the four measures, merge them by Ward's method, write the cost of each merge, and read the groups' medians in words.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab clusters the teams you code, exactly, and reads the groups' medians. It cannot say how many groups are right, whether the answers are honest, or whether the groups mean anything about causes; the book's groups come from its survey's responses, and the lab's ten teams are invented.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the clustering tells you which group is high performing</strong><span>The method sees distances and nothing else. We call a group high performing because we read its medians afterwards and see that they are the best options. The lab prints the medians so that the reading is yours.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading no trade-off as proof that speed causes stability</strong><span>The authors report that the high group is better on all four measures in their survey, which is evidence against the idea that speed must be bought with quality. Why the measures go together is a question for the later chapters on practices, and the lesson's invented teams were written to cluster, and show nothing about it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the groups as fixed bands every team can be placed in</strong><span>The groups are drawn from each year's responses, and the authors report that the high group kept pulling away and that last year's good was not enough. A cluster is a description of one sample in one year.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a fusion coefficient costs.</strong><p>Given teams coded on the four measures, merge them by Ward's method, write the cost of each merge, and read the groups' medians in words.</p></div></div><div class="note"><strong>Note:</strong> The lab clusters the teams you code, exactly, and reads the groups' medians. It cannot say how many groups are right, whether the answers are honest, or whether the groups mean anything about causes; the book's groups come from its survey's responses, and the lab's ten teams are invented.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Cluster analysis</summary><p>A way of grouping responses so that those in a group are more like one another than like those in other groups. Each measure is a dimension, and the method sees only the distances between responses, never whether an answer is a good one.</p></details><details class="recall"><summary>Ward&#x27;s method</summary><p>A hierarchical clustering: start with every team alone and merge, step by step, the two groups whose merger adds least to the spread within the groups. The authors compared it with four other methods and report that it performed best.</p></details><details class="recall"><summary>Fusion coefficient</summary><p>The cost of one merge: how much the within-group sum of squares grows when two groups join. Small early on, large when unlike groups are forced together; a jump is where to consider stopping.</p></details></div>
+      <h3>Summary</h3>
       <p>How do the authors get from four measures to high, medium and low performers? By a method that does not know which answers are good. Read what cluster analysis is, which variant they chose and why, what the groups look like in words, and the 2016 result that did not fit; then cluster ten invented teams with Ward's method and read the groups' medians.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Cluster analysis.</strong> A way of grouping responses so that those in a group are more like one another than like those in other groups. Each measure is a dimension, and the method sees only the distances between responses, never whether an answer is a good one.</li><li><strong>Ward&#x27;s method.</strong> A hierarchical clustering: start with every team alone and merge, step by step, the two groups whose merger adds least to the spread within the groups. The authors compared it with four other methods and report that it performed best.</li><li><strong>Fusion coefficient.</strong> The cost of one merge: how much the within-group sum of squares grows when two groups join. Small early on, large when unlike groups are forced together; a jump is where to consider stopping.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="cluster analysis cannot tell good from bad. Ward&#x27;s method, merge the cheapest pair. a fusion coefficient is the cost of a merge. high performers do better on all four. no tradeoff between tempo and stability. groups are drawn afresh from each year" tabindex="0" role="region" aria-label="Mathematical notation">cluster analysis cannot tell good from bad
 Ward&#x27;s method: merge the cheapest pair
 a fusion coefficient is the cost of a merge
@@ -2361,11 +2406,40 @@ groups are drawn afresh from each year</div><figcaption>High, medium and low in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2433,7 +2507,7 @@ groups are drawn afresh from each year</div><figcaption>High, medium and low in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,32 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Randomised Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Two kinds of guarantee</p>
       <h1>Repetition, and the Probability It Buys</h1>
       <p class="lesson-lede">Run a one-sided algorithm t times, keep the best answer, and compute the smallest t that reaches a stated target exactly.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Independent failures multiply</li><li>The error must be one-sided for this to work at all</li><li>The smallest t is found by multiplying, not by a logarithm</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Turning a coin-flip into a guarantee</h2>
-      <article class="prose reading"><p>The lab's hardest graph is two triangles joined by a single edge: <span class="math" data-say="1 minus 2, 1 minus 3, 2 minus 3, 4 minus 5, 4 minus 6, 5 minus 6, 3 minus 4">1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 3-4</span>. Seven edges, six vertices, and a unique minimum cut of one edge &mdash; the bridge <span class="math" data-say="3 minus 4">3-4</span>. There is exactly one way to succeed and the single edge has to survive all four contractions, which it does with probability <span class="math" data-say="13 over 35 is approximately 0.3714">13/35 ≈ 0.3714</span>. Over seeds 1 to 120 the algorithm succeeded 41 times and missed 79, the first miss being seed 1, which returned a cut of two edges.</p><p>One run at <span class="math" data-say="0.37">0.37</span> is not an algorithm anybody would use. The question this page answers is what it costs to turn it into one, and the answer is exact.</p><div class="thm"><span class="label">Theorem &middot; Amplification</span><p>Let one run of a Monte Carlo algorithm return a correct answer with probability at least <span class="math" data-say="p">p</span>, and suppose a wrong answer is never better than a correct one, so that keeping the best of several runs keeps a correct answer if any run produced one. Then <span class="math" data-say="t">t</span> independent runs return a correct answer with probability at least <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span>.</p></div><div class="proof"><p>Let <span class="math" data-say="A sub i">Aᵢ</span> be the event that run <span class="math" data-say="i">i</span> returns a correct answer, so <span class="math" data-say="P of A sub i is at least p">P(Aᵢ) ≥ p</span>. The kept answer is incorrect only if every run was incorrect, which is the intersection of the complements.</p><p>The runs use independent randomness, so those complements are independent and <span class="math" data-say="P of no run correct equals the product of P of not A sub i is at most the quantity 1 minus p, to the power t">P(no run correct) = Π P(not Aᵢ) ≤ (1 − p)ᵗ</span>. The kept answer is therefore correct with probability at least <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span>.</p><p>The hypothesis about wrong answers is where the &ldquo;keep the best&rdquo; step is discharged: without it, knowing that some run was correct does not tell you that the answer you kept is.</p><p><span class="qed">&#9633;</span></p></div><p>On the bridge graph that gives <span class="math" data-say="1 minus the quantity 22 over 35, to the power t">1 − (22/35)ᵗ</span>. The panel prints it at several values of <span class="math" data-say="t">t</span> as exact fractions with decimals beside them, and the growth is the one to internalise: each extra run multiplies the failure probability by <span class="math" data-say="22 over 35">22/35</span>, so failure decays geometrically while the work grows linearly.</p><div class="mathblock" data-say="t, P of at least one run succeeds, P of all t fail. 1, 13 over 35, equals 0.371429, 0.628571. 2, 741 over 1225, equals 0.604898, 0.395102. a table, shown on the page. smallest t reaching 99 over 100, 10. smallest t reaching 999 over 1000, 15" tabindex="0" role="region" aria-label="Mathematical notation">  t     P(at least one run succeeds)      P(all t fail)
-  1     13/35            = 0.371429       0.628571
-  2     741/1225         = 0.604898       0.395102
-  5     0.901876                          0.098124
- 10     0.990372                          0.009628
-
-  smallest t reaching  9/10   :  5
-  smallest t reaching 99/100  : 10
-  smallest t reaching 999/1000: 15</div><h3>The same arithmetic on an easier graph</h3><p>Switch to the two triangles joined by two edges, where one run succeeds with probability <span class="math" data-say="19 over 35">19/35</span>. Now three runs reach <span class="math" data-say="9 over 10">9/10</span>, six reach <span class="math" data-say="99 over 100">99/100</span> and nine reach <span class="math" data-say="999 over 1000">999/1000</span>. Compare with the bridge graph's 5, 10 and 15. The success probability changed by less than a factor of two and the cost of a given target changed by about the same factor, which is what a geometric decay predicts: halving <span class="math" data-say="p">p</span> roughly doubles the runs needed.</p><p>And on the four-cycle one run succeeds with probability <span class="math" data-say="1">1</span>, so the smallest <span class="math" data-say="t">t</span> for every target is <span class="math" data-say="1">1</span>, and the panel prints <span class="math" data-say="1">1</span> rather than a logarithm's rounded suggestion. That is the case where the general formula would still work and would be an odd thing to quote.</p><h3>What repetition does not buy</h3><p>It does not make the algorithm always correct. <span class="math" data-say="1 minus the quantity 22 over 35, to the power 15">1 − (22/35)¹⁵</span> is about <span class="math" data-say="0.9991">0.9991</span>, which is not <span class="math" data-say="1">1</span>, and no finite <span class="math" data-say="t">t</span> reaches <span class="math" data-say="1">1</span>. The panel's target menu offers <span class="math" data-say="9 over 10">9/10</span>, <span class="math" data-say="99 over 100">99/100</span> and <span class="math" data-say="999 over 1000">999/1000</span> rather than certainty for that reason. If you need certainty you need a different algorithm; what repetition buys is a failure probability you choose, at a cost you can compute.</p><p>It also does not help if the runs share randomness. Independence is a hypothesis of the theorem, and it is the hypothesis that a real implementation is most likely to break &mdash; by reusing a seed, by deriving all <span class="math" data-say="t">t</span> seeds from one in a way that correlates them, or by drawing from a generator whose low bits are a short cycle. The generator behind every lab on this course is a prime-modulus stream with a mixed seed for exactly that reason.</p><p>And it does not turn a one-sided guarantee into a two-sided one. Everything above rested on being able to prefer one answer to another. The next lesson's algorithm has the same structure from a different direction: a primality test whose positive findings are proofs and whose negative findings are silence, so that repeating it accumulates evidence in one direction only.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Karger&#x27;s contraction, and the probability it works</h2></div><p>The success probability is a recursion over contraction states, exact; the measured rate over seeds is not it, and repetition is what makes either of them useful</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Turning a coin-flip into a guarantee</h2><div class="prose reading"><p>The lab's hardest graph is two triangles joined by a single edge: <span class="math" data-say="1 minus 2, 1 minus 3, 2 minus 3, 4 minus 5, 4 minus 6, 5 minus 6, 3 minus 4">1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 3-4</span>. Seven edges, six vertices, and a unique minimum cut of one edge &mdash; the bridge <span class="math" data-say="3 minus 4">3-4</span>. There is exactly one way to succeed and the single edge has to survive all four contractions, which it does with probability <span class="math" data-say="13 over 35 is approximately 0.3714">13/35 ≈ 0.3714</span>. Over seeds 1 to 120 the algorithm succeeded 41 times and missed 79, the first miss being seed 1, which returned a cut of two edges.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Karger&#x27;s contraction, and the probability it works</h2></div><p>The success probability is a recursion over contraction states, exact; the measured rate over seeds is not it, and repetition is what makes either of them useful</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Karger's contraction, and the probability it works</strong><span>the exact success probability by recursion over contraction states, never by sampling</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>exact, over every contraction order</span><span class="tone-amber"><i class="legend-swatch"></i>measured, over the seeds shown</span><span class="tone-purple"><i class="legend-swatch"></i>one side of a minimum cut</span><span class="tone-green"><i class="legend-swatch"></i>the other side</span></div>
@@ -1413,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="kgCuts"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="kgAmp"></table></div>
       <div class="status-banner" id="kgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the graph, then read the exact probability against the measured rate</h3>
-          <p>Every minimum cut is found by exhaustive search over the bipartitions, and each one gets its exact probability. The algorithm succeeds if it returns <em>any</em> of them, which is a different number from the bound, and the bound is about one named cut. The seeds that failed are listed, because a with-high-probability guarantee that never shows a failure has not been demonstrated.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the graph, then read the exact probability against the measured rate</h3>
+            <p>Every minimum cut is found by exhaustive search over the bipartitions, and each one gets its exact probability. The algorithm succeeds if it returns <em>any</em> of them, which is a different number from the bound, and the bound is about one named cut. The seeds that failed are listed, because a with-high-probability guarantee that never shows a failure has not been demonstrated.</p>
         <div class="field">
           <label for="kgPreset">Worked example</label>
           <select id="kgPreset"><option value="barbell">two triangles joined by two edges</option><option value="cycle4">a four-cycle</option><option value="bridge" selected>two triangles joined by one edge</option><option value="parallel">a parallel pair between 1 and 2, five vertices</option><option value="star">a hub with a heavy rim — seven vertices</option></select>
@@ -1448,12 +1483,23 @@
           <div class="kpi"><span>Repetitions needed for the target</span><strong id="kgNeed">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="kgHint" style="margin:0;">An edge is <span class="tt">1-2</span>; write it twice for a parallel pair, which the algorithm treats as two chances to contract that pair. Contraction merges the endpoints of a uniformly random edge and drops the loops it creates. The exact column is a recursion over <em>contraction states</em> &mdash; not a sample and not an enumeration of edge orders, because different orders reach the same state and the algorithm&rsquo;s future depends only on the state.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>One run at <span class="math" data-say="0.37">0.37</span> is not an algorithm anybody would use. The question this page answers is what it costs to turn it into one, and the answer is exact.</p><div class="thm"><span class="label">Theorem &middot; Amplification</span><p>Let one run of a Monte Carlo algorithm return a correct answer with probability at least <span class="math" data-say="p">p</span>, and suppose a wrong answer is never better than a correct one, so that keeping the best of several runs keeps a correct answer if any run produced one. Then <span class="math" data-say="t">t</span> independent runs return a correct answer with probability at least <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span>.</p></div><div class="proof"><p>Let <span class="math" data-say="A sub i">Aᵢ</span> be the event that run <span class="math" data-say="i">i</span> returns a correct answer, so <span class="math" data-say="P of A sub i is at least p">P(Aᵢ) ≥ p</span>. The kept answer is incorrect only if every run was incorrect, which is the intersection of the complements.</p><p>The runs use independent randomness, so those complements are independent and <span class="math" data-say="P of no run correct equals the product of P of not A sub i is at most the quantity 1 minus p, to the power t">P(no run correct) = Π P(not Aᵢ) ≤ (1 − p)ᵗ</span>. The kept answer is therefore correct with probability at least <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span>.</p><p>The hypothesis about wrong answers is where the &ldquo;keep the best&rdquo; step is discharged: without it, knowing that some run was correct does not tell you that the answer you kept is.</p><p><span class="qed">&#9633;</span></p></div><p>On the bridge graph that gives <span class="math" data-say="1 minus the quantity 22 over 35, to the power t">1 − (22/35)ᵗ</span>. The panel prints it at several values of <span class="math" data-say="t">t</span> as exact fractions with decimals beside them, and the growth is the one to internalise: each extra run multiplies the failure probability by <span class="math" data-say="22 over 35">22/35</span>, so failure decays geometrically while the work grows linearly.</p><div class="mathblock" data-say="t, P of at least one run succeeds, P of all t fail. 1, 13 over 35, equals 0.371429, 0.628571. 2, 741 over 1225, equals 0.604898, 0.395102. a table, shown on the page. smallest t reaching 99 over 100, 10. smallest t reaching 999 over 1000, 15" tabindex="0" role="region" aria-label="Mathematical notation">  t     P(at least one run succeeds)      P(all t fail)
+  1     13/35            = 0.371429       0.628571
+  2     741/1225         = 0.604898       0.395102
+  5     0.901876                          0.098124
+ 10     0.990372                          0.009628
+
+  smallest t reaching  9/10   :  5
+  smallest t reaching 99/100  : 10
+  smallest t reaching 999/1000: 15</div><h3>The same arithmetic on an easier graph</h3><p>Switch to the two triangles joined by two edges, where one run succeeds with probability <span class="math" data-say="19 over 35">19/35</span>. Now three runs reach <span class="math" data-say="9 over 10">9/10</span>, six reach <span class="math" data-say="99 over 100">99/100</span> and nine reach <span class="math" data-say="999 over 1000">999/1000</span>. Compare with the bridge graph's 5, 10 and 15. The success probability changed by less than a factor of two and the cost of a given target changed by about the same factor, which is what a geometric decay predicts: halving <span class="math" data-say="p">p</span> roughly doubles the runs needed.</p><p>And on the four-cycle one run succeeds with probability <span class="math" data-say="1">1</span>, so the smallest <span class="math" data-say="t">t</span> for every target is <span class="math" data-say="1">1</span>, and the panel prints <span class="math" data-say="1">1</span> rather than a logarithm's rounded suggestion. That is the case where the general formula would still work and would be an odd thing to quote.</p><h3>What repetition does not buy</h3><p>It does not make the algorithm always correct. <span class="math" data-say="1 minus the quantity 22 over 35, to the power 15">1 − (22/35)¹⁵</span> is about <span class="math" data-say="0.9991">0.9991</span>, which is not <span class="math" data-say="1">1</span>, and no finite <span class="math" data-say="t">t</span> reaches <span class="math" data-say="1">1</span>. The panel's target menu offers <span class="math" data-say="9 over 10">9/10</span>, <span class="math" data-say="99 over 100">99/100</span> and <span class="math" data-say="999 over 1000">999/1000</span> rather than certainty for that reason. If you need certainty you need a different algorithm; what repetition buys is a failure probability you choose, at a cost you can compute.</p><p>It also does not help if the runs share randomness. Independence is a hypothesis of the theorem, and it is the hypothesis that a real implementation is most likely to break &mdash; by reusing a seed, by deriving all <span class="math" data-say="t">t</span> seeds from one in a way that correlates them, or by drawing from a generator whose low bits are a short cycle. The generator behind every lab on this course is a prime-modulus stream with a mixed seed for exactly that reason.</p><p>And it does not turn a one-sided guarantee into a two-sided one. Everything above rested on being able to prefer one answer to another. The next lesson's algorithm has the same structure from a different direction: a primality test whose positive findings are proofs and whose negative findings are silence, so that repeating it accumulates evidence in one direction only.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a target failure probability</h2></div><p>Establish one run's probability first; everything after it is one multiplication per run.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that the error is one-sided</h3><p>Can you tell a better answer from a worse one without knowing the truth? For a minimum cut, yes: fewer edges is better and nothing returned is ever below the minimum. If not, keeping the best of <span class="math" data-say="t">t</span> runs is keeping the most extreme error.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Get one run&#x27;s success probability, exactly if you can</h3><p>The panel computes it by recursion over contraction states. Where you cannot compute it, use the proved bound &mdash; and then the <span class="math" data-say="t">t</span> you derive is a bound on the runs needed rather than the exact number.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply, do not take a logarithm</h3><p><span class="math" data-say="1 minus p">(1 − p)</span> times itself, counting steps until it falls under <span class="math" data-say="1 minus target">1 − target</span>. This gives the least <span class="math" data-say="t">t</span> exactly. The logarithmic formula is a fine estimate and it rounds in an unstated direction, which matters when <span class="math" data-say="t">t</span> is small.</p></article><article class="card concept-card"><div class="icon">4</div><h3>State the failure probability you have bought</h3><p>Ten runs on the bridge graph leave a failure probability of about <span class="math" data-say="0.0096">0.0096</span>, not zero. Write that number down next to the answer; it is the part of the guarantee that is easiest to drop and the only part that is a risk.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Pricing a target failure probability</h2>
+      <p class="lead-in">Establish one run's probability first; everything after it is one multiplication per run.</p>
+      <ol class="key-ideas method"><li><strong>Check that the error is one-sided.</strong> Can you tell a better answer from a worse one without knowing the truth? For a minimum cut, yes: fewer edges is better and nothing returned is ever below the minimum. If not, keeping the best of <span class="math" data-say="t">t</span> runs is keeping the most extreme error.</li><li><strong>Get one run&#x27;s success probability, exactly if you can.</strong> The panel computes it by recursion over contraction states. Where you cannot compute it, use the proved bound &mdash; and then the <span class="math" data-say="t">t</span> you derive is a bound on the runs needed rather than the exact number.</li><li><strong>Multiply, do not take a logarithm.</strong> <span class="math" data-say="1 minus p">(1 − p)</span> times itself, counting steps until it falls under <span class="math" data-say="1 minus target">1 − target</span>. This gives the least <span class="math" data-say="t">t</span> exactly. The logarithmic formula is a fine estimate and it rounds in an unstated direction, which matters when <span class="math" data-say="t">t</span> is small.</li><li><strong>State the failure probability you have bought.</strong> Ten runs on the bridge graph leave a failure probability of about <span class="math" data-say="0.0096">0.0096</span>, not zero. Write that number down next to the answer; it is the part of the guarantee that is easiest to drop and the only part that is a risk.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1484,17 +1530,16 @@ MEASURED, one run each, seeds 1..120
   missed    79 of 120,  first miss seed 1, which returned 2 edges</div><p>The measured rate <span class="math" data-say="41 over 120 is approximately 0.342">41/120 ≈ 0.342</span> sits below the exact <span class="math" data-say="13 over 35 is approximately 0.371">13/35 ≈ 0.371</span>. At the previous lesson's graph the measured rate sat above the exact one. Both are ordinary, and the pair of observations is the cheapest available demonstration that a measured rate is not an estimate of the truth in any sense you can act on at 120 samples.</p><p>Ten runs of an algorithm that is wrong 63 per cent of the time give an answer that is wrong less than one per cent of the time. Nothing about the algorithm improved; the failure probability was multiplied by <span class="math" data-say="22 over 35">22/35</span> ten times. That is the whole trade, and it is why a Monte Carlo algorithm with a constant success probability is a useful object even when the constant is small.</p><p>For a faded rehearsal, set the target to <span class="math" data-say="999 over 1000">999/1000</span> and predict the smallest <span class="math" data-say="t">t</span> on the two-triangles-joined-by-two-edges graph before switching to it. The supplied first move is this: there <span class="math" data-say="p equals 19 over 35">p = 19/35</span>, so <span class="math" data-say="1 minus p equals 16 over 35 is approximately 0.457">1 − p = 16/35 ≈ 0.457</span>, and each run multiplies the failure probability by that. Estimate how many runs take <span class="math" data-say="0.457 to the power t">0.457ᵗ</span> below <span class="math" data-say="0.001">0.001</span>, then check the exact answer &mdash; and then say why the bridge graph needs 15 for the same target.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding the success probabilities of the runs</strong><span><span class="math" data-say="10 times 13 over 35">10 × 13/35</span> is greater than three, which is not a probability. Failures multiply and successes do not add, and the identity to remember is the one about the complement: all <span class="math" data-say="t">t</span> fail with probability <span class="math" data-say="the quantity 1 minus p, to the power t">(1 − p)ᵗ</span>. The panel prints that column beside the success column so the two are never confused.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Amplifying an algorithm whose error is two-sided</strong><span>If a run can report a value that is too small as well as too large, the best of <span class="math" data-say="t">t</span> runs is the largest error rather than the best answer, and repetition makes the output worse. Check that a wrong answer is detectably no better than a right one before running anything twice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Deriving t from a logarithm and not checking it</strong><span><span class="math" data-say="the natural log of 100 over p">ln(100)/p</span> at <span class="math" data-say="p equals 13 over 35">p = 13/35</span> gives about <span class="math" data-say="12.4">12.4</span>, suggesting 13 runs where 10 suffice. The estimate is in the right place and it is not the answer, and at these sizes the difference is 30 per cent of the work. The exact least <span class="math" data-say="t">t</span> costs <span class="math" data-say="t">t</span> multiplications to find.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price a target failure probability exactly, and say what the pricing assumes.</strong><p>You should be able to derive <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span>, name the one-sided-error hypothesis that licenses keeping the best run, find the smallest <span class="math" data-say="t">t</span> for a target by multiplying, and state the residual failure probability you have bought rather than implying certainty.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Independence between runs is the hypothesis a real implementation breaks, usually by deriving every seed from one in a way that correlates them. Every lab on this course draws from a prime-modulus stream with a mixed seed, because under the power-of-two modulus used elsewhere in this library the low bits repeat on a short cycle and a page whose whole claim is about independent runs would have been demonstrating the opposite.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding the success probabilities of the runs</strong><span><span class="math" data-say="10 times 13 over 35">10 × 13/35</span> is greater than three, which is not a probability. Failures multiply and successes do not add, and the identity to remember is the one about the complement: all <span class="math" data-say="t">t</span> fail with probability <span class="math" data-say="the quantity 1 minus p, to the power t">(1 − p)ᵗ</span>. The panel prints that column beside the success column so the two are never confused.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Amplifying an algorithm whose error is two-sided</strong><span>If a run can report a value that is too small as well as too large, the best of <span class="math" data-say="t">t</span> runs is the largest error rather than the best answer, and repetition makes the output worse. Check that a wrong answer is detectably no better than a right one before running anything twice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Deriving t from a logarithm and not checking it</strong><span><span class="math" data-say="the natural log of 100 over p">ln(100)/p</span> at <span class="math" data-say="p equals 13 over 35">p = 13/35</span> gives about <span class="math" data-say="12.4">12.4</span>, suggesting 13 runs where 10 suffice. The estimate is in the right place and it is not the answer, and at these sizes the difference is 30 per cent of the work. The exact least <span class="math" data-say="t">t</span> costs <span class="math" data-say="t">t</span> multiplications to find.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price a target failure probability exactly, and say what the pricing assumes.</strong><p>You should be able to derive <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span>, name the one-sided-error hypothesis that licenses keeping the best run, find the smallest <span class="math" data-say="t">t</span> for a target by multiplying, and state the residual failure probability you have bought rather than implying certainty.</p></div></div><div class="note"><strong>Note:</strong> Independence between runs is the hypothesis a real implementation breaks, usually by deriving every seed from one in a way that correlates them. Every lab on this course draws from a prime-modulus stream with a mixed seed, because under the power-of-two modulus used elsewhere in this library the low bits repeat on a short cycle and a page whose whole claim is about independent runs would have been demonstrating the opposite.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Independent failures multiply</summary><p>Run the algorithm <span class="math" data-say="t">t</span> times with independent randomness and keep the smallest cut any run returned. The kept answer is wrong only if <em>every</em> run was wrong, and the runs are independent, so that has probability <span class="math" data-say="the quantity 1 minus p, to the power t">(1 − p)ᵗ</span>. On the bridge graph <span class="math" data-say="p equals 13 over 35">p = 13/35</span>, so <span class="math" data-say="1 minus p equals 22 over 35">1 − p = 22/35</span> and ten runs fail with probability <span class="math" data-say="the quantity 22 over 35, to the power 10 is approximately 0.0096">(22/35)¹⁰ ≈ 0.0096</span>. The panel computes that as an exact fraction rather than as a decimal.</p></details><details class="recall"><summary>The error must be one-sided for this to work at all</summary><p>Karger's algorithm never returns a cut smaller than the minimum, because everything it returns is a genuine cut. So a run that returns 2 edges is definitely at least as good as a run that returns 3, and taking the best of <span class="math" data-say="t">t</span> answers cannot be fooled. If an algorithm could err in both directions, the best of <span class="math" data-say="t">t</span> answers would be the most extreme error rather than the best answer, and amplification would make things worse.</p></details><details class="recall"><summary>The smallest t is found by multiplying, not by a logarithm</summary><p><span class="math" data-say="t is at least the natural log of the quantity 1 over delta, over p">t ≥ ln(1/δ)/p</span> is the familiar estimate, and it is an estimate: it involves logarithms of quantities that are not exact and it rounds. The panel instead multiplies <span class="math" data-say="1 minus p">1 − p</span> by itself until the product drops below <span class="math" data-say="1 minus target">1 − target</span>, counting the steps. The answer is the exact least <span class="math" data-say="t">t</span>, and the routine refuses rather than looping if <span class="math" data-say="p">p</span> is zero.</p></details></div>
+      <h3>Summary</h3>
       <p>An algorithm that is right with probability <span class="math" data-say="p">p</span> and, when it is wrong, is detectably no better, becomes an algorithm that is right with probability <span class="math" data-say="1 minus the quantity 1 minus p, to the power t">1 − (1 − p)ᵗ</span> after <span class="math" data-say="t">t</span> independent runs. On the lab's bridge graph <span class="math" data-say="p equals 13 over 35">p = 13/35</span>, so five runs reach <span class="math" data-say="9 over 10">9/10</span> and ten reach <span class="math" data-say="99 over 100">99/100</span>. The panel finds the smallest <span class="math" data-say="t">t</span> by multiplying rather than by taking a logarithm, so the answer is an exact integer and the probability beside it is an exact fraction.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Independent failures multiply.</strong> Run the algorithm <span class="math" data-say="t">t</span> times with independent randomness and keep the smallest cut any run returned. The kept answer is wrong only if <em>every</em> run was wrong, and the runs are independent, so that has probability <span class="math" data-say="the quantity 1 minus p, to the power t">(1 − p)ᵗ</span>. On the bridge graph <span class="math" data-say="p equals 13 over 35">p = 13/35</span>, so <span class="math" data-say="1 minus p equals 22 over 35">1 − p = 22/35</span> and ten runs fail with probability <span class="math" data-say="the quantity 22 over 35, to the power 10 is approximately 0.0096">(22/35)¹⁰ ≈ 0.0096</span>. The panel computes that as an exact fraction rather than as a decimal.</li><li><strong>The error must be one-sided for this to work at all.</strong> Karger's algorithm never returns a cut smaller than the minimum, because everything it returns is a genuine cut. So a run that returns 2 edges is definitely at least as good as a run that returns 3, and taking the best of <span class="math" data-say="t">t</span> answers cannot be fooled. If an algorithm could err in both directions, the best of <span class="math" data-say="t">t</span> answers would be the most extreme error rather than the best answer, and amplification would make things worse.</li><li><strong>The smallest t is found by multiplying, not by a logarithm.</strong> <span class="math" data-say="t is at least the natural log of the quantity 1 over delta, over p">t ≥ ln(1/δ)/p</span> is the familiar estimate, and it is an estimate: it involves logarithms of quantities that are not exact and it rounds. The panel instead multiplies <span class="math" data-say="1 minus p">1 − p</span> by itself until the product drops below <span class="math" data-say="1 minus target">1 − target</span>, counting the steps. The answer is the exact least <span class="math" data-say="t">t</span>, and the routine refuses rather than looping if <span class="math" data-say="p">p</span> is zero.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="t independent runs all fail with probability the quantity 1 minus p, to the power t. so P of at least one succeeds equals 1 minus the quantity 1 minus p, to the power t. p equals 13 over 35 on the bridge graph, one run, and 79 of 120 seeds missed. t equals 5 reaches 0.901876, t equals 10 reaches 0.990372. smallest t for 99 over 100, ten runs, found by multiplying, not by a logarithm. keeping the best of t answers needs the error to be ONE-SIDED" tabindex="0" role="region" aria-label="Mathematical notation">t independent runs all fail with probability (1 − p)ᵗ
 so P(at least one succeeds) = 1 − (1 − p)ᵗ
 p = 13/35 on the bridge graph: one run, and 79 of 120 seeds missed
@@ -3755,11 +3800,40 @@ keeping the best of t answers needs the error to be ONE-SIDED</div><figcaption>O
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3827,7 +3901,7 @@ keeping the best of t answers needs the error to be ONE-SIDED</div><figcaption>O
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Concurrency and Session State</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 16 · Offline Concurrency Patterns</p>
       <h1>Pessimistic and Coarse-Grained Locks</h1>
       <p class="lesson-lede">Lock before you load, refuse rather than wait, and lock a group with one lock when the group is what the business edits.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Lock manager</li><li>Coarse-grained lock</li><li>Implicit lock</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The patterns first, then the replay</h2>
-      <article class="prose reading"><p>&ldquo;Pessimistic Offline Lock prevents conflicts by avoiding them altogether.&rdquo; The words are David Rice's, from his Pessimistic Offline Lock in Chapter 16 of Fowler's book. This lesson reads it with the two patterns that make it easier to live with, Coarse-Grained Lock, by Rice and Matt Foemmel, and Implicit Lock, by Rice. They are tools, read as tools: what each does and when to reach for it. Read them in your own copy first.</p><p>Why prevent rather than detect? With an optimistic lock, Rice says, when several people work on the same data one commits and the others fail, and they find out only at the end, after doing all the work. On long business transactions that soon makes a system unpopular. A pessimistic lock makes the business transaction lock the data before touching it, and in return a session that has started can usually expect to finish.</p><p>How It Works has three parts. First, the kind of lock. An <em>exclusive write lock</em> is needed only to edit, and ignores reading. An <em>exclusive read lock</em> is needed even to load the record, for when a transaction must always have the latest data, and it restricts concurrency severely. A <em>read/write lock</em> combines them: many readers or one writer. Rice asks you to weigh concurrency, the business's needs and the complexity of the code, and to choose a scheme the domain's analysts can understand; a poor choice, such as locking every record, can leave a multi-user system behaving much like a single-user one. Second, the <em>lock manager</em>: a table from locks to owners, in memory or in the database, exactly one of it, and, once the servers are clustered, probably in the database, since a table in one server's memory works only if it is pinned to that server.</p><p>Third, the protocol. Take the lock before loading the data, since a lock is of little use without the assurance that you have the latest version, and lock the record's id, which lets you lock before you load. Release locks when the business transaction completes. If a lock cannot be had, abort; the user should accept that, because it happens early, and the earlier the better, ideally before any work begins. Do not wait for a lock: a business transaction might take twenty minutes, in the book's example, so the lock manager should refuse at once, which also takes deadlock off the table. Give abandoned sessions a timeout. Use the pattern where conflicts are likely or too costly, as a complement to Optimistic Offline Lock rather than on every record, and weigh a long transaction too, which may do no more harm and be easier to program; load test before choosing.</p><p>Coarse-Grained Lock answers the cost of many locks. Locking each object of a group means finding and perhaps loading every member, and with pessimistic locks a large lock set crowds the lock table. One lock for the group removes both. With optimistic locks the members share one version, the same version and not merely an equal one, so that moving it on locks them all; with pessimistic locks they share a lockable token. For an aggregate, a cluster treated as a unit for changes in Evans and Siegel's sense, the authors offer a root lock: lock the root, and every member is locked. The first reason to use it, they say, is the business's requirement that the group be edited as one; cheaper locking is a second, and they warn against inventing unnatural relationships to get it.</p><p>Implicit Lock starts from the fact that a locking scheme with one gap is no scheme: forget one line that takes a lock and the whole scheme is useless, and such a mistake is hard to find by testing. In Rice's words, &ldquo;if an item might be locked anywhere it must be locked everywhere.&rdquo; So the framework or a layer supertype takes the locks nobody may forget: versions for an optimistic scheme, the locks needed to load data for a pessimistic one. The write locks are the exception, because an implicit point to take them gives no promise of failing early; the framework instead checks at commit that the lock was taken, and throws if not. He recommends the pattern for all but the simplest applications.</p><p>The snippet is a root lock in miniature. <span class="math" data-say="try edit">tryEdit</span> does not lock the line it is given: line 3 builds a key from the line's order, so every line of one order asks for the same lock. <span class="math" data-say="owners">owners</span> stands for the lock manager's table, a map from key to session declared elsewhere. A key another session holds refuses the edit at once, on line 6; there is no waiting. A real lock manager must also serialize access to that table, as Rice requires, so that two sessions cannot both find the key free; the snippet leaves that, like releasing the lock at commit, to the code around it.</p><pre class="codeblock" data-say="line 1, comment, Locks the order, not the line one lock covers the group.. line 2, boolean try edit of line line, string session. line 3, string key is set to order plus line dot order id. line 4, string holder is set to owners dot get of key. line 5, if holder is not equal to null and not holder dot equals of session. line 6, return false. line 8, owners dot put of key, session. line 9, return true" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Locks the order, not the line: one lock covers the group.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The patterns first, then the replay</h2><div class="prose reading"><p>&ldquo;Pessimistic Offline Lock prevents conflicts by avoiding them altogether.&rdquo; The words are David Rice's, from his Pessimistic Offline Lock in Chapter 16 of Fowler's book. This lesson reads it with the two patterns that make it easier to live with, Coarse-Grained Lock, by Rice and Matt Foemmel, and Implicit Lock, by Rice. They are tools, read as tools: what each does and when to reach for it. Read them in your own copy first.</p><p>Why prevent rather than detect? With an optimistic lock, Rice says, when several people work on the same data one commits and the others fail, and they find out only at the end, after doing all the work. On long business transactions that soon makes a system unpopular. A pessimistic lock makes the business transaction lock the data before touching it, and in return a session that has started can usually expect to finish.</p><p>How It Works has three parts. First, the kind of lock. An <em>exclusive write lock</em> is needed only to edit, and ignores reading. An <em>exclusive read lock</em> is needed even to load the record, for when a transaction must always have the latest data, and it restricts concurrency severely. A <em>read/write lock</em> combines them: many readers or one writer. Rice asks you to weigh concurrency, the business's needs and the complexity of the code, and to choose a scheme the domain's analysts can understand; a poor choice, such as locking every record, can leave a multi-user system behaving much like a single-user one. Second, the <em>lock manager</em>: a table from locks to owners, in memory or in the database, exactly one of it, and, once the servers are clustered, probably in the database, since a table in one server's memory works only if it is pinned to that server.</p><p>Third, the protocol. Take the lock before loading the data, since a lock is of little use without the assurance that you have the latest version, and lock the record's id, which lets you lock before you load. Release locks when the business transaction completes. If a lock cannot be had, abort; the user should accept that, because it happens early, and the earlier the better, ideally before any work begins. Do not wait for a lock: a business transaction might take twenty minutes, in the book's example, so the lock manager should refuse at once, which also takes deadlock off the table. Give abandoned sessions a timeout. Use the pattern where conflicts are likely or too costly, as a complement to Optimistic Offline Lock rather than on every record, and weigh a long transaction too, which may do no more harm and be easier to program; load test before choosing.</p><p>Coarse-Grained Lock answers the cost of many locks. Locking each object of a group means finding and perhaps loading every member, and with pessimistic locks a large lock set crowds the lock table. One lock for the group removes both. With optimistic locks the members share one version, the same version and not merely an equal one, so that moving it on locks them all; with pessimistic locks they share a lockable token. For an aggregate, a cluster treated as a unit for changes in Evans and Siegel's sense, the authors offer a root lock: lock the root, and every member is locked. The first reason to use it, they say, is the business's requirement that the group be edited as one; cheaper locking is a second, and they warn against inventing unnatural relationships to get it.</p><p>Implicit Lock starts from the fact that a locking scheme with one gap is no scheme: forget one line that takes a lock and the whole scheme is useless, and such a mistake is hard to find by testing. In Rice's words, &ldquo;if an item might be locked anywhere it must be locked everywhere.&rdquo; So the framework or a layer supertype takes the locks nobody may forget: versions for an optimistic scheme, the locks needed to load data for a pessimistic one. The write locks are the exception, because an implicit point to take them gives no promise of failing early; the framework instead checks at commit that the lock was taken, and throws if not. He recommends the pattern for all but the simplest applications.</p><p>The snippet is a root lock in miniature. <span class="math" data-say="try edit">tryEdit</span> does not lock the line it is given: line 3 builds a key from the line's order, so every line of one order asks for the same lock. <span class="math" data-say="owners">owners</span> stands for the lock manager's table, a map from key to session declared elsewhere. A key another session holds refuses the edit at once, on line 6; there is no waiting. A real lock manager must also serialize access to that table, as Rice requires, so that two sessions cannot both find the key free; the snippet leaves that, like releasing the lock at commit, to the code around it.</p><pre class="codeblock" data-say="line 1, comment, Locks the order, not the line one lock covers the group.. line 2, boolean try edit of line line, string session. line 3, string key is set to order plus line dot order id. line 4, string holder is set to owners dot get of key. line 5, if holder is not equal to null and not holder dot equals of session. line 6, return false. line 8, owners dot put of key, session. line 9, return true" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Locks the order, not the line: one lock covers the group.</span>
 <span class="cl">boolean tryEdit(Line line, String session) {</span>
 <span class="cl">    String key = &quot;order:&quot; + line.orderId();</span>
 <span class="cl">    String holder = owners.get(key);</span>
@@ -1454,17 +1498,11 @@
 <span class="cl">    }</span>
 <span class="cl">    owners.put(key, session);</span>
 <span class="cl">    return true;</span>
-<span class="cl">}</span></code></pre><p>The lab is the timeline again, with the scheme set to pessimistic and one more input, the groups: a list of <span class="math" data-say="record equals group">record=group</span> pairs, where a record not listed is its own group and the lock is taken on the group. These timelines have no reads, so each lock is taken at the edit, which is also the load. In <code>line-locks</code> Kim edits line1 at minute 0 and Lee edits line2 at 1, and they commit at 4 and 5. With a lock per line the lab prints &ldquo;2: kim, lee&rdquo; committed, &ldquo;0: none&rdquo; refused, and at most 2 locks held at once.</p><p>In <code>order-lock</code> both lines belong to one order, <span class="math" data-say="line 1 equals order 9">line1=order9</span> and <span class="math" data-say="line 2 equals order 9">line2=order9</span>. Now the lab prints &ldquo;1: kim&rdquo; committed, &ldquo;1: lee&rdquo; refused, and at most 1 lock: Lee's edit at minute 1 asks for the order that Kim's session holds. Lee is refused although the two lines are different rows. That is the coarse lock's cost. It is also its point, if the order has a rule that spans its lines, such as a total or a credit limit: with a lock per line, two sessions can each make a change that keeps the rule and together break it.</p><p>The preset <code>optimistic-groups</code> keeps the groups and switches the scheme, which makes the order a shared version. The lab prints &ldquo;1: kim&rdquo; committed and &ldquo;1: lee&rdquo; in conflict, with 4 minutes redone: Lee works from minute 1 and learns at her commit at minute 5 that Kim's commit moved the order's version. The grouping protects the order either way; the scheme decides whether Lee is told at the start or at the end.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, ann, edit, room 1. line 2, 1, bo, edit, room 2. line 3, 2, cy, edit, room 3. line 4, 3, ann, commit, no record. line 5, 7, bo, commit, no record. line 6, 8, cy, commit, no record" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, ann, edit, room1;</span>
-<span class="cl">1, bo, edit, room2;</span>
-<span class="cl">2, cy, edit, room3;</span>
-<span class="cl">3, ann, commit, -;</span>
-<span class="cl">7, bo, commit, -;</span>
-<span class="cl">8, cy, commit, -</span></code></pre><p>Three people edit three rooms, with pessimistic locks on floors: <span class="math" data-say="room 1 equals floor 1, room 2 equals floor 1, room 3 equals floor 2">room1=floor1; room2=floor1; room3=floor2</span>. Replay it by hand: say who commits, who is refused and at which minute, how many minutes of work the refusal discards, and the most locks held at once.</p><p>Every lock in this lesson protects the record data; the next question is where the data a session has not yet committed should live. The next lesson, The Value of Statelessness, opens Chapter 6 with it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Concurrency</h2></div><p>sessions under no control, optimistic and pessimistic locking</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab is the timeline again, with the scheme set to pessimistic and one more input, the groups: a list of <span class="math" data-say="record equals group">record=group</span> pairs, where a record not listed is its own group and the lock is taken on the group. These timelines have no reads, so each lock is taken at the edit, which is also the load. In <code>line-locks</code> Kim edits line1 at minute 0 and Lee edits line2 at 1, and they commit at 4 and 5. With a lock per line the lab prints &ldquo;2: kim, lee&rdquo; committed, &ldquo;0: none&rdquo; refused, and at most 2 locks held at once.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Concurrency</h2></div><p>sessions under no control, optimistic and pessimistic locking</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Concurrency</strong><span>sessions under no control, optimistic and pessimistic locking</span></div>
       </div>
@@ -1472,10 +1510,10 @@
       <div class="table-wrap" id="olTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="olTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Every group has a version, 0 at the start, and a successful commit adds one to each group the session edited; a record not given a group is its own. A session's first read or edit of a group records the version it saw. None: every commit succeeds, and a lost update is counted for each edited group whose version changed since the session saw it. Optimistic: a commit fails (a conflict) when an edited group has changed since the session saw it; with reads checked, the groups it only read too. Pessimistic: the lock is taken when the record is first loaded for editing, not when the edit begins: at the session's first read or edit of a group it edits anywhere in the timeline (a read of a group it never edits takes none); this is the exclusive write lock, the first of Pessimistic Offline Lock's three. Taking a lock another session holds is refused and ends the session, releasing its locks; a commit releases them. A failed session's later events are skipped. Redo is the minutes from a failed session's first event to its failure.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A lock per record, or one for the group</h3>
-          <p>A count over the situation the lesson states. Each event is a minute, a session, an action and a record; the groups map records to the group their lock or version belongs to. A pessimistic lock is refused at once, never waited for. The timelines are illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A lock per record, or one for the group</h3>
+            <p>A count over the situation the lesson states. Each event is a minute, a session, an action and a record; the groups map records to the group their lock or version belongs to. A pessimistic lock is refused at once, never waited for. The timelines are illustrative.</p>
         <div class="field">
           <label for="olPreset">Worked example</label>
           <select id="olPreset"><option value="line-locks" selected>Kim and Lee edit two lines of one order, a lock per line</option><option value="order-lock">The same edits, one lock for the order</option><option value="optimistic-groups">The same edits, one shared version for the order</option></select>
@@ -1505,12 +1543,20 @@
           <div class="kpi"><span>Most locks held at once</span><strong id="olPeakLocks">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>In <code>order-lock</code> both lines belong to one order, <span class="math" data-say="line 1 equals order 9">line1=order9</span> and <span class="math" data-say="line 2 equals order 9">line2=order9</span>. Now the lab prints &ldquo;1: kim&rdquo; committed, &ldquo;1: lee&rdquo; refused, and at most 1 lock: Lee's edit at minute 1 asks for the order that Kim's session holds. Lee is refused although the two lines are different rows. That is the coarse lock's cost. It is also its point, if the order has a rule that spans its lines, such as a total or a credit limit: with a lock per line, two sessions can each make a change that keeps the rule and together break it.</p><p>The preset <code>optimistic-groups</code> keeps the groups and switches the scheme, which makes the order a shared version. The lab prints &ldquo;1: kim&rdquo; committed and &ldquo;1: lee&rdquo; in conflict, with 4 minutes redone: Lee works from minute 1 and learns at her commit at minute 5 that Kim's commit moved the order's version. The grouping protects the order either way; the scheme decides whether Lee is told at the start or at the end.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, ann, edit, room 1. line 2, 1, bo, edit, room 2. line 3, 2, cy, edit, room 3. line 4, 3, ann, commit, no record. line 5, 7, bo, commit, no record. line 6, 8, cy, commit, no record" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, ann, edit, room1;</span>
+<span class="cl">1, bo, edit, room2;</span>
+<span class="cl">2, cy, edit, room3;</span>
+<span class="cl">3, ann, commit, -;</span>
+<span class="cl">7, bo, commit, -;</span>
+<span class="cl">8, cy, commit, -</span></code></pre><p>Three people edit three rooms, with pessimistic locks on floors: <span class="math" data-say="room 1 equals floor 1, room 2 equals floor 1, room 3 equals floor 2">room1=floor1; room2=floor1; room3=floor2</span>. Replay it by hand: say who commits, who is refused and at which minute, how many minutes of work the refusal discards, and the most locks held at once.</p><p>Every lock in this lesson protects the record data; the next question is where the data a session has not yet committed should live. The next lesson, The Value of Statelessness, opens Chapter 6 with it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Replaying a pessimistic lock</h2></div><p>Four steps, the last of them on an aggregate of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Map each record to its group</h3><p>Write down the group for every record the timeline touches. A record not listed is a group of its own, and the lock or version belongs to the group.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take each lock at the load</h3><p>Walk the events in order. A session takes its group's lock at its first read or edit of a group it will edit; if another session holds that lock, the session is refused there, and its later events never happen.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Release at commit and count</h3><p>A commit releases the session's locks. Count the sessions that committed and were refused, the most locks held at any moment, and the minutes from each refused session's first event to its refusal.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on an aggregate of your own</h3><p>Pick one aggregate in a system you know, such as an order and its lines or a document and its sections. Write down what is locked when one part is edited, and one rule that spans the parts.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Replaying a pessimistic lock</h2>
+      <p class="lead-in">Four steps, the last of them on an aggregate of your own.</p>
+      <ol class="key-ideas method"><li><strong>Map each record to its group.</strong> Write down the group for every record the timeline touches. A record not listed is a group of its own, and the lock or version belongs to the group.</li><li><strong>Take each lock at the load.</strong> Walk the events in order. A session takes its group's lock at its first read or edit of a group it will edit; if another session holds that lock, the session is refused there, and its later events never happen.</li><li><strong>Release at commit and count.</strong> A commit releases the session's locks. Count the sessions that committed and were refused, the most locks held at any moment, and the minutes from each refused session's first event to its refusal.</li><li><strong>Do it on an aggregate of your own.</strong> Pick one aggregate in a system you know, such as an order and its lines or a document and its sections. Write down what is locked when one part is edited, and one rule that spans the parts.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1530,17 +1576,16 @@ minute 4: Kim commits, releases order9
 most locks held at once: 1</div><p>With a lock per line, line-locks, both commit and two locks are held at minute 1. The coarse lock trades that concurrency for protection of anything that depends on both lines together.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a finer lock is always better</strong><span>A lock per row allows the most concurrency, and that sounds like the whole story. It also protects the least: two sessions can each change one line of an order whose rule spans both lines, and each change passes on its own. On the lesson's illustration the lock per line lets Kim and Lee both commit; one lock for the order refuses Lee. Coarse-Grained Lock makes the business's grouping the reason to choose.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making pessimistic locks wait</strong><span>A database lock usually waits, so an offline lock might as well. Rice's lock manager refuses at once and the business transaction aborts, because another session may hold the lock for twenty minutes, and because waiting brings timeouts and deadlock with it. Failing early is the pattern's promise to the user.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving each lock to the developer who needs it</strong><span>Every business transaction could take its own locks. Implicit Lock's point is that one forgotten lock makes the whole scheme useless, and that the mistake is hard to find by testing. A record that some code locks has to be locked by all code that touches it, so the framework takes the locks that cannot be skipped.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can replay a pessimistic lock on groups.</strong><p>Given a timeline and a grouping of records, state who is refused and when, the most locks held at once, and what the grouping changes against a lock per record.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's lock is the exclusive write lock alone, taken at the first read or edit of a record the session will edit; it does not model exclusive read or read/write locks, timeouts for abandoned sessions, or a lock manager that is itself a bottleneck. Which records form a group is a question about your domain, which the groups input only states.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a finer lock is always better</strong><span>A lock per row allows the most concurrency, and that sounds like the whole story. It also protects the least: two sessions can each change one line of an order whose rule spans both lines, and each change passes on its own. On the lesson's illustration the lock per line lets Kim and Lee both commit; one lock for the order refuses Lee. Coarse-Grained Lock makes the business's grouping the reason to choose.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making pessimistic locks wait</strong><span>A database lock usually waits, so an offline lock might as well. Rice's lock manager refuses at once and the business transaction aborts, because another session may hold the lock for twenty minutes, and because waiting brings timeouts and deadlock with it. Failing early is the pattern's promise to the user.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving each lock to the developer who needs it</strong><span>Every business transaction could take its own locks. Implicit Lock's point is that one forgotten lock makes the whole scheme useless, and that the mistake is hard to find by testing. A record that some code locks has to be locked by all code that touches it, so the framework takes the locks that cannot be skipped.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can replay a pessimistic lock on groups.</strong><p>Given a timeline and a grouping of records, state who is refused and when, the most locks held at once, and what the grouping changes against a lock per record.</p></div></div><div class="note"><strong>Note:</strong> The lab's lock is the exclusive write lock alone, taken at the first read or edit of a record the session will edit; it does not model exclusive read or read/write locks, timeouts for abandoned sessions, or a lock manager that is itself a bottleneck. Which records form a group is a question about your domain, which the groups input only states.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Lock manager</summary><p>The one place that grants or refuses locks: little more than a table from each locked item to its owner, the session. It may be in memory or a database table, and business transactions talk only to it.</p></details><details class="recall"><summary>Coarse-grained lock</summary><p>One lock that covers a group of objects edited together, such as an order and its lines. It is taken on a version the members share, or on the group's root, so a session locks the group without finding and locking every member.</p></details><details class="recall"><summary>Implicit lock</summary><p>Locking that the framework or a layer supertype does for the developer, so that no business transaction can forget a lock it must take. A layer supertype is a class every class of a layer inherits from.</p></details></div>
+      <h3>Summary</h3>
       <p>David Rice's Pessimistic Offline Lock, his Coarse-Grained Lock with Matt Foemmel, and his Implicit Lock, in Fowler's book: lock before loading, refuse at once rather than wait, cover a group with one lock, and let the framework take the locks nobody may forget. Replay two edits to the lines of one order with a lock per line and with one lock for the order.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Lock manager.</strong> The one place that grants or refuses locks: little more than a table from each locked item to its owner, the session. It may be in memory or a database table, and business transactions talk only to it.</li><li><strong>Coarse-grained lock.</strong> One lock that covers a group of objects edited together, such as an order and its lines. It is taken on a version the members share, or on the group's root, so a session locks the group without finding and locking every member.</li><li><strong>Implicit lock.</strong> Locking that the framework or a layer supertype does for the developer, so that no business transaction can forget a lock it must take. A layer supertype is a class every class of a layer inherits from.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="lock before you load the data. refused, abort at once, never wait. one lock for the group, on its root. coarser, fewer locks, less concurrency. let the framework take the locks" tabindex="0" role="region" aria-label="Mathematical notation">lock before you load the data
 refused: abort at once, never wait
 one lock for the group, on its root
@@ -2270,11 +2315,40 @@ let the framework take the locks</div><figcaption>The three patterns in five lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2342,7 +2416,7 @@ let the framework take the locks</div><figcaption>The three patterns in five lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

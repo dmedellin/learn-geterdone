@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Security, Lean Management and Product Development</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 8 · Product Development</p>
       <h1>Lean Product Development Practices</h1>
       <p class="lesson-lede">Cut the work into batches that finish in under a week, show the flow, ask customers, and the first feedback arrives sooner.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Small batch</li><li>Minimum viable product (MVP)</li><li>Time to first feedback</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s four capabilities, then the count</h2>
-      <article class="prose reading"><p>Chapter 8, Product Development, begins with a complaint. The authors say Agile has largely won the argument over methods, but a good deal of what organizations have adopted is faux Agile: some of the practices without the culture and processes around them. In larger companies, they say, three signs are common: months spent on budgets, analysis and requirements before work begins; work gathered into large projects that ship rarely; and customer feedback treated as an afterthought. Against that they set the Lean approach to product development and the Lean startup movement of Eric Ries, which test a product's design and business model from the start with frequent user research, drawing on Steve Blank's work and on design thinking.</p><p>The chapter then states a hypothesis. Practices such as building and validating prototypes from the beginning, working in small batches, and changing course, or pivoting, early and often might affect organizational performance, which the authors measure as productivity, market share and profitability. They examined four capabilities that make up their model of a Lean approach.</p><p>The four are these. Small batches, with MVPs among the means. Visibility of the flow of work to customers. Customer feedback built into design. And team authority over specifications. The last gets a lesson of its own.</p><p>What they found: the factors were statistically significant predictors of higher software delivery performance and of organizational performance, and also of a better organizational culture and less burnout. Because they ran the research over several years, they also found that the prediction runs the other way, from delivery performance to Lean product management practices, a reciprocal relationship that they call a virtuous cycle. The next lesson reads that finding with care.</p><p>The box Working in Small Batches gives the reason for the first capability. &ldquo;Working in small batches enables short lead times and faster feedback loops,&rdquo; the authors write, and the key is to break work into features that can be built quickly, in place of elaborate ones grown on branches and shipped seldom. It applies at the feature level and the product level, where it is the MVP. The authors add that software makes small batches especially valuable, because users can answer quickly, through techniques such as A/B testing, and that an experimental style of product work goes closely with the technical practices behind continuous delivery. Customer feedback, as they use the term, covers several practices, from gathering satisfaction metrics to feeding what customers say into design; whether teams have the authority to respond turns out to matter too.</p><p>Now the count. The lab takes a number of work items, the size of a batch, the time each item takes and the fixed time each release costs, and says when the first batch is out, when the last is, and how much of the time went to releasing. The team is invented: twelve items of one day each, and a release that costs 2 days, by hand. On the preset <code>by-hand</code> one batch of 12 means one release: the first and last feedback both arrive on day 14, and 2 days went to releasing. Four batches of 3 mean the first feedback on day 5, 3 days of work and the 2 of the release, the last on day 20, and 8 days of release time in all. Two more tiles compare the plans. The average wait per item, from the start to its release, is 14 days for the one batch and 12.5 for the four (the batches wait 5, 10, 15 and 20 days, which averages to that), and the first feedback comes 14/5, about 2.8 times sooner.</p><p>The numbers show a cost as well as a gain, which the chapter does not discuss: small batches finish later in total when each release is costly. The preset <code>automated</code> makes the release cost half a day, as a deployment pipeline would. One batch of 12 now arrives on day 12.5. Four batches of 3 bring the first feedback on day 3.5, the last on day 14, with 2 days of release time. The authors report that experimenting with a product is highly correlated with the technical practices behind continuous delivery; the arithmetic shows one way the two could fit together, since a cheaper release makes small batches affordable.</p><h3>Exercise</h3><ul><li>Ten items of one day each; a release costs 3 days.</li><li>Compare one batch of 10 with five batches of 2.</li></ul><p>Find the day the first feedback arrives, the day the last does and the days spent releasing, for both. Then say which of the two plans a cheaper release would help more, and what that tells you about the practices behind a cheap release. Enter the records to check.</p><p>The first three capabilities are about the work; the fourth is about who may change it. The next lesson, Team Experimentation and Effective Product Management, reads it, and the finding that delivery and product practices drive each other.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Flow</h2></div><p>what a smaller batch does to the wait for feedback</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s four capabilities, then the count</h2><div class="prose reading"><p>Chapter 8, Product Development, begins with a complaint. The authors say Agile has largely won the argument over methods, but a good deal of what organizations have adopted is faux Agile: some of the practices without the culture and processes around them. In larger companies, they say, three signs are common: months spent on budgets, analysis and requirements before work begins; work gathered into large projects that ship rarely; and customer feedback treated as an afterthought. Against that they set the Lean approach to product development and the Lean startup movement of Eric Ries, which test a product's design and business model from the start with frequent user research, drawing on Steve Blank's work and on design thinking.</p><p>The chapter then states a hypothesis. Practices such as building and validating prototypes from the beginning, working in small batches, and changing course, or pivoting, early and often might affect organizational performance, which the authors measure as productivity, market share and profitability. They examined four capabilities that make up their model of a Lean approach.</p><p>The four are these. Small batches, with MVPs among the means. Visibility of the flow of work to customers. Customer feedback built into design. And team authority over specifications. The last gets a lesson of its own.</p><p>What they found: the factors were statistically significant predictors of higher software delivery performance and of organizational performance, and also of a better organizational culture and less burnout. Because they ran the research over several years, they also found that the prediction runs the other way, from delivery performance to Lean product management practices, a reciprocal relationship that they call a virtuous cycle. The next lesson reads that finding with care.</p><p>The box Working in Small Batches gives the reason for the first capability. &ldquo;Working in small batches enables short lead times and faster feedback loops,&rdquo; the authors write, and the key is to break work into features that can be built quickly, in place of elaborate ones grown on branches and shipped seldom. It applies at the feature level and the product level, where it is the MVP. The authors add that software makes small batches especially valuable, because users can answer quickly, through techniques such as A/B testing, and that an experimental style of product work goes closely with the technical practices behind continuous delivery. Customer feedback, as they use the term, covers several practices, from gathering satisfaction metrics to feeding what customers say into design; whether teams have the authority to respond turns out to matter too.</p><p>Now the count. The lab takes a number of work items, the size of a batch, the time each item takes and the fixed time each release costs, and says when the first batch is out, when the last is, and how much of the time went to releasing. The team is invented: twelve items of one day each, and a release that costs 2 days, by hand. On the preset <code>by-hand</code> one batch of 12 means one release: the first and last feedback both arrive on day 14, and 2 days went to releasing. Four batches of 3 mean the first feedback on day 5, 3 days of work and the 2 of the release, the last on day 20, and 8 days of release time in all. Two more tiles compare the plans. The average wait per item, from the start to its release, is 14 days for the one batch and 12.5 for the four (the batches wait 5, 10, 15 and 20 days, which averages to that), and the first feedback comes 14/5, about 2.8 times sooner.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Flow</h2></div><p>what a smaller batch does to the wait for feedback</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Flow</strong><span>what a smaller batch does to the wait for feedback</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="aflTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="aflTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> One worker does the items one after another; a batch is released when its last item is done, taking the fixed release time, and the next batch starts after the release. Batch i is released at (items done through batch i) × time per item + i × release time; the last batch holds what is left when the work does not divide evenly. Feedback on an item arrives when its batch is released. The average wait is the mean, over items, of the time from the start to the item's release. With two sizes each tile reads first → second.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>When the first feedback arrives</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>When the first feedback arrives</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="aflPreset">Worked example</label>
           <select id="aflPreset"><option value="by-hand" selected>Twelve items, a release costing two days, one batch or four</option><option value="automated">The same work, with a release costing half a day</option></select>
@@ -1441,12 +1484,15 @@
           <div class="kpi"><span>First feedback, first size over second</span><strong id="aflRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The numbers show a cost as well as a gain, which the chapter does not discuss: small batches finish later in total when each release is costly. The preset <code>automated</code> makes the release cost half a day, as a deployment pipeline would. One batch of 12 now arrives on day 12.5. Four batches of 3 bring the first feedback on day 3.5, the last on day 14, with 2 days of release time. The authors report that experimenting with a product is highly correlated with the technical practices behind continuous delivery; the arithmetic shows one way the two could fit together, since a cheaper release makes small batches affordable.</p><h3>Exercise</h3><ul><li>Ten items of one day each; a release costs 3 days.</li><li>Compare one batch of 10 with five batches of 2.</li></ul><p>Find the day the first feedback arrives, the day the last does and the days spent releasing, for both. Then say which of the two plans a cheaper release would help more, and what that tells you about the practices behind a cheap release. Enter the records to check.</p><p>The first three capabilities are about the work; the fourth is about who may change it. The next lesson, Team Experimentation and Effective Product Management, reads it, and the finding that delivery and product practices drive each other.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Timing the first feedback</h2></div><p>Four steps, the last of them on work of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the work and the costs</h3><p>Count the items, the time each takes and the fixed time one release costs, all in the same unit. Say where each came from.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Cut it into batches</h3><p>Divide the items by the batch size to get the number of batches, which is the number of releases.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Time the feedback</h3><p>The first feedback arrives after one batch's work plus one release. The last arrives after every batch's work and every release.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Change the release cost</h3><p>Recompute with a cheaper release, then on your own project with the real figures. Write down which practices would make the release cheap enough.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Timing the first feedback</h2>
+      <p class="lead-in">Four steps, the last of them on work of your own.</p>
+      <ol class="key-ideas method"><li><strong>State the work and the costs.</strong> Count the items, the time each takes and the fixed time one release costs, all in the same unit. Say where each came from.</li><li><strong>Cut it into batches.</strong> Divide the items by the batch size to get the number of batches, which is the number of releases.</li><li><strong>Time the feedback.</strong> The first feedback arrives after one batch's work plus one release. The last arrives after every batch's work and every release.</li><li><strong>Change the release cost.</strong> Recompute with a cheaper release, then on your own project with the real figures. Write down which practices would make the release cheap enough.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1511,16 @@ Last feedback: 4 x 5 = day 20
 Release time: 4 releases x 2 = 8 days</div><p>Small batches bring the first feedback 9 days sooner and the last 6 days later, at four times the release time. With the half-day release the last arrives on day 14, only 1.5 days after the single batch.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Agile ceremonies make a team Lean in its product work</strong><span>The chapter opens by calling much of what has been implemented faux Agile: following some common practices without addressing the wider culture and processes. Months of requirements before work starts, big projects with infrequent releases and feedback as an afterthought are the signs it names.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting smaller batches to finish the whole job sooner</strong><span>The lab's four batches bring the first feedback earlier and the last later, because each batch carries a release. The gain is in feedback, not in the total, and it depends on the release being cheap, which the lab shows and the chapter does not argue; the authors report only that the experimental approach is highly correlated with continuous delivery's practices.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a lab figure as the authors&#x27; finding about batch size</strong><span>The days are arithmetic on invented work, with release costs the lesson chose. The authors report that the capabilities predict delivery and organizational performance in their survey; they do not give a time to feedback for any batch size.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can time the first feedback from different batch sizes.</strong><p>Given a number of items, the time per item, a batch size and a release cost, compute when the first and the last feedback arrive and how much time went to releasing.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab times batches from the numbers you give it. It cannot tell you whether customers will answer, whether the feedback will be used, or whether the work divides into batches of that size; the authors measured those by survey.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Agile ceremonies make a team Lean in its product work</strong><span>The chapter opens by calling much of what has been implemented faux Agile: following some common practices without addressing the wider culture and processes. Months of requirements before work starts, big projects with infrequent releases and feedback as an afterthought are the signs it names.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting smaller batches to finish the whole job sooner</strong><span>The lab's four batches bring the first feedback earlier and the last later, because each batch carries a release. The gain is in feedback, not in the total, and it depends on the release being cheap, which the lab shows and the chapter does not argue; the authors report only that the experimental approach is highly correlated with continuous delivery's practices.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a lab figure as the authors&#x27; finding about batch size</strong><span>The days are arithmetic on invented work, with release costs the lesson chose. The authors report that the capabilities predict delivery and organizational performance in their survey; they do not give a time to feedback for any batch size.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can time the first feedback from different batch sizes.</strong><p>Given a number of items, the time per item, a batch size and a release cost, compute when the first and the last feedback arrive and how much time went to releasing.</p></div></div><div class="note"><strong>Note:</strong> The lab times batches from the numbers you give it. It cannot tell you whether customers will answer, whether the feedback will be used, or whether the work divides into batches of that size; the authors measured those by survey.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Small batch</summary><p>A slice of a product or feature that a team can finish inside a week and ship often. The authors set it against large features built on branches and shipped rarely.</p></details><details class="recall"><summary>Minimum viable product (MVP)</summary><p>A first version with only the features needed to learn, by testing it, whether the product and its business model are sound. It applies the idea of a small batch at the level of the whole product.</p></details><details class="recall"><summary>Time to first feedback</summary><p>In the lab, the time from the start until the first batch is done and released. It is the earliest moment a customer can answer anything, so it is what a batch size changes first.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 8 turns from delivery to what is delivered. Read the four capabilities the authors call Lean product development, what they found about them, and what working in small batches is for; then compare when the first customer feedback arrives from one big release and from four small ones.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Small batch.</strong> A slice of a product or feature that a team can finish inside a week and ship often. The authors set it against large features built on branches and shipped rarely.</li><li><strong>Minimum viable product (MVP).</strong> A first version with only the features needed to learn, by testing it, whether the product and its business model are sound. It applies the idea of a small batch at the level of the whole product.</li><li><strong>Time to first feedback.</strong> In the lab, the time from the start until the first batch is done and released. It is the earliest moment a customer can answer anything, so it is what a batch size changes first.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="faux agile, big projects, late feedback. small batches, done in under a week. see the flow of work to the customer. seek customer feedback and use it. teams change specifications themselves. short lead times, faster feedback loops" tabindex="0" role="region" aria-label="Mathematical notation">faux Agile: big projects, late feedback
 small batches, done in under a week
 see the flow of work to the customer
@@ -2336,11 +2381,40 @@ short lead times, faster feedback loops</div><figcaption>Lean product developmen
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2408,7 +2482,7 @@ short lead times, faster feedback loops</div><figcaption>Lean product developmen
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

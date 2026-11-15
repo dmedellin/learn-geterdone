@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,27 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Laplace Transforms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Solving with it</p>
       <h1>Solving an Initial Value Problem</h1>
       <p class="lesson-lede">Transform both sides, solve for Y by algebra, invert with partial fractions, and the initial values are already in the answer.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The equation becomes algebra in s</li><li>The initial values arrive with the transform</li><li>Inverting is partial fractions and the table read backwards</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four moves, on a second-order equation</h2>
-      <article class="prose reading"><p>Take the equation <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals q of t">a·y″ + b·y′ + c·y = q(t)</span> with starting values <span class="math" data-say="y of 0">y(0)</span> and <span class="math" data-say="y prime of 0">y′(0)</span>. Transform each term with the rules of the previous lesson and collect everything that multiplies <span class="math" data-say="Y">Y</span>.</p><div class="mathblock" data-say="A times the quantity s squared times Y minus s times y of 0 minus y prime of 0, plus b times the quantity s times Y minus y of 0, plus c times Y equals the Laplace transform of q. the quantity A times s squared plus b times s plus c, times Y equals A times the quantity s times y of 0 plus y prime of 0, plus b times y of 0 plus the Laplace transform of q" tabindex="0" role="region" aria-label="Mathematical notation">a·(s²·Y − s·y(0) − y′(0)) + b·(s·Y − y(0)) + c·Y = ℒ[q]
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four moves, on a second-order equation</h2><div class="prose reading"><p>Take the equation <span class="math" data-say="A times y double prime plus b times y prime plus c times y equals q of t">a·y″ + b·y′ + c·y = q(t)</span> with starting values <span class="math" data-say="y of 0">y(0)</span> and <span class="math" data-say="y prime of 0">y′(0)</span>. Transform each term with the rules of the previous lesson and collect everything that multiplies <span class="math" data-say="Y">Y</span>.</p><div class="mathblock" data-say="A times the quantity s squared times Y minus s times y of 0 minus y prime of 0, plus b times the quantity s times Y minus y of 0, plus c times Y equals the Laplace transform of q. the quantity A times s squared plus b times s plus c, times Y equals A times the quantity s times y of 0 plus y prime of 0, plus b times y of 0 plus the Laplace transform of q" tabindex="0" role="region" aria-label="Mathematical notation">a·(s²·Y − s·y(0) − y′(0)) + b·(s·Y − y(0)) + c·Y = ℒ[q]
 (a·s² + b·s + c)·Y = a·(s·y(0) + y′(0)) + b·y(0) + ℒ[q]</div><p>The polynomial <span class="math" data-say="A times s squared plus b times s plus c">a·s² + b·s + c</span> multiplying <span class="math" data-say="Y">Y</span> is the characteristic polynomial of the equation, with <span class="math" data-say="s">s</span> in place of <span class="math" data-say="r">r</span>. That is the first connection to the earlier method, and the next lessons make it precise. For a first-order equation <span class="math" data-say="y prime plus A times y equals q">y′ + a·y = q</span> the same steps give <span class="math" data-say="the quantity s plus A, times Y equals y of 0 plus the Laplace transform of q">(s + a)·Y = y(0) + ℒ[q]</span>.</p><div class="example"><span class="label">Example &middot; A first-order case</span><p>Solve <span class="math" data-say="y prime plus 2 y equals 6">y′ + 2y = 6</span> with <span class="math" data-say="y of 0 equals 0">y(0) = 0</span>. The transform of the constant <span class="math" data-say="6">6</span> is <span class="math" data-say="6 over s">6/s</span>, so <span class="math" data-say="the quantity s plus 2, times Y equals 0 plus 6 over s">(s + 2)·Y = 0 + 6/s</span>, and <span class="math" data-say="Y equals 6 over the quantity s times the quantity s plus 2">Y = 6/(s·(s + 2))</span>.</p><p>Partial fractions: <span class="math" data-say="6 over the quantity s times the quantity s plus 2, equals A over s plus B over the quantity s plus 2">6/(s·(s + 2)) = A/s + B/(s + 2)</span>. At <span class="math" data-say="s equals 0">s = 0</span> the factor <span class="math" data-say="s plus 2">s + 2</span> is <span class="math" data-say="2">2</span>, so <span class="math" data-say="A equals 6 over 2 equals 3">A = 6/2 = 3</span>. At <span class="math" data-say="s equals negative 2">s = −2</span> the factor <span class="math" data-say="s">s</span> is <span class="math" data-say="negative 2">−2</span>, so <span class="math" data-say="B equals 6 over the quantity negative 2, equals negative 3">B = 6/(−2) = −3</span>. Then <span class="math" data-say="y equals 3 minus 3 e to the power the quantity negative 2 t">y = 3 − 3e^(−2t)</span>, which starts at <span class="math" data-say="0">0</span> and settles at <span class="math" data-say="3">3</span>.</p></div><h3>A second-order case</h3><p>For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> with <span class="math" data-say="y of 0 equals 1">y(0) = 1</span> and <span class="math" data-say="y prime of 0 equals 0">y′(0) = 0</span> the right side is <span class="math" data-say="s times 1 plus 0 plus 3 times 1 equals s plus 3">s·1 + 0 + 3·1 = s + 3</span>, and the left coefficient is <span class="math" data-say="s squared plus 3 s plus 2 equals the quantity s plus 1, times the quantity s plus 2">s² + 3s + 2 = (s + 1)(s + 2)</span>. The forcing is zero, so nothing else contributes.</p><div class="mathblock" data-say="the quantity s squared plus 3 s plus 2, times Y equals s plus 3. Y equals the quantity s plus 3, over the quantity the quantity s plus 1, times the quantity s plus 2. Y equals A over the quantity s plus 1, plus B over the quantity s plus 2" tabindex="0" role="region" aria-label="Mathematical notation">(s² + 3s + 2)·Y = s + 3
 Y = (s + 3)/((s + 1)(s + 2))
-Y = A/(s + 1) + B/(s + 2)</div><p>To find <span class="math" data-say="A">A</span>, multiply both sides by <span class="math" data-say="s plus 1">s + 1</span> and set <span class="math" data-say="s equals negative 1">s = −1</span>: <span class="math" data-say="A equals the quantity negative 1 plus 3, over the quantity negative 1 plus 2, equals 2">A = (−1 + 3)/(−1 + 2) = 2</span>. To find <span class="math" data-say="B">B</span>, multiply by <span class="math" data-say="s plus 2">s + 2</span> and set <span class="math" data-say="s equals negative 2">s = −2</span>: <span class="math" data-say="B equals the quantity negative 2 plus 3, over the quantity negative 2 plus 1, equals negative 1">B = (−2 + 3)/(−2 + 1) = −1</span>. So <span class="math" data-say="Y equals 2 over the quantity s plus 1, minus 1 over the quantity s plus 2">Y = 2/(s + 1) − 1/(s + 2)</span>, and reading the table backwards gives <span class="math" data-say="y equals 2 e to the power the quantity negative t, minus e to the power the quantity negative 2 t">y = 2e^(−t) − e^(−2t)</span>.</p><p>This is the answer to the real-roots example in “Real Distinct Roots” in Second-Order Linear Equations, found there by fitting two constants from a <span data-say="2 times 2">2×2</span> system. Here the starting values went in at the first line and the constants came out of two substitutions.</p><h3>When the denominator does not factor over the rationals</h3><p>For <span class="math" data-say="y double prime plus 2 y prime plus 5 y equals 0">y″ + 2y′ + 5y = 0</span> with <span class="math" data-say="y of 0 equals 0">y(0) = 0</span> and <span class="math" data-say="y prime of 0 equals 2">y′(0) = 2</span> the right side is <span class="math" data-say="s times 0 plus 2 plus 2 times 0 equals 2">s·0 + 2 + 2·0 = 2</span> and the left coefficient is <span class="math" data-say="s squared plus 2 s plus 5">s² + 2s + 5</span>, which has no real roots. Complete the square: <span class="math" data-say="s squared plus 2 s plus 5 equals the quantity s plus 1, squared plus 4">s² + 2s + 5 = (s + 1)² + 4</span>. Then <span class="math" data-say="Y equals 2 over the quantity the quantity s plus 1, squared plus 4">Y = 2/((s + 1)² + 4)</span>.</p><p>The sine entry is <span class="math" data-say="b over the quantity s squared plus b squared">b/(s² + b²)</span>, and replacing <span class="math" data-say="s">s</span> by <span class="math" data-say="s plus 1">s + 1</span> multiplies the signal by <span class="math" data-say="e to the power the quantity negative t">e^(−t)</span>, as in the table's last entries. With <span class="math" data-say="b equals 2">b = 2</span> the numerator is already the <span class="math" data-say="2">2</span> the entry needs, so <span class="math" data-say="y equals e to the power the quantity negative t, times sine of 2 t">y = e^(−t)·sin(2t)</span>. The lab checks this by transforming the answer back and reading its residual in the original equation.</p><p>Two limits of the lab, stated where they matter. A linear factor of the denominator must have a rational root, so <span class="math" data-say="s squared minus 2">s² − 2</span>, whose roots are <span class="math" data-say="plus or minus the square root of 2">±√2</span>, is refused with the factor named. An irreducible quadratic must have a rational frequency, so <span class="math" data-say="s squared plus 2">s² + 2</span>, whose inverse would carry <span class="math" data-say="cosine of the quantity the square root of 2 times t">cos(√2·t)</span>, is refused the same way rather than printed with a surd inside a cosine. The mathematics is still fine in both cases; the lab is limited.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The Laplace transform</h2></div><p>Transforms, partial fractions and solutions, exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+Y = A/(s + 1) + B/(s + 2)</div><p>To find <span class="math" data-say="A">A</span>, multiply both sides by <span class="math" data-say="s plus 1">s + 1</span> and set <span class="math" data-say="s equals negative 1">s = −1</span>: <span class="math" data-say="A equals the quantity negative 1 plus 3, over the quantity negative 1 plus 2, equals 2">A = (−1 + 3)/(−1 + 2) = 2</span>. To find <span class="math" data-say="B">B</span>, multiply by <span class="math" data-say="s plus 2">s + 2</span> and set <span class="math" data-say="s equals negative 2">s = −2</span>: <span class="math" data-say="B equals the quantity negative 2 plus 3, over the quantity negative 2 plus 1, equals negative 1">B = (−2 + 3)/(−2 + 1) = −1</span>. So <span class="math" data-say="Y equals 2 over the quantity s plus 1, minus 1 over the quantity s plus 2">Y = 2/(s + 1) − 1/(s + 2)</span>, and reading the table backwards gives <span class="math" data-say="y equals 2 e to the power the quantity negative t, minus e to the power the quantity negative 2 t">y = 2e^(−t) − e^(−2t)</span>.</p><p>This is the answer to the real-roots example in “Real Distinct Roots” in Second-Order Linear Equations, found there by fitting two constants from a <span data-say="2 times 2">2×2</span> system. Here the starting values went in at the first line and the constants came out of two substitutions.</p><h3>When the denominator does not factor over the rationals</h3><p>For <span class="math" data-say="y double prime plus 2 y prime plus 5 y equals 0">y″ + 2y′ + 5y = 0</span> with <span class="math" data-say="y of 0 equals 0">y(0) = 0</span> and <span class="math" data-say="y prime of 0 equals 2">y′(0) = 2</span> the right side is <span class="math" data-say="s times 0 plus 2 plus 2 times 0 equals 2">s·0 + 2 + 2·0 = 2</span> and the left coefficient is <span class="math" data-say="s squared plus 2 s plus 5">s² + 2s + 5</span>, which has no real roots. Complete the square: <span class="math" data-say="s squared plus 2 s plus 5 equals the quantity s plus 1, squared plus 4">s² + 2s + 5 = (s + 1)² + 4</span>. Then <span class="math" data-say="Y equals 2 over the quantity the quantity s plus 1, squared plus 4">Y = 2/((s + 1)² + 4)</span>.</p><p>The sine entry is <span class="math" data-say="b over the quantity s squared plus b squared">b/(s² + b²)</span>, and replacing <span class="math" data-say="s">s</span> by <span class="math" data-say="s plus 1">s + 1</span> multiplies the signal by <span class="math" data-say="e to the power the quantity negative t">e^(−t)</span>, as in the table's last entries. With <span class="math" data-say="b equals 2">b = 2</span> the numerator is already the <span class="math" data-say="2">2</span> the entry needs, so <span class="math" data-say="y equals e to the power the quantity negative t, times sine of 2 t">y = e^(−t)·sin(2t)</span>. The lab checks this by transforming the answer back and reading its residual in the original equation.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The Laplace transform</h2></div><p>Transforms, partial fractions and solutions, exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The Laplace transform</strong><span>functions of t as exact rational functions of s</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the function of t, drawn from its closed form</span></div>
@@ -1407,10 +1450,10 @@ Y = A/(s + 1) + B/(s + 2)</div><p>To find <span class="math" data-say="A">A</spa
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="lpPlot" viewBox="0 0 660 420" role="img" aria-label="the function of t"></svg></div>
       <div class="status-banner" id="lpStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Solve an initial value problem</h3>
-          <p>Pick an example and read the chain: Y(s), its partial fractions, the solution, and the residual of that solution in the original equation. Then type your own equation with a prime for each derivative, and its starting values in the order y(0), then y'(0).</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Solve an initial value problem</h3>
+            <p>Pick an example and read the chain: Y(s), its partial fractions, the solution, and the residual of that solution in the original equation. Then type your own equation with a prime for each derivative, and its starting values in the order y(0), then y'(0).</p>
         <div class="field">
           <label for="lpPreset">Example</label>
           <select id="lpPreset"><option value="decay" selected>y″ + 3y′ + 2y = 0, y(0) = 1, y′(0) = 0</option><option value="first-order">y′ + 2y = 6, y(0) = 0</option><option value="damped">y″ + 2y′ + 5y = 0, y(0) = 0, y′(0) = 2</option></select>
@@ -1442,12 +1485,15 @@ Y = A/(s + 1) + B/(s + 2)</div><p>To find <span class="math" data-say="A">A</spa
         </div>
         <p class="small-copy" style="margin:0;">A signal such as 3t^2 - 2e^(-t) or cos(2t); an equation such as y'' + 3y' + 2y = u(t - 1).</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Two limits of the lab, stated where they matter. A linear factor of the denominator must have a rational root, so <span class="math" data-say="s squared minus 2">s² − 2</span>, whose roots are <span class="math" data-say="plus or minus the square root of 2">±√2</span>, is refused with the factor named. An irreducible quadratic must have a rational frequency, so <span class="math" data-say="s squared plus 2">s² + 2</span>, whose inverse would carry <span class="math" data-say="cosine of the quantity the square root of 2 times t">cos(√2·t)</span>, is refused the same way rather than printed with a surd inside a cosine. The mathematics is still fine in both cases; the lab is limited.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving by transform</h2></div><p>Transform, solve, decompose, invert, check. The check is the step that finds a slip in any of the others.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Transform both sides</h3><p>Replace each derivative by its rule, with the starting values written in. Transform the forcing from the table.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Collect Y and solve</h3><p>Move every term that contains <span class="math" data-say="Y">Y</span> to the left and factor it out. Divide by the characteristic polynomial. <span class="math" data-say="Y">Y</span> is now a single fraction in <span class="math" data-say="s">s</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Decompose into table forms</h3><p>Factor the denominator. Write one term for each linear factor, and complete the square for a quadratic that does not factor. Find the coefficients by substituting the roots.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the table backwards</h3><p>Replace each fraction by the signal that has it as its transform, and add the signals.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check by substitution</h3><p>Put the answer into the original equation and its starting values. The residual must be zero, and the answer must start where the problem says.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving by transform</h2>
+      <p class="lead-in">Transform, solve, decompose, invert, check. The check is the step that finds a slip in any of the others.</p>
+      <ol class="key-ideas method"><li><strong>Transform both sides.</strong> Replace each derivative by its rule, with the starting values written in. Transform the forcing from the table.</li><li><strong>Collect Y and solve.</strong> Move every term that contains <span class="math" data-say="Y">Y</span> to the left and factor it out. Divide by the characteristic polynomial. <span class="math" data-say="Y">Y</span> is now a single fraction in <span class="math" data-say="s">s</span>.</li><li><strong>Decompose into table forms.</strong> Factor the denominator. Write one term for each linear factor, and complete the square for a quadratic that does not factor. Find the coefficients by substituting the roots.</li><li><strong>Read the table backwards.</strong> Replace each fraction by the signal that has it as its transform, and add the signals.</li><li><strong>Check by substitution.</strong> Put the answer into the original equation and its starting values. The residual must be zero, and the answer must start where the problem says.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1513,16 @@ Y = 2/(s + 1) − 1/(s + 2)
 y = 2e^(−t) − e^(−2t)</div><p>Check the starting values: <span class="math" data-say="y of 0 equals 2 minus 1 equals 1">y(0) = 2 − 1 = 1</span> and <span class="math" data-say="y prime of 0 equals negative 2 plus 2 equals 0">y′(0) = −2 + 2 = 0</span>. Check the equation: <span class="math" data-say="y double prime plus 3 y prime plus 2 y">y″ + 3y′ + 2y</span> has the <span class="math" data-say="e to the power the quantity negative t">e^(−t)</span> coefficients <span class="math" data-say="2 minus 6 plus 4 equals 0">2 − 6 + 4 = 0</span> and the <span class="math" data-say="e to the power the quantity negative 2 t">e^(−2t)</span> coefficients <span class="math" data-say="negative 4 plus 6 minus 2 equals 0">−4 + 6 − 2 = 0</span>. The lab reports the same residual.</p><p>Notice what was not done. No general solution with two constants was written and no pair of equations for them was solved. The starting values were in the first line.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying the initial conditions after inverting</strong><span>In the characteristic-equation method the constants are fitted at the end, and a reader carries that habit over by transforming the equation with the starting values left out. Then <span class="math" data-say="the quantity s squared plus 3 s plus 2, times Y equals 0">(s² + 3s + 2)·Y = 0</span>, so <span class="math" data-say="Y equals 0">Y = 0</span>, and the answer is <span class="math" data-say="y equals 0">y = 0</span>, which has <span class="math" data-say="y of 0 equals 0">y(0) = 0</span> and not <span class="math" data-say="1">1</span>. The starting values belong in the first line, inside the derivative rules, and nothing is left to fit afterward.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the <span data-say="b times y of 0">b·y(0)</span> term from the right side</strong><span>For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> the right side is <span class="math" data-say="s plus 3">s + 3</span>, and the <span class="math" data-say="3">3</span> comes from <span class="math" data-say="3 y prime">3y′</span> contributing <span class="math" data-say="3 times y of 0">3·y(0)</span>. Using <span class="math" data-say="s">s</span> alone gives <span class="math" data-say="Y equals s over the quantity the quantity s plus 1, times the quantity s plus 2, equals negative 1 over the quantity s plus 1, plus 2 over the quantity s plus 2">Y = s/((s + 1)(s + 2)) = −1/(s + 1) + 2/(s + 2)</span> and <span class="math" data-say="y equals negative e to the power the quantity negative t, plus 2 e to the power the quantity negative 2 t">y = −e^(−t) + 2e^(−2t)</span>. That starts at <span class="math" data-say="1">1</span> but has <span class="math" data-say="y prime of 0 equals 1 minus 4 equals negative 3">y′(0) = 1 − 4 = −3</span>, not <span class="math" data-say="0">0</span>, so the check on the second starting value fails.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Inverting the shifted sine without its exponential</strong><span>The shifted square means the signal decays: <span class="math" data-say="y equals e to the power the quantity negative t, times sine of 2 t">y = e^(−t)·sin(2t)</span>. Reading the fraction as <span class="math" data-say="sine of 2 t">sin(2t)</span> keeps the frequency and loses the decay, and the residual in <span class="math" data-say="y double prime plus 2 y prime plus 5 y">y″ + 2y′ + 5y</span> is <span class="math" data-say="sine of 2 t plus 4 times cosine of 2 t">sin(2t) + 4cos(2t)</span>, not zero. The lab reports <span class="math" data-say="residual 0">residual 0</span> only for the form with <span class="math" data-say="e to the power the quantity negative t">e^(−t)</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can solve a constant-coefficient initial value problem by transforming it, with no constants fitted at the end.</strong><p>You should be able to write the transformed equation with the starting values inside it, solve for Y(s), decompose it by substituting the roots, read the table backwards, and verify the answer by its two starting values and by substitution into the equation.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The decomposition step carried most of the weight here, and three cases were enough for the examples. The next lesson takes it apart on its own, with repeated and irreducible factors.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying the initial conditions after inverting</strong><span>In the characteristic-equation method the constants are fitted at the end, and a reader carries that habit over by transforming the equation with the starting values left out. Then <span class="math" data-say="the quantity s squared plus 3 s plus 2, times Y equals 0">(s² + 3s + 2)·Y = 0</span>, so <span class="math" data-say="Y equals 0">Y = 0</span>, and the answer is <span class="math" data-say="y equals 0">y = 0</span>, which has <span class="math" data-say="y of 0 equals 0">y(0) = 0</span> and not <span class="math" data-say="1">1</span>. The starting values belong in the first line, inside the derivative rules, and nothing is left to fit afterward.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the <span data-say="b times y of 0">b·y(0)</span> term from the right side</strong><span>For <span class="math" data-say="y double prime plus 3 y prime plus 2 y equals 0">y″ + 3y′ + 2y = 0</span> the right side is <span class="math" data-say="s plus 3">s + 3</span>, and the <span class="math" data-say="3">3</span> comes from <span class="math" data-say="3 y prime">3y′</span> contributing <span class="math" data-say="3 times y of 0">3·y(0)</span>. Using <span class="math" data-say="s">s</span> alone gives <span class="math" data-say="Y equals s over the quantity the quantity s plus 1, times the quantity s plus 2, equals negative 1 over the quantity s plus 1, plus 2 over the quantity s plus 2">Y = s/((s + 1)(s + 2)) = −1/(s + 1) + 2/(s + 2)</span> and <span class="math" data-say="y equals negative e to the power the quantity negative t, plus 2 e to the power the quantity negative 2 t">y = −e^(−t) + 2e^(−2t)</span>. That starts at <span class="math" data-say="1">1</span> but has <span class="math" data-say="y prime of 0 equals 1 minus 4 equals negative 3">y′(0) = 1 − 4 = −3</span>, not <span class="math" data-say="0">0</span>, so the check on the second starting value fails.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Inverting the shifted sine without its exponential</strong><span>The shifted square means the signal decays: <span class="math" data-say="y equals e to the power the quantity negative t, times sine of 2 t">y = e^(−t)·sin(2t)</span>. Reading the fraction as <span class="math" data-say="sine of 2 t">sin(2t)</span> keeps the frequency and loses the decay, and the residual in <span class="math" data-say="y double prime plus 2 y prime plus 5 y">y″ + 2y′ + 5y</span> is <span class="math" data-say="sine of 2 t plus 4 times cosine of 2 t">sin(2t) + 4cos(2t)</span>, not zero. The lab reports <span class="math" data-say="residual 0">residual 0</span> only for the form with <span class="math" data-say="e to the power the quantity negative t">e^(−t)</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can solve a constant-coefficient initial value problem by transforming it, with no constants fitted at the end.</strong><p>You should be able to write the transformed equation with the starting values inside it, solve for Y(s), decompose it by substituting the roots, read the table backwards, and verify the answer by its two starting values and by substitution into the equation.</p></div></div><div class="note"><strong>Note:</strong> The decomposition step carried most of the weight here, and three cases were enough for the examples. The next lesson takes it apart on its own, with repeated and irreducible factors.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The equation becomes algebra in s</summary><p>Transform every term of the equation. The derivative rules turn <span class="math" data-say="y prime">y′</span> and <span class="math" data-say="y double prime">y″</span> into multiples of <span class="math" data-say="Y">Y</span> plus terms that are already known. What remains is <span class="math" data-say="the quantity A times s squared plus b times s plus c, times Y equals something">(a·s² + b·s + c)·Y = something</span>, where the left coefficient is the characteristic polynomial of the equation, and the right side is made of the initial values and the transform of the forcing.</p></details><details class="recall"><summary>The initial values arrive with the transform</summary><p>The corrections in the derivative rules are the initial values, so the right side already contains them. Dividing by the characteristic polynomial gives <span class="math" data-say="Y of s">Y(s)</span> as one fraction, and its inverse is the solution to this initial value problem, with no constants left to fit.</p></details><details class="recall"><summary>Inverting is partial fractions and the table read backwards</summary><p>A fraction like <span class="math" data-say="the quantity s plus 3, over the quantity the quantity s plus 1, times the quantity s plus 2">(s + 3)/((s + 1)(s + 2))</span> is not in the table. Taking it apart into <span class="math" data-say="A over the quantity s plus 1, plus B over the quantity s plus 2">A/(s + 1) + B/(s + 2)</span> gives two entries that are, and the table read from right to left returns <span class="math" data-say="A times e to the power the quantity negative t, plus B times e to the power the quantity negative 2 t">A·e^(−t) + B·e^(−2t)</span>. When the denominator has an irreducible quadratic, complete the square: <span class="math" data-say="the quantity s plus 1, squared plus 4">(s + 1)² + 4</span> is the form the sine and cosine entries have.</p></details></div>
+      <h3>Summary</h3>
       <p>A constant-coefficient initial value problem is solved in four moves: transform both sides with the derivative rules, solve the resulting algebraic equation for <span class="math" data-say="Y of s">Y(s)</span>, take <span class="math" data-say="Y">Y</span> apart into table forms by partial fractions, and read the table backwards to get <span class="math" data-say="y of t">y(t)</span>. The initial values enter at the first move, so no constants are fitted at the end. The lab runs the whole chain in exact fractions and substitutes the answer back into the equation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The equation becomes algebra in s.</strong> Transform every term of the equation. The derivative rules turn <span class="math" data-say="y prime">y′</span> and <span class="math" data-say="y double prime">y″</span> into multiples of <span class="math" data-say="Y">Y</span> plus terms that are already known. What remains is <span class="math" data-say="the quantity A times s squared plus b times s plus c, times Y equals something">(a·s² + b·s + c)·Y = something</span>, where the left coefficient is the characteristic polynomial of the equation, and the right side is made of the initial values and the transform of the forcing.</li><li><strong>The initial values arrive with the transform.</strong> The corrections in the derivative rules are the initial values, so the right side already contains them. Dividing by the characteristic polynomial gives <span class="math" data-say="Y of s">Y(s)</span> as one fraction, and its inverse is the solution to this initial value problem, with no constants left to fit.</li><li><strong>Inverting is partial fractions and the table read backwards.</strong> A fraction like <span class="math" data-say="the quantity s plus 3, over the quantity the quantity s plus 1, times the quantity s plus 2">(s + 3)/((s + 1)(s + 2))</span> is not in the table. Taking it apart into <span class="math" data-say="A over the quantity s plus 1, plus B over the quantity s plus 2">A/(s + 1) + B/(s + 2)</span> gives two entries that are, and the table read from right to left returns <span class="math" data-say="A times e to the power the quantity negative t, plus B times e to the power the quantity negative 2 t">A·e^(−t) + B·e^(−2t)</span>. When the denominator has an irreducible quadratic, complete the square: <span class="math" data-say="the quantity s plus 1, squared plus 4">(s + 1)² + 4</span> is the form the sine and cosine entries have.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="transform, solve for Y, invert, check. y prime plus A times y equals q, the quantity s plus A, times Y equals y of 0 plus the Laplace transform of q. the quantity s squared plus b times s plus c, times Y equals initial terms plus the Laplace transform of q. y of 0 and y prime of 0 go in at the first step" tabindex="0" role="region" aria-label="Mathematical notation">transform, solve for Y, invert, check
 y′ + a·y = q:   (s + a)·Y = y(0) + ℒ[q]
 (s² + b·s + c)·Y = initial terms + ℒ[q]
@@ -3777,11 +3822,40 @@ y(0) and y′(0) go in at the first step</div><figcaption>The four moves</figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3849,7 +3923,7 @@ y(0) and y′(0) go in at the first step</div><figcaption>The four moves</figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

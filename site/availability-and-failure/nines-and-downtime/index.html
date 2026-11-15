@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Availability and Failure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The fraction</p>
       <h1>Nines and Downtime</h1>
       <p class="lesson-lede">Convert a target availability into minutes of downtime and back, over a period you have stated.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Availability is a share of a period</li><li>A nine is a factor of ten in the downtime</li><li>The period is part of the number</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Nines, minutes, and the period they are measured over</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Availability</span><p>The <strong>availability</strong> <span class="math" data-say="A">A</span> of a service over a period is the fraction of that period during which it is serving. It is a number in <span class="math" data-say="0, 1">[0, 1]</span>; the percentage is a presentation of it and never enters a calculation. The complementary fraction <span class="math" data-say="1 minus A">1 − A</span> is the <strong>unavailability</strong>, and the <strong>downtime</strong> permitted by <span class="math" data-say="A">A</span> over a period of length <span class="math" data-say="T">T</span> is <span class="math" data-say="the quantity 1 minus A, times T">(1 − A) × T</span>.</p></div><p>Both directions of that equation are used constantly. A target hands you <span class="math" data-say="A">A</span> and you want the minutes; a downtime budget hands you the minutes and you want the <span class="math" data-say="A">A</span> it corresponds to. They are the same equation rearranged, and the lab does both.</p><div class="mathblock" data-say="given A, downtime equals the quantity 1 minus A, times T. given downtime, A equals 1 minus downtime over T. A equals 999 over 1000, T equals 2628000 seconds. downtime equals the quantity 1 over 1000, times 2628000 equals 2628 seconds equals 43 minutes 48 seconds" tabindex="0" role="region" aria-label="Mathematical notation">given A:        downtime = (1 − A) × T
-given downtime: A = 1 − downtime/T
-
-A = 999/1000, T = 2 628 000 s
-downtime = (1/1000) × 2 628 000 = 2628 s = 43 min 48 s</div><p>Keep <span class="math" data-say="A">A</span> as a fraction throughout. <span class="math" data-say="999 over 1000">999/1000</span> is exactly three nines and <span class="math" data-say="0.999">0.999</span> is a double that is very slightly not; the differences this course cares about live in the fourth decimal place and further down, and a percentage rounded for display hides all of them. Every figure the lab prints is an exact fraction until the last digit.</p><div class="example"><span class="label">Example &middot; The same service, one nine apart</span><p>At 99.9% you may be down <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> a month and <span class="math" data-say="8 h 45 minutes 36 seconds">8 h 45 min 36 s</span> a year. At 99.99% those become <span class="math" data-say="4 minutes 22.8 seconds">4 min 22.8 s</span> and <span class="math" data-say="52 minutes 33.6 seconds">52 min 33.6 s</span>. The percentages differ by <span class="math" data-say="0.09000 percent">0.09000%</span>; the minutes differ by a factor of ten, and it is the minutes that get paid for &mdash; in redundancy, in deployment discipline and in how fast someone has to be woken up.</p></div><div class="defbox"><span class="label">Definition &middot; Nines</span><p>An availability has <strong>k nines</strong> when <span class="math" data-say="1 minus A is at most 10 to the power negative k">1 − A ≤ 10⁻ᵏ</span>, taking the largest such <span class="math" data-say="k">k</span>. This is a statement about the unavailability and not about how many <span class="math" data-say="9">9</span> characters appear in the printed percentage.</p></div><p>The two readings come apart immediately. 99.95% shows two nines in its digits, but <span class="math" data-say="1 minus A equals 0.0005">1 − A = 0.0005</span>, which is smaller than <span class="math" data-say="10 to the power negative 3">10⁻³</span> and larger than <span class="math" data-say="10 to the power negative 4">10⁻⁴</span>, so it has three nines &mdash; and it permits <span class="math" data-say="21 minutes 54 seconds">21 min 54 s</span> a month, half of what 99.9% permits. Nines are a logarithmic scale, so &ldquo;three and a half nines&rdquo; is not a category the definition contains.</p><h3>The period is not optional</h3><p>A downtime is a duration and a duration only means something against a period. This course fixes one table and states it on every page: an hour is <span class="math" data-say="3600">3600</span> s, a day <span class="math" data-say="86400">86 400</span> s, a week <span class="math" data-say="604800">604 800</span> s, a month <span class="math" data-say="2628000">2 628 000</span> s, a quarter <span class="math" data-say="7884000">7 884 000</span> s and a year <span class="math" data-say="31536000">31 536 000</span> s. The month is a twelfth of a 365-day year, which is the convention under which three nines is the 43.8 minutes quoted everywhere above.</p><p>Another convention is in circulation and it is also defensible: a 30-day month is <span class="math" data-say="2592000">2 592 000</span> seconds, and three nines over that is <span class="math" data-say="2592">2592</span> s, or 43.2 minutes. Neither figure is wrong. What is wrong is quoting one of them beside an annual figure computed from the other, and that is why the period is written down first rather than assumed.</p><h3>The other direction: a budget is an availability</h3><p>Start from what you are willing to be down and the same equation hands back the target. This is usually the more honest order, because a team can say how long an outage may last long before it can say which nine it wants, and the arithmetic converts one into the other without any negotiation.</p><div class="example"><span class="label">Example &middot; A budget that does not quite buy a nine</span><p>Someone rounds 43.8 minutes up and writes &ldquo;44 minutes a month&rdquo; into a document. That budget is <span class="math" data-say="1 minus 2640 over 2628000 equals 10939 over 10950">1 − 2640/2 628 000 = 10939/10950</span>, or <span class="math" data-say="99.89954 percent">99.89954%</span>, and by the definition above it has <strong>two</strong> nines rather than three. The rounding went the wrong way across a boundary. Set the lab to work from a budget and move the slider between 43 and 44 minutes to watch the count change.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Nines are minutes</h2></div><p>Downtime is (1 − A) × period, and each nine is a factor of ten</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Nines, minutes, and the period they are measured over</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Availability</span><p>The <strong>availability</strong> <span class="math" data-say="A">A</span> of a service over a period is the fraction of that period during which it is serving. It is a number in <span class="math" data-say="0, 1">[0, 1]</span>; the percentage is a presentation of it and never enters a calculation. The complementary fraction <span class="math" data-say="1 minus A">1 − A</span> is the <strong>unavailability</strong>, and the <strong>downtime</strong> permitted by <span class="math" data-say="A">A</span> over a period of length <span class="math" data-say="T">T</span> is <span class="math" data-say="the quantity 1 minus A, times T">(1 − A) × T</span>.</p></div><p>Both directions of that equation are used constantly. A target hands you <span class="math" data-say="A">A</span> and you want the minutes; a downtime budget hands you the minutes and you want the <span class="math" data-say="A">A</span> it corresponds to. They are the same equation rearranged, and the lab does both.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Nines are minutes</h2></div><p>Downtime is (1 − A) × period, and each nine is a factor of ten</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Nines and downtime</strong><span>each further nine is ten times less of it, not a hundredth of a per cent more</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the nine you chose</span><span class="tone-muted"><i class="legend-swatch"></i>the ladder</span><span class="tone-amber"><i class="legend-swatch"></i>your budget</span></div>
@@ -1408,10 +1447,10 @@ downtime = (1/1000) × 2 628 000 = 2628 s = 43 min 48 s</div><p>Keep <span class
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="nnLadder" viewBox="0 0 520 210" role="img" aria-label="A ladder of nines with the monthly downtime each one allows."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="nnTable"></table></div>
       <div class="status-banner" id="nnStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pick a target, or pick a budget</h3>
-          <p>Start from a target availability and read the minutes off, then switch the selector and start from the minutes instead. The ladder beside it draws one rung per nine, and each rung is a tenth of the one above it rather than a hundredth of a per cent below it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pick a target, or pick a budget</h3>
+            <p>Start from a target availability and read the minutes off, then switch the selector and start from the minutes instead. The ladder beside it draws one rung per nine, and each rung is a tenth of the one above it rather than a hundredth of a per cent below it.</p>
         <div class="field">
           <label for="nnDir">Work from</label>
           <select id="nnDir"><option value="target" selected>a target availability</option><option value="budget">a downtime budget</option></select>
@@ -1437,12 +1476,19 @@ downtime = (1/1000) × 2 628 000 = 2628 s = 43 min 48 s</div><p>Keep <span class
           <div class="kpi"><span>One more nine costs</span><strong id="nnNext">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="nnHint" style="margin:0;">A month here is a twelfth of a 365-day year &mdash; 2 628 000 seconds &mdash; which is the convention under which 99.9% is 43.8 minutes. Every figure is the exact fraction (1 &minus; A) &times; period; nothing is looked up.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="given A, downtime equals the quantity 1 minus A, times T. given downtime, A equals 1 minus downtime over T. A equals 999 over 1000, T equals 2628000 seconds. downtime equals the quantity 1 over 1000, times 2628000 equals 2628 seconds equals 43 minutes 48 seconds" tabindex="0" role="region" aria-label="Mathematical notation">given A:        downtime = (1 − A) × T
+given downtime: A = 1 − downtime/T
+
+A = 999/1000, T = 2 628 000 s
+downtime = (1/1000) × 2 628 000 = 2628 s = 43 min 48 s</div><p>Keep <span class="math" data-say="A">A</span> as a fraction throughout. <span class="math" data-say="999 over 1000">999/1000</span> is exactly three nines and <span class="math" data-say="0.999">0.999</span> is a double that is very slightly not; the differences this course cares about live in the fourth decimal place and further down, and a percentage rounded for display hides all of them. Every figure the lab prints is an exact fraction until the last digit.</p><div class="example"><span class="label">Example &middot; The same service, one nine apart</span><p>At 99.9% you may be down <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> a month and <span class="math" data-say="8 h 45 minutes 36 seconds">8 h 45 min 36 s</span> a year. At 99.99% those become <span class="math" data-say="4 minutes 22.8 seconds">4 min 22.8 s</span> and <span class="math" data-say="52 minutes 33.6 seconds">52 min 33.6 s</span>. The percentages differ by <span class="math" data-say="0.09000 percent">0.09000%</span>; the minutes differ by a factor of ten, and it is the minutes that get paid for &mdash; in redundancy, in deployment discipline and in how fast someone has to be woken up.</p></div><div class="defbox"><span class="label">Definition &middot; Nines</span><p>An availability has <strong>k nines</strong> when <span class="math" data-say="1 minus A is at most 10 to the power negative k">1 − A ≤ 10⁻ᵏ</span>, taking the largest such <span class="math" data-say="k">k</span>. This is a statement about the unavailability and not about how many <span class="math" data-say="9">9</span> characters appear in the printed percentage.</p></div><p>The two readings come apart immediately. 99.95% shows two nines in its digits, but <span class="math" data-say="1 minus A equals 0.0005">1 − A = 0.0005</span>, which is smaller than <span class="math" data-say="10 to the power negative 3">10⁻³</span> and larger than <span class="math" data-say="10 to the power negative 4">10⁻⁴</span>, so it has three nines &mdash; and it permits <span class="math" data-say="21 minutes 54 seconds">21 min 54 s</span> a month, half of what 99.9% permits. Nines are a logarithmic scale, so &ldquo;three and a half nines&rdquo; is not a category the definition contains.</p><h3>The period is not optional</h3><p>A downtime is a duration and a duration only means something against a period. This course fixes one table and states it on every page: an hour is <span class="math" data-say="3600">3600</span> s, a day <span class="math" data-say="86400">86 400</span> s, a week <span class="math" data-say="604800">604 800</span> s, a month <span class="math" data-say="2628000">2 628 000</span> s, a quarter <span class="math" data-say="7884000">7 884 000</span> s and a year <span class="math" data-say="31536000">31 536 000</span> s. The month is a twelfth of a 365-day year, which is the convention under which three nines is the 43.8 minutes quoted everywhere above.</p><p>Another convention is in circulation and it is also defensible: a 30-day month is <span class="math" data-say="2592000">2 592 000</span> seconds, and three nines over that is <span class="math" data-say="2592">2592</span> s, or 43.2 minutes. Neither figure is wrong. What is wrong is quoting one of them beside an annual figure computed from the other, and that is why the period is written down first rather than assumed.</p><h3>The other direction: a budget is an availability</h3><p>Start from what you are willing to be down and the same equation hands back the target. This is usually the more honest order, because a team can say how long an outage may last long before it can say which nine it wants, and the arithmetic converts one into the other without any negotiation.</p><div class="example"><span class="label">Example &middot; A budget that does not quite buy a nine</span><p>Someone rounds 43.8 minutes up and writes &ldquo;44 minutes a month&rdquo; into a document. That budget is <span class="math" data-say="1 minus 2640 over 2628000 equals 10939 over 10950">1 − 2640/2 628 000 = 10939/10950</span>, or <span class="math" data-say="99.89954 percent">99.89954%</span>, and by the definition above it has <strong>two</strong> nines rather than three. The rounding went the wrong way across a boundary. Set the lab to work from a budget and move the slider between 43 and 44 minutes to watch the count change.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Turning a target into minutes</h2></div><p>Four lines, and the third one is the only arithmetic. The other three are what stop the arithmetic being done on the wrong number.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the availability as an exact fraction</h3><p>99.9% is <span class="math" data-say="999 over 1000">999/1000</span>. Do not carry it as <span class="math" data-say="0.999">0.999</span>, and do not carry the percentage into the multiplication: the factor you need is <span class="math" data-say="1 minus A">1 − A</span>, and here that is exactly <span class="math" data-say="1 over 1000">1/1000</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Name the period and put it in seconds</h3><p>Write down which period you are quoting and its length before anything else. A month on this course is <span class="math" data-say="2628000">2 628 000</span> s. If a different convention is in use, say so in the same sentence as the answer.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply, then read the product as a duration</h3><p><span class="math" data-say="the quantity 1 over 1000, times 2628000 equals 2628">(1/1000) × 2 628 000 = 2628</span> s. Convert once, at the end: 43 minutes and 48 seconds. Converting earlier introduces a rounding into a quantity whose interesting digits are at the far right.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the answer against the ladder</h3><p>One more nine must give a tenth of the downtime and one fewer must give ten times as much. If your answer does not sit on that ladder, the error is almost always a period mismatch &mdash; a monthly figure compared with an annual one.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Turning a target into minutes</h2>
+      <p class="lead-in">Four lines, and the third one is the only arithmetic. The other three are what stop the arithmetic being done on the wrong number.</p>
+      <ol class="key-ideas method"><li><strong>Write the availability as an exact fraction.</strong> 99.9% is <span class="math" data-say="999 over 1000">999/1000</span>. Do not carry it as <span class="math" data-say="0.999">0.999</span>, and do not carry the percentage into the multiplication: the factor you need is <span class="math" data-say="1 minus A">1 − A</span>, and here that is exactly <span class="math" data-say="1 over 1000">1/1000</span>.</li><li><strong>Name the period and put it in seconds.</strong> Write down which period you are quoting and its length before anything else. A month on this course is <span class="math" data-say="2628000">2 628 000</span> s. If a different convention is in use, say so in the same sentence as the answer.</li><li><strong>Multiply, then read the product as a duration.</strong> <span class="math" data-say="the quantity 1 over 1000, times 2628000 equals 2628">(1/1000) × 2 628 000 = 2628</span> s. Convert once, at the end: 43 minutes and 48 seconds. Converting earlier introduces a rounding into a quantity whose interesting digits are at the far right.</li><li><strong>Check the answer against the ladder.</strong> One more nine must give a tenth of the downtime and one fewer must give ten times as much. If your answer does not sit on that ladder, the error is almost always a period mismatch &mdash; a monthly figure compared with an annual one.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ how many nines
 99.95% is three nines, and it permits half the downtime of 99.9%</div><p>The check at the end is the part worth keeping. Two digits of the percentage moved and the count of nines did not; the downtime halved. Anyone reading &ldquo;99.95&rdquo; as &ldquo;two nines and a bit&rdquo; has compared the printed characters instead of the unavailability.</p><p>For a faded rehearsal, take 99.5%. The supplied first move is <span class="math" data-say="1 minus A equals 1 over 200">1 − A = 1/200</span>. Produce the downtime per week and per quarter, say how many nines it has by the definition rather than by looking, and then state the monthly budget in minutes that would buy exactly one more nine. Check all three against the lab before opening the quiz, and say which period each of your figures belongs to.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Comparing two targets by subtracting their percentages</strong><span><span class="math" data-say="99.99 minus 99.9 equals 0.09">99.99 − 99.9 = 0.09</span> is arithmetic about the wrong quantity. The thing that changed is <span class="math" data-say="1 minus A">1 − A</span>, and it changed by a factor of ten. Any argument of the form &ldquo;that is a tiny improvement&rdquo; based on the percentage gap has measured the availability where it should have measured the outage.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a downtime with no period attached</strong><span>&ldquo;We were down 52 minutes&rdquo; is four nines against a year and worse than three against a month. A duration is half a number; the period is the other half. Write both, every time, and prefer to write the period in seconds so that nobody has to guess whether your month has 30 days or 30.4167 of them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting the nines that are printed rather than the ones that are bought</strong><span>99.95% displays two nines and has three. 99.5% displays two and has two. The definition looks at <span class="math" data-say="1 minus A">1 − A</span> and asks which power of ten it fits under, which is a question about the size of the outage rather than about the spelling of the target.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a target availability and a downtime budget feel like one number written two ways.</strong><p>You should be able to convert either into the other over any of the six periods without looking anything up, say how many nines an availability has by the definition rather than by eye, and state the period alongside every duration you quote.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This lesson takes the availability as given. Where it comes from is the next question, and it has an answer with two levers in it: a machine is available in proportion to how long it runs between failures and how fast it is repaired. &ldquo;MTBF and MTTR&rdquo; shows that those two levers are worth exactly the same amount, and that one of them is usually far cheaper to pull.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Comparing two targets by subtracting their percentages</strong><span><span class="math" data-say="99.99 minus 99.9 equals 0.09">99.99 − 99.9 = 0.09</span> is arithmetic about the wrong quantity. The thing that changed is <span class="math" data-say="1 minus A">1 − A</span>, and it changed by a factor of ten. Any argument of the form &ldquo;that is a tiny improvement&rdquo; based on the percentage gap has measured the availability where it should have measured the outage.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a downtime with no period attached</strong><span>&ldquo;We were down 52 minutes&rdquo; is four nines against a year and worse than three against a month. A duration is half a number; the period is the other half. Write both, every time, and prefer to write the period in seconds so that nobody has to guess whether your month has 30 days or 30.4167 of them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Counting the nines that are printed rather than the ones that are bought</strong><span>99.95% displays two nines and has three. 99.5% displays two and has two. The definition looks at <span class="math" data-say="1 minus A">1 − A</span> and asks which power of ten it fits under, which is a question about the size of the outage rather than about the spelling of the target.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a target availability and a downtime budget feel like one number written two ways.</strong><p>You should be able to convert either into the other over any of the six periods without looking anything up, say how many nines an availability has by the definition rather than by eye, and state the period alongside every duration you quote.</p></div></div><div class="note"><strong>Note:</strong> This lesson takes the availability as given. Where it comes from is the next question, and it has an answer with two levers in it: a machine is available in proportion to how long it runs between failures and how fast it is repaired. &ldquo;MTBF and MTTR&rdquo; shows that those two levers are worth exactly the same amount, and that one of them is usually far cheaper to pull.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Availability is a share of a period</summary><p><span class="math" data-say="A">A</span> is the fraction of a period during which the service does its job, so <span class="math" data-say="1 minus A">1 − A</span> is the fraction during which it does not, and multiplying that by the length of the period gives the downtime the target permits. Nothing else is happening: <span class="math" data-say="downtime equals the quantity 1 minus A, times period">downtime = (1 − A) × period</span> is the whole of this lesson, and every other lesson on this course is what happens to <span class="math" data-say="A">A</span> when several of them are put together.</p></details><details class="recall"><summary>A nine is a factor of ten in the downtime</summary><p>Going from 99.9% to 99.99% moves the percentage by <span class="math" data-say="0.09">0.09</span> points, which sounds like a rounding. It divides <span class="math" data-say="1 minus A">1 − A</span> by ten, and <span class="math" data-say="1 minus A">1 − A</span> is what you actually buy: 43 minutes and 48 seconds a month become 4 minutes and 22.8 seconds. The percentage is a bad scale for this quantity and the downtime is a good one, which is why the lab draws the ladder in minutes.</p></details><details class="recall"><summary>The period is part of the number</summary><p>&ldquo;Fifty-two minutes of downtime&rdquo; is four nines over a year and barely three nines over a month; the same duration is a different promise on a different clock. This course fixes one table of periods, and a month in it is a twelfth of a 365-day year &mdash; <span class="math" data-say="2628000">2 628 000</span> seconds &mdash; so every monthly figure on every page can be reconciled with every other.</p></details></div>
+      <h3>Summary</h3>
       <p>Availability is a fraction of a period, and the downtime it permits is <span class="math" data-say="the quantity 1 minus A, times period">(1 − A) × period</span>. Each further nine divides that downtime by ten while moving the percentage by less than a tenth of a point, which is why the two ways of quoting the same target sound so unlike each other. The period is part of the number: a downtime figure without one says nothing at all.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Availability is a share of a period.</strong> <span class="math" data-say="A">A</span> is the fraction of a period during which the service does its job, so <span class="math" data-say="1 minus A">1 − A</span> is the fraction during which it does not, and multiplying that by the length of the period gives the downtime the target permits. Nothing else is happening: <span class="math" data-say="downtime equals the quantity 1 minus A, times period">downtime = (1 − A) × period</span> is the whole of this lesson, and every other lesson on this course is what happens to <span class="math" data-say="A">A</span> when several of them are put together.</li><li><strong>A nine is a factor of ten in the downtime.</strong> Going from 99.9% to 99.99% moves the percentage by <span class="math" data-say="0.09">0.09</span> points, which sounds like a rounding. It divides <span class="math" data-say="1 minus A">1 − A</span> by ten, and <span class="math" data-say="1 minus A">1 − A</span> is what you actually buy: 43 minutes and 48 seconds a month become 4 minutes and 22.8 seconds. The percentage is a bad scale for this quantity and the downtime is a good one, which is why the lab draws the ladder in minutes.</li><li><strong>The period is part of the number.</strong> &ldquo;Fifty-two minutes of downtime&rdquo; is four nines over a year and barely three nines over a month; the same duration is a different promise on a different clock. This course fixes one table of periods, and a month in it is a twelfth of a 365-day year &mdash; <span class="math" data-say="2628000">2 628 000</span> seconds &mdash; so every monthly figure on every page can be reconciled with every other.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="downtime equals the quantity 1 minus A, times period, A is a fraction, never a percentage. 99.9 percent, goes to, 43 minutes 48 seconds a month, 8 h 45 minutes 36 seconds a year. 99.99 percent, goes to, 4 minutes 22.8 seconds a month, 52 minutes 33.6 seconds a year. k nines if and only if 1 minus A is at most 10 to the power negative k, a month here is 2628000 seconds" tabindex="0" role="region" aria-label="Mathematical notation">downtime = (1 − A) × period          A is a fraction, never a percentage
 99.9%   →  43 min 48 s a month,  8 h 45 min 36 s a year
 99.99%  →  4 min 22.8 s a month, 52 min 33.6 s a year
@@ -2639,11 +2684,40 @@ k nines ⟺ 1 − A ≤ 10⁻ᵏ              a month here is 2 628 000 s</div><
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2711,7 +2785,7 @@ k nines ⟺ 1 − A ≤ 10⁻ᵏ              a month here is 2 628 000 s</div><
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

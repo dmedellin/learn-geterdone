@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Vocabulary and Reading</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; How much you know</p>
       <h1>How Much of a Page You Know</h1>
       <p class="lesson-lede">Check every word of a page against the list, and read the share you know and the words you do not.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Coverage counts every word, each time it appears</li><li>A name is read, not learned</li><li>98% is a high bar, and the gap is a list</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The 41 words the passage leaves</h2>
-      <article class="prose reading"><p>How much of a page do you know? Most people answer with a feeling. This lesson answers with a count. The lab takes a printed text and asks one question of every word: is it on the list? The list is the 2,800 <dfn>headwords</dfn> of the New General Service List. A <dfn>headword</dfn> is the word the list files the others under: <em>walk</em> for <em>walks</em>, <em>walked</em> and <em>walking</em>. The answer is a share, and the share is the <dfn>coverage</dfn> of the list on that text.</p><h3>Three steps of the list</h3><p>The list comes in three bands. The first holds the commonest 1,000 headwords and, beside them, the numbers, the days and the months, 1,050 in all; the second holds the next 1,000, and the third the last 809. That is 2,859 headwords, which this Subject calls 2,800 everywhere. On the passage, 936 words from the end of a chapter of <em>Pride and Prejudice</em>, the first 1,000 cover 85.0%, the first 2,000 cover 89.2%, and all 2,800 cover 91.0%. On the part of the play printed here, 1,972 words, the same steps give 79.5%, 83.9% and 85.9%. On the two modern documents, 1,685 words in all, they give 76.0%, 84.7% and 87.3%.</p><h3>How the lab knows a form</h3><p>The list holds headwords, and a page holds forms. The lab closes the gap with the rules of the earlier courses, run backwards. It takes <em>-s</em>, <em>-ed</em> and <em>-ing</em> off a verb, with the spelling changes put back; it takes a plural off a noun, the irregular ones too; it takes <em>-er</em>, <em>-est</em> and <em>-ly</em> off a word; it turns <em>n't</em> into <em>not</em>; it files <em>him</em> and <em>his</em> under <em>he</em>, as the list does; and it knows the irregular verbs. If the word that comes out is on the list, the form is covered. The menu calls the passage 936 words, the count this lab reads, with <em>don't</em> and <em>aunt's</em> one word each.</p><p>Does this work? It was checked away from this page, against the full list of 10,296 forms the list records. The rules take 9,925 of them back to a headword, and 9,920 of those to their own headword. The 371 they miss are of six kinds: 152 British spellings (<em>colour</em>, <em>centre</em>, words in <em>-ise</em>); 74 spoken forms and words cut short (<em>gonna</em>, <em>comin</em>); 64 number words (<em>fourth</em>, <em>twentieth</em>); 17 old or irregular forms (<em>cometh</em>, <em>bade</em>, <em>borne</em>, <em>farther</em>); 11 plurals from Latin and Greek (<em>crises</em>, <em>phenomena</em>); and 53 wrong spellings and the rest (<em>arguement</em>, <em>e-mail</em>). The rules also reach words the list does not record, so the lab gives a little more cover than looking each word up in the list of forms would: 91.0% against 90.8% on the passage and 87.3% against 87.1% on the modern documents. On the play the gap is wider, 85.9% against 83.6%, and most of it is <em>don't</em> and the other short forms with an apostrophe: the forms list does not record them, and the rules take them apart. One extra hit is wrong: <em>Worthing</em>, a family name, is read as a form of <em>worth</em> six times.</p><h3>What counts as a name</h3><p>The lab asks about the list first, so a listed word that happens to carry a capital is covered, not a name. A word the list lacks is a name if its capital letter does not start a sentence. So is a word in capitals all through, which is how the play prints the name of each speaker, and a word that stands with a capital in the middle of a sentence somewhere else in the text, even where it opens a sentence. <em>Mr</em> and <em>Mrs</em> fall in this set too. The capital is the whole test, and the lab cannot tell a name from a word that happens to have one. Read the passage's 31 names and you find <em>Lord</em>, from <em>Oh, Lord!</em>. In the play, <em>Ahem</em>, a sound written as a word, is a name three times.</p><h3>What is left</h3><p>Now compare the share with names with the 98% a reader needs. For the passage the gap is 5.7 points at 94.3%. The play is at 94.6% and the modern documents at 92.7%. All three fall short, and the table says which words make the difference. The words are not the same in each. Read the three tables: the passage lacks words of manner, such as <em>affection</em> and <em>gallantry</em>; the play lacks words of feeling, such as <em>darling</em> and <em>passionately</em>, and its biggest single miss is the word of surprise it says fourteen times; and the modern documents lack the words of two trades, law and population counting.</p><h3>A text of your own</h3><p>Choose &ldquo;a text of your own&rdquo; and paste a page. Below fifty words the lab says so and counts nothing. Above it, you get the same tiles and the same table. The words under <em>not covered</em> are the ones to learn first for that page, and the ones that appear most often come first.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>How much of a page the 2,800 words cover</h2></div><p>Every word of the text checked against the list, by the rules of the nine courses before</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The 41 words the passage leaves</h2><div class="prose reading"><p>How much of a page do you know? Most people answer with a feeling. This lesson answers with a count. The lab takes a printed text and asks one question of every word: is it on the list? The list is the 2,800 <dfn>headwords</dfn> of the New General Service List. A <dfn>headword</dfn> is the word the list files the others under: <em>walk</em> for <em>walks</em>, <em>walked</em> and <em>walking</em>. The answer is a share, and the share is the <dfn>coverage</dfn> of the list on that text.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>How much of a page the 2,800 words cover</h2></div><p>Every word of the text checked against the list, by the rules of the nine courses before</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>words read</span><strong id="cvN">&mdash;</strong></div><div class="kpi"><span>first band, 1,050 headwords</span><strong id="cvB1">&mdash;</strong></div><div class="kpi"><span>first two bands, 2,050</span><strong id="cvB2">&mdash;</strong></div><div class="kpi"><span>all three, 2,859</span><strong id="cvB3">&mdash;</strong></div><div class="kpi"><span>and names</span><strong id="cvNames">&mdash;</strong></div><div class="kpi"><span>and families</span><strong id="cvFam">&mdash;</strong></div><div class="kpi"><span>words not covered</span><strong id="cvOff">&mdash;</strong></div><div class="kpi"><span>different words</span><strong id="cvDistinct">&mdash;</strong></div></div><div class="kpi-grid"><div class="kpi"><span>the commonest ten</span><strong id="cvTop10">&mdash;</strong></div><div class="kpi"><span>fifty</span><strong id="cvTop50">&mdash;</strong></div><div class="kpi"><span>a hundred</span><strong id="cvTop100">&mdash;</strong></div></div><p class="small-copy" id="cvLimit"></p><div class="table-wrap" style="max-height:20rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="cvTable"><thead><tr id="cvCols"></tr></thead><tbody id="cvBody"></tbody></table></div><details><summary>The text, printed in full</summary><div class="mathblock" id="cvText" style="font-size:0.84rem;line-height:1.9;" tabindex="0" role="region" aria-label="Mathematical notation"></div></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Check a page against the 2,800 words</h3>
-          <p>Every word of the text is checked against the 2,800 headwords. A form such as <em>walked</em> or <em>happier</em> counts when the rules of the earlier courses turn it back into a headword. Choose the passage (1813), the excerpt from the play (1895), the two modern documents, or &ldquo;a text of your own&rdquo; and paste fifty words or more. The table lists the words that are not covered and the names.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Check a page against the 2,800 words</h3>
+            <p>Every word of the text is checked against the 2,800 headwords. A form such as <em>walked</em> or <em>happier</em> counts when the rules of the earlier courses turn it back into a headword. Choose the passage (1813), the excerpt from the play (1895), the two modern documents, or &ldquo;a text of your own&rdquo; and paste fifty words or more. The table lists the words that are not covered and the names.</p>
 <label for="cvPreset">Text</label> <select id="cvPreset"><option value="passage" selected="selected">the 936-word passage from the novel (1813)</option><option value="wilde">1,975 words of the play (1895)</option><option value="modern">the two modern documents</option><option value="own">a text of your own</option></select> <label for="cvShow">List</label> <select id="cvShow"><option value="bands" selected="selected">the words not covered</option><option value="top">the commonest words, ranked</option><option value="family">the words a family adds</option></select><div id="cvOwnBox"><label for="cvOwn">Paste a text of fifty words or more</label><textarea id="cvOwn" rows="6" style="width:100%;"></textarea></div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Three steps of the list</h3><p>The list comes in three bands. The first holds the commonest 1,000 headwords and, beside them, the numbers, the days and the months, 1,050 in all; the second holds the next 1,000, and the third the last 809. That is 2,859 headwords, which this Subject calls 2,800 everywhere. On the passage, 936 words from the end of a chapter of <em>Pride and Prejudice</em>, the first 1,000 cover 85.0%, the first 2,000 cover 89.2%, and all 2,800 cover 91.0%. On the part of the play printed here, 1,972 words, the same steps give 79.5%, 83.9% and 85.9%. On the two modern documents, 1,685 words in all, they give 76.0%, 84.7% and 87.3%.</p><h3>How the lab knows a form</h3><p>The list holds headwords, and a page holds forms. The lab closes the gap with the rules of the earlier courses, run backwards. It takes <em>-s</em>, <em>-ed</em> and <em>-ing</em> off a verb, with the spelling changes put back; it takes a plural off a noun, the irregular ones too; it takes <em>-er</em>, <em>-est</em> and <em>-ly</em> off a word; it turns <em>n't</em> into <em>not</em>; it files <em>him</em> and <em>his</em> under <em>he</em>, as the list does; and it knows the irregular verbs. If the word that comes out is on the list, the form is covered. The menu calls the passage 936 words, the count this lab reads, with <em>don't</em> and <em>aunt's</em> one word each.</p><p>Does this work? It was checked away from this page, against the full list of 10,296 forms the list records. The rules take 9,925 of them back to a headword, and 9,920 of those to their own headword. The 371 they miss are of six kinds: 152 British spellings (<em>colour</em>, <em>centre</em>, words in <em>-ise</em>); 74 spoken forms and words cut short (<em>gonna</em>, <em>comin</em>); 64 number words (<em>fourth</em>, <em>twentieth</em>); 17 old or irregular forms (<em>cometh</em>, <em>bade</em>, <em>borne</em>, <em>farther</em>); 11 plurals from Latin and Greek (<em>crises</em>, <em>phenomena</em>); and 53 wrong spellings and the rest (<em>arguement</em>, <em>e-mail</em>). The rules also reach words the list does not record, so the lab gives a little more cover than looking each word up in the list of forms would: 91.0% against 90.8% on the passage and 87.3% against 87.1% on the modern documents. On the play the gap is wider, 85.9% against 83.6%, and most of it is <em>don't</em> and the other short forms with an apostrophe: the forms list does not record them, and the rules take them apart. One extra hit is wrong: <em>Worthing</em>, a family name, is read as a form of <em>worth</em> six times.</p><h3>What counts as a name</h3><p>The lab asks about the list first, so a listed word that happens to carry a capital is covered, not a name. A word the list lacks is a name if its capital letter does not start a sentence. So is a word in capitals all through, which is how the play prints the name of each speaker, and a word that stands with a capital in the middle of a sentence somewhere else in the text, even where it opens a sentence. <em>Mr</em> and <em>Mrs</em> fall in this set too. The capital is the whole test, and the lab cannot tell a name from a word that happens to have one. Read the passage's 31 names and you find <em>Lord</em>, from <em>Oh, Lord!</em>. In the play, <em>Ahem</em>, a sound written as a word, is a name three times.</p><h3>What is left</h3><p>Now compare the share with names with the 98% a reader needs. For the passage the gap is 5.7 points at 94.3%. The play is at 94.6% and the modern documents at 92.7%. All three fall short, and the table says which words make the difference. The words are not the same in each. Read the three tables: the passage lacks words of manner, such as <em>affection</em> and <em>gallantry</em>; the play lacks words of feeling, such as <em>darling</em> and <em>passionately</em>, and its biggest single miss is the word of surprise it says fourteen times; and the modern documents lack the words of two trades, law and population counting.</p><h3>A text of your own</h3><p>Choose &ldquo;a text of your own&rdquo; and paste a page. Below fifty words the lab says so and counts nothing. Above it, you get the same tiles and the same table. The words under <em>not covered</em> are the ones to learn first for that page, and the ones that appear most often come first.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a figure for a text in front of you</h2></div><p>Five steps, in this order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>How many words did the lab read?</h3><p>Look at the first number. A share of a short text moves a lot when one word changes, which is why the lab asks for fifty words or more.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the three shares for the list</h3><p>The first 1,000 words, the first 2,000 and all 2,800. Each step adds less than the one before, and that is how the list was made: the commonest words first.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the share with names</h3><p>This is the figure to hold against 98%. If it is above, you can read the text without looking words up. If it is below, the next step says how far.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Turn the gap into words</h3><p>Take the share from 100 and divide 100 by what is left. At 94.3% the gap is 5.7, and 100 divided by 5.7 is about 18, so about one word in 18 is a word you may not know. At 98% it is one in 50.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Read the table of words not covered</h3><p>Sort them into kinds before you learn them. A word that appears twice is worth more than a word that appears once.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a figure for a text in front of you</h2>
+      <p class="lead-in">Five steps, in this order.</p>
+      <ol class="key-ideas method"><li><strong>How many words did the lab read?.</strong> Look at the first number. A share of a short text moves a lot when one word changes, which is why the lab asks for fifty words or more.</li><li><strong>Read the three shares for the list.</strong> The first 1,000 words, the first 2,000 and all 2,800. Each step adds less than the one before, and that is how the list was made: the commonest words first.</li><li><strong>Read the share with names.</strong> This is the figure to hold against 98%. If it is above, you can read the text without looking words up. If it is below, the next step says how far.</li><li><strong>Turn the gap into words.</strong> Take the share from 100 and divide 100 by what is left. At 94.3% the gap is 5.7, and 100 divided by 5.7 is about 18, so about one word in 18 is a word you may not know. At 98% it is one in 50.</li><li><strong>Read the table of words not covered.</strong> Sort them into kinds before you learn them. A word that appears twice is worth more than a word that appears once.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1436,17 +1482,16 @@ formal words        departure, exertion, affirmative,
 the rest            oh (twice), de</div><p>Ten, five, eleven, two, four, six and three make 41, the number the lab prints. The first kind is a matter of the year: words of manners and feeling in a novel from 1813. The second is a matter of the setting: a country house and a church. The third is the one to read with care. The table lists forms, not headwords, so one missing verb can fill two rows: <em>provoke</em> and <em>provoked</em>, and the same for <em>sermon</em> and for <em>interrupt</em>. For <em>provoked</em> and <em>sermons</em> the rules would reach the second row if the first were on the list; for <em>interruption</em> they would not even then, because the lab cuts <em>-tion</em>, not <em>-ion</em>. None of the three is on the list, so every row stands. Learn the eleven as nine words. Two words are only a British spelling of a listed word (<em>honor</em>, <em>humor</em>). Four are made from listed words by a cut the lab does not make: <em>after</em> with an ending, <em>condition</em> with two, <em>separate</em> with one, and <em>twelve</em> and <em>month</em> joined. Six are formal words whose roots are not listed either. <em>Oh</em> is a word said in surprise, and <em>de</em> is the small word in the middle of one name, with no capital to mark it.</p><p>Now read the other two tables the same way. The play has 91 words not covered in 1,972 words, and the modern documents have 106 in 1,685. A reader of the first is short of words about love and manners; a reader of the second is short of the words of law and population, <em>mortality</em> and <em>discrimination</em> among them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking 2,800 words is enough to read a page</strong><span>On these pages the 2,800 words cover between 85.9% and 91.0% of what is printed, and between 92.7% and 94.6% once names are set apart. Both are below 98%. At 94.3% about one word in 18 is unknown, where a reader at 98% meets one in 50. The same list was counted once over the whole novel, a count no page can carry, and the quoted result, from a count whose rules differ a little from the lab's, is 80.7%, 86.1% and 88.4% for the three steps and 93.0% with names. The list is a start, not the end.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a share as a count of different words</strong><span>The passage has 361 different words, and 91.0% is not 91.0% of those. It is the share of all 936 words that are on the list, with each repeat counted. A word that appears 26 times counts 26 times. That is why learning the commonest words moves the share so much.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the share for one text as the share for all of them</strong><span>The same 2,800 words cover 91.0% of the passage, 85.9% of the play and 87.3% of the modern documents. A text with its own subject and its own words has its own share. The figure for a page you have to read is the one you need, and the lab will give it to you.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what share of a page a word list covers, and what is missing.</strong><p>You should be able to read the share for the first 1,000, 2,000 and 2,800 words off the lab, say what a name does to the share, compare it with the 98% a reader needs, work out how many words of a page that gap stands for, and test a text of your own.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The 98% is a reader's figure for an easy read of a novel, quoted from Nation (2006). The list's own authors, Browne, Culligan and Phillips, say it covers about 92% of general English text; that is a claim about a large mixed collection, quoted here and not counted on this page. The passage, at 91.0% by headword and 94.3% with names, sits on either side of it. One chapter from one 1813 novel is a sample, not a measurement of English.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking 2,800 words is enough to read a page</strong><span>On these pages the 2,800 words cover between 85.9% and 91.0% of what is printed, and between 92.7% and 94.6% once names are set apart. Both are below 98%. At 94.3% about one word in 18 is unknown, where a reader at 98% meets one in 50. The same list was counted once over the whole novel, a count no page can carry, and the quoted result, from a count whose rules differ a little from the lab's, is 80.7%, 86.1% and 88.4% for the three steps and 93.0% with names. The list is a start, not the end.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a share as a count of different words</strong><span>The passage has 361 different words, and 91.0% is not 91.0% of those. It is the share of all 936 words that are on the list, with each repeat counted. A word that appears 26 times counts 26 times. That is why learning the commonest words moves the share so much.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the share for one text as the share for all of them</strong><span>The same 2,800 words cover 91.0% of the passage, 85.9% of the play and 87.3% of the modern documents. A text with its own subject and its own words has its own share. The figure for a page you have to read is the one you need, and the lab will give it to you.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what share of a page a word list covers, and what is missing.</strong><p>You should be able to read the share for the first 1,000, 2,000 and 2,800 words off the lab, say what a name does to the share, compare it with the 98% a reader needs, work out how many words of a page that gap stands for, and test a text of your own.</p></div></div><div class="note"><strong>Note:</strong> The 98% is a reader's figure for an easy read of a novel, quoted from Nation (2006). The list's own authors, Browne, Culligan and Phillips, say it covers about 92% of general English text; that is a claim about a large mixed collection, quoted here and not counted on this page. The passage, at 91.0% by headword and 94.3% with names, sits on either side of it. One chapter from one 1813 novel is a sample, not a measurement of English.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Coverage counts every word, each time it appears</summary><p>The passage has 936 words and 361 different ones. If the list has <em>the</em>, then all 26 times that <em>the</em> appears count as known. This is why a short list of common words does so much: the first 1,000 words cover 85.0% of the passage, and the next 1,000 add only 4.2 points, to 89.2%. The rest of the list adds 1.8 more, to 91.0%.</p></details><details class="recall"><summary>A name is read, not learned</summary><p>A word in capitals in the middle of a sentence, such as <em>Darcy</em> or <em>Meryton</em>, is a name, and nobody looks a name up. The lab sets names apart. With them the passage is covered 94.3%, the play 94.6% and the modern documents 92.7%. This is the fairer figure to hold against a reader's 98%.</p></details><details class="recall"><summary>98% is a high bar, and the gap is a list</summary><p>Nation (2006) puts the share a reader needs for an easy read at 98%, which is one unknown word in every 50. The passage has 936 words, so 98% would leave about 19 words unknown. After names and families, the lab finds 41. The words that make up the gap are printed, and a list of 41 can be learned.</p></details></div>
+      <h3>Summary</h3>
       <p>A page is a count of words, and a list of words either has each one or does not. On a passage from a novel, the 2,800 words of the list cover 91.0% of what is printed, and 94.3% once names are set apart. A reader needs 98%. The gap is not a feeling about difficulty: it is a list of words you can read off the page, and this lesson shows you how to find it for any text.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Coverage counts every word, each time it appears.</strong> The passage has 936 words and 361 different ones. If the list has <em>the</em>, then all 26 times that <em>the</em> appears count as known. This is why a short list of common words does so much: the first 1,000 words cover 85.0% of the passage, and the next 1,000 add only 4.2 points, to 89.2%. The rest of the list adds 1.8 more, to 91.0%.</li><li><strong>A name is read, not learned.</strong> A word in capitals in the middle of a sentence, such as <em>Darcy</em> or <em>Meryton</em>, is a name, and nobody looks a name up. The lab sets names apart. With them the passage is covered 94.3%, the play 94.6% and the modern documents 92.7%. This is the fairer figure to hold against a reader's 98%.</li><li><strong>98% is a high bar, and the gap is a list.</strong> Nation (2006) puts the share a reader needs for an easy read at 98%, which is one unknown word in every 50. The passage has 936 words, so 98% would leave about 19 words unknown. After names and families, the lab finds 41. The words that make up the gap are printed, and a list of 41 can be learned.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the passage, 91.0 percent, 94.3 percent with names. the play excerpt, 85.9 percent, 94.6 percent with names. the modern papers, 87.3 percent, 92.7 percent with names. a reader needs, 98 percent, quoted from Nation" tabindex="0" role="region" aria-label="Mathematical notation">the passage          91.0%   94.3% with names
 the play excerpt     85.9%   94.6% with names
 the modern papers    87.3%   92.7% with names
@@ -2124,11 +2169,40 @@ var cvFamily = function (t) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2196,7 +2270,7 @@ var cvFamily = function (t) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

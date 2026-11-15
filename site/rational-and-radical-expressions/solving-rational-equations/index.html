@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rational and Radical Expressions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Rational equations</p>
       <h1>Solving Rational Equations</h1>
       <p class="lesson-lede">Clear denominators, solve the resulting linear or factorable quadratic equation, and check every candidate in the original.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Clearing denominators is the whole method</li><li>The step only runs one way</li><li>An extraneous root is not a mistake</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Clearing denominators, and what it costs</h2>
-      <article class="prose reading"><p>The method is short. Factor every denominator, list the excluded values, multiply both sides by the LCD, solve whatever polynomial equation appears, and then test each candidate in the original.</p><div class="defbox"><span class="label">Definition &middot; Extraneous solution</span><p>An <strong>extraneous solution</strong> is a value that satisfies an equation derived from the original but not the original itself. For rational equations these are precisely the candidates that are excluded values.</p></div><p>The mechanism is worth stating exactly. Multiplying both sides by the LCD is multiplication by an expression whose value depends on <span class="math" data-say="x">x</span>. At an excluded value that expression is <span class="math" data-say="0">0</span>, and multiplying an equation by <span class="math" data-say="0">0</span> produces <span class="math" data-say="0 equals 0">0 = 0</span> &mdash; true regardless of what the original said.</p><div class="thm"><span class="label">Theorem &middot; Why the check is required</span><p><span class="math" data-say="A equals B">A = B</span> implies <span class="math" data-say="AM equals BM">AM = BM</span> always. <span class="math" data-say="AM equals BM">AM = BM</span> implies <span class="math" data-say="A equals B">A = B</span> only when <span class="math" data-say="M is not equal to 0">M ≠ 0</span>. Clearing denominators uses the first implication, so the solution set can only grow, never shrink. Every candidate must be tested against the original.</p></div><div class="example"><span class="label">Example &middot; An equation with no solution at all</span><p><span class="math" data-say="x over the quantity x minus 3, equals 3 over the quantity x minus 3, plus 2">x/(x − 3) = 3/(x − 3) + 2</span>. The LCD is <span class="math" data-say="x minus 3">x − 3</span>, and <span class="math" data-say="x equals 3">x = 3</span> is excluded. Clearing gives <span class="math" data-say="x equals 3 plus 2 times the quantity x minus 3">x = 3 + 2(x − 3)</span>, so <span class="math" data-say="x equals 2 x minus 3">x = 2x − 3</span> and <span class="math" data-say="x equals 3">x = 3</span>. The only candidate is the excluded value, so it is extraneous and the equation has no solution.</p></div><p>Nothing went wrong there. The algebra is correct at every line; the equation simply has no solution, and the method's honest report of that fact takes the form of a candidate you must throw away.</p><p>A quadratic can produce two candidates of which only one survives, and that is the case worth practising, because discarding both is easy and discarding neither is easier still.</p><div class="example"><span class="label">Example &middot; One survivor</span><p><span class="math" data-say="1 over the quantity x minus 2, plus 1 over x equals the quantity x squared plus x minus 4, over the quantity x times the quantity x minus 2">1/(x − 2) + 1/x = (x² + x − 4)/(x(x − 2))</span> has LCD <span class="math" data-say="x times the quantity x minus 2">x(x − 2)</span> and exclusions <span class="math" data-say="x is not equal to 0">x ≠ 0</span>, <span class="math" data-say="x is not equal to 2">x ≠ 2</span>. Clearing gives <span class="math" data-say="x plus x minus 2 equals x squared plus x minus 4">x + (x − 2) = x² + x − 4</span>, that is <span class="math" data-say="x squared minus x minus 2 equals 0">x² − x − 2 = 0</span>, or <span class="math" data-say="the quantity x minus 2, times the quantity x plus 1, equals 0">(x − 2)(x + 1) = 0</span>. The candidates are <span class="math" data-say="2">2</span> and <span class="math" data-say="negative 1">−1</span>; <span class="math" data-say="2">2</span> is excluded, <span class="math" data-say="negative 1">−1</span> checks out, and the solution set is <span class="math" data-say="the set negative 1">{−1}</span>.</p></div><p>Substitute into the <em>original</em> equation, never into the cleared one. Every candidate satisfies the cleared equation by construction, so checking there confirms nothing at all &mdash; it is the one test guaranteed to pass.</p><p>One special case deserves a name. When both sides have the same denominator, or the equation is a single fraction equal to a single fraction, clearing is the familiar cross-multiplication: <span class="math" data-say="A over b equals c over d">a/b = c/d</span> becomes <span class="math" data-say="A d equals b c">ad = bc</span>. It is the same step, with the same obligation to check.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Rational equations, and the check</h2></div><p>Clear the denominators, solve, then substitute into the ORIGINAL</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Clearing denominators, and what it costs</h2><div class="prose reading"><p>The method is short. Factor every denominator, list the excluded values, multiply both sides by the LCD, solve whatever polynomial equation appears, and then test each candidate in the original.</p><div class="defbox"><span class="label">Definition &middot; Extraneous solution</span><p>An <strong>extraneous solution</strong> is a value that satisfies an equation derived from the original but not the original itself. For rational equations these are precisely the candidates that are excluded values.</p></div><p>The mechanism is worth stating exactly. Multiplying both sides by the LCD is multiplication by an expression whose value depends on <span class="math" data-say="x">x</span>. At an excluded value that expression is <span class="math" data-say="0">0</span>, and multiplying an equation by <span class="math" data-say="0">0</span> produces <span class="math" data-say="0 equals 0">0 = 0</span> &mdash; true regardless of what the original said.</p><div class="thm"><span class="label">Theorem &middot; Why the check is required</span><p><span class="math" data-say="A equals B">A = B</span> implies <span class="math" data-say="AM equals BM">AM = BM</span> always. <span class="math" data-say="AM equals BM">AM = BM</span> implies <span class="math" data-say="A equals B">A = B</span> only when <span class="math" data-say="M is not equal to 0">M ≠ 0</span>. Clearing denominators uses the first implication, so the solution set can only grow, never shrink. Every candidate must be tested against the original.</p></div><div class="example"><span class="label">Example &middot; An equation with no solution at all</span><p><span class="math" data-say="x over the quantity x minus 3, equals 3 over the quantity x minus 3, plus 2">x/(x − 3) = 3/(x − 3) + 2</span>. The LCD is <span class="math" data-say="x minus 3">x − 3</span>, and <span class="math" data-say="x equals 3">x = 3</span> is excluded. Clearing gives <span class="math" data-say="x equals 3 plus 2 times the quantity x minus 3">x = 3 + 2(x − 3)</span>, so <span class="math" data-say="x equals 2 x minus 3">x = 2x − 3</span> and <span class="math" data-say="x equals 3">x = 3</span>. The only candidate is the excluded value, so it is extraneous and the equation has no solution.</p></div><p>Nothing went wrong there. The algebra is correct at every line; the equation simply has no solution, and the method's honest report of that fact takes the form of a candidate you must throw away.</p><p>A quadratic can produce two candidates of which only one survives, and that is the case worth practising, because discarding both is easy and discarding neither is easier still.</p><div class="example"><span class="label">Example &middot; One survivor</span><p><span class="math" data-say="1 over the quantity x minus 2, plus 1 over x equals the quantity x squared plus x minus 4, over the quantity x times the quantity x minus 2">1/(x − 2) + 1/x = (x² + x − 4)/(x(x − 2))</span> has LCD <span class="math" data-say="x times the quantity x minus 2">x(x − 2)</span> and exclusions <span class="math" data-say="x is not equal to 0">x ≠ 0</span>, <span class="math" data-say="x is not equal to 2">x ≠ 2</span>. Clearing gives <span class="math" data-say="x plus x minus 2 equals x squared plus x minus 4">x + (x − 2) = x² + x − 4</span>, that is <span class="math" data-say="x squared minus x minus 2 equals 0">x² − x − 2 = 0</span>, or <span class="math" data-say="the quantity x minus 2, times the quantity x plus 1, equals 0">(x − 2)(x + 1) = 0</span>. The candidates are <span class="math" data-say="2">2</span> and <span class="math" data-say="negative 1">−1</span>; <span class="math" data-say="2">2</span> is excluded, <span class="math" data-say="negative 1">−1</span> checks out, and the solution set is <span class="math" data-say="the set negative 1">{−1}</span>.</p></div><p>Substitute into the <em>original</em> equation, never into the cleared one. Every candidate satisfies the cleared equation by construction, so checking there confirms nothing at all &mdash; it is the one test guaranteed to pass.</p><p>One special case deserves a name. When both sides have the same denominator, or the equation is a single fraction equal to a single fraction, clearing is the familiar cross-multiplication: <span class="math" data-say="A over b equals c over d">a/b = c/d</span> becomes <span class="math" data-say="A d equals b c">ad = bc</span>. It is the same step, with the same obligation to check.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Rational equations, and the check</h2></div><p>Clear the denominators, solve, then substitute into the ORIGINAL</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="rfTitle">Rational expression</strong><span id="rfSub"></span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>verified solution</span><span class="tone-red"><i class="legend-swatch"></i>extraneous or excluded</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" id="rfStage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="rfPlot"></svg></div>
       <div id="rfWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="rfStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Every candidate, substituted back</h3>
-          <p>The lab clears the denominators, solves exactly, and then substitutes each candidate into the ORIGINAL equation. An extraneous root is shown failing that test, not dropped.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Every candidate, substituted back</h3>
+            <p>The lab clears the denominators, solves exactly, and then substitutes each candidate into the ORIGINAL equation. An extraneous root is shown failing that test, not dropped.</p>
         <div class="field" id="rfFieldPreset">
           <label for="rfPreset">Worked example</label>
           <select id="rfPreset"><option value="x/(x - 2)|2/(x - 2)|mul">the only candidate is extraneous</option><option value="x^2/(x - 1)|1/(x - 1)|mul">one candidate survives, one does not</option><option value="(x^2 - 4)/(x - 2)|4|mul">the cancelled factor comes back to bite</option><option value="1/x + 1/2|3/4|mul">a clean solution, checked anyway</option><option value="x + 1/x|1|mul">no real solution at all</option><option value="x + 1/x|3|mul">two irrational solutions, both genuine</option></select>
@@ -1426,12 +1469,14 @@
           <div class="kpi"><span id="rfK3Lab">&mdash;</span><strong id="rfK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="rfHint" style="margin:0;">Type any rational expression in <code>x</code>: <code>2x</code>, <code>(x+1)(x-2)</code> and <code>1/x + 1/2</code> all parse. Every coefficient below is an exact fraction, and every excluded value is found from the denominators as you wrote them.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a rational equation</h2></div><p>Four steps, and the fourth is not optional.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Factor the denominators and list the exclusions</h3><p>Before any solving. These are the values that will disqualify a candidate later, and they are easiest to find now.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply both sides by the LCD</h3><p>Every term on both sides, including terms that are not fractions. Bracket each numerator as you go, exactly as in “Adding and Subtracting Rational Expressions”.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Solve the polynomial equation</h3><p>Use Linear Equations and Inequalities for a linear result and factoring from Polynomials and Factoring for the quadratics chosen in this course. The quadratic formula arrives in Quadratics and Complex Numbers and is not required here.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Test every candidate in the original</h3><p>Any candidate on the exclusion list is extraneous and is discarded. State the surviving solution set, which may be empty.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a rational equation</h2>
+      <p class="lead-in">Four steps, and the fourth is not optional.</p>
+      <ol class="key-ideas method"><li><strong>Factor the denominators and list the exclusions.</strong> Before any solving. These are the values that will disqualify a candidate later, and they are easiest to find now.</li><li><strong>Multiply both sides by the LCD.</strong> Every term on both sides, including terms that are not fractions. Bracket each numerator as you go, exactly as in “Adding and Subtracting Rational Expressions”.</li><li><strong>Solve the polynomial equation.</strong> Use Linear Equations and Inequalities for a linear result and factoring from Polynomials and Factoring for the quadratics chosen in this course. The quadratic formula arrives in Quadratics and Complex Numbers and is not required here.</li><li><strong>Test every candidate in the original.</strong> Any candidate on the exclusion list is extraneous and is discarded. State the surviving solution set, which may be empty.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1462,17 +1507,16 @@ x = −1 :   LHS  =  1/(−3) + 1/(−1)  =  −1/3 − 1  =  −4/3
 solution set:   { −1 }</div><p>The candidate <span class="math" data-say="x equals 2">x = 2</span> is not a slip. It is the value at which the LCD <span class="math" data-say="x times the quantity x minus 2">x(x − 2)</span> is zero, so it is exactly the value at which multiplying through stopped being reversible. The method predicts where its own failures will appear, which is why the exclusion list is written first.</p><p>Rational and Radical Expressions does this twice: “Solving Radical Equations” squares both sides of a radical equation, which is legal in the same one-way manner and produces extraneous roots for the same structural reason.</p><p>For a faded solve, take <span class="math" data-say="1 over the quantity x minus 1, plus 1 over the quantity x plus 1, equals the quantity x squared minus x plus 2, over the quantity x squared minus 1">1/(x − 1) + 1/(x + 1) = (x² − x + 2)/(x² − 1)</span>. The supplied LCD is <span class="math" data-say="the quantity x minus 1, times the quantity x plus 1">(x − 1)(x + 1)</span> and the exclusions are <span class="math" data-say="x is not equal to negative 1, 1">x ≠ −1, 1</span>. Clear every term, factor the resulting quadratic and check both candidates in the original. You should reach candidates <span class="math" data-say="1">1</span> and <span class="math" data-say="2">2</span>, discard <span class="math" data-say="1">1</span>, and keep solution set <span class="math" data-say="the set 2">{2}</span>. If both survived, you checked only the cleared quadratic.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Skipping the check because the algebra looked clean</strong><span>The algebra usually is clean. Extraneous roots come from a correct step, not a careless one, so tidy work is no evidence at all that a candidate is genuine.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Checking in the cleared equation</strong><span>That equation was built to be satisfied by every candidate. It is the one place where the test cannot fail and therefore cannot help.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reporting no solution as an error</strong><span>An equation may genuinely have no solution. "No solution" is the answer in those cases, and it is not the same as "I could not solve it".</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can explain the extraneous root, not just remove it.</strong><p>Given a rational equation you should list the exclusions before solving, clear correctly, test each candidate in the original, and say why the discarded one appeared &mdash; naming the value at which the LCD was zero. That explanation is what transfers to “Solving Radical Equations”.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab never silently drops a root. Each candidate is substituted into the original equation in front of you and the two sides are printed as exact fractions, so an extraneous root is seen failing rather than asserted to fail &mdash; and a genuine one is seen passing.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Skipping the check because the algebra looked clean</strong><span>The algebra usually is clean. Extraneous roots come from a correct step, not a careless one, so tidy work is no evidence at all that a candidate is genuine.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Checking in the cleared equation</strong><span>That equation was built to be satisfied by every candidate. It is the one place where the test cannot fail and therefore cannot help.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reporting no solution as an error</strong><span>An equation may genuinely have no solution. "No solution" is the answer in those cases, and it is not the same as "I could not solve it".</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can explain the extraneous root, not just remove it.</strong><p>Given a rational equation you should list the exclusions before solving, clear correctly, test each candidate in the original, and say why the discarded one appeared &mdash; naming the value at which the LCD was zero. That explanation is what transfers to “Solving Radical Equations”.</p></div></div><div class="note"><strong>Note:</strong> The lab never silently drops a root. Each candidate is substituted into the original equation in front of you and the two sides are printed as exact fractions, so an extraneous root is seen failing rather than asserted to fail &mdash; and a genuine one is seen passing.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Clearing denominators is the whole method</summary><p>Multiply every term on both sides by the LCD. The denominators cancel and you are left with a linear equation from Linear Equations and Inequalities or a factorable quadratic from Polynomials and Factoring.</p></details><details class="recall"><summary>The step only runs one way</summary><p>If <span class="math" data-say="A equals B">A = B</span> then <span class="math" data-say="A times M equals B times M">A·M = B·M</span>, for any <span class="math" data-say="M">M</span> at all. The converse needs <span class="math" data-say="M is not equal to 0">M ≠ 0</span>, because <span class="math" data-say="A times 0 equals B times 0">A·0 = B·0</span> holds for every <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>. So solutions of the cleared equation need not be solutions of the original.</p></details><details class="recall"><summary>An extraneous root is not a mistake</summary><p>It is the predictable residue of a legal step. You cannot avoid it by being careful; you can only detect it, by substituting into the equation you were actually given.</p></details></div>
+      <h3>Summary</h3>
       <p>Multiplying an equation by the LCD turns it into a polynomial equation you can already solve. That step is legal and it is not reversible, so it can hand you numbers that solve the new equation and not the old one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Clearing denominators is the whole method.</strong> Multiply every term on both sides by the LCD. The denominators cancel and you are left with a linear equation from Linear Equations and Inequalities or a factorable quadratic from Polynomials and Factoring.</li><li><strong>The step only runs one way.</strong> If <span class="math" data-say="A equals B">A = B</span> then <span class="math" data-say="A times M equals B times M">A·M = B·M</span>, for any <span class="math" data-say="M">M</span> at all. The converse needs <span class="math" data-say="M is not equal to 0">M ≠ 0</span>, because <span class="math" data-say="A times 0 equals B times 0">A·0 = B·0</span> holds for every <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>. So solutions of the cleared equation need not be solutions of the original.</li><li><strong>An extraneous root is not a mistake.</strong> It is the predictable residue of a legal step. You cannot avoid it by being careful; you can only detect it, by substituting into the equation you were actually given.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="multiply BOTH sides by the LCD, implies, a polynomial equation. the step is not reversible where the LCD is zero. a candidate equal to an excluded value is EXTRANEOUS. the check is part of the method, not politeness" tabindex="0" role="region" aria-label="Mathematical notation">multiply BOTH sides by the LCD  ⟹  a polynomial equation
 the step is not reversible where the LCD is zero
 a candidate equal to an excluded value is EXTRANEOUS
@@ -3909,11 +3953,40 @@ the check is part of the method, not politeness</div><figcaption>One legal step 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3981,7 +4054,7 @@ the check is part of the method, not politeness</div><figcaption>One legal step 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Induction and Recursion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Recursion</p>
       <h1>Structural Induction</h1>
       <p class="lesson-lede">Induction over how an object was built, not over a number.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The cases mirror the definition</li><li>The hypothesis is about the parts</li><li>No size parameter is needed</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Induction over a recursive structure</h2>
-      <article class="prose reading"><div class="thm"><span class="label">Theorem &middot; Structural induction</span><p>Let <span class="math" data-say="S">S</span> be defined recursively. To prove <span class="math" data-say="P of x">P(x)</span> for every <span class="math" data-say="x in S">x ∈ S</span>, prove <span class="math" data-say="P">P</span> for each object given by a base clause, and prove that each recursive clause preserves <span class="math" data-say="P">P</span> &mdash; that is, if <span class="math" data-say="P">P</span> holds for the parts, it holds for the object built from them.</p></div><p>Validity comes straight from the definition. Every member of <span class="math" data-say="S">S</span> is produced in finitely many steps, so induct on that number: at zero steps the object is a base object, and each further step is a recursive clause applied to objects built in fewer steps.</p><div class="example"><span class="label">Example &middot; Parenthesis strings are balanced</span><p>Recall the definition: the empty string is well formed; if <span class="math" data-say="s">s</span> is, so is <span class="math" data-say="s">(s)</span>; if <span class="math" data-say="s">s</span> and <span class="math" data-say="t">t</span> are, so is <span class="math" data-say="st">st</span>. Claim: every well-formed string has equally many left and right parentheses.</p></div><div class="proof"><p><strong>Base.</strong> The empty string has 0 of each.</p><p><strong>Clause <span class="math" data-say="s">(s)</span>.</strong> Assume <span class="math" data-say="s">s</span> has <span class="math" data-say="m">m</span> of each. Then <span class="math" data-say="s">(s)</span> has <span class="math" data-say="m plus 1">m + 1</span> of each.</p><p><strong>Clause <span class="math" data-say="st">st</span>.</strong> Assume <span class="math" data-say="s">s</span> has <span class="math" data-say="m">m</span> of each and <span class="math" data-say="t">t</span> has <span class="math" data-say="p">p</span> of each. Then <span class="math" data-say="st">st</span> has <span class="math" data-say="m plus p">m + p</span> of each.</p><p>Every well-formed string is built by these clauses, so the property holds throughout.</p><p><span class="qed">&#9633;</span></p></div><p>Three parts, matching the three clauses. Missing one &mdash; forgetting the concatenation clause, say &mdash; would leave a whole family of strings unproved, and the omission is invisible unless the definition is beside the proof.</p><h3>Trees</h3><div class="defbox"><span class="label">Definition &middot; Height and node count</span><p>For a binary tree: <span class="math" data-say="h of empty equals negative 1">h(empty) = −1</span> and <span class="math" data-say="h of node of v, L, R equals 1 plus the max of h of L and h of R">h(node(v, L, R)) = 1 + max(h(L), h(R))</span>. <span class="math" data-say="n of empty equals 0">n(empty) = 0</span> and <span class="math" data-say="n of node of v, L, R equals 1 plus n of L plus n of R">n(node(v, L, R)) = 1 + n(L) + n(R)</span>.</p></div><div class="thm"><span class="label">Theorem &middot; A binary tree of height <span class="math" data-say="h">h</span> has at most <span class="math" data-say="2 to the power the quantity h plus 1, minus 1">2^{h+1} − 1</span> nodes</span><p>For every binary tree <span class="math" data-say="T">T</span>, <span class="math" data-say="n of T is at most 2 to the power the quantity h of T plus 1, minus 1">n(T) ≤ 2^{h(T)+1} − 1</span>.</p></div><div class="proof"><p><strong>Base.</strong> The empty tree has <span class="math" data-say="h equals negative 1">h = −1</span> and <span class="math" data-say="n equals 0">n = 0</span>, and <span class="math" data-say="2 to the power 0 minus 1 equals 0">2⁰ − 1 = 0</span>.</p><p><strong>Step.</strong> Let <span class="math" data-say="T equals node of v, L, R">T = node(v, L, R)</span> and assume the bound for <span class="math" data-say="L">L</span> and <span class="math" data-say="R">R</span>. Write <span class="math" data-say="h equals h of T">h = h(T)</span>, so <span class="math" data-say="h of L is at most h minus 1">h(L) ≤ h − 1</span> and <span class="math" data-say="h of R is at most h minus 1">h(R) ≤ h − 1</span>.</p><p>Then <span class="math" data-say="n of T equals 1 plus n of L plus n of R is at most 1 plus the quantity 2 to the power h minus 1, plus the quantity 2 to the power h minus 1, equals 2 times 2 to the power h minus 1, equals 2 to the power the quantity h plus 1, minus 1">n(T) = 1 + n(L) + n(R) ≤ 1 + (2^h − 1) + (2^h − 1) = 2·2^h − 1 = 2^{h+1} − 1</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Both subtrees needed the hypothesis, which makes this structural induction with two recursive parts &mdash; the structural analogue of the two-term recurrence that forced strong induction in “Strong Induction”.</p><h3>Formulas</h3><p>The well-formed formulas of Logic and Proof are a recursively defined set: a variable is a formula; if <span class="math" data-say="A">A</span> is a formula so is <span class="math" data-say="not A">¬A</span>; if <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are, so is <span class="math" data-say="A and B">(A ∧ B)</span>, and similarly for the other binary connectives. Structural induction over that definition proves the syntactic facts Logic and Proof used without proof.</p><div class="example"><span class="label">Example &middot; Parentheses balance in every formula</span><p>Base: a variable has none of either. Negation adds none. Each binary clause adds one of each. So every well-formed formula has matching parentheses &mdash; which is what makes the parser in the truth-table lab able to reject the strings that are not formulas.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Recurrence and closed form</h2></div><p>Iterated and solved, then compared</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Induction over a recursive structure</h2><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; Structural induction</span><p>Let <span class="math" data-say="S">S</span> be defined recursively. To prove <span class="math" data-say="P of x">P(x)</span> for every <span class="math" data-say="x in S">x ∈ S</span>, prove <span class="math" data-say="P">P</span> for each object given by a base clause, and prove that each recursive clause preserves <span class="math" data-say="P">P</span> &mdash; that is, if <span class="math" data-say="P">P</span> holds for the parts, it holds for the object built from them.</p></div><p>Validity comes straight from the definition. Every member of <span class="math" data-say="S">S</span> is produced in finitely many steps, so induct on that number: at zero steps the object is a base object, and each further step is a recursive clause applied to objects built in fewer steps.</p><div class="example"><span class="label">Example &middot; Parenthesis strings are balanced</span><p>Recall the definition: the empty string is well formed; if <span class="math" data-say="s">s</span> is, so is <span class="math" data-say="s">(s)</span>; if <span class="math" data-say="s">s</span> and <span class="math" data-say="t">t</span> are, so is <span class="math" data-say="st">st</span>. Claim: every well-formed string has equally many left and right parentheses.</p></div><div class="proof"><p><strong>Base.</strong> The empty string has 0 of each.</p><p><strong>Clause <span class="math" data-say="s">(s)</span>.</strong> Assume <span class="math" data-say="s">s</span> has <span class="math" data-say="m">m</span> of each. Then <span class="math" data-say="s">(s)</span> has <span class="math" data-say="m plus 1">m + 1</span> of each.</p><p><strong>Clause <span class="math" data-say="st">st</span>.</strong> Assume <span class="math" data-say="s">s</span> has <span class="math" data-say="m">m</span> of each and <span class="math" data-say="t">t</span> has <span class="math" data-say="p">p</span> of each. Then <span class="math" data-say="st">st</span> has <span class="math" data-say="m plus p">m + p</span> of each.</p><p>Every well-formed string is built by these clauses, so the property holds throughout.</p><p><span class="qed">&#9633;</span></p></div><p>Three parts, matching the three clauses. Missing one &mdash; forgetting the concatenation clause, say &mdash; would leave a whole family of strings unproved, and the omission is invisible unless the definition is beside the proof.</p><h3>Trees</h3><div class="defbox"><span class="label">Definition &middot; Height and node count</span><p>For a binary tree: <span class="math" data-say="h of empty equals negative 1">h(empty) = −1</span> and <span class="math" data-say="h of node of v, L, R equals 1 plus the max of h of L and h of R">h(node(v, L, R)) = 1 + max(h(L), h(R))</span>. <span class="math" data-say="n of empty equals 0">n(empty) = 0</span> and <span class="math" data-say="n of node of v, L, R equals 1 plus n of L plus n of R">n(node(v, L, R)) = 1 + n(L) + n(R)</span>.</p></div><div class="thm"><span class="label">Theorem &middot; A binary tree of height <span class="math" data-say="h">h</span> has at most <span class="math" data-say="2 to the power the quantity h plus 1, minus 1">2^{h+1} − 1</span> nodes</span><p>For every binary tree <span class="math" data-say="T">T</span>, <span class="math" data-say="n of T is at most 2 to the power the quantity h of T plus 1, minus 1">n(T) ≤ 2^{h(T)+1} − 1</span>.</p></div><div class="proof"><p><strong>Base.</strong> The empty tree has <span class="math" data-say="h equals negative 1">h = −1</span> and <span class="math" data-say="n equals 0">n = 0</span>, and <span class="math" data-say="2 to the power 0 minus 1 equals 0">2⁰ − 1 = 0</span>.</p><p><strong>Step.</strong> Let <span class="math" data-say="T equals node of v, L, R">T = node(v, L, R)</span> and assume the bound for <span class="math" data-say="L">L</span> and <span class="math" data-say="R">R</span>. Write <span class="math" data-say="h equals h of T">h = h(T)</span>, so <span class="math" data-say="h of L is at most h minus 1">h(L) ≤ h − 1</span> and <span class="math" data-say="h of R is at most h minus 1">h(R) ≤ h − 1</span>.</p><p>Then <span class="math" data-say="n of T equals 1 plus n of L plus n of R is at most 1 plus the quantity 2 to the power h minus 1, plus the quantity 2 to the power h minus 1, equals 2 times 2 to the power h minus 1, equals 2 to the power the quantity h plus 1, minus 1">n(T) = 1 + n(L) + n(R) ≤ 1 + (2^h − 1) + (2^h − 1) = 2·2^h − 1 = 2^{h+1} − 1</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Both subtrees needed the hypothesis, which makes this structural induction with two recursive parts &mdash; the structural analogue of the two-term recurrence that forced strong induction in “Strong Induction”.</p><h3>Formulas</h3><p>The well-formed formulas of Logic and Proof are a recursively defined set: a variable is a formula; if <span class="math" data-say="A">A</span> is a formula so is <span class="math" data-say="not A">¬A</span>; if <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are, so is <span class="math" data-say="A and B">(A ∧ B)</span>, and similarly for the other binary connectives. Structural induction over that definition proves the syntactic facts Logic and Proof used without proof.</p><div class="example"><span class="label">Example &middot; Parentheses balance in every formula</span><p>Base: a variable has none of either. Negation adds none. Each binary clause adds one of each. So every well-formed formula has matching parentheses &mdash; which is what makes the parser in the truth-table lab able to reject the strings that are not formulas.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Recurrence and closed form</h2></div><p>Iterated and solved, then compared</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>a<sub>n</sub> = c₁·a<sub>n−1</sub> + c₂·a<sub>n−2</sub> + f(n)</strong><span id="recCaption"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>iterated</span><span class="tone-purple"><i class="legend-swatch"></i>closed form</span></div>
@@ -1406,10 +1449,10 @@
         <div class="table-wrap" style="margin-top:10px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="recTable"></table></div>
       </div>
       <div class="status-banner" id="recStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two parts, two base cases</h3>
-          <p>Fibonacci is the numeric shadow of a two-part structure: each value depends on two smaller ones, exactly as a binary tree node depends on two subtrees.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two parts, two base cases</h3>
+            <p>Fibonacci is the numeric shadow of a two-part structure: each value depends on two smaller ones, exactly as a binary tree node depends on two subtrees.</p>
         <div class="field">
           <label for="recPreset">Recurrence</label>
           <select id="recPreset">
@@ -1430,12 +1473,14 @@
           <label>Closed form</label>
           <div class="mathblock" id="recClosed" style="font-size:0.84rem;" tabindex="0" role="region" aria-label="Mathematical notation"></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Writing a structural induction proof</h2></div><p>Put the definition beside the proof and match them clause for clause.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the clauses of the definition</h3><p>Base clauses and recursive clauses. The proof will have exactly this many parts, and matching them is how you know none was skipped.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Prove the claim for each base object</h3><p>Usually immediate. Do it anyway, in writing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>For each recursive clause, assume the claim for the parts</h3><p>Then establish it for the object constructed. This is the inductive hypothesis, and there may be more than one part.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check nothing else is in the set</h3><p>The closure sentence of the definition is what makes these cases exhaustive. Without it the proof covers a subset.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Writing a structural induction proof</h2>
+      <p class="lead-in">Put the definition beside the proof and match them clause for clause.</p>
+      <ol class="key-ideas method"><li><strong>List the clauses of the definition.</strong> Base clauses and recursive clauses. The proof will have exactly this many parts, and matching them is how you know none was skipped.</li><li><strong>Prove the claim for each base object.</strong> Usually immediate. Do it anyway, in writing.</li><li><strong>For each recursive clause, assume the claim for the parts.</strong> Then establish it for the object constructed. This is the inductive hypothesis, and there may be more than one part.</li><li><strong>Check nothing else is in the set.</strong> The closure sentence of the definition is what makes these cases exhaustive. Without it the proof covers a subset.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1505,16 @@ Every full binary tree is built by these two clauses, so every one
 has an odd number of nodes.        ∎</div><p>The parity argument reuses the result of “Direct Proof”, in Logic and Proof: the sum of two odd integers is even. Structural induction supplied the two odd numbers; elementary arithmetic finished the job.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Omitting a clause</strong><span>The concatenation clause for strings and the second subtree for trees are the ones usually forgotten. Write the definition out first.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the hypothesis for only one part</strong><span>A binary construction gives you two hypotheses. Using one and asserting the other is a gap.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the set has no other members</strong><span>That is the closure sentence of the definition, and if the definition omits it the proof cannot supply it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can match a proof to a definition clause by clause.</strong><p>Prove that every well-formed parenthesis string has no proper prefix with more right than left parentheses. Three clauses, three parts, and the concatenation case is the one that needs thought.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Structural induction is how properties of programs and of syntax are proved: type soundness, evaluation termination and compiler correctness are all structural inductions over a recursively defined language.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Omitting a clause</strong><span>The concatenation clause for strings and the second subtree for trees are the ones usually forgotten. Write the definition out first.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using the hypothesis for only one part</strong><span>A binary construction gives you two hypotheses. Using one and asserting the other is a gap.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the set has no other members</strong><span>That is the closure sentence of the definition, and if the definition omits it the proof cannot supply it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can match a proof to a definition clause by clause.</strong><p>Prove that every well-formed parenthesis string has no proper prefix with more right than left parentheses. Three clauses, three parts, and the concatenation case is the one that needs thought.</p></div></div><div class="note"><strong>Note:</strong> Structural induction is how properties of programs and of syntax are proved: type soundness, evaluation termination and compiler correctness are all structural inductions over a recursively defined language.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The cases mirror the definition</summary><p>One base case per base clause, one step per recursive clause. If the definition has three rules the proof has three parts.</p></details><details class="recall"><summary>The hypothesis is about the parts</summary><p>For a tree built from <span class="math" data-say="L">L</span> and <span class="math" data-say="R">R</span>, you assume the claim for <span class="math" data-say="L">L</span> and for <span class="math" data-say="R">R</span> and prove it for the whole. That is strong induction on structure.</p></details><details class="recall"><summary>No size parameter is needed</summary><p>Trees and formulas have no obvious <span class="math" data-say="n">n</span>. Structural induction sidesteps the question by inducting on how the object was assembled.</p></details></div>
+      <h3>Summary</h3>
       <p>When a set is defined recursively, proving something about all its members means proving it for the base objects and showing each construction rule preserves it. No numeric parameter is needed.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The cases mirror the definition.</strong> One base case per base clause, one step per recursive clause. If the definition has three rules the proof has three parts.</li><li><strong>The hypothesis is about the parts.</strong> For a tree built from <span class="math" data-say="L">L</span> and <span class="math" data-say="R">R</span>, you assume the claim for <span class="math" data-say="L">L</span> and for <span class="math" data-say="R">R</span> and prove it for the whole. That is strong induction on structure.</li><li><strong>No size parameter is needed.</strong> Trees and formulas have no obvious <span class="math" data-say="n">n</span>. Structural induction sidesteps the question by inducting on how the object was assembled.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="BASE, prove P for every object given outright. STEP, assume P for the parts, prove P for the object built from them. Valid because every object is built in finitely many steps. Applies to strings, trees, formulas, anything with a recursive definition" tabindex="0" role="region" aria-label="Mathematical notation">BASE   prove P for every object given outright
 STEP   assume P for the parts, prove P for the object built from them
 Valid because every object is built in finitely many steps.
@@ -1937,11 +1981,40 @@ Applies to strings, trees, formulas — anything with a recursive definition.</d
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2009,7 +2082,7 @@ Applies to strings, trees, formulas — anything with a recursive definition.</d
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

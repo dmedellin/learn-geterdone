@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Helping Verbs</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Not, do and the boxes</p>
       <h1>Which of the Twelve Boxes Get Used</h1>
       <p class="lesson-lede">The tense table has twelve boxes. A writer lives in a few of them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Twelve boxes are not twelve equal tools</li><li>Most of a page is in three places</li><li>A scan has a group for what it cannot sort</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The boxes the chapter hardly uses</h2>
-      <article class="prose reading"><p>You have been given a table of twelve boxes: present, past and future, each simple, progressive, perfect and perfect progressive. It is a good table. It is also usually taught as if each box mattered the same.</p><p>Count and it does not. The lab takes every pronoun in Chapter XXVI, 216 of them, and sorts the verb phrase after each into a box.</p><h3>Where the 216 land</h3><p><em>Be</em> as the main verb holds 38, the largest named group. A modal in front holds 57, and the table under the boxes splits it: 28 with a <dfn>bare</dfn> verb straight after, <em>I will try</em>; 27 filed as <em>modal, other</em>, most of them <em>be</em> as the main verb with a modal in front, <em>I should be miserable</em>, <em>it will be as well</em>, and the rest gaps of the kinds &ldquo;After a Modal, the Verb Is Bare&rdquo; sorted; one modal perfect, <em>we must have met</em>; and one modal progressive, <em>I will not be wishing</em>. The plain present and past hold 55: past simple 27, present simple 25 and past simple with <em>do</em> 3.</p><p>The small groups: <em>be</em> and a participle hold 4, and only one of the four, <em>you are warned</em>, plainly says what was done to the subject; <em>satisfied</em>, <em>resolved</em> and <em>convinced</em> read as states. The perfect holds 4. The progressive holds 3. Forty-two are filed as no verb found.</p><p>So the simple boxes and the phrases with a modal in front hold 112 of the 216, just over half. The progressive holds 1.4%.</p><h3>The rare boxes, read by hand</h3><p>The three progressives are <em>she has been acting</em>, <em>I will not be wishing</em> and <em>he was now rendering himself agreeable</em>, 3 of 216, 1.4%, and reading the rows by hand finds no more. &ldquo;Be Is Mostly a Main Verb&rdquo; finds six <em>-ing</em> forms after <em>be</em> in this same chapter by scan and seven by hand. The difference is that this lab reads only the phrase after a pronoun, and <em>this is being serious</em>, <em>my aunt is going</em>, <em>Mrs. Hurst were going out</em> and <em>his marriage was fast approaching</em> have no pronoun in front.</p><h3>Why the group for the rest matters</h3><p>The 42 in no verb found are the lab being honest. Read the rows. Some are an object, as in <em>to use it your father</em>. Some have a word between the pronoun and its verb, as in <em>we all expect</em>, and some a verb the word list lacks, as in <em>she endeavoured to</em>. Five are <em>I cannot</em>, which the lab does not read as <em>can</em> and <em>not</em>. Some are <em>he ought to</em>, where <em>ought</em> is not one of the helping verbs the lab tracks. They are printed so you can sort them yourself.</p><h3>The whole novel</h3><p>Counted once over the whole novel, which no page can carry, and quoted here: 8,864 pronoun subjects. Past simple is 18.2%, <em>be</em> as the main verb 15.5%, present simple 12.5%, and a modal or future simple 8.4%. The passive is 3.3%, the past perfect 2.8%, the present perfect 1.8%, and all the progressive phrases together 143 of the 8,864, 1.6%. No verb found is 17.7%.</p><h3>Today&#x27;s pages</h3><p>Switch the lab to the two modern documents. They have 34 pronoun subjects. The simple boxes hold 14, 41.2%. The perfect holds 3, 8.8%. The progressive holds 0. The boxes that a page uses are about the same in 1813 and 2026.</p><h3>What this does not say</h3><p>None of this tells you which box to choose. A writer picks a box because of what they mean, and a count of printed words cannot see that. It tells you which boxes to practise first if you have little time, and which to know well enough to read.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Helping verbs, counted on one chapter of a novel</h2></div><p>Every pronoun, modal, have, be and not in the chapter, and what comes next</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The boxes the chapter hardly uses</h2><div class="prose reading"><p>You have been given a table of twelve boxes: present, past and future, each simple, progressive, perfect and perfect progressive. It is a good table. It is also usually taught as if each box mattered the same.</p><p>Count and it does not. The lab takes every pronoun in Chapter XXVI, 216 of them, and sorts the verb phrase after each into a box.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Helping verbs, counted on one chapter of a novel</h2></div><p>Every pronoun, modal, have, be and not in the chapter, and what comes next</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div id="axK_axN" style="display:contents;"><div class="kpi"><span>how many it looks at</span><strong id="axN">&mdash;</strong></div></div><div id="axK_axHit" style="display:contents;"><div class="kpi"><span>the rule holds</span><strong id="axHit">&mdash;</strong></div></div><div id="axK_axPct" style="display:contents;"><div class="kpi"><span>share</span><strong id="axPct">&mdash;</strong></div></div><div id="axK_axPairs" style="display:contents;"><div class="kpi"><span>pairs the rule covers</span><strong id="axPairs">&mdash;</strong></div></div><div id="axK_axBroken" style="display:contents;"><div class="kpi"><span>against the rule</span><strong id="axBroken">&mdash;</strong></div></div><div id="axK_axBetween" style="display:contents;"><div class="kpi"><span>not or an adverb between</span><strong id="axBetween">&mdash;</strong></div></div><div id="axK_axFormed" style="display:contents;"><div class="kpi"><span>a verb with an ending next</span><strong id="axFormed">&mdash;</strong></div></div><div id="axK_axPerf" style="display:contents;"><div class="kpi"><span>perfect: have and a participle</span><strong id="axPerf">&mdash;</strong></div></div><div id="axK_axMain" style="display:contents;"><div class="kpi"><span>a noun phrase next: the main verb</span><strong id="axMain">&mdash;</strong></div></div><div id="axK_axTo" style="display:contents;"><div class="kpi"><span>have to</span><strong id="axTo">&mdash;</strong></div></div><div id="axK_axIng" style="display:contents;"><div class="kpi"><span>an -ing form next</span><strong id="axIng">&mdash;</strong></div></div><div id="axK_axIngPct" style="display:contents;"><div class="kpi"><span>share</span><strong id="axIngPct">&mdash;</strong></div></div><div id="axK_axPP" style="display:contents;"><div class="kpi"><span>a participle next</span><strong id="axPP">&mdash;</strong></div></div><div id="axK_axAdj" style="display:contents;"><div class="kpi"><span>an adjective next</span><strong id="axAdj">&mdash;</strong></div></div><div id="axK_axNP" style="display:contents;"><div class="kpi"><span>a noun phrase next</span><strong id="axNP">&mdash;</strong></div></div><div id="axK_axPrep" style="display:contents;"><div class="kpi"><span>a preposition or place word next</span><strong id="axPrep">&mdash;</strong></div></div><div id="axK_axOld" style="display:contents;"><div class="kpi"><span>after a main verb: the old order</span><strong id="axOld">&mdash;</strong></div></div><div id="axK_axJoin" style="display:contents;"><div class="kpi"><span>after a joining word</span><strong id="axJoin">&mdash;</strong></div></div><div id="axK_axNt" style="display:contents;"><div class="kpi"><span>n't</span><strong id="axNt">&mdash;</strong></div></div><div id="axK_axQ" style="display:contents;"><div class="kpi"><span>a pronoun next: a question</span><strong id="axQ">&mdash;</strong></div></div><div id="axK_axOther" style="display:contents;"><div class="kpi"><span>something else</span><strong id="axOther">&mdash;</strong></div></div><div id="axK_axSimple" style="display:contents;"><div class="kpi"><span>simple, present and past</span><strong id="axSimple">&mdash;</strong></div></div><div id="axK_axProg" style="display:contents;"><div class="kpi"><span>progressive, any time</span><strong id="axProg">&mdash;</strong></div></div><div id="axK_axModal" style="display:contents;"><div class="kpi"><span>with a modal</span><strong id="axModal">&mdash;</strong></div></div><div id="axK_axPassive" style="display:contents;"><div class="kpi"><span>be and a participle</span><strong id="axPassive">&mdash;</strong></div></div><div id="axK_axNone" style="display:contents;"><div class="kpi"><span>no verb found</span><strong id="axNone">&mdash;</strong></div></div></div><p class="small-copy" id="axLimit"></p><div class="table-wrap" id="axBoxWrap" tabindex="0" role="region" aria-label="Data table"><table><thead><tr><th>box</th><th>pronoun subjects</th><th>share</th></tr></thead><tbody id="axBoxBody"></tbody></table></div><div class="table-wrap" style="max-height:22rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="axTable"><thead><tr id="axCols"></tr></thead><tbody id="axBody"></tbody></table></div><details><summary>The text the figures come from</summary><div class="mathblock" id="axText" style="font-size:0.8rem;white-space:pre-wrap;" tabindex="0" role="region" aria-label="Mathematical notation"></div></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Sort every verb phrase after a pronoun</h3>
-          <p>The table at the top lists the boxes with how many pronoun subjects fall into each, and their shares. Under it, every row is printed with the box it was given. Every pronoun counts as a subject, so a pronoun used as an object, such as <em>it</em> in <em>to use it</em>, lands in <em>no verb found</em>. The first boxes give the count of pronoun subjects, then the simple boxes, progressive boxes, perfect boxes, the modal box, the passive and the leftovers, each as a count and a share. Switch the text to the two modern documents to compare. The chapter is 1813 prose.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Sort every verb phrase after a pronoun</h3>
+            <p>The table at the top lists the boxes with how many pronoun subjects fall into each, and their shares. Under it, every row is printed with the box it was given. Every pronoun counts as a subject, so a pronoun used as an object, such as <em>it</em> in <em>to use it</em>, lands in <em>no verb found</em>. The first boxes give the count of pronoun subjects, then the simple boxes, progressive boxes, perfect boxes, the modal box, the passive and the leftovers, each as a count and a share. Switch the text to the two modern documents to compare. The chapter is 1813 prose.</p>
 <label for="axPreset">The rule</label> <select id="axPreset"><option value="agree">the -s belongs to he, she and it</option><option value="modal">after a modal, the verb is bare</option><option value="have">have: the helping verb or the main verb</option><option value="be">be: what follows it</option><option value="not">not goes after the first helping verb</option><option value="boxes" selected>which of the twelve boxes get used</option></select> <label for="axSource">Text</label> <select id="axSource"><option value="chapter" selected>Chapter XXVI of the novel (1813)</option><option value="modern">the two modern documents</option></select> <label for="axShow">Show</label> <select id="axShow"><option value="residue" selected>only the rows the rule does not cover</option><option value="all">every row</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Where the 216 land</h3><p><em>Be</em> as the main verb holds 38, the largest named group. A modal in front holds 57, and the table under the boxes splits it: 28 with a <dfn>bare</dfn> verb straight after, <em>I will try</em>; 27 filed as <em>modal, other</em>, most of them <em>be</em> as the main verb with a modal in front, <em>I should be miserable</em>, <em>it will be as well</em>, and the rest gaps of the kinds &ldquo;After a Modal, the Verb Is Bare&rdquo; sorted; one modal perfect, <em>we must have met</em>; and one modal progressive, <em>I will not be wishing</em>. The plain present and past hold 55: past simple 27, present simple 25 and past simple with <em>do</em> 3.</p><p>The small groups: <em>be</em> and a participle hold 4, and only one of the four, <em>you are warned</em>, plainly says what was done to the subject; <em>satisfied</em>, <em>resolved</em> and <em>convinced</em> read as states. The perfect holds 4. The progressive holds 3. Forty-two are filed as no verb found.</p><p>So the simple boxes and the phrases with a modal in front hold 112 of the 216, just over half. The progressive holds 1.4%.</p><h3>The rare boxes, read by hand</h3><p>The three progressives are <em>she has been acting</em>, <em>I will not be wishing</em> and <em>he was now rendering himself agreeable</em>, 3 of 216, 1.4%, and reading the rows by hand finds no more. &ldquo;Be Is Mostly a Main Verb&rdquo; finds six <em>-ing</em> forms after <em>be</em> in this same chapter by scan and seven by hand. The difference is that this lab reads only the phrase after a pronoun, and <em>this is being serious</em>, <em>my aunt is going</em>, <em>Mrs. Hurst were going out</em> and <em>his marriage was fast approaching</em> have no pronoun in front.</p><h3>Why the group for the rest matters</h3><p>The 42 in no verb found are the lab being honest. Read the rows. Some are an object, as in <em>to use it your father</em>. Some have a word between the pronoun and its verb, as in <em>we all expect</em>, and some a verb the word list lacks, as in <em>she endeavoured to</em>. Five are <em>I cannot</em>, which the lab does not read as <em>can</em> and <em>not</em>. Some are <em>he ought to</em>, where <em>ought</em> is not one of the helping verbs the lab tracks. They are printed so you can sort them yourself.</p><h3>The whole novel</h3><p>Counted once over the whole novel, which no page can carry, and quoted here: 8,864 pronoun subjects. Past simple is 18.2%, <em>be</em> as the main verb 15.5%, present simple 12.5%, and a modal or future simple 8.4%. The passive is 3.3%, the past perfect 2.8%, the present perfect 1.8%, and all the progressive phrases together 143 of the 8,864, 1.6%. No verb found is 17.7%.</p><h3>Today&#x27;s pages</h3><p>Switch the lab to the two modern documents. They have 34 pronoun subjects. The simple boxes hold 14, 41.2%. The perfect holds 3, 8.8%. The progressive holds 0. The boxes that a page uses are about the same in 1813 and 2026.</p><h3>What this does not say</h3><p>None of this tells you which box to choose. A writer picks a box because of what they mean, and a count of printed words cannot see that. It tells you which boxes to practise first if you have little time, and which to know well enough to read.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sorting a verb phrase into a box</h2></div><p>Collect the helping verbs, then look at the word after them.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the helping verbs in a row</h3><p><em>Will not be</em>, <em>has been</em>, <em>did</em>. Skip <em>not</em> and short adverb words.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the main word</h3><p>The word after the last helping verb: <em>wishing</em>, <em>acting</em>, <em>written</em>, <em>afraid</em>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Match the chain to a box</h3><p><em>Have</em> and a <dfn>participle</dfn> is a perfect. <em>Be</em> and an <em>-ing</em> word is a progressive. A modal alone is the modal box. <em>Be</em> and a participle is the passive.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what the box is called by its parts, not its name</h3><p><em>Has been acting</em> is present, perfect, progressive: three parts in one phrase. The names are a way to say the parts, not a thing to learn by heart.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sorting a verb phrase into a box</h2>
+      <p class="lead-in">Collect the helping verbs, then look at the word after them.</p>
+      <ol class="key-ideas method"><li><strong>List the helping verbs in a row.</strong> <em>Will not be</em>, <em>has been</em>, <em>did</em>. Skip <em>not</em> and short adverb words.</li><li><strong>Find the main word.</strong> The word after the last helping verb: <em>wishing</em>, <em>acting</em>, <em>written</em>, <em>afraid</em>.</li><li><strong>Match the chain to a box.</strong> <em>Have</em> and a <dfn>participle</dfn> is a perfect. <em>Be</em> and an <em>-ing</em> word is a progressive. A modal alone is the modal box. <em>Be</em> and a participle is the passive.</li><li><strong>Say what the box is called by its parts, not its name.</strong> <em>Has been acting</em> is present, perfect, progressive: three parts in one phrase. The names are a way to say the parts, not a thing to learn by heart.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1427,17 +1473,16 @@ you are warned           passive, or an adjective
 she has been acting      present perfect progressive</div><p>The first two are the simple boxes. The third, <em>be</em> as the main verb, is a group of its own, and it is the largest named group in the chapter: 39 phrases. The fourth is the modal box, and the future of the table lives there as <em>will</em> and a bare verb. The last two are the rare ones. A phrase with three parts, present, perfect and progressive at once, appears once in 216.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>The progressive is the ordinary present</strong><span>It is taught first and practised hardest. In the chapter the lab files 3 of 216 phrases as progressive, 1.4%, and the two modern documents give 0 of 34. Counted once over the whole novel and quoted here, with 8,864 pronoun subjects, all the progressive phrases together are 143, which is 1.6%. The plain present and past are far more common.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the table as twelve equal tools</strong><span>The chapter puts 55 phrases in the simple boxes and 4 in all the perfect boxes together. The perfect is real and needed, and it is rare. A page that spread its phrases equally over twelve boxes would look nothing like this one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating no verb found as a failure of the lab</strong><span>It is 42 of 216 because the lab reads every pronoun as a subject, and many are objects. Quoted for the whole novel, the same group is 17.7%. Read the rows and you can sort them by hand.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a verb phrase into its box, and say which boxes carry most of a real page.</strong><p>You should be able to sort every pronoun-subject verb phrase in a printed chapter into the tense table's boxes or into the extra groups the lab adds, read off the shares, and say which boxes carry most of the writing and which carry almost none.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The twelve boxes are a way to build a phrase. They are not a ranking of what to say. A writer who wants to say that something began before and goes on needs the perfect progressive, however rare it is. This lesson shows what the boxes cost to learn against how often they turn up; it never says which to choose.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>The progressive is the ordinary present</strong><span>It is taught first and practised hardest. In the chapter the lab files 3 of 216 phrases as progressive, 1.4%, and the two modern documents give 0 of 34. Counted once over the whole novel and quoted here, with 8,864 pronoun subjects, all the progressive phrases together are 143, which is 1.6%. The plain present and past are far more common.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the table as twelve equal tools</strong><span>The chapter puts 55 phrases in the simple boxes and 4 in all the perfect boxes together. The perfect is real and needed, and it is rare. A page that spread its phrases equally over twelve boxes would look nothing like this one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating no verb found as a failure of the lab</strong><span>It is 42 of 216 because the lab reads every pronoun as a subject, and many are objects. Quoted for the whole novel, the same group is 17.7%. Read the rows and you can sort them by hand.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a verb phrase into its box, and say which boxes carry most of a real page.</strong><p>You should be able to sort every pronoun-subject verb phrase in a printed chapter into the tense table's boxes or into the extra groups the lab adds, read off the shares, and say which boxes carry most of the writing and which carry almost none.</p></div></div><div class="note"><strong>Note:</strong> The twelve boxes are a way to build a phrase. They are not a ranking of what to say. A writer who wants to say that something began before and goes on needs the perfect progressive, however rare it is. This lesson shows what the boxes cost to learn against how often they turn up; it never says which to choose.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Twelve boxes are not twelve equal tools</summary><p>The <dfn>tense</dfn> table has twelve boxes: present, past and future, each simple, <dfn>progressive</dfn>, perfect and perfect progressive. The lab sorts the phrase after each <dfn>pronoun</dfn> into those boxes, and adds groups the table does not draw: <em>be</em> or <em>have</em> as the main verb, <em>be</em> and a participle, which may be the <dfn>passive</dfn> or an adjective, and <em>do</em> as a helping verb.</p></details><details class="recall"><summary>Most of a page is in three places</summary><p>In the chapter the largest groups are <em>be</em> as the main verb (39), a <dfn>modal</dfn> in front (57) and the plain present and past (55). Together they hold 151 of the 216. The other groups share the rest.</p></details><details class="recall"><summary>A scan has a group for what it cannot sort</summary><p>The lab calls it <em>no verb found</em>, and it holds 42 of 216. The rows are printed, and they are the lab being honest: a verb the word list lacks, a pronoun that is an object, <em>he ought to</em>. A count that hides its group for the rest is not a count.</p></details></div>
+      <h3>Summary</h3>
       <p>The tense table has twelve boxes, and a course gives them equal time. A page does not. In one chapter, 216 pronoun subjects are followed by a verb phrase. The simple boxes, present and past, hold 55, and the phrases with a modal in front hold 57. The lab files 3 as progressive.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Twelve boxes are not twelve equal tools.</strong> The <dfn>tense</dfn> table has twelve boxes: present, past and future, each simple, <dfn>progressive</dfn>, perfect and perfect progressive. The lab sorts the phrase after each <dfn>pronoun</dfn> into those boxes, and adds groups the table does not draw: <em>be</em> or <em>have</em> as the main verb, <em>be</em> and a participle, which may be the <dfn>passive</dfn> or an adjective, and <em>do</em> as a helping verb.</li><li><strong>Most of a page is in three places.</strong> In the chapter the largest groups are <em>be</em> as the main verb (39), a <dfn>modal</dfn> in front (57) and the plain present and past (55). Together they hold 151 of the 216. The other groups share the rest.</li><li><strong>A scan has a group for what it cannot sort.</strong> The lab calls it <em>no verb found</em>, and it holds 42 of 216. The rows are printed, and they are the lab being honest: a verb the word list lacks, a pronoun that is an object, <em>he ought to</em>. A count that hides its group for the rest is not a count.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="simple, present and past, 55 of 216. with a modal, 57 of 216. perfect, any time, 4 of 216. progressive, any time, 3 of 216. be plus a participle, 4 of 216. no verb found, 42 of 216" tabindex="0" role="region" aria-label="Mathematical notation">simple, present and past    55 of 216
 with a modal               57 of 216
 perfect, any time           4 of 216
@@ -2137,11 +2182,40 @@ var writeTiles = function (tiles) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2209,7 +2283,7 @@ var writeTiles = function (tiles) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

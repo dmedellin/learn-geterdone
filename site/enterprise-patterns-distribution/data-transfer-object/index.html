@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,31 +1478,29 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Distribution and Putting It Together</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 15 · Distribution Patterns</p>
       <h1>Data Transfer Object</h1>
       <p class="lesson-lede">An object with no domain behaviour that carries everything one call needs across a process boundary, built from the domain by an assembler.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Data Transfer Object</li><li>Serialization</li><li>Assembler</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Due to the latency costs of remote calls, its better to err on the side of sending too much data than have to make multiple calls.&rdquo; The sentence is from How It Works in Chapter 15's Data Transfer Object, and it is the pattern's argument in one line. A Remote Facade needs coarse methods; this lesson reads the coarse object those methods take and return, as a pattern, a tool to look up and use.</p><p>Each call to a remote interface is expensive, so each call has to carry more data. Many parameters would do it for an update, awkwardly, but Java returns only one value. So the pattern gathers everything the call needs into one object. It must be serializable to cross the connection, and an assembler on the server usually moves data between it and the domain objects. Fowler admits it is the kind of object you were brought up not to write, a bag of fields and accessors, whose whole value is that it moves many pieces of information in one call.</p><p>What goes in it is decided by the client, not the domain. A transfer object usually carries more than the remote object asked for, data from the order, the customer, the lines and the delivery, everything the client will want for a while. Domain objects themselves usually cannot be sent: they are tied into a web of references that is hard to serialize, and you would not want the domain classes on the client. So the fields are primitives, strings, dates and other transfer objects, arranged as a simple hierarchy. Transfer objects are often shaped for one web page or screen; whether to have one for a whole interaction or one per request, and one for request and response or two, Fowler says has no blanket rule. A Record Set is the transfer object for a SQL database, and suits Table Module.</p><p>Serializing the Data Transfer Object weighs the forms. Use the platform's built-in serialization when there is one. Text forms such as XML are easy to read and to generate, but need more bandwidth for the same data, XML especially, and can be markedly slower. A direct binary form is fragile: a change as small as adding an optional field can break an out-of-date client, where XML, or a binary form written through a dictionary, can be made to tolerate it. Chapter 6, Session State, gives the book's illustration of the size: one application's session data, sent as XML, came to about a megabyte, which one of Fowler's team likened to three Shakespeare plays.</p><p>Assembling a Data Transfer Object from Domain Objects keeps the two apart. The transfer object is deployed on both sides of the wire, so it must not depend on the domain; and the domain should not depend on it, because its shape changes with the interface. A separate assembler builds one from the other. When to Use It is brief: whenever several items of data must cross between two processes in one call, and in particular to hide an XML document behind an explicit interface. One naming note: much of the J2EE world called this pattern a value object, which in this book is something else, the small immutable object read in the Value Object lesson of the second course.</p><pre class="codeblock" data-say="line 1, comment, Everything the order screen shows, in one serializable bundle.. line 2, class order dto implements serializable. line 3, long id. line 4, string customer name. line 5, string status. line 6, long total cents. line 7, list of string line summaries is set to new array list of string" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Everything the order screen shows, in one serializable bundle.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Due to the latency costs of remote calls, its better to err on the side of sending too much data than have to make multiple calls.&rdquo; The sentence is from How It Works in Chapter 15's Data Transfer Object, and it is the pattern's argument in one line. A Remote Facade needs coarse methods; this lesson reads the coarse object those methods take and return, as a pattern, a tool to look up and use.</p><p>Each call to a remote interface is expensive, so each call has to carry more data. Many parameters would do it for an update, awkwardly, but Java returns only one value. So the pattern gathers everything the call needs into one object. It must be serializable to cross the connection, and an assembler on the server usually moves data between it and the domain objects. Fowler admits it is the kind of object you were brought up not to write, a bag of fields and accessors, whose whole value is that it moves many pieces of information in one call.</p><p>What goes in it is decided by the client, not the domain. A transfer object usually carries more than the remote object asked for, data from the order, the customer, the lines and the delivery, everything the client will want for a while. Domain objects themselves usually cannot be sent: they are tied into a web of references that is hard to serialize, and you would not want the domain classes on the client. So the fields are primitives, strings, dates and other transfer objects, arranged as a simple hierarchy. Transfer objects are often shaped for one web page or screen; whether to have one for a whole interaction or one per request, and one for request and response or two, Fowler says has no blanket rule. A Record Set is the transfer object for a SQL database, and suits Table Module.</p><p>Serializing the Data Transfer Object weighs the forms. Use the platform's built-in serialization when there is one. Text forms such as XML are easy to read and to generate, but need more bandwidth for the same data, XML especially, and can be markedly slower. A direct binary form is fragile: a change as small as adding an optional field can break an out-of-date client, where XML, or a binary form written through a dictionary, can be made to tolerate it. Chapter 6, Session State, gives the book's illustration of the size: one application's session data, sent as XML, came to about a megabyte, which one of Fowler's team likened to three Shakespeare plays.</p><p>Assembling a Data Transfer Object from Domain Objects keeps the two apart. The transfer object is deployed on both sides of the wire, so it must not depend on the domain; and the domain should not depend on it, because its shape changes with the interface. A separate assembler builds one from the other. When to Use It is brief: whenever several items of data must cross between two processes in one call, and in particular to hide an XML document behind an explicit interface. One naming note: much of the J2EE world called this pattern a value object, which in this book is something else, the small immutable object read in the Value Object lesson of the second course.</p><pre class="codeblock" data-say="line 1, comment, Everything the order screen shows, in one serializable bundle.. line 2, class order dto implements serializable. line 3, long id. line 4, string customer name. line 5, string status. line 6, long total cents. line 7, list of string line summaries is set to new array list of string" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Everything the order screen shows, in one serializable bundle.</span>
 <span class="cl">class OrderDto implements Serializable {</span>
 <span class="cl">    long id;</span>
 <span class="cl">    String customerName;</span>
 <span class="cl">    String status;</span>
 <span class="cl">    long totalCents;</span>
 <span class="cl">    List&lt;String&gt; lineSummaries = new ArrayList&lt;String&gt;();</span>
-<span class="cl">}</span></code></pre><p>The snippet is a transfer object shaped for one screen. Lines 3 to 7 hold what the order screen shows: the order's id, the customer's name, the status, the total and a summary of each line, gathered from at least three domain objects by an assembler the snippet leaves out. It has no domain behaviour, and nothing in it refers to a domain class, so the client can hold the class without the domain.</p><p>Now the count. The lab reads records <span class="math" data-say="field, bytes, needed">field, bytes, needed</span>, one per field the server could send, with a latency, a bandwidth in bytes a millisecond and an encoding factor, the encoded size over the raw bytes. It compares two designs. The getter design makes one call for each field the screen needs; the transfer object is one call carrying every field. The tiles are the getter calls, the time of the getters (a latency each and their bytes at the bandwidth), the bytes in the transfer object, its time (one latency and all its bytes), the bytes it carries that the screen does not need, and the bytes the saved round trips could have carried: one fewer than the getter calls, times the latency, times the bandwidth. The model sends data at a steady rate after a fixed latency, and the panel says real networks are lumpier.</p><p>The preset <code>order-screen</code> is the snippet's five fields, with a 4,000-byte <span class="math" data-say="notes">notes</span> field added that the screen does not show, as if the assembler had copied the whole order: the err-on-the-side-of-too-much case. At 20 ms and 1,000 bytes a millisecond, five getters take <span data-say="51033 over 500, about 102.07 milliseconds">51,033/500 ≈ 102.07 ms</span>; one transfer object of 6,066 bytes takes <span data-say="13033 over 500, about 26.07 milliseconds">13,033/500 ≈ 26.07 ms</span>, though 4,000 of its bytes are never shown. The four round trips it saved could have carried 80,000 bytes, twenty times the waste.</p><p>The preset <code>as-xml</code> sends the same fields at three times their raw size, the lesson's stand-in for a text encoding; the factor is illustrative, not the book's. The getters now take <span data-say="53099 over 500, about 106.20 milliseconds">53,099/500 ≈ 106.20 ms</span> and the transfer object, 18,198 bytes with 12,000 of them unneeded, <span data-say="19099 over 500, about 38.20 milliseconds">19,099/500 ≈ 38.20 ms</span>. The encoding costs the transfer object far more than the getters, because it sends more bytes, and it is still the faster design here. Whether it stays faster depends on how many bytes it wastes against what the saved trips could have carried, and the exercise is a case to test that.</p><h3>Exercise</h3><ul><li>A profile screen that shows a member's <span class="math" data-say="name">name</span> (30 bytes) and <span class="math" data-say="email">email</span> (40 bytes). The server also holds a <span class="math" data-say="photo">photo</span> of 60,000 bytes and a <span class="math" data-say="history">history</span> of 9,000 bytes, which the screen does not show.</li><li>A latency of 10 ms, 2,000 bytes a millisecond, and an encoding factor of 1.</li></ul><p>Find by hand the time of one getter for each field the screen needs, the time of one transfer object carrying all four fields, and the time of one carrying only the two the screen shows, and say which is fastest and why the quotation's advice does not settle it.</p><p>With a facade and its transfer objects the boundary is designed. The next lesson, Putting It All Together, reads Fowler's summary of the whole book, and prices one request through every layer under three deployments.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Remote calls</h2></div><p>getters against one data transfer object</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The snippet is a transfer object shaped for one screen. Lines 3 to 7 hold what the order screen shows: the order's id, the customer's name, the status, the total and a summary of each line, gathered from at least three domain objects by an assembler the snippet leaves out. It has no domain behaviour, and nothing in it refers to a domain class, so the client can hold the class without the domain.</p><p>Now the count. The lab reads records <span class="math" data-say="field, bytes, needed">field, bytes, needed</span>, one per field the server could send, with a latency, a bandwidth in bytes a millisecond and an encoding factor, the encoded size over the raw bytes. It compares two designs. The getter design makes one call for each field the screen needs; the transfer object is one call carrying every field. The tiles are the getter calls, the time of the getters (a latency each and their bytes at the bandwidth), the bytes in the transfer object, its time (one latency and all its bytes), the bytes it carries that the screen does not need, and the bytes the saved round trips could have carried: one fewer than the getter calls, times the latency, times the bandwidth. The model sends data at a steady rate after a fixed latency, and the panel says real networks are lumpier.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Remote calls</h2></div><p>getters against one data transfer object</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Remote calls</strong><span>getters against one data transfer object</span></div>
       </div>
@@ -1465,10 +1508,10 @@
       <div class="table-wrap" id="rrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The getters make one call a needed field; the DTO is one call carrying every field. A call's time is the latency plus its bytes × the factor / the bytes a millisecond. The spare bytes are the round trips the DTO saves (needed fields − 1) × latency × bytes a millisecond.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One getter a field, or one transfer object</h3>
-          <p>The arithmetic of the figures the lesson states (marked with their source). Each record is one field the server could send, its size in bytes and whether the screen needs it. The getter design makes one call for each needed field; the transfer object is one call carrying every field. The factor is the lesson's stand-in for an encoding's size against the raw bytes. Figures: illustrative, the lesson's own; none is the book's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One getter a field, or one transfer object</h3>
+            <p>The arithmetic of the figures the lesson states (marked with their source). Each record is one field the server could send, its size in bytes and whether the screen needs it. The getter design makes one call for each needed field; the transfer object is one call carrying every field. The factor is the lesson's stand-in for an encoding's size against the raw bytes. Figures: illustrative, the lesson's own; none is the book's.</p>
         <div class="field">
           <label for="rrPreset">Worked example</label>
           <select id="rrPreset"><option value="order-screen" selected>The order screen, with the notes it does not show (illustrative)</option><option value="as-xml">The same fields, encoded at three times their size (illustrative)</option></select>
@@ -1498,12 +1541,15 @@
           <div class="kpi"><span>Bytes the saved round trips could have carried</span><strong id="rrSpare">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>order-screen</code> is the snippet's five fields, with a 4,000-byte <span class="math" data-say="notes">notes</span> field added that the screen does not show, as if the assembler had copied the whole order: the err-on-the-side-of-too-much case. At 20 ms and 1,000 bytes a millisecond, five getters take <span data-say="51033 over 500, about 102.07 milliseconds">51,033/500 ≈ 102.07 ms</span>; one transfer object of 6,066 bytes takes <span data-say="13033 over 500, about 26.07 milliseconds">13,033/500 ≈ 26.07 ms</span>, though 4,000 of its bytes are never shown. The four round trips it saved could have carried 80,000 bytes, twenty times the waste.</p><p>The preset <code>as-xml</code> sends the same fields at three times their raw size, the lesson's stand-in for a text encoding; the factor is illustrative, not the book's. The getters now take <span data-say="53099 over 500, about 106.20 milliseconds">53,099/500 ≈ 106.20 ms</span> and the transfer object, 18,198 bytes with 12,000 of them unneeded, <span data-say="19099 over 500, about 38.20 milliseconds">19,099/500 ≈ 38.20 ms</span>. The encoding costs the transfer object far more than the getters, because it sends more bytes, and it is still the faster design here. Whether it stays faster depends on how many bytes it wastes against what the saved trips could have carried, and the exercise is a case to test that.</p><h3>Exercise</h3><ul><li>A profile screen that shows a member's <span class="math" data-say="name">name</span> (30 bytes) and <span class="math" data-say="email">email</span> (40 bytes). The server also holds a <span class="math" data-say="photo">photo</span> of 60,000 bytes and a <span class="math" data-say="history">history</span> of 9,000 bytes, which the screen does not show.</li><li>A latency of 10 ms, 2,000 bytes a millisecond, and an encoding factor of 1.</li></ul><p>Find by hand the time of one getter for each field the screen needs, the time of one transfer object carrying all four fields, and the time of one carrying only the two the screen shows, and say which is fastest and why the quotation's advice does not settle it.</p><p>With a facade and its transfer objects the boundary is designed. The next lesson, Putting It All Together, reads Fowler's summary of the whole book, and prices one request through every layer under three deployments.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Weighing a transfer object</h2></div><p>Four steps, the last of them on an API response of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Price the getters</h3><p>Count the fields the screen needs: one call each, one latency each, and their bytes, encoded, at the bandwidth.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Price the transfer object</h3><p>One latency, and every field it carries, encoded, at the bandwidth. Note the bytes the screen does not need.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Weigh the waste against the trips</h3><p>The round trips the transfer object saved are one fewer than the getters. Multiply them by the latency and the bandwidth for the bytes they could have carried, and compare that with the unneeded bytes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a response you know</h3><p>Take one API response in a system you know. Weigh it in bytes, count the fields its client actually uses, write both figures, and say in one sentence whether a smaller response or fewer calls would save more.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Weighing a transfer object</h2>
+      <p class="lead-in">Four steps, the last of them on an API response of your own.</p>
+      <ol class="key-ideas method"><li><strong>Price the getters.</strong> Count the fields the screen needs: one call each, one latency each, and their bytes, encoded, at the bandwidth.</li><li><strong>Price the transfer object.</strong> One latency, and every field it carries, encoded, at the bandwidth. Note the bytes the screen does not need.</li><li><strong>Weigh the waste against the trips.</strong> The round trips the transfer object saved are one fewer than the getters. Multiply them by the latency and the bandwidth for the bytes they could have carried, and compare that with the unneeded bytes.</li><li><strong>Do it on a response you know.</strong> Take one API response in a system you know. Weigh it in bytes, count the fields its client actually uses, write both figures, and say in one sentence whether a smaller response or fewer calls would save more.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1522,17 +1568,16 @@ one object: 6,066 bytes at 1,000 a ms
 object time: about 26.07 ms</div><p>The transfer object sends 4,000 bytes nobody sees and is still four times faster, because those bytes cost 4 ms and the four round trips it saved cost 80. That is the quotation in figures, on the lesson's illustration.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Fetching each value only when the screen asks for it</strong><span>It looks economical: no byte crosses the wire unless it is shown. On the lesson's illustration it is five calls and <span data-say="51033 over 500, about 102.07 milliseconds">51,033/500 ≈ 102.07 ms</span>, against <span data-say="13033 over 500, about 26.07 milliseconds">13,033/500 ≈ 26.07 ms</span> for one transfer object that also carries 4,000 bytes the screen never shows. The quotation gives the reason: a round trip costs more than the bytes most fields add, so Fowler would rather send too much than call again. The advice has a limit, which the exercise finds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking a transfer object for a domain object with getters</strong><span>Both have fields and accessors, but a transfer object has no domain behaviour and is shaped by the call, often by one screen, gathering data from several domain objects. It must not refer to the domain, so that it can live on both sides of the wire. An assembler builds it; it does not build itself from the domain.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing the encoding by size alone</strong><span>A binary form is smaller and faster, and the as-xml preset shows what three times the bytes costs. The book adds the other side: binary serialization is fragile, and a change as small as an optional field can break an out-of-date client, where XML can be written to tolerate changes. Size is one of the trade-offs, not the whole of it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can weigh a transfer object by hand.</strong><p>Given fields with sizes and whether the screen needs them, a latency, a bandwidth and an encoding factor, compute the getters' time and the transfer object's, the unneeded bytes it sends, and the bytes the saved round trips could have carried.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab models a network as a fixed latency and a steady rate, and an encoding as one factor on every byte; real networks send in packets and windows, and real encodings cost time to build and parse as well as to send. It cannot weigh the fragility of a binary form or the cost of keeping both sides' classes in step, which the book counts as part of the choice.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Fetching each value only when the screen asks for it</strong><span>It looks economical: no byte crosses the wire unless it is shown. On the lesson's illustration it is five calls and <span data-say="51033 over 500, about 102.07 milliseconds">51,033/500 ≈ 102.07 ms</span>, against <span data-say="13033 over 500, about 26.07 milliseconds">13,033/500 ≈ 26.07 ms</span> for one transfer object that also carries 4,000 bytes the screen never shows. The quotation gives the reason: a round trip costs more than the bytes most fields add, so Fowler would rather send too much than call again. The advice has a limit, which the exercise finds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking a transfer object for a domain object with getters</strong><span>Both have fields and accessors, but a transfer object has no domain behaviour and is shaped by the call, often by one screen, gathering data from several domain objects. It must not refer to the domain, so that it can live on both sides of the wire. An assembler builds it; it does not build itself from the domain.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing the encoding by size alone</strong><span>A binary form is smaller and faster, and the as-xml preset shows what three times the bytes costs. The book adds the other side: binary serialization is fragile, and a change as small as an optional field can break an out-of-date client, where XML can be written to tolerate changes. Size is one of the trade-offs, not the whole of it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can weigh a transfer object by hand.</strong><p>Given fields with sizes and whether the screen needs them, a latency, a bandwidth and an encoding factor, compute the getters' time and the transfer object's, the unneeded bytes it sends, and the bytes the saved round trips could have carried.</p></div></div><div class="note"><strong>Note:</strong> The lab models a network as a fixed latency and a steady rate, and an encoding as one factor on every byte; real networks send in packets and windows, and real encodings cost time to build and parse as well as to send. It cannot weigh the fragility of a binary form or the cost of keeping both sides' classes in step, which the book counts as part of the choice.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Data Transfer Object</summary><p>An object that carries the data for one remote call: fields, getters and setters, and no domain behaviour beyond its accessors and, usually, its own serialization. It is serializable, it holds only simple values and other transfer objects, and its class is present on both sides of the wire.</p></details><details class="recall"><summary>Serialization</summary><p>Turning an object into bytes to send, and back on arrival. The book weighs a direct binary form, compact but fragile when the class changes, against text forms such as XML, easy to read and more tolerant of change but larger and slower.</p></details><details class="recall"><summary>Assembler</summary><p>A separate object on the server that builds a transfer object from the domain objects and updates the domain from one, so that neither depends on the other. The book calls it an example of Mapper.</p></details></div>
+      <h3>Summary</h3>
       <p>A Data Transfer Object bundles the data for a call, from several domain objects, into one serializable object, so that a remote client asks once. Compute the time of one getter call per field against one object carrying every field, the bytes it sends that the screen never shows, and how many bytes the saved round trips could have carried.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Data Transfer Object.</strong> An object that carries the data for one remote call: fields, getters and setters, and no domain behaviour beyond its accessors and, usually, its own serialization. It is serializable, it holds only simple values and other transfer objects, and its class is present on both sides of the wire.</li><li><strong>Serialization.</strong> Turning an object into bytes to send, and back on arrival. The book weighs a direct binary form, compact but fragile when the class changes, against text forms such as XML, easy to read and more tolerant of change but larger and slower.</li><li><strong>Assembler.</strong> A separate object on the server that builds a transfer object from the domain objects and updates the domain from one, so that neither depends on the other. The book calls it an example of Mapper.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one call carries all the data it needs. shaped for the screen, not the domain. an assembler builds it from the domain. a getter each, calls times latency. send too much rather than call twice. extra bytes against saved round trips" tabindex="0" role="region" aria-label="Mathematical notation">one call carries all the data it needs
 shaped for the screen, not the domain
 an assembler builds it from the domain
@@ -2206,11 +2251,40 @@ extra bytes against saved round trips</div><figcaption>Data Transfer Object in s
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2278,7 +2352,7 @@ extra bytes against saved round trips</div><figcaption>Data Transfer Object in s
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

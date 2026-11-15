@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The cost model</p>
       <h1>Arrays, Linked Lists, and the Cost Model</h1>
       <p class="lesson-lede">Cost one operation sequence on a dynamic array and on a doubly-linked list, and name the operation that decided it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The cost belongs to the representation, not to the operation</li><li>Reaching a position and acting there are separate costs</li><li>A total is about one sequence; a bound is about all of them</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The word-RAM model, and two representations priced in it</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The word-RAM cost model</span><p>Memory is an array of words. Reading or writing a word at a known address costs <strong>1</strong>, arithmetic on a word costs <strong>1</strong>, and nothing else is charged for. Under this model an array index <span class="math" data-say="A at i">A[i]</span> is one operation, because the address is computed from <span class="math" data-say="i">i</span>; reaching the i-th node of a linked list is <span class="math" data-say="i plus 1">i + 1</span> operations, because the only way to the i-th node is through the ones before it.</p><p>This is the model every cost on this course is stated in. It has no cache, no page, and no notion of one access being nearer than another &mdash; System Design&rsquo;s storage course is where that assumption is dropped and the answers change.</p></div><p>A <strong>dynamic array</strong> stores the elements contiguously, with spare capacity at the end. A <strong>doubly-linked list</strong> stores each element in its own node with pointers to its neighbours, and keeps a pointer to the head and to the tail. Both implement the same abstract sequence. Here is what each charges:</p><div class="mathblock" data-say="index i, search, insert front, insert end, delete at i. dynamic array, 1, n, n plus 1, 1, n minus i. doubly-linked list, i plus 1, n, 1, 1, i plus 2. the array pays to MAKE ROOM, the list pays to ARRIVE" tabindex="0" role="region" aria-label="Mathematical notation">                    index i    search     insert front    insert end    delete at i
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The word-RAM model, and two representations priced in it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The word-RAM cost model</span><p>Memory is an array of words. Reading or writing a word at a known address costs <strong>1</strong>, arithmetic on a word costs <strong>1</strong>, and nothing else is charged for. Under this model an array index <span class="math" data-say="A at i">A[i]</span> is one operation, because the address is computed from <span class="math" data-say="i">i</span>; reaching the i-th node of a linked list is <span class="math" data-say="i plus 1">i + 1</span> operations, because the only way to the i-th node is through the ones before it.</p><p>This is the model every cost on this course is stated in. It has no cache, no page, and no notion of one access being nearer than another &mdash; System Design&rsquo;s storage course is where that assumption is dropped and the answers change.</p></div><p>A <strong>dynamic array</strong> stores the elements contiguously, with spare capacity at the end. A <strong>doubly-linked list</strong> stores each element in its own node with pointers to its neighbours, and keeps a pointer to the head and to the tail. Both implement the same abstract sequence. Here is what each charges:</p><div class="mathblock" data-say="index i, search, insert front, insert end, delete at i. dynamic array, 1, n, n plus 1, 1, n minus i. doubly-linked list, i plus 1, n, 1, 1, i plus 2. the array pays to MAKE ROOM, the list pays to ARRIVE" tabindex="0" role="region" aria-label="Mathematical notation">                    index i    search     insert front    insert end    delete at i
 
 dynamic array             1         n             n + 1            1          n − i
 doubly-linked list    i + 1         n                 1            1          i + 2
 
-  the array pays to MAKE ROOM      the list pays to ARRIVE</div><p>Read the two rows against each other rather than down. <span class="math" data-say="insert front">insert front</span> is <span class="math" data-say="n plus 1">n + 1</span> on the array because every one of the <span class="math" data-say="n">n</span> elements shifts up one place and then the new element is written; it is <span class="math" data-say="1">1</span> on the list because two pointers change. <span class="math" data-say="index i">index i</span> is <span class="math" data-say="1">1</span> on the array because the address is arithmetic; it is <span class="math" data-say="i plus 1">i + 1</span> on the list because the walk is the only route. <span class="math" data-say="delete at i">delete at i</span> costs the array the <span class="math" data-say="n minus i">n − i</span> elements it must shift down, and costs the list <span class="math" data-say="i plus 2">i + 2</span>: <span class="math" data-say="i plus 1">i + 1</span> to arrive and one splice.</p><div class="example"><span class="label">Example &middot; One insertion at the front, both ways</span><p>With <span class="math" data-say="n equals 8">n = 8</span> elements, inserting at the front costs the array <span class="math" data-say="9">9</span> and the list <span class="math" data-say="1">1</span>. The lab reports exactly that pair, and it is the single most quoted comparison in this subject. It is also the comparison that produces the mistake, because the next operation in almost every real sequence is a lookup, and the lookup reverses it.</p></div><h3>The sequence, executed</h3><p>The lab&rsquo;s opening sequence is the four operations the model is stated on &mdash; index, insert at the front, insert at the end, delete from the middle &mdash; repeated four times from <span class="math" data-say="n equals 16">n = 16</span>, reaching halfway along for the two that take a position. Sixteen operations. Grouped by kind, the counters read:</p><div class="mathblock" data-say="operation, how many, array, list. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">operation              how many    array    list
-
-index                         4        4      38
-insert at the front           4       74       4
-insert at the end             4        4       4
-delete from the middle        4       40      46
-
-total                        16      122      92</div><p>The list wins this sequence, <span class="math" data-say="92">92</span> against <span class="math" data-say="122">122</span>, and the operation that decided it is the insertion at the front: four of them cost <span class="math" data-say="74">74</span> on the array and <span class="math" data-say="4">4</span> on the list, a gap of <span class="math" data-say="70">70</span> in a contest settled by <span class="math" data-say="30">30</span>. Every other row is either close or the wrong way round. That is the useful way to read a cost comparison &mdash; find the row with the largest gap, because that row is the answer and the rest is noise.</p><div class="example"><span class="label">Example &middot; Two sequences that reverse the verdict</span><p>Change nothing but the mix. Three insertions at the front and one index, four times over from <span class="math" data-say="n equals 24">n = 24</span>: array <span class="math" data-say="370">370</span>, list <span class="math" data-say="78">78</span>. Three indexes and one insertion at the end, same size: array <span class="math" data-say="16">16</span>, list <span class="math" data-say="250">250</span>. Same two representations, same counters, same model &mdash; a factor of nearly five one way and a factor of fifteen the other. The representation does not win or lose; a workload decides.</p></div><h3>Where the counted number and the proved bound part company</h3><p>One entry in that table is not a worst case. <span class="math" data-say="insert end">insert end</span> on a dynamic array is written <span class="math" data-say="1">1</span>, and sometimes it is not <span class="math" data-say="1">1</span>: when the spare capacity runs out the array is reallocated and every element is copied. The <span class="math" data-say="1">1</span> is the <em>amortised</em> cost &mdash; the average over a run of insertions, which is <span class="math" data-say="big O of 1">O(1)</span> because doubling makes the copies rare. The lab charges <span class="math" data-say="1">1</span> every time and never shows the copy, so the array column is a little optimistic about any single insertion at the end, and honest about a run of them.</p><p>That gap is worth naming on the first page of the course, because it is the shape of every disagreement to come. Three different promises hide behind a single small number: a <strong>worst case</strong> that no input beats, an <strong>amortised</strong> cost that holds on average over a sequence, and an <strong>expected</strong> cost that holds on average over some randomness. A measurement cannot tell them apart. <span class="math" data-say="122">122</span> and <span class="math" data-say="92">92</span> are two integers produced by running sixteen operations; they are not a bound, and the next lesson is about a structure whose whole interest is that the distinction matters.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Arrays against linked lists</h2></div><p>One operation sequence, two representations, two counts</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  the array pays to MAKE ROOM      the list pays to ARRIVE</div><p>Read the two rows against each other rather than down. <span class="math" data-say="insert front">insert front</span> is <span class="math" data-say="n plus 1">n + 1</span> on the array because every one of the <span class="math" data-say="n">n</span> elements shifts up one place and then the new element is written; it is <span class="math" data-say="1">1</span> on the list because two pointers change. <span class="math" data-say="index i">index i</span> is <span class="math" data-say="1">1</span> on the array because the address is arithmetic; it is <span class="math" data-say="i plus 1">i + 1</span> on the list because the walk is the only route. <span class="math" data-say="delete at i">delete at i</span> costs the array the <span class="math" data-say="n minus i">n − i</span> elements it must shift down, and costs the list <span class="math" data-say="i plus 2">i + 2</span>: <span class="math" data-say="i plus 1">i + 1</span> to arrive and one splice.</p><div class="example"><span class="label">Example &middot; One insertion at the front, both ways</span><p>With <span class="math" data-say="n equals 8">n = 8</span> elements, inserting at the front costs the array <span class="math" data-say="9">9</span> and the list <span class="math" data-say="1">1</span>. The lab reports exactly that pair, and it is the single most quoted comparison in this subject. It is also the comparison that produces the mistake, because the next operation in almost every real sequence is a lookup, and the lookup reverses it.</p></div><h3>The sequence, executed</h3><p>The lab&rsquo;s opening sequence is the four operations the model is stated on &mdash; index, insert at the front, insert at the end, delete from the middle &mdash; repeated four times from <span class="math" data-say="n equals 16">n = 16</span>, reaching halfway along for the two that take a position. Sixteen operations. Grouped by kind, the counters read:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Arrays against linked lists</h2></div><p>One operation sequence, two representations, two counts</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two representations, one sequence</strong><span>cost counted in the word RAM, not quoted from a class</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>dynamic array</span><span class="tone-amber"><i class="legend-swatch"></i>doubly-linked list</span></div>
@@ -1416,10 +1452,10 @@ total                        16      122      92</div><p>The list wins this sequ
       <div class="lab-stage" id="alStage" tabindex="0" role="region" aria-label="Cumulative cost of the operation sequence on a dynamic array and on a doubly-linked list."><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 220" role="img" aria-label="Cumulative cost of the operation sequence on a dynamic array and on a doubly-linked list."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Compose a sequence and watch both representations pay</h3>
-          <p>Every figure is a count in the word RAM: an array index is <span class="math" data-say="1">1</span>, reaching the i-th list node is <span class="math" data-say="i plus 1">i + 1</span>, and a shift moves every element after the gap. Change the mix and the winner changes. Nothing here is a complexity class &mdash; the table is the sequence executed, operation by operation.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Compose a sequence and watch both representations pay</h3>
+            <p>Every figure is a count in the word RAM: an array index is <span class="math" data-say="1">1</span>, reaching the i-th list node is <span class="math" data-say="i plus 1">i + 1</span>, and a shift moves every element after the gap. Change the mix and the winner changes. Nothing here is a complexity class &mdash; the table is the sequence executed, operation by operation.</p>
         <div class="field" id="alPresetField">
           <label for="alPreset">Operation sequence</label>
           <select id="alPreset"><option value="four-operations" selected>index, insert at the front, insert at the end, delete from the middle</option><option value="front-insertions">three insertions at the front, then one index</option><option value="random-access">three indexes, then one insertion at the end</option><option value="scan-bound">search, insert at the end, search, delete at a position</option></select>
@@ -1445,12 +1481,22 @@ total                        16      122      92</div><p>The list wins this sequ
           <div class="kpi"><span>Decided by</span><strong id="alDecider">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="operation, how many, array, list. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">operation              how many    array    list
+
+index                         4        4      38
+insert at the front           4       74       4
+insert at the end             4        4       4
+delete from the middle        4       40      46
+
+total                        16      122      92</div><p>The list wins this sequence, <span class="math" data-say="92">92</span> against <span class="math" data-say="122">122</span>, and the operation that decided it is the insertion at the front: four of them cost <span class="math" data-say="74">74</span> on the array and <span class="math" data-say="4">4</span> on the list, a gap of <span class="math" data-say="70">70</span> in a contest settled by <span class="math" data-say="30">30</span>. Every other row is either close or the wrong way round. That is the useful way to read a cost comparison &mdash; find the row with the largest gap, because that row is the answer and the rest is noise.</p><div class="example"><span class="label">Example &middot; Two sequences that reverse the verdict</span><p>Change nothing but the mix. Three insertions at the front and one index, four times over from <span class="math" data-say="n equals 24">n = 24</span>: array <span class="math" data-say="370">370</span>, list <span class="math" data-say="78">78</span>. Three indexes and one insertion at the end, same size: array <span class="math" data-say="16">16</span>, list <span class="math" data-say="250">250</span>. Same two representations, same counters, same model &mdash; a factor of nearly five one way and a factor of fifteen the other. The representation does not win or lose; a workload decides.</p></div><h3>Where the counted number and the proved bound part company</h3><p>One entry in that table is not a worst case. <span class="math" data-say="insert end">insert end</span> on a dynamic array is written <span class="math" data-say="1">1</span>, and sometimes it is not <span class="math" data-say="1">1</span>: when the spare capacity runs out the array is reallocated and every element is copied. The <span class="math" data-say="1">1</span> is the <em>amortised</em> cost &mdash; the average over a run of insertions, which is <span class="math" data-say="big O of 1">O(1)</span> because doubling makes the copies rare. The lab charges <span class="math" data-say="1">1</span> every time and never shows the copy, so the array column is a little optimistic about any single insertion at the end, and honest about a run of them.</p><p>That gap is worth naming on the first page of the course, because it is the shape of every disagreement to come. Three different promises hide behind a single small number: a <strong>worst case</strong> that no input beats, an <strong>amortised</strong> cost that holds on average over a sequence, and an <strong>expected</strong> cost that holds on average over some randomness. A measurement cannot tell them apart. <span class="math" data-say="122">122</span> and <span class="math" data-say="92">92</span> are two integers produced by running sixteen operations; they are not a bound, and the next lesson is about a structure whose whole interest is that the distinction matters.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing a sequence you have been handed</h2></div><p>The order matters: the operation list comes before either representation, and the label on the cost comes last.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the operation sequence out, with positions</h3><p>&ldquo;Mostly lookups with some insertions&rdquo; cannot be costed. <span class="math" data-say="index at 8, insert front, insert end, delete at 9">index at 8, insert front, insert end, delete at 9</span> can. A position is part of an operation here, because two of the four costs depend on it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Price each operation on each representation</h3><p>One row per operation, one column per representation, from the table above. Keep the running size in its own column: an insertion changes <span class="math" data-say="n">n</span>, and the operation after it is priced at the new size.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the columns and find the row with the largest gap</h3><p>The totals answer the question; the widest row explains it. If the widest gap is small relative to the totals, the honest report is that the representation barely matters for this mix &mdash; which happens, and is worth saying.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Label each cost worst-case, amortised or expected</h3><p>Everything in the table above is worst-case except the array&rsquo;s insertion at the end, which is amortised. Writing the label beside the number is the habit that keeps a fast measurement from being read as a guarantee.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Pricing a sequence you have been handed</h2>
+      <p class="lead-in">The order matters: the operation list comes before either representation, and the label on the cost comes last.</p>
+      <ol class="key-ideas method"><li><strong>Write the operation sequence out, with positions.</strong> &ldquo;Mostly lookups with some insertions&rdquo; cannot be costed. <span class="math" data-say="index at 8, insert front, insert end, delete at 9">index at 8, insert front, insert end, delete at 9</span> can. A position is part of an operation here, because two of the four costs depend on it.</li><li><strong>Price each operation on each representation.</strong> One row per operation, one column per representation, from the table above. Keep the running size in its own column: an insertion changes <span class="math" data-say="n">n</span>, and the operation after it is priced at the new size.</li><li><strong>Add the columns and find the row with the largest gap.</strong> The totals answer the question; the widest row explains it. If the widest gap is small relative to the totals, the honest report is that the representation barely matters for this mix &mdash; which happens, and is worth saying.</li><li><strong>Label each cost worst-case, amortised or expected.</strong> Everything in the table above is worst-case except the array&rsquo;s insertion at the end, which is amortised. Writing the label beside the number is the habit that keeps a fast measurement from being read as a guarantee.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1477,17 +1523,16 @@ four rounds, as the lab counts them    122             92
 ratio  122 : 92  =  61 : 46            the list, by 30</div><p>The array&rsquo;s <span class="math" data-say="17">17</span> at step 2 is the whole of its loss, and it grows as the sequence runs: by the fourth round that one operation costs <span class="math" data-say="20">20</span>, because three insertions have made the array longer. The list&rsquo;s <span class="math" data-say="9">9</span> and <span class="math" data-say="11">11</span> at steps 1 and 4 are its loss, and they grow the same way and more slowly.</p><p>Notice what the round total does not tell you. <span class="math" data-say="28">28</span> against <span class="math" data-say="22">22</span> is a true statement about four operations at one size. It does not establish that the list is cheaper for this pattern at every size, and it does not settle where you might guess: the lab reports <span class="math" data-say="61, 46">61 : 46</span> at <span class="math" data-say="n equals 16">n = 16</span>, <span class="math" data-say="109, 78">109 : 78</span> at <span class="math" data-say="n equals 32">n = 32</span> and <span class="math" data-say="205, 142">205 : 142</span> at <span class="math" data-say="n equals 64">n = 64</span>, creeping toward <span class="math" data-say="3, 2">3 : 2</span> as the array&rsquo;s front insertion grows like <span class="math" data-say="n">n</span> against the list&rsquo;s walk of <span class="math" data-say="n over 2">n/2</span>. Reading a bound off two integers is the thing to distrust.</p><p>For a faded rehearsal, price <span class="math" data-say="search, insert end, search, delete at the middle">search, insert end, search, delete at the middle</span> at <span class="math" data-say="n equals 20">n = 20</span>, one round. The supplied first move is that <span class="math" data-say="search">search</span> costs <span class="math" data-say="n">n</span> on both, so the two columns are equal for steps 1 and 3 and the contest is decided by steps 2 and 4 alone. Predict the winner before you total it; then run that preset in the lab, which reports <span class="math" data-say="212">212</span> against <span class="math" data-say="216">216</span> over four rounds, and say why it is nearly a tie.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a linked list’s insertion as constant time</strong><span>The splice is constant; arriving is not. Inserting at position <span class="math" data-say="i">i</span> costs <span class="math" data-say="i plus 2">i + 2</span>, and inserting at the front costs <span class="math" data-say="1">1</span> only because the front is the one position you already hold a pointer to. Any claim that a list inserts in <span class="math" data-say="big O of 1">O(1)</span> is really a claim about a cursor you already have, and the moment the position is described by an index rather than by a pointer, the walk is back.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing representations on a sequence chosen to suit one of them</strong><span>Three insertions at the front and one index gives the list a factor of nearly five. Three indexes and one insertion at the end gives the array a factor of fifteen. Both are real measurements of the same two structures, and either one quoted alone is an advertisement rather than an analysis.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a measured total as a bound</strong><span><span class="math" data-say="122">122</span> against <span class="math" data-say="92">92</span> is a fact about sixteen operations at one size. It licenses no statement about other sizes, other mixes, or other positions, and the cost table above &mdash; which is a claim about all of them &mdash; is a different kind of object that no amount of running can produce.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price an operation before you are told which structure it is on, by asking where the position comes from.</strong><p>You should be able to fill in both rows of the cost table from memory, price a stated sequence on both representations with the running size carried correctly, name the operation whose gap decided the total, and say which single entry in the table is amortised rather than worst-case.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two of the four operations above were expensive on both representations, and a structure that restricts which positions you may touch can be cheap on all of its operations for that reason. &ldquo;Stacks, Queues, and the Two-Stack Queue&rdquo; takes the smallest interesting case: a queue built from two stacks, where one dequeue costs <span class="math" data-say="n">n</span> and the guarantee is still constant &mdash; the first place on this course where a single measurement and the promise behind it are plainly not the same statement.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a linked list’s insertion as constant time</strong><span>The splice is constant; arriving is not. Inserting at position <span class="math" data-say="i">i</span> costs <span class="math" data-say="i plus 2">i + 2</span>, and inserting at the front costs <span class="math" data-say="1">1</span> only because the front is the one position you already hold a pointer to. Any claim that a list inserts in <span class="math" data-say="big O of 1">O(1)</span> is really a claim about a cursor you already have, and the moment the position is described by an index rather than by a pointer, the walk is back.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing representations on a sequence chosen to suit one of them</strong><span>Three insertions at the front and one index gives the list a factor of nearly five. Three indexes and one insertion at the end gives the array a factor of fifteen. Both are real measurements of the same two structures, and either one quoted alone is an advertisement rather than an analysis.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a measured total as a bound</strong><span><span class="math" data-say="122">122</span> against <span class="math" data-say="92">92</span> is a fact about sixteen operations at one size. It licenses no statement about other sizes, other mixes, or other positions, and the cost table above &mdash; which is a claim about all of them &mdash; is a different kind of object that no amount of running can produce.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price an operation before you are told which structure it is on, by asking where the position comes from.</strong><p>You should be able to fill in both rows of the cost table from memory, price a stated sequence on both representations with the running size carried correctly, name the operation whose gap decided the total, and say which single entry in the table is amortised rather than worst-case.</p></div></div><div class="note"><strong>Note:</strong> Two of the four operations above were expensive on both representations, and a structure that restricts which positions you may touch can be cheap on all of its operations for that reason. &ldquo;Stacks, Queues, and the Two-Stack Queue&rdquo; takes the smallest interesting case: a queue built from two stacks, where one dequeue costs <span class="math" data-say="n">n</span> and the guarantee is still constant &mdash; the first place on this course where a single measurement and the promise behind it are plainly not the same statement.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The cost belongs to the representation, not to the operation</summary><p>&ldquo;Insert at position <span class="math" data-say="i">i</span>&rdquo; is one operation with two different prices. On an array the position is free and making room is not: every element after the gap moves. On a linked list making room is free and the position is not: you walk to it. An abstract data type deliberately hides which of those you are paying for, which is exactly why a cost cannot be read off it.</p></details><details class="recall"><summary>Reaching a position and acting there are separate costs</summary><p>This is the whole of the linked-list misunderstanding. Splicing a node into a doubly-linked list is a fixed number of pointer writes &mdash; genuinely <span class="math" data-say="big O of 1">O(1)</span>. Getting to the node you splice beside costs <span class="math" data-say="i plus 1">i + 1</span> hops, and nothing about the list makes that cheaper. The two costs add, and only one of them is constant.</p></details><details class="recall"><summary>A total is about one sequence; a bound is about all of them</summary><p>The lab prints <span class="math" data-say="122">122</span> and <span class="math" data-say="92">92</span> for the sixteen operations on screen. That is evidence about those sixteen operations on a table of that size. The cost model above is the claim about every sequence, and the two are different kinds of statement &mdash; which is the habit this whole course is built to install.</p></details></div>
+      <h3>Summary</h3>
       <p>An abstract data type says what the operations are; it does not say what they cost. The cost is a property of the representation, and the two oldest representations of a sequence disagree about every operation except one. Both are run here on the same sequence in the word-RAM model, with a counter on each, and the totals are <span class="math" data-say="122">122</span> against <span class="math" data-say="92">92</span>.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The cost belongs to the representation, not to the operation.</strong> &ldquo;Insert at position <span class="math" data-say="i">i</span>&rdquo; is one operation with two different prices. On an array the position is free and making room is not: every element after the gap moves. On a linked list making room is free and the position is not: you walk to it. An abstract data type deliberately hides which of those you are paying for, which is exactly why a cost cannot be read off it.</li><li><strong>Reaching a position and acting there are separate costs.</strong> This is the whole of the linked-list misunderstanding. Splicing a node into a doubly-linked list is a fixed number of pointer writes &mdash; genuinely <span class="math" data-say="big O of 1">O(1)</span>. Getting to the node you splice beside costs <span class="math" data-say="i plus 1">i + 1</span> hops, and nothing about the list makes that cheaper. The two costs add, and only one of them is constant.</li><li><strong>A total is about one sequence; a bound is about all of them.</strong> The lab prints <span class="math" data-say="122">122</span> and <span class="math" data-say="92">92</span> for the sixteen operations on screen. That is evidence about those sixteen operations on a table of that size. The cost model above is the claim about every sequence, and the two are different kinds of statement &mdash; which is the habit this whole course is built to install.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="word RAM, an array index costs 1, reaching the i-th list node costs i plus 1. index, search, insert front, insert end, delete at i. array, 1, n, n plus 1, 1, n minus i. list, i plus 1, n, 1, 1, i plus 2. 16 operations from n equals 16, array 122, list 92, ratio 61 over 46" tabindex="0" role="region" aria-label="Mathematical notation">word RAM      an array index costs 1;  reaching the i-th list node costs i + 1
               index   search   insert front   insert end   delete at i
 array             1        n          n + 1            1         n − i
@@ -3006,11 +3051,40 @@ list          i + 1        n              1            1         i + 2
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3078,7 +3152,7 @@ list          i + 1        n              1            1         i + 2
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

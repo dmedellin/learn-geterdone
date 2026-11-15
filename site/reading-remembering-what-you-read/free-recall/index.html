@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,24 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Remembering What You Read</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Recall</p>
       <h1>Free Recall</h1>
       <p class="lesson-lede">Write down what a passage said with the page hidden, and count how much of it you kept.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An idea unit is one thing the passage said</li><li>Recall and recognition</li><li>A recall-adjusted rate</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What the drill measures</h2>
-      <article class="prose reading"><p>The drill below times one reading of How a Camel Saves Water, a passage of 383 words, at your usual pace. When you press Done the passage disappears and a box opens: write down everything you remember, in any order, in notes or in sentences. Press Finished writing, and the passage's twelve idea units appear under what you wrote. Tick each one your writing contains, then press Score.</p><p>Tick a unit when your writing has its substance. &ldquo;The hump is fat&rdquo; earns the first unit; &ldquo;something about the hump&rdquo; does not. A unit you could have written but did not stays unticked: the drill measures what came back without help, and seeing the list is help. The kit never reads your writing, so the count is exactly as honest as you are.</p><div class="defbox"><span class="label">Definition &middot; Recall share</span><p>The <strong>recall share</strong> is the number of idea units ticked over the number in the passage. Your rate times the recall share is the <strong>recalled rate</strong>, in words a minute: the part of your reading you could give back.</p></div><p>The typical preset is a reader who took 95.75 seconds over the 383 words, a rate of 240 words a minute, wrote 84 words, and ticked 7 of the 12 units, 12 words written for each unit recalled. The recall share is 7/12 &asymp; 58.3%, and the recalled rate is 240 &times; 7/12 = 140 words a minute. The strong preset is the same reading with 10 of the 12 units ticked: 5/6 &asymp; 83.3%, and 240 &times; 10/12 = 200 words a minute.</p><div class="mathblock" data-say="383 times 60 over 95.75 equals 240 words a minute. typical, 240 times 7 over 12 equals 140. strong, 240 times 10 over 12 equals 200" tabindex="0" role="region" aria-label="Mathematical notation">383 × 60 / 95.75 = 240 words a minute
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What the drill measures</h2><div class="prose reading"><p>The drill below times one reading of How a Camel Saves Water, a passage of 383 words, at your usual pace. When you press Done the passage disappears and a box opens: write down everything you remember, in any order, in notes or in sentences. Press Finished writing, and the passage's twelve idea units appear under what you wrote. Tick each one your writing contains, then press Score.</p><p>Tick a unit when your writing has its substance. &ldquo;The hump is fat&rdquo; earns the first unit; &ldquo;something about the hump&rdquo; does not. A unit you could have written but did not stays unticked: the drill measures what came back without help, and seeing the list is help. The kit never reads your writing, so the count is exactly as honest as you are.</p><div class="defbox"><span class="label">Definition &middot; Recall share</span><p>The <strong>recall share</strong> is the number of idea units ticked over the number in the passage. Your rate times the recall share is the <strong>recalled rate</strong>, in words a minute: the part of your reading you could give back.</p></div><p>The typical preset is a reader who took 95.75 seconds over the 383 words, a rate of 240 words a minute, wrote 84 words, and ticked 7 of the 12 units, 12 words written for each unit recalled. The recall share is 7/12 &asymp; 58.3%, and the recalled rate is 240 &times; 7/12 = 140 words a minute. The strong preset is the same reading with 10 of the 12 units ticked: 5/6 &asymp; 83.3%, and 240 &times; 10/12 = 200 words a minute.</p><div class="mathblock" data-say="383 times 60 over 95.75 equals 240 words a minute. typical, 240 times 7 over 12 equals 140. strong, 240 times 10 over 12 equals 200" tabindex="0" role="region" aria-label="Mathematical notation">383 × 60 / 95.75 = 240 words a minute
 typical:  240 × 7/12 = 140
-strong:   240 × 10/12 = 200</div><p>After your ticks the drill asks the passage's six multiple-choice questions, and the lab prints your score beside the recall share. Expect the recall share to be the lower of the two: the typical preset pairs 7 of 12 units with 5 of 6 questions. That gap is not a contradiction. The two tests ask different things of memory:</p><ul><li>a multiple-choice question puts the right answer on the screen, and it only has to look familiar;</li><li>free recall gives you nothing to look at, so a fact you would know if you saw it does not count;</li><li>and recall asks for the passage's own ideas, not for the four options a question-setter chose.</li></ul><p>Roediger and Karpicke (2006) measured what students kept from prose passages by free recall, the method this drill uses, and the next lesson rests on their result. Recall is the harsher number, and the more useful one for a reading you need later: what you can tell someone, or act on, when the page is closed.</p><p>There is no published norm for these twelve units, and the units are not equal in weight: the hump storing fat is the passage's opening claim, while the eyelashes are one item in a list. So the comparison that matters is with your own recall on the next passage, scored by the same rules. The drill logs this reading as a test, so that Your Training Plan can set your first recall beside your last.</p><p>Next, Retrieval Beats Rereading uses this same write-and-tick drill as one of two ways to study a passage, and asks which of the two is still working two days later.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Free recall</h2></div><p>what is kept, measured by you</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+strong:   240 × 10/12 = 200</div><p>After your ticks the drill asks the passage's six multiple-choice questions, and the lab prints your score beside the recall share. Expect the recall share to be the lower of the two: the typical preset pairs 7 of 12 units with 5 of 6 questions. That gap is not a contradiction. The two tests ask different things of memory:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Free recall</h2></div><p>what is kept, measured by you</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Free recall</strong><span>what is kept, measured by you</span></div>
       </div>
@@ -1415,10 +1458,10 @@ strong:   240 × 10/12 = 200</div><p>After your ticks the drill asks the passage
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="reTable"></table></div>
       <div class="status-banner" id="reStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What one reading kept</h3>
-          <p>Your measurement, scored by your own ticks. Before you do the drill, the boxes hold the typical preset: 383 words in 95.75 seconds, 7 of 12 idea units recalled and 5 of 6 questions right afterwards.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What one reading kept</h3>
+            <p>Your measurement, scored by your own ticks. Before you do the drill, the boxes hold the typical preset: 383 words in 95.75 seconds, 7 of 12 idea units recalled and 5 of 6 questions right afterwards.</p>
         <div class="field">
           <label for="rePreset">Worked example</label>
           <select id="rePreset"><option value="typical" selected>Typical: 7 of 12 units</option><option value="strong">Strong: 10 of 12 units</option></select>
@@ -1458,12 +1501,15 @@ strong:   240 × 10/12 = 200</div><p>After your ticks the drill asks the passage
           <div class="kpi"><span>Questions right, after the recall</span><strong id="reComp">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><ul><li>a multiple-choice question puts the right answer on the screen, and it only has to look familiar;</li><li>free recall gives you nothing to look at, so a fact you would know if you saw it does not count;</li><li>and recall asks for the passage's own ideas, not for the four options a question-setter chose.</li></ul><p>Roediger and Karpicke (2006) measured what students kept from prose passages by free recall, the method this drill uses, and the next lesson rests on their result. Recall is the harsher number, and the more useful one for a reading you need later: what you can tell someone, or act on, when the page is closed.</p><p>There is no published norm for these twelve units, and the units are not equal in weight: the hump storing fat is the passage's opening claim, while the eyelashes are one item in a list. So the comparison that matters is with your own recall on the next passage, scored by the same rules. The drill logs this reading as a test, so that Your Training Plan can set your first recall beside your last.</p><p>Next, Retrieval Beats Rereading uses this same write-and-tick drill as one of two ways to study a passage, and asks which of the two is still working two days later.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>A free recall on another day</h2></div><p>Five steps. The third is the one that keeps the number honest.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read once at your usual pace</h3><p>Pick a passage of three or four hundred words that you have not read, and time one reading. Do not slow down to memorise; the point is what an ordinary reading keeps.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write with the page hidden</h3><p>Close or cover the text and write down everything you remember, in any order, until nothing more comes. Notes are fine.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Tick the idea units strictly</h3><p>Against the drill's list, or a list of the passage's main claims that you make afterwards, tick each unit your writing has in substance. Something you only recognise on the list stays unticked.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the share and the recalled rate</h3><p>Units ticked over units, then your rate times that share. Compare the share with your next recall, not with anyone else's.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Run The Daily Drill as usual. A recall drill is slow and sits beside the practice; it does not replace it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>A free recall on another day</h2>
+      <p class="lead-in">Five steps. The third is the one that keeps the number honest.</p>
+      <ol class="key-ideas method"><li><strong>Read once at your usual pace.</strong> Pick a passage of three or four hundred words that you have not read, and time one reading. Do not slow down to memorise; the point is what an ordinary reading keeps.</li><li><strong>Write with the page hidden.</strong> Close or cover the text and write down everything you remember, in any order, until nothing more comes. Notes are fine.</li><li><strong>Tick the idea units strictly.</strong> Against the drill's list, or a list of the passage's main claims that you make afterwards, tick each unit your writing has in substance. Something you only recognise on the list stays unticked.</li><li><strong>Compute the share and the recalled rate.</strong> Units ticked over units, then your rate times that share. Compare the share with your next recall, not with anyone else's.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Run The Daily Drill as usual. A recall drill is slow and sits beside the practice; it does not replace it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1479,17 +1525,16 @@ recall = 7/12 ≈ 58.3%
 recalled rate = 240 × 7/12 = 140</div><p>The reader read at 240 words a minute and could give back 140 words a minute's worth of the passage in their own words. The strong preset ticks 10 units: 240 &times; 10/12 = 200.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recognising the right answer is remembering it</strong><span>Multiple choice measures recognition: the answer is on the screen, and you need only know it when you see it. Free recall is harder, and closer to what you can use later. A reader who picks five of six right options may, asked to write the passage down, give back little more than half of its ideas: the typical preset pairs 5 of 6 questions with 7 of 12 units.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Ticking what the list reminds you of</strong><span>Once the idea units are on the screen, half-remembered facts feel familiar, and familiarity is recognition again. Tick only what your writing contains; a unit you know now but did not write stays unticked, or the drill has turned back into multiple choice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Slowing down to memorise the passage</strong><span>Knowing a recall test is coming, it is tempting to read at a crawl and rehearse. That measures a different kind of reading. Read at your usual pace, so that the share describes what your ordinary reading keeps; the recalled rate already charges a fast, forgetful reading for what it lost.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a recall and say what it measures.</strong><p>Given the idea units recalled, the passage's units, its words and the seconds, compute the recall share and the recalled rate, and say in a sentence why the same reader scores lower on free recall than on multiple choice. Both figures right and the reason given is the pass.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One passage on one day: the share depends on the passage's units and on how strictly you tick, so compare it with your own next recall, not with a norm. The questions come after the recall, so they cannot prompt it, but six questions on one passage are a small sample of recognition.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recognising the right answer is remembering it</strong><span>Multiple choice measures recognition: the answer is on the screen, and you need only know it when you see it. Free recall is harder, and closer to what you can use later. A reader who picks five of six right options may, asked to write the passage down, give back little more than half of its ideas: the typical preset pairs 5 of 6 questions with 7 of 12 units.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Ticking what the list reminds you of</strong><span>Once the idea units are on the screen, half-remembered facts feel familiar, and familiarity is recognition again. Tick only what your writing contains; a unit you know now but did not write stays unticked, or the drill has turned back into multiple choice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Slowing down to memorise the passage</strong><span>Knowing a recall test is coming, it is tempting to read at a crawl and rehearse. That measures a different kind of reading. Read at your usual pace, so that the share describes what your ordinary reading keeps; the recalled rate already charges a fast, forgetful reading for what it lost.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a recall and say what it measures.</strong><p>Given the idea units recalled, the passage's units, its words and the seconds, compute the recall share and the recalled rate, and say in a sentence why the same reader scores lower on free recall than on multiple choice. Both figures right and the reason given is the pass.</p></div></div><div class="note"><strong>Note:</strong> One passage on one day: the share depends on the passage's units and on how strictly you tick, so compare it with your own next recall, not with a norm. The questions come after the recall, so they cannot prompt it, but six questions on one passage are a small sample of recognition.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An idea unit is one thing the passage said</summary><p>The passage comes with a list of twelve short statements, each one claim the text makes: the hump stores fat, not water; the droppings are dry enough to burn. Your writing is scored by how many of them it holds in substance, whatever words you used.</p></details><details class="recall"><summary>Recall and recognition</summary><p>Choosing the right option from four is recognition: the answer is on the screen and you only have to know it when you see it. Writing down what you remember is recall: nothing on the screen helps. Recall usually scores lower for the same reading, and is closer to what you can use once the text is gone.</p></details><details class="recall"><summary>A recall-adjusted rate</summary><p>The effective rate multiplies your rate by the share of questions you got right. This drill multiplies it by the share of idea units you recalled instead: the words a minute of reading that you could still give back in your own words.</p></details></div>
+      <h3>Summary</h3>
       <p>Read a passage at your usual pace, then write everything you remember with the page hidden, and tick the passage's twelve idea units that your writing contains. The share you tick is your recall, and your rate times that share is a recall-adjusted rate. Free recall asks more of memory than picking the right answer from four does.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An idea unit is one thing the passage said.</strong> The passage comes with a list of twelve short statements, each one claim the text makes: the hump stores fat, not water; the droppings are dry enough to burn. Your writing is scored by how many of them it holds in substance, whatever words you used.</li><li><strong>Recall and recognition.</strong> Choosing the right option from four is recognition: the answer is on the screen and you only have to know it when you see it. Writing down what you remember is recall: nothing on the screen helps. Recall usually scores lower for the same reading, and is closer to what you can use once the text is gone.</li><li><strong>A recall-adjusted rate.</strong> The effective rate multiplies your rate by the share of questions you got right. This drill multiplies it by the share of idea units you recalled instead: the words a minute of reading that you could still give back in your own words.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="recall equals units ticked over units. recalled rate equals rate times recall. 7 of 12 units is approximately 58.3 percent. 240 times 7 over 12 equals 140 words a minute. recall is harder than recognition" tabindex="0" role="region" aria-label="Mathematical notation">recall = units ticked / units
 recalled rate = rate × recall
 7 of 12 units ≈ 58.3%
@@ -2523,11 +2568,40 @@ recall is harder than recognition</div><figcaption>Free recall in five lines</fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2595,7 +2669,7 @@ recall is harder than recognition</div><figcaption>Free recall in five lines</fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

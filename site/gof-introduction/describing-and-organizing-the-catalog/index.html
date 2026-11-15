@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">What Design Patterns Are</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 1 · Introduction</p>
       <h1>Describing and Organizing the Catalog</h1>
       <p class="lesson-lede">Every pattern in the catalog is written in the same thirteen sections, and classified by what it does and whether it works on classes or on objects.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The template</li><li>Purpose</li><li>Scope</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The template, the catalog, then a selection by purpose and scope</h2>
-      <article class="prose reading"><p>&ldquo;The template lends a uniform structure to the information, making design patterns easier to learn, compare, and use.&rdquo; That is the authors' reason, in Section 1.3, Describing Design Patterns, for writing all twenty-three patterns the same way. This lesson reads 1.3, 1.4, The Catalog of Design Patterns, and 1.5, Organizing the Catalog. Read them in your own copy first.</p><p>A diagram, Section 1.3 argues, is not enough to describe a pattern. It shows the classes and objects a design ended with, but not the choices made on the way, the options turned down and what each cost, and those are what someone reusing the design needs; concrete examples are needed too, to see the design at work. So each pattern is written in a fixed set of sections, listed here by their headings, which are the book's own.</p><pre class="codeblock" data-say="line 1, pattern name and classification. line 2, intent. line 3, also known as. line 4, motivation. line 5, applicability. line 6, structure. line 7, participants. line 8, collaborations. line 9, consequences. line 10, implementation. line 11, sample code. line 12, known uses. line 13, related patterns" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">Pattern Name and Classification</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The template, the catalog, then a selection by purpose and scope</h2><div class="prose reading"><p>&ldquo;The template lends a uniform structure to the information, making design patterns easier to learn, compare, and use.&rdquo; That is the authors' reason, in Section 1.3, Describing Design Patterns, for writing all twenty-three patterns the same way. This lesson reads 1.3, 1.4, The Catalog of Design Patterns, and 1.5, Organizing the Catalog. Read them in your own copy first.</p><p>A diagram, Section 1.3 argues, is not enough to describe a pattern. It shows the classes and objects a design ended with, but not the choices made on the way, the options turned down and what each cost, and those are what someone reusing the design needs; concrete examples are needed too, to see the design at work. So each pattern is written in a fixed set of sections, listed here by their headings, which are the book's own.</p><pre class="codeblock" data-say="line 1, pattern name and classification. line 2, intent. line 3, also known as. line 4, motivation. line 5, applicability. line 6, structure. line 7, participants. line 8, collaborations. line 9, consequences. line 10, implementation. line 11, sample code. line 12, known uses. line 13, related patterns" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">Pattern Name and Classification</span>
 <span class="cl">Intent</span>
 <span class="cl">Also Known As</span>
 <span class="cl">Motivation</span>
@@ -1457,16 +1501,11 @@
 <span class="cl">Implementation</span>
 <span class="cl">Sample Code</span>
 <span class="cl">Known Uses</span>
-<span class="cl">Related Patterns</span></code></pre><p>Read as a guide, the sections fall into four groups. The name, its classification, the <strong>Intent</strong> and any other names say what the pattern is and the problem it addresses, in a sentence or two. <strong>Motivation</strong> and <strong>Applicability</strong> say when to use it: a scenario first, then the situations, and the poor designs it can repair. <strong>Structure</strong>, <strong>Participants</strong> and <strong>Collaborations</strong> say what it is: the classes, drawn in a notation based on OMT, with their responsibilities and how they work together. <strong>Consequences</strong>, <strong>Implementation</strong>, <strong>Sample Code</strong>, <strong>Known Uses</strong> and <strong>Related Patterns</strong> say what using it involves: its trade-offs, the pitfalls and techniques of building it, code in C++ or Smalltalk, at least two uses in real systems from different domains, and its neighbours in the catalog. The pattern lessons of this path follow the same order in their own words.</p><p>Section 1.4 is the catalog's table of contents: the twenty-three pattern names in alphabetical order, each with its intent, from Abstract Factory to Visitor. It is worth reading through once, quickly, now; you will come back to it. From here on, every pattern is named with the page it starts on in parentheses, a convention the authors say they follow throughout the book.</p><p>Section 1.5 classifies the patterns by two criteria. <strong>Purpose</strong> is what a pattern does: creational patterns are about making objects, structural ones about composing classes or objects, and behavioral ones about how they interact and divide the work. <strong>Scope</strong> is whether a pattern is mainly about relationships between classes and their subclasses, set by inheritance and so fixed at compile time, or about relationships between objects, which can change at run time. Almost every pattern uses inheritance somewhere, the authors note, so only those whose point is a class relationship are called class patterns, and most of the catalog has object scope.</p><p>Crossing the two criteria says something about each group. A creational class pattern leaves part of the making of an object to a subclass, as Factory Method does; a creational object pattern leaves it to another object, as Abstract Factory and Singleton do. Structural class patterns combine classes by inheritance, while structural object patterns such as Composite and Decorator assemble objects. Behavioral class patterns use inheritance to lay out an algorithm and its flow of control, Template Method and Interpreter among them; behavioral object patterns such as Observer and Strategy describe objects that cooperate on a task none of them could do alone. Those eight are the lab's candidates, with the purpose and scope this paragraph gives each.</p><p>The section adds other ways to group them. Some patterns are used together: Composite with Iterator or with Visitor. Some are alternatives: Prototype often instead of Abstract Factory. Some produce similar diagrams for different intents, as Composite and Decorator do. And the Related Patterns sections refer to one another, which the book draws as a figure, Figure 1.1, a map of the whole catalog worth looking at in your copy. Having several ways to see the catalog, the authors say, deepens your sense of what each pattern does and when.</p><p>Now the lab. The preset <code>class-scope</code> asks for <code>scope = class</code> and selects 2 of the 8 candidates, factory-method and template-method; the other 6 fail on that one clause, each with <code>scope is object</code>. The preset <code>behavioral-objects</code> asks for <code>purpose = behavioral and scope = object</code> and selects observer and strategy. Its failing list shows the clause that rejects each of the other six: the purpose clause for the three creational and two structural patterns, the scope clause for template-method, which is behavioral but a class pattern.</p><p>The preset <code>creational-or-class</code> joins the clauses with <code>or</code>, <code>purpose = creational or scope = class</code>, and selects 4: the three creational patterns and template-method. Section 1.7 later suggests narrowing a search with this classification. A selection is only as good as the attributes typed in: the lab checks the specification against the records, and the records against nothing.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, builder, purpose is set to creational, scope is set to object. line 2, bridge, purpose is set to structural, scope is set to object. line 3, interpreter, purpose is set to behavioral, scope is set to class. line 4, iterator, purpose is set to behavioral, scope is set to object. line 5, specification, scope is set to class or purpose is set to structural" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">builder, purpose=creational, scope=object;</span>
-<span class="cl">bridge, purpose=structural, scope=object;</span>
-<span class="cl">interpreter, purpose=behavioral, scope=class;</span>
-<span class="cl">iterator, purpose=behavioral, scope=object</span>
-<span class="cl">specification: scope = class or purpose = structural</span></code></pre><p>Four more patterns, with the purpose and scope Section 1.5 gives them: Builder and Bridge have object scope, Interpreter is the other behavioral class pattern, and Iterator a behavioral object pattern. By hand, say which of the four the specification selects, and for each of the others which clause it fails. Then add them to the candidates in the lab and check.</p><p>The template and the classification say how the catalog is written. Section 1.6 says what the patterns are for, beginning with objects themselves. The next lesson is Objects, Interfaces and Implementations.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">Related Patterns</span></code></pre><p>Read as a guide, the sections fall into four groups. The name, its classification, the <strong>Intent</strong> and any other names say what the pattern is and the problem it addresses, in a sentence or two. <strong>Motivation</strong> and <strong>Applicability</strong> say when to use it: a scenario first, then the situations, and the poor designs it can repair. <strong>Structure</strong>, <strong>Participants</strong> and <strong>Collaborations</strong> say what it is: the classes, drawn in a notation based on OMT, with their responsibilities and how they work together. <strong>Consequences</strong>, <strong>Implementation</strong>, <strong>Sample Code</strong>, <strong>Known Uses</strong> and <strong>Related Patterns</strong> say what using it involves: its trade-offs, the pitfalls and techniques of building it, code in C++ or Smalltalk, at least two uses in real systems from different domains, and its neighbours in the catalog. The pattern lessons of this path follow the same order in their own words.</p><p>Section 1.4 is the catalog's table of contents: the twenty-three pattern names in alphabetical order, each with its intent, from Abstract Factory to Visitor. It is worth reading through once, quickly, now; you will come back to it. From here on, every pattern is named with the page it starts on in parentheses, a convention the authors say they follow throughout the book.</p><p>Section 1.5 classifies the patterns by two criteria. <strong>Purpose</strong> is what a pattern does: creational patterns are about making objects, structural ones about composing classes or objects, and behavioral ones about how they interact and divide the work. <strong>Scope</strong> is whether a pattern is mainly about relationships between classes and their subclasses, set by inheritance and so fixed at compile time, or about relationships between objects, which can change at run time. Almost every pattern uses inheritance somewhere, the authors note, so only those whose point is a class relationship are called class patterns, and most of the catalog has object scope.</p><p>Crossing the two criteria says something about each group. A creational class pattern leaves part of the making of an object to a subclass, as Factory Method does; a creational object pattern leaves it to another object, as Abstract Factory and Singleton do. Structural class patterns combine classes by inheritance, while structural object patterns such as Composite and Decorator assemble objects. Behavioral class patterns use inheritance to lay out an algorithm and its flow of control, Template Method and Interpreter among them; behavioral object patterns such as Observer and Strategy describe objects that cooperate on a task none of them could do alone. Those eight are the lab's candidates, with the purpose and scope this paragraph gives each.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Specifications</strong><span>a rule as a query over candidates</span></div>
       </div>
@@ -1474,10 +1513,10 @@
       <div class="table-wrap" id="dspTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dspTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A specification is clauses attribute op value, with op one of = != &lt; &lt;= &gt; &gt;=, joined by and, or, not and parentheses (not binds tightest, then and, then or); a value is a number or a word beginning with a letter. Numbers compare exactly; a word compares only by = and != (an ordering op on a word is refused), and words compare exactly, letter case counted. A clause on an attribute the candidate lacks is false whatever its op, so not of it is true; an ordering clause on a word value is false. Candidates are listed in record order. A failing candidate is shown with the clause that rejects it, found from the left: a false and is blamed on its first false part, a true or on its first true part, and under a not a clause rejects by being true (for clauses joined only by and, this is the first false clause in the order written).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Patterns selected by purpose and scope</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of a classification; what the attributes should be is the book's, and is checked against the lesson's prose, not by the lab.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Patterns selected by purpose and scope</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of a classification; what the attributes should be is the book's, and is checked against the lesson's prose, not by the lab.</p>
         <div class="field">
           <label for="dspPreset">Worked example</label>
           <select id="dspPreset"><option value="class-scope" selected>Eight patterns: those with class scope</option><option value="behavioral-objects">Eight patterns: behavioral, with object scope</option><option value="creational-or-class">Eight patterns: creational, or with class scope</option></select>
@@ -1496,12 +1535,19 @@
           <div class="kpi"><span>Failing, each with the clause that rejects it</span><strong id="dspFailing">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The section adds other ways to group them. Some patterns are used together: Composite with Iterator or with Visitor. Some are alternatives: Prototype often instead of Abstract Factory. Some produce similar diagrams for different intents, as Composite and Decorator do. And the Related Patterns sections refer to one another, which the book draws as a figure, Figure 1.1, a map of the whole catalog worth looking at in your copy. Having several ways to see the catalog, the authors say, deepens your sense of what each pattern does and when.</p><p>Now the lab. The preset <code>class-scope</code> asks for <code>scope = class</code> and selects 2 of the 8 candidates, factory-method and template-method; the other 6 fail on that one clause, each with <code>scope is object</code>. The preset <code>behavioral-objects</code> asks for <code>purpose = behavioral and scope = object</code> and selects observer and strategy. Its failing list shows the clause that rejects each of the other six: the purpose clause for the three creational and two structural patterns, the scope clause for template-method, which is behavioral but a class pattern.</p><p>The preset <code>creational-or-class</code> joins the clauses with <code>or</code>, <code>purpose = creational or scope = class</code>, and selects 4: the three creational patterns and template-method. Section 1.7 later suggests narrowing a search with this classification. A selection is only as good as the attributes typed in: the lab checks the specification against the records, and the records against nothing.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, builder, purpose is set to creational, scope is set to object. line 2, bridge, purpose is set to structural, scope is set to object. line 3, interpreter, purpose is set to behavioral, scope is set to class. line 4, iterator, purpose is set to behavioral, scope is set to object. line 5, specification, scope is set to class or purpose is set to structural" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">builder, purpose=creational, scope=object;</span>
+<span class="cl">bridge, purpose=structural, scope=object;</span>
+<span class="cl">interpreter, purpose=behavioral, scope=class;</span>
+<span class="cl">iterator, purpose=behavioral, scope=object</span>
+<span class="cl">specification: scope = class or purpose = structural</span></code></pre><p>Four more patterns, with the purpose and scope Section 1.5 gives them: Builder and Bridge have object scope, Interpreter is the other behavioral class pattern, and Iterator a behavioral object pattern. By hand, say which of the four the specification selects, and for each of the others which clause it fails. Then add them to the candidates in the lab and check.</p><p>The template and the classification say how the catalog is written. Section 1.6 says what the patterns are for, beginning with objects themselves. The next lesson is Objects, Interfaces and Implementations.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding your way in the catalog</h2></div><p>Four steps, the last of them on a problem of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the intent first</h3><p>For any pattern, read its Intent and Applicability before its Structure. They say whether the rest is worth reading for the problem in front of you.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Place it by purpose</h3><p>Ask whether the problem is about making objects, composing them, or how they interact. That picks one of the catalog's three chapters.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Place it by scope</h3><p>Ask whether the relationship you need is fixed when the code is compiled or must change while it runs. Class patterns give the first, object patterns the second.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a problem of your own</h3><p>Take a design problem from your own work, write its purpose and scope as two attributes, select the candidates from the catalog's list that match, and read their intents in Section 1.4.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding your way in the catalog</h2>
+      <p class="lead-in">Four steps, the last of them on a problem of your own.</p>
+      <ol class="key-ideas method"><li><strong>Read the intent first.</strong> For any pattern, read its Intent and Applicability before its Structure. They say whether the rest is worth reading for the problem in front of you.</li><li><strong>Place it by purpose.</strong> Ask whether the problem is about making objects, composing them, or how they interact. That picks one of the catalog's three chapters.</li><li><strong>Place it by scope.</strong> Ask whether the relationship you need is fixed when the code is compiled or must change while it runs. Class patterns give the first, object patterns the second.</li><li><strong>Do it on a problem of your own.</strong> Take a design problem from your own work, write its purpose and scope as two attributes, select the candidates from the catalog's list that match, and read their intents in Section 1.4.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1520,17 +1566,16 @@ Observer, Strategy: behavioral objects, selected
 selected: 2 of the 8 patterns</div><p>For clauses joined only by <code>and</code>, the clause that rejects a candidate is the first one it fails, read from the left. Template Method passes the purpose clause and fails on scope.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading only the structure diagram</strong><span>Section 1.3 says a diagram records only where a design ended up, not the decisions and trade-offs behind it. A pattern read from its Structure alone loses Applicability and Consequences, which say whether it fits at all; Section 1.8 tells you to read those two first.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking object patterns do not use inheritance</strong><span>Scope says what a pattern is mainly about, not whether it inherits. The authors note that almost every pattern uses inheritance somewhere; Observer and Strategy have abstract classes with subclasses, and are still object patterns because their point is objects linked at run time.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the classification as the only map</strong><span>Purpose and scope are one way to organise the catalog. The authors give others in the same section: patterns used together, patterns that are alternatives, patterns with similar structure, and the cross-references of Figure 1.1. Each shows something the table does not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what each template section is for and classify a pattern.</strong><p>Given a pattern's description, state its purpose and scope with the reason for each, say which sections of the template to read first and why, and select from a list of patterns by a specification on the two criteria.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab selects from the attributes typed in and checks them against nothing. Whether a pattern's purpose and scope are what the records say is a matter of reading its chapter, and Section 1.5 itself places Adapter in both scopes, which a single attribute cannot hold.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading only the structure diagram</strong><span>Section 1.3 says a diagram records only where a design ended up, not the decisions and trade-offs behind it. A pattern read from its Structure alone loses Applicability and Consequences, which say whether it fits at all; Section 1.8 tells you to read those two first.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking object patterns do not use inheritance</strong><span>Scope says what a pattern is mainly about, not whether it inherits. The authors note that almost every pattern uses inheritance somewhere; Observer and Strategy have abstract classes with subclasses, and are still object patterns because their point is objects linked at run time.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the classification as the only map</strong><span>Purpose and scope are one way to organise the catalog. The authors give others in the same section: patterns used together, patterns that are alternatives, patterns with similar structure, and the cross-references of Figure 1.1. Each shows something the table does not.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what each template section is for and classify a pattern.</strong><p>Given a pattern's description, state its purpose and scope with the reason for each, say which sections of the template to read first and why, and select from a list of patterns by a specification on the two criteria.</p></div></div><div class="note"><strong>Note:</strong> The lab selects from the attributes typed in and checks them against nothing. Whether a pattern's purpose and scope are what the records say is a matter of reading its chapter, and Section 1.5 itself places Adapter in both scopes, which a single attribute cannot hold.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The template</summary><p>The fixed sequence of sections in which every pattern of the catalog is written, from its name and intent through its motivation, applicability, structure, participants, collaborations, consequences and implementation to sample code, known uses and related patterns. The uniform order makes patterns easier to compare and to look things up in.</p></details><details class="recall"><summary>Purpose</summary><p>What a pattern does. A creational pattern concerns how objects are made; a structural one, how classes or objects are put together; a behavioral one, how classes or objects interact and share out responsibility.</p></details><details class="recall"><summary>Scope</summary><p>Whether a pattern is mainly about classes or about objects. Class patterns work through inheritance, so their relationships are fixed when the program is compiled; object patterns work through references between objects, which can change while it runs. Most patterns have object scope.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 1.3 to 1.5 set out the template every pattern in the catalog follows, list the twenty-three patterns with their intents, and classify them by purpose and scope. Read what each section of the template is for, then give eight patterns their purpose and scope and let a specification select from them.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The template.</strong> The fixed sequence of sections in which every pattern of the catalog is written, from its name and intent through its motivation, applicability, structure, participants, collaborations, consequences and implementation to sample code, known uses and related patterns. The uniform order makes patterns easier to compare and to look things up in.</li><li><strong>Purpose.</strong> What a pattern does. A creational pattern concerns how objects are made; a structural one, how classes or objects are put together; a behavioral one, how classes or objects interact and share out responsibility.</li><li><strong>Scope.</strong> Whether a pattern is mainly about classes or about objects. Class patterns work through inheritance, so their relationships are fixed when the program is compiled; object patterns work through references between objects, which can change while it runs. Most patterns have object scope.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="every pattern in thirteen sections. intent, what it does and why. purpose, creational, structural, behavioral. scope, class or object. class relations are fixed at compile time. some go together, some are alternatives" tabindex="0" role="region" aria-label="Mathematical notation">every pattern in thirteen sections
 intent: what it does and why
 purpose: creational, structural, behavioral
@@ -2439,11 +2484,40 @@ some go together; some are alternatives</div><figcaption>The catalog in six line
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2511,7 +2585,7 @@ some go together; some are alternatives</div><figcaption>The catalog in six line
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

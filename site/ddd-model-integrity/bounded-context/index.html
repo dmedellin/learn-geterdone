@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,42 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Maintaining Model Integrity</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Maintaining Model Integrity</p>
       <h1>Bounded Context</h1>
       <p class="lesson-lede">Say where a model applies, keep it consistent inside that line, and expect translation across it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Unification</li><li>Bounded Context</li><li>Duplicate concept and false cognate</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s premise first, then the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The model context is whatever set of conditions must apply in order to be able to say that the terms in a model have a specific meaning.&rdquo; That is Evans's definition, inside the Bounded Context pattern that begins Chapter 14, Maintaining Model Integrity, the first chapter of Part IV, Strategic Design. This lesson reads the chapter's opening, the pattern and its section Recognizing Splinters Within a Bounded Context.</p><p>The chapter starts with a story. Two teams building parts of one new system each needed a class for a charge. The second found the first team's class, added the field it lacked, renamed its own idea to fit an attribute that was already there, and moved on. Days later the first team's module was showing records nobody had entered and crashing in a monthly tax report: one team had meant a charge to a customer and the other a payment to a supplier. Their repair was two classes with two names, after which, Evans notes, they carried on exactly as before.</p><p>From the story he draws the chapter's premise. The most basic thing a model needs is internal consistency, which he calls unification. One unified model across a whole enterprise would be ideal, and on a large system it costs more than it is worth. He lists what goes wrong when a project tries anyway: too many legacy replacements attempted at once; coordination that outgrows the team; specialised applications forced onto a model that does not serve them; and a model swollen with options to satisfy everyone. Models also part company for political and organisational reasons that no technical decision removes. So the question is not how to have one model, but how to choose on purpose which parts stay unified and how the rest relate to them.</p><p>Bounded Context is the first answer, and it reads as a tool. Every large project has several models in play, and when code built on two of them is combined without anyone noticing, the software becomes unreliable and the team's talk confused; the trouble, Evans insists, begins in how the teams are organised, not in the code. So: state where a model applies, and draw that line in three sorts of terms together, the team that owns it, the parts of the application that use it, and the code base and database schema that embody it. Within the line, hold the model strictly consistent; beyond it, do not be pulled about by other models' concerns. Integration across the line will need translation, and once the line is drawn that translation can be designed rather than discovered.</p><p>A sidebar separates the pattern from Chapter 5's Modules. Two models' objects nearly always sit in different Modules, and the separate name spaces help, but Modules also divide up a single model. Inside one context their separate name spaces can even hide the fragmentation the pattern exists to catch. Evans's example then draws the line for a booking application at a shipping company, deciding team by team and artefact by artefact what is inside it; the most useful result, he says, is seeing that a neighbouring team has been sharing objects casually with no agreed relationship at all.</p><p>Recognizing Splinters names the two ways a mixed model goes wrong. A duplicate concept is one idea held by two elements: each change must be made twice, in practice is not, and the copies drift into different rules and data. A false cognate is one term two people use for different things, each sure the other means the same. Evans calls false cognates less common and more damaging, and the opening story's charge is his example. The early warning of both, he says, is confused language, before any interface fails to fit.</p><p>Now the count. The lab reads glossaries: each record is a context, a term used there, and the concept it stands for. The lesson's two contexts are a theatre's Box Office, which sells seats for performances, and its Venue Operations team, which runs the building. On the preset <code>two-teams</code> the lab counts 2 contexts and 7 distinct terms, 3 of them used in both. Of those 3, 2 are false cognates, <span class="math" data-say="seat">seat</span> and <span class="math" data-say="hold">hold</span>, and 1 is safe to share, <span class="math" data-say="performance">performance</span>, used alike in both. It also finds 1 duplicate concept: the person who buys a ticket is a <span class="math" data-say="patron">patron</span> to the box office and a <span class="math" data-say="guest">guest</span> to the venue.</p><pre class="codeblock" data-say="line 1, boxoffice, seat, sellable minus place. line 2, boxoffice, performance, dated minus showing. line 3, boxoffice, patron, ticket minus buyer. line 4, boxoffice, hold, unsold minus reserve. line 5, boxoffice, order, ticket minus sale. line 6, venue, seat, physical minus chair. line 7, venue, performance, dated minus showing. line 8, venue, guest, ticket minus buyer. line 9, venue, hold, out minus of minus service. line 10, venue, usher minus shift, staff minus rota" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">boxoffice, seat, sellable-place;</span>
-<span class="cl">boxoffice, performance, dated-showing;</span>
-<span class="cl">boxoffice, patron, ticket-buyer;</span>
-<span class="cl">boxoffice, hold, unsold-reserve;</span>
-<span class="cl">boxoffice, order, ticket-sale;</span>
-<span class="cl">venue, seat, physical-chair;</span>
-<span class="cl">venue, performance, dated-showing;</span>
-<span class="cl">venue, guest, ticket-buyer;</span>
-<span class="cl">venue, hold, out-of-service;</span>
-<span class="cl">venue, usher-shift, staff-rota;</span></code></pre><p>Read the counts as Evans reads his symptoms. A box office seat is a place in one performance that can be sold; a venue seat is a chair with a row and a number, which can break. A box office hold keeps seats back from sale; a venue hold takes a broken chair out of use. If the two teams shared one <span class="math" data-say="seat">Seat</span> class, each would add what it needed, and one evening the box office would sell a chair the venue had taken out: the opening story again, with seats. The duplicate is milder. Two names for one person is a translation, and across a boundary a translation is allowed.</p><p>The preset <code>renamed</code> does what the story's teams did: the venue now says <span class="math" data-say="chair">chair</span> and <span class="math" data-say="block">block</span>. The lab finds 0 false cognates, 1 shared term and 1 safe to share, and the duplicate is still there, 1, since nothing about a boundary requires two contexts to name a patron alike. What renaming did not do is Evans's complaint about the story's ending: no line was drawn and no process set up to catch the next divergence. The lab counts words; it cannot tell whether anyone has written down where the Box Office model stops.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, timetable, period, teaching minus slot. line 2, timetable, room, teaching minus space. line 3, timetable, set, student minus group. line 4, timetable, teacher, staff minus member. line 5, exams, period, exam minus window. line 6, exams, room, teaching minus space. line 7, exams, set, paper minus batch. line 8, exams, staff, staff minus member. line 9, exams, group, student minus group. line 10, exams, sitting, exam minus session" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">timetable, period, teaching-slot;</span>
-<span class="cl">timetable, room, teaching-space;</span>
-<span class="cl">timetable, set, student-group;</span>
-<span class="cl">timetable, teacher, staff-member;</span>
-<span class="cl">exams, period, exam-window;</span>
-<span class="cl">exams, room, teaching-space;</span>
-<span class="cl">exams, set, paper-batch;</span>
-<span class="cl">exams, staff, staff-member;</span>
-<span class="cl">exams, group, student-group;</span>
-<span class="cl">exams, sitting, exam-session;</span></code></pre><p>A school's timetabling team and its exams office, each with its own glossary. Find the terms both use, say which of them are false cognates and which are safe to share, and list the duplicate concepts with their two names. Then paste the records into the lab to check your count.</p><p>A boundary is drawn once; keeping the model inside it whole is daily work. The next lesson, Continuous Integration, reads Evans's process for that.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The language</h2></div><p>the same word in different bounded contexts</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s premise first, then the pattern, then the count</h2><div class="prose reading"><p>&ldquo;The model context is whatever set of conditions must apply in order to be able to say that the terms in a model have a specific meaning.&rdquo; That is Evans's definition, inside the Bounded Context pattern that begins Chapter 14, Maintaining Model Integrity, the first chapter of Part IV, Strategic Design. This lesson reads the chapter's opening, the pattern and its section Recognizing Splinters Within a Bounded Context.</p><p>The chapter starts with a story. Two teams building parts of one new system each needed a class for a charge. The second found the first team's class, added the field it lacked, renamed its own idea to fit an attribute that was already there, and moved on. Days later the first team's module was showing records nobody had entered and crashing in a monthly tax report: one team had meant a charge to a customer and the other a payment to a supplier. Their repair was two classes with two names, after which, Evans notes, they carried on exactly as before.</p><p>From the story he draws the chapter's premise. The most basic thing a model needs is internal consistency, which he calls unification. One unified model across a whole enterprise would be ideal, and on a large system it costs more than it is worth. He lists what goes wrong when a project tries anyway: too many legacy replacements attempted at once; coordination that outgrows the team; specialised applications forced onto a model that does not serve them; and a model swollen with options to satisfy everyone. Models also part company for political and organisational reasons that no technical decision removes. So the question is not how to have one model, but how to choose on purpose which parts stay unified and how the rest relate to them.</p><p>Bounded Context is the first answer, and it reads as a tool. Every large project has several models in play, and when code built on two of them is combined without anyone noticing, the software becomes unreliable and the team's talk confused; the trouble, Evans insists, begins in how the teams are organised, not in the code. So: state where a model applies, and draw that line in three sorts of terms together, the team that owns it, the parts of the application that use it, and the code base and database schema that embody it. Within the line, hold the model strictly consistent; beyond it, do not be pulled about by other models' concerns. Integration across the line will need translation, and once the line is drawn that translation can be designed rather than discovered.</p><p>A sidebar separates the pattern from Chapter 5's Modules. Two models' objects nearly always sit in different Modules, and the separate name spaces help, but Modules also divide up a single model. Inside one context their separate name spaces can even hide the fragmentation the pattern exists to catch. Evans's example then draws the line for a booking application at a shipping company, deciding team by team and artefact by artefact what is inside it; the most useful result, he says, is seeing that a neighbouring team has been sharing objects casually with no agreed relationship at all.</p><p>Recognizing Splinters names the two ways a mixed model goes wrong. A duplicate concept is one idea held by two elements: each change must be made twice, in practice is not, and the copies drift into different rules and data. A false cognate is one term two people use for different things, each sure the other means the same. Evans calls false cognates less common and more damaging, and the opening story's charge is his example. The early warning of both, he says, is confused language, before any interface fails to fit.</p><p>Now the count. The lab reads glossaries: each record is a context, a term used there, and the concept it stands for. The lesson's two contexts are a theatre's Box Office, which sells seats for performances, and its Venue Operations team, which runs the building. On the preset <code>two-teams</code> the lab counts 2 contexts and 7 distinct terms, 3 of them used in both. Of those 3, 2 are false cognates, <span class="math" data-say="seat">seat</span> and <span class="math" data-say="hold">hold</span>, and 1 is safe to share, <span class="math" data-say="performance">performance</span>, used alike in both. It also finds 1 duplicate concept: the person who buys a ticket is a <span class="math" data-say="patron">patron</span> to the box office and a <span class="math" data-say="guest">guest</span> to the venue.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The language</h2></div><p>the same word in different bounded contexts</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The language</strong><span>the same word in different bounded contexts</span></div>
       </div>
@@ -1476,10 +1501,10 @@
       <div class="table-wrap" id="dlnTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dlnTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record says what one term means in one context, the meaning a short name of the concept. Terms and meanings compare ignoring letter case. A shared term appears in two or more contexts; it is a false cognate when its meanings there are not all the same, and safe to share when they are (a term in one context is neither). A duplicate concept is one meaning carried by two or more different terms, in any contexts. A context may give a term once. Lists follow the order in which contexts, terms and meanings first appear.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two teams&#x27; glossaries, side by side</h3>
-          <p>A count over the small model the lesson states. Each record is a context, a term used there, and the concept the term stands for, written as a short name. The lab compares the concept names exactly; it does not read definitions, so two names for one concept are two concepts to it until you write them alike. The glossaries are the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two teams&#x27; glossaries, side by side</h3>
+            <p>A count over the small model the lesson states. Each record is a context, a term used there, and the concept the term stands for, written as a short name. The lab compares the concept names exactly; it does not read definitions, so two names for one concept are two concepts to it until you write them alike. The glossaries are the lesson's.</p>
         <div class="field">
           <label for="dlnPreset">Worked example</label>
           <select id="dlnPreset"><option value="two-teams" selected>Box Office and Venue Operations, each with its own words</option><option value="renamed">The venue renames seat and hold</option></select>
@@ -1497,12 +1522,33 @@
           <div class="kpi"><span>Terms safe to share</span><strong id="dlnSafe">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, boxoffice, seat, sellable minus place. line 2, boxoffice, performance, dated minus showing. line 3, boxoffice, patron, ticket minus buyer. line 4, boxoffice, hold, unsold minus reserve. line 5, boxoffice, order, ticket minus sale. line 6, venue, seat, physical minus chair. line 7, venue, performance, dated minus showing. line 8, venue, guest, ticket minus buyer. line 9, venue, hold, out minus of minus service. line 10, venue, usher minus shift, staff minus rota" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">boxoffice, seat, sellable-place;</span>
+<span class="cl">boxoffice, performance, dated-showing;</span>
+<span class="cl">boxoffice, patron, ticket-buyer;</span>
+<span class="cl">boxoffice, hold, unsold-reserve;</span>
+<span class="cl">boxoffice, order, ticket-sale;</span>
+<span class="cl">venue, seat, physical-chair;</span>
+<span class="cl">venue, performance, dated-showing;</span>
+<span class="cl">venue, guest, ticket-buyer;</span>
+<span class="cl">venue, hold, out-of-service;</span>
+<span class="cl">venue, usher-shift, staff-rota;</span></code></pre><p>Read the counts as Evans reads his symptoms. A box office seat is a place in one performance that can be sold; a venue seat is a chair with a row and a number, which can break. A box office hold keeps seats back from sale; a venue hold takes a broken chair out of use. If the two teams shared one <span class="math" data-say="seat">Seat</span> class, each would add what it needed, and one evening the box office would sell a chair the venue had taken out: the opening story again, with seats. The duplicate is milder. Two names for one person is a translation, and across a boundary a translation is allowed.</p><p>The preset <code>renamed</code> does what the story's teams did: the venue now says <span class="math" data-say="chair">chair</span> and <span class="math" data-say="block">block</span>. The lab finds 0 false cognates, 1 shared term and 1 safe to share, and the duplicate is still there, 1, since nothing about a boundary requires two contexts to name a patron alike. What renaming did not do is Evans's complaint about the story's ending: no line was drawn and no process set up to catch the next divergence. The lab counts words; it cannot tell whether anyone has written down where the Box Office model stops.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, timetable, period, teaching minus slot. line 2, timetable, room, teaching minus space. line 3, timetable, set, student minus group. line 4, timetable, teacher, staff minus member. line 5, exams, period, exam minus window. line 6, exams, room, teaching minus space. line 7, exams, set, paper minus batch. line 8, exams, staff, staff minus member. line 9, exams, group, student minus group. line 10, exams, sitting, exam minus session" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">timetable, period, teaching-slot;</span>
+<span class="cl">timetable, room, teaching-space;</span>
+<span class="cl">timetable, set, student-group;</span>
+<span class="cl">timetable, teacher, staff-member;</span>
+<span class="cl">exams, period, exam-window;</span>
+<span class="cl">exams, room, teaching-space;</span>
+<span class="cl">exams, set, paper-batch;</span>
+<span class="cl">exams, staff, staff-member;</span>
+<span class="cl">exams, group, student-group;</span>
+<span class="cl">exams, sitting, exam-session;</span></code></pre><p>A school's timetabling team and its exams office, each with its own glossary. Find the terms both use, say which of them are false cognates and which are safe to share, and list the duplicate concepts with their two names. Then paste the records into the lab to check your count.</p><p>A boundary is drawn once; keeping the model inside it whole is daily work. The next lesson, Continuous Integration, reads Evans's process for that.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding the splinters between two glossaries</h2></div><p>Four steps, the last of them on a project of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each team&#x27;s glossary</h3><p>For each context, list the terms its people use and give each the concept it stands for in a short name, as the lab's records do.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compare the shared terms</h3><p>For each term that appears in more than one context, compare the concepts. The same concept everywhere is safe to share; any difference is a false cognate.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the concepts with two names</h3><p>For each concept, list the terms that name it. More than one is a duplicate concept: inside one context a splinter, across a boundary a translation.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own project</h3><p>Take two teams or two services you know that share a word such as account, order or user. Write a few records for each, count the false cognates, and say in one sentence where the boundary between them lies.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding the splinters between two glossaries</h2>
+      <p class="lead-in">Four steps, the last of them on a project of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write each team&#x27;s glossary.</strong> For each context, list the terms its people use and give each the concept it stands for in a short name, as the lab's records do.</li><li><strong>Compare the shared terms.</strong> For each term that appears in more than one context, compare the concepts. The same concept everywhere is safe to share; any difference is a false cognate.</li><li><strong>Find the concepts with two names.</strong> For each concept, list the terms that name it. More than one is a duplicate concept: inside one context a splinter, across a boundary a translation.</li><li><strong>Do it on your own project.</strong> Take two teams or two services you know that share a word such as account, order or user. Write a few records for each, count the false cognates, and say in one sentence where the boundary between them lies.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1522,17 +1568,16 @@ performance: dated-showing in both
 ticket-buyer: patron and guest</div><p>Two false cognates, one safe term and one duplicate concept. Which of them matters is a reading of the domain: the false cognates would break a shared class, while the duplicate only asks for a translation at the boundary.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Setting out to give the whole enterprise one model</strong><span>It sounds like the end of all translation. Evans judges total unification of a large system neither feasible nor cost-effective, and lists the risks of attempting it: too many replacements at once, coordination the project cannot carry, applications forced onto a model that does not fit them, and a model full of options. His goal is a chosen set of unified models with known relationships, which on the lesson's illustration means two glossaries with their false cognates found, not one glossary forced on both teams.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking a Bounded Context for a Module or a package</strong><span>The pattern's sidebar keeps them apart. Separate models usually do sit in separate Modules, but a Module also divides one model and says nothing about an intention to keep models apart; a context is drawn around teams, usage and schemas as well as code.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking that renaming a class repairs a splinter</strong><span>Renaming, as the story's teams did with their two charges, removes one false cognate. It draws no boundary and sets up no process, and the next divergence arrives the same way. On the preset <code>renamed</code> the lab shows the words are fixed; it cannot show that anything else is.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find the splinters between two glossaries.</strong><p>Given two contexts' glossaries, name the shared terms, the false cognates and the duplicate concepts, and say which would break a shared class.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares concept names as you write them, so it finds the splinters your records already state. Deciding that two definitions are one concept, or that a term in your code has drifted, is the knowledge crunching the glossary comes from, and where a boundary should lie is a judgement about teams and integration that no count of words settles.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Setting out to give the whole enterprise one model</strong><span>It sounds like the end of all translation. Evans judges total unification of a large system neither feasible nor cost-effective, and lists the risks of attempting it: too many replacements at once, coordination the project cannot carry, applications forced onto a model that does not fit them, and a model full of options. His goal is a chosen set of unified models with known relationships, which on the lesson's illustration means two glossaries with their false cognates found, not one glossary forced on both teams.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking a Bounded Context for a Module or a package</strong><span>The pattern's sidebar keeps them apart. Separate models usually do sit in separate Modules, but a Module also divides one model and says nothing about an intention to keep models apart; a context is drawn around teams, usage and schemas as well as code.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking that renaming a class repairs a splinter</strong><span>Renaming, as the story's teams did with their two charges, removes one false cognate. It draws no boundary and sets up no process, and the next divergence arrives the same way. On the preset <code>renamed</code> the lab shows the words are fixed; it cannot show that anything else is.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find the splinters between two glossaries.</strong><p>Given two contexts' glossaries, name the shared terms, the false cognates and the duplicate concepts, and say which would break a shared class.</p></div></div><div class="note"><strong>Note:</strong> The lab compares concept names as you write them, so it finds the splinters your records already state. Deciding that two definitions are one concept, or that a term in your code has drifted, is the knowledge crunching the glossary comes from, and where a boundary should lie is a judgement about teams and integration that no count of words settles.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Unification</summary><p>Evans's word for a model's internal consistency: every term means one thing and no two rules contradict. A model without it, he says, means nothing.</p></details><details class="recall"><summary>Bounded Context</summary><p>The explicit limit within which one model applies and is kept unified, drawn in terms of a team, the parts of the application that use the model, and the code and schema it lives in.</p></details><details class="recall"><summary>Duplicate concept and false cognate</summary><p>A duplicate concept is one idea held by two model elements under two names. A false cognate is one name that two people use for two different ideas, each believing the other means the same.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 14 opens by giving up on one model for a whole enterprise and asks instead where each model applies. Read Evans's case for drawing that line explicitly, and his two symptoms of models mixed without one, duplicate concepts and false cognates; then count both in two teams' glossaries.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Unification.</strong> Evans's word for a model's internal consistency: every term means one thing and no two rules contradict. A model without it, he says, means nothing.</li><li><strong>Bounded Context.</strong> The explicit limit within which one model applies and is kept unified, drawn in terms of a team, the parts of the application that use the model, and the code and schema it lives in.</li><li><strong>Duplicate concept and false cognate.</strong> A duplicate concept is one idea held by two model elements under two names. A false cognate is one name that two people use for two different ideas, each believing the other means the same.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a model means something only in a context. one enterprise minus wide model rarely pays. draw the line, team, code, schema. consistent inside, translated across. duplicate concept, one idea, two names. false cognate, one name, two ideas" tabindex="0" role="region" aria-label="Mathematical notation">a model means something only in a context
 one enterprise-wide model rarely pays
 draw the line: team, code, schema
@@ -2302,11 +2347,40 @@ false cognate: one name, two ideas</div><figcaption>Bounded Context in six lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2374,7 +2448,7 @@ false cognate: one name, two ideas</div><figcaption>Bounded Context in six lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

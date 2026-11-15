@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,24 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Science Behind the Book</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Introduction to Psychometrics</p>
       <h1>Latent Constructs and System Data</h1>
       <p class="lesson-lede">The same idea works on a service&#x27;s own signals: several readings of one thing, and a figure for whether they agree.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A proxy</li><li>Cronbach&#x27;s alpha</li><li>Alpha with an item removed</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The same safeguards on a system&#x27;s own data</h2>
-      <article class="prose reading"><p>&ldquo;Latent constructs give us one mechanism to protect ourselves against bad measures or bad agents.&rdquo; That is the last argument of Chapter 13, and it is made about surveys and system data in the same breath. The chapter's final section, How Latent Constructs Can Be Used for System Data, is short, and it is written for readers who already trust what their toolchain records.</p><p>Its advice carries over in two parts. Collect several measures and look for the same pattern across them, and think through what you are really trying to proxy. If you want to measure a system's performance, response time is one measure of it; ask what other aspects of performance would show in the system's data, and you may find that what you care about is a concept better captured by several related measures than by one. Then comes the sentence the chapter stresses: all measures are proxies, true of system data as of survey data.</p><p>The risk of a single measure is concrete. A change to the code that collects a metric can alter that one measure, and if it is the only one you have, the chance of noticing is low. With several, a shift in one stands out against the rest and is likelier to be caught. The authors add the same caution as before, that measures which pass checks today should still be checked from time to time, because they can change.</p><p>How would you know the several measures agree? Chapter 13 calls the property reliability, or internal consistency, assurance that items are read alike. Appendix C gives the usual figure, Cronbach's alpha, an acceptable cutoff of 0.70, and a caution: alpha runs low on short scales, those with few items, so the authors also ran composite reliability, and every construct met the cutoff on one or the other.</p><div class="mathblock" data-say="alpha equals k over k minus 1, times the quantity 1 minus the sum of the item variances over the variance of the total. k is the number of items, and sigma i squared is the variance of item i,. and sigma t squared is the variance of the total score, the sum of the items" tabindex="0" role="region" aria-label="Mathematical notation">α  =  k / (k − 1)  ·  ( 1 − Σ σᵢ² / σₜ² )
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The same safeguards on a system&#x27;s own data</h2><div class="prose reading"><p>&ldquo;Latent constructs give us one mechanism to protect ourselves against bad measures or bad agents.&rdquo; That is the last argument of Chapter 13, and it is made about surveys and system data in the same breath. The chapter's final section, How Latent Constructs Can Be Used for System Data, is short, and it is written for readers who already trust what their toolchain records.</p><p>Its advice carries over in two parts. Collect several measures and look for the same pattern across them, and think through what you are really trying to proxy. If you want to measure a system's performance, response time is one measure of it; ask what other aspects of performance would show in the system's data, and you may find that what you care about is a concept better captured by several related measures than by one. Then comes the sentence the chapter stresses: all measures are proxies, true of system data as of survey data.</p><p>The risk of a single measure is concrete. A change to the code that collects a metric can alter that one measure, and if it is the only one you have, the chance of noticing is low. With several, a shift in one stands out against the rest and is likelier to be caught. The authors add the same caution as before, that measures which pass checks today should still be checked from time to time, because they can change.</p><p>How would you know the several measures agree? Chapter 13 calls the property reliability, or internal consistency, assurance that items are read alike. Appendix C gives the usual figure, Cronbach's alpha, an acceptable cutoff of 0.70, and a caution: alpha runs low on short scales, those with few items, so the authors also ran composite reliability, and every construct met the cutoff on one or the other.</p><div class="mathblock" data-say="alpha equals k over k minus 1, times the quantity 1 minus the sum of the item variances over the variance of the total. k is the number of items, and sigma i squared is the variance of item i,. and sigma t squared is the variance of the total score, the sum of the items" tabindex="0" role="region" aria-label="Mathematical notation">α  =  k / (k − 1)  ·  ( 1 − Σ σᵢ² / σₜ² )
 k = number of items, σᵢ² = variance of item i,
-σₜ² = variance of the total score, the sum of the items</div><p>Read the formula as a comparison. If the items moved independently, the variance of their sum would be about the sum of their variances, the fraction would be near 1 and alpha near 0. If they move together, the variance of the sum is larger, the fraction smaller and alpha closer to 1. The factor k/(k − 1) corrects for the number of items. Divide the squared distances by n or by n − 1 and the variances change by the same factor, so alpha is the same either way.</p><p>The caution about small scales can be shown without any data. When every item has the same variance and the items correlate on average r, alpha equals <span data-say="k times r over the quantity 1 plus the quantity k minus 1, times r">k·r / (1 + (k − 1)·r)</span>, the textbook relation for standardised items, which the book does not print. With r = 0.5 it is 0.667 for two items, 0.75 for three and 0.80 for four. The items agree equally well in all three; only their number has changed.</p><p>Now compute it on a sample written for the lesson: eight days of four signals about the strain on one invented service, each banded from 1 to 7 by a stated rule, 7 the most strained. On the preset <code>four-signals-agree</code> the lab reports alpha = 0.921, which meets 0.70; the signals' variances are 2.359375, 2.1875, 1.484375 and 1.75, which are 151, 140, 95 and 112 from the worked example divided by 64, and the variance of the daily totals is 25.1875, 1612 divided by 64. With each signal left out in turn it gives 0.861, 0.931, 0.870 and 0.923, so no single signal is holding the figure up; leaving out the second or the fourth raises it slightly, to 0.931 and 0.923.</p><div class="mathblock" data-say="day d 1 d 2 d 3 d 4 d 5 d 6 d 7 d 8. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">day      d1  d2  d3  d4  d5  d6  d7  d8
-signal 1  1   4   2   4   4   5   5   6
-signal 2  1   3   3   5   3   6   5   4
-signal 3  1   4   3   4   3   4   5   5
-signal 4  1   4   4   4   5   4   4   6</div><p>Now suppose the collector for the fourth signal was changed after day 4, and it reads 7, 1, 1, 3 on the last four days. On the preset <code>collector-changed</code> alpha is 0.610, below the cutoff. Leave out signal 1, 2 or 3 and it falls further, to 0.245, 0.448 and 0.320, because the changed signal is still in and now has fewer partners; leave out signal 4 and it returns to 0.923, which is the figure for the three untouched signals. The table of figures with an item removed points at the one that moved. That is the rogue-data safeguard of the last lesson at work on system data.</p><p>Do not read more into it than it holds. Alpha measures consistency and not validity. Four signals that all follow daily traffic would agree whether or not they measure strain. It does not catch every failure either: if the fourth collector froze at 4 from day 5 on, alpha in this sample would be 0.924, because the frozen readings sit in the middle of the others' range and its one low day, day 1, still agrees with them; a stuck signal that contradicts nothing does not pull alpha down. And eight days is a very small sample.</p><h3>Exercise</h3><ul><li>Five days of three signals about another service: <span class="math" data-say="d 1, 7, 1, 7, d 2, 4, 2, 5, d 3, 6, 4, 7, d 4, 5, 4, 5, d 5, 4, 1, 3">d1, 7, 1, 7; d2, 4, 2, 5; d3, 6, 4, 7; d4, 5, 4, 5; d5, 4, 1, 3</span>.</li><li>Find alpha and say whether it meets 0.70. Then find alpha with each signal left out in turn.</li></ul><p>Use the sums of squares method of the worked example. Say which signal you would look at first, and what you would want to know about it before you removed it.</p><p>That ends the first two chapters of Part II. Surveys, Data and Statistical Methods begins with Chapter 14's case for surveys, in its first lesson, Surveys Allow You to Collect and Analyze Data Quickly.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Likert-type items</h2></div><p>Cronbach&#x27;s alpha for one construct&#x27;s items</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+σₜ² = variance of the total score, the sum of the items</div><p>Read the formula as a comparison. If the items moved independently, the variance of their sum would be about the sum of their variances, the fraction would be near 1 and alpha near 0. If they move together, the variance of the sum is larger, the fraction smaller and alpha closer to 1. The factor k/(k − 1) corrects for the number of items. Divide the squared distances by n or by n − 1 and the variances change by the same factor, so alpha is the same either way.</p><p>The caution about small scales can be shown without any data. When every item has the same variance and the items correlate on average r, alpha equals <span data-say="k times r over the quantity 1 plus the quantity k minus 1, times r">k·r / (1 + (k − 1)·r)</span>, the textbook relation for standardised items, which the book does not print. With r = 0.5 it is 0.667 for two items, 0.75 for three and 0.80 for four. The items agree equally well in all three; only their number has changed.</p><p>Now compute it on a sample written for the lesson: eight days of four signals about the strain on one invented service, each banded from 1 to 7 by a stated rule, 7 the most strained. On the preset <code>four-signals-agree</code> the lab reports alpha = 0.921, which meets 0.70; the signals' variances are 2.359375, 2.1875, 1.484375 and 1.75, which are 151, 140, 95 and 112 from the worked example divided by 64, and the variance of the daily totals is 25.1875, 1612 divided by 64. With each signal left out in turn it gives 0.861, 0.931, 0.870 and 0.923, so no single signal is holding the figure up; leaving out the second or the fourth raises it slightly, to 0.931 and 0.923.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Likert-type items</h2></div><p>Cronbach&#x27;s alpha for one construct&#x27;s items</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Likert-type items</strong><span>Cronbach's alpha for one construct's items</span></div>
       </div>
@@ -1410,10 +1449,10 @@ signal 4  1   4   4   4   5   4   4   6</div><p>Now suppose the collector for th
       <div class="table-wrap" id="alkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Alpha = k/(k − 1) × (1 − the sum of the item variances ÷ the variance of the total score), where the total is a respondent's answers added up, computed exactly and shown to 3 places. Variances are population variances (divide by n). With sample variances (divide by n − 1) every variance grows by the same factor n/(n − 1), so the ratio, and alpha, are the same. Alpha with an item removed recomputes it over the other k − 1 items (not computed when only one would be left). The threshold is the lesson's (default 0.70, the book's), met when alpha is at or above it, compared exactly. Answers are used as given: reverse any reverse-coded item before entering it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How well do the signals agree?</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How well do the signals agree?</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="alkPreset">Worked example</label>
           <select id="alkPreset"><option value="four-signals-agree" selected>Eight invented days of four signals that agree</option><option value="collector-changed">The same days after the fourth signal's collector changed</option></select>
@@ -1440,12 +1479,19 @@ signal 4  1   4   4   4   5   4   4   6</div><p>Now suppose the collector for th
           <div class="kpi"><span>At or above the threshold</span><strong id="alkMeets">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="day d 1 d 2 d 3 d 4 d 5 d 6 d 7 d 8. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">day      d1  d2  d3  d4  d5  d6  d7  d8
+signal 1  1   4   2   4   4   5   5   6
+signal 2  1   3   3   5   3   6   5   4
+signal 3  1   4   3   4   3   4   5   5
+signal 4  1   4   4   4   5   4   4   6</div><p>Now suppose the collector for the fourth signal was changed after day 4, and it reads 7, 1, 1, 3 on the last four days. On the preset <code>collector-changed</code> alpha is 0.610, below the cutoff. Leave out signal 1, 2 or 3 and it falls further, to 0.245, 0.448 and 0.320, because the changed signal is still in and now has fewer partners; leave out signal 4 and it returns to 0.923, which is the figure for the three untouched signals. The table of figures with an item removed points at the one that moved. That is the rogue-data safeguard of the last lesson at work on system data.</p><p>Do not read more into it than it holds. Alpha measures consistency and not validity. Four signals that all follow daily traffic would agree whether or not they measure strain. It does not catch every failure either: if the fourth collector froze at 4 from day 5 on, alpha in this sample would be 0.924, because the frozen readings sit in the middle of the others' range and its one low day, day 1, still agrees with them; a stuck signal that contradicts nothing does not pull alpha down. And eight days is a very small sample.</p><h3>Exercise</h3><ul><li>Five days of three signals about another service: <span class="math" data-say="d 1, 7, 1, 7, d 2, 4, 2, 5, d 3, 6, 4, 7, d 4, 5, 4, 5, d 5, 4, 1, 3">d1, 7, 1, 7; d2, 4, 2, 5; d3, 6, 4, 7; d4, 5, 4, 5; d5, 4, 1, 3</span>.</li><li>Find alpha and say whether it meets 0.70. Then find alpha with each signal left out in turn.</li></ul><p>Use the sums of squares method of the worked example. Say which signal you would look at first, and what you would want to know about it before you removed it.</p><p>That ends the first two chapters of Part II. Surveys, Data and Statistical Methods begins with Chapter 14's case for surveys, in its first lesson, Surveys Allow You to Collect and Analyze Data Quickly.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing Cronbach&#x27;s alpha</h2></div><p>Five steps, the last of them on signals of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Put the signals in columns</h3><p>Write one row per day, or per person, and one column per signal, all on the same scale and pointing the same way.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find each signal&#x27;s spread</h3><p>For every column compute n times the sum of squares minus the square of the column sum. That is <span data-say="n squared">n²</span> times the variance, in whole numbers.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the spread of the daily totals</h3><p>Add each row, and compute the same quantity for the row totals.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Put them together</h3><p>Subtract the signals' spreads, added up, over the totals' spread from 1, and multiply by k/(k − 1).</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on signals of your own</h3><p>Pick three or four readings of one thing that you already record, band each for eight or more days on a 1 to 7 scale, and type them in. Note alpha, and alpha with each signal left out.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing Cronbach&#x27;s alpha</h2>
+      <p class="lead-in">Five steps, the last of them on signals of your own.</p>
+      <ol class="key-ideas method"><li><strong>Put the signals in columns.</strong> Write one row per day, or per person, and one column per signal, all on the same scale and pointing the same way.</li><li><strong>Find each signal&#x27;s spread.</strong> For every column compute n times the sum of squares minus the square of the column sum. That is <span data-say="n squared">n²</span> times the variance, in whole numbers.</li><li><strong>Find the spread of the daily totals.</strong> Add each row, and compute the same quantity for the row totals.</li><li><strong>Put them together.</strong> Subtract the signals' spreads, added up, over the totals' spread from 1, and multiply by k/(k − 1).</li><li><strong>Do it on signals of your own.</strong> Pick three or four readings of one thing that you already record, band each for eight or more days on a 1 to 7 scale, and type them in. Note alpha, and alpha with each signal left out.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1513,16 @@ totals: 8·2062 − 122² = 16496 − 14884 = 1612
 α = 1114/1209 ≈ 0.921</div><p>Using sample variances divides every spread by the same factor, which cancels in the fraction. For collector-changed the fourth signal's line becomes <span data-say="8 times 109 minus 25 squared equals 247">8·109 − 25² = 247</span> and the totals' line 1167, so alpha <span data-say="equals the quantity 4 over 3, times the quantity 1 minus 633 over 1167, equals 712 over 1167 is approximately 0.610">= (4/3)·(1 − 633/1167) = 712/1167 ≈ 0.610</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a high alpha as proof that the signals measure strain</strong><span>Alpha measures whether the signals agree, not whether they measure what you named. Four signals that all follow traffic would score well. Chapter 13's first benefit, defining what you mean before you choose the measures, is what alpha cannot supply.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting alpha to raise the alarm for every broken signal</strong><span>A signal whose collector changed so that its readings jump about pulls alpha down, as the second preset shows. One that freezes does not: in this sample alpha is 0.924, slightly higher. Alpha is one test among several, and the chapter's advice to check the measures periodically stands.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Judging a short scale by alpha alone</strong><span>Appendix C says alpha penalises scales with few items. With the same average correlation of 0.5 between items it is 0.667 for two items and 0.80 for four. That is why the authors also ran composite reliability, and every construct met the cutoff on one or the other.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute and read Cronbach&#x27;s alpha.</strong><p>Given a table of signals over several days, find alpha by sums of squares, say whether it meets 0.70, and find which signal's removal changes it most.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes alpha for the table you type. It cannot tell whether the signals measure what you named, whether eight days is enough, or why a signal went wrong; the book's answer to the first is a clear definition, and to the last is to check the collector.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a high alpha as proof that the signals measure strain</strong><span>Alpha measures whether the signals agree, not whether they measure what you named. Four signals that all follow traffic would score well. Chapter 13's first benefit, defining what you mean before you choose the measures, is what alpha cannot supply.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting alpha to raise the alarm for every broken signal</strong><span>A signal whose collector changed so that its readings jump about pulls alpha down, as the second preset shows. One that freezes does not: in this sample alpha is 0.924, slightly higher. Alpha is one test among several, and the chapter's advice to check the measures periodically stands.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Judging a short scale by alpha alone</strong><span>Appendix C says alpha penalises scales with few items. With the same average correlation of 0.5 between items it is 0.667 for two items and 0.80 for four. That is why the authors also ran composite reliability, and every construct met the cutoff on one or the other.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute and read Cronbach&#x27;s alpha.</strong><p>Given a table of signals over several days, find alpha by sums of squares, say whether it meets 0.70, and find which signal's removal changes it most.</p></div></div><div class="note"><strong>Note:</strong> The lab computes alpha for the table you type. It cannot tell whether the signals measure what you named, whether eight days is enough, or why a signal went wrong; the book's answer to the first is a clear definition, and to the last is to check the collector.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A proxy</summary><p>A measure that stands for an idea it is not. Chapter 13 says all measures are proxies, system data as much as survey data: response time stands in for a system's performance, as an item's answer stands in for part of a team's culture.</p></details><details class="recall"><summary>Cronbach&#x27;s alpha</summary><p>A figure of at most 1, and below 0 when items move against each other, for how well a set of items measure together, which Appendix C calls a measure of internal consistency, with an acceptable cutoff of 0.70. It is high when the items vary together and low when each varies on its own.</p></details><details class="recall"><summary>Alpha with an item removed</summary><p>Alpha recomputed from the other items. The lab prints it for every item. An item whose removal lifts alpha well past the rest is the one pulling the figure down.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 13 closes by saying its ideas carry over from surveys to the data a system produces: use several measures, and remember that every measure is a proxy. Read that section, then compute Cronbach's alpha, the book's figure for internal consistency, for four invented signals about one service and watch what one signal that goes wrong does to it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A proxy.</strong> A measure that stands for an idea it is not. Chapter 13 says all measures are proxies, system data as much as survey data: response time stands in for a system's performance, as an item's answer stands in for part of a team's culture.</li><li><strong>Cronbach&#x27;s alpha.</strong> A figure of at most 1, and below 0 when items move against each other, for how well a set of items measure together, which Appendix C calls a measure of internal consistency, with an acceptable cutoff of 0.70. It is high when the items vary together and low when each varies on its own.</li><li><strong>Alpha with an item removed.</strong> Alpha recomputed from the other items. The lab prints it for every item. An item whose removal lifts alpha well past the rest is the one pulling the figure down.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="every measure is a proxy. several signals beat one. alpha, how well the signals agree. 0.70 is the usual cutoff. alpha runs low on short scales. agreeing is not the same as valid" tabindex="0" role="region" aria-label="Mathematical notation">every measure is a proxy
 several signals beat one
 alpha: how well the signals agree
@@ -2363,11 +2408,40 @@ agreeing is not the same as valid</div><figcaption>Constructs on system data in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2435,7 +2509,7 @@ agreeing is not the same as valid</div><figcaption>Constructs on system data in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Science, Induction and Causation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Confirmation</p>
       <h1>The Duhem–Quine Problem</h1>
       <p class="lesson-lede">A failed prediction refutes the theory together with its auxiliaries, and logic cannot say which to give up.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A prediction needs more than the theory</li><li>A failed prediction makes a set inconsistent</li><li>Every member is a candidate for blame</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From a failed prediction to a set of claims</h2>
-      <article class="prose reading"><p>A theory by itself forbids nothing observable. “Falsification and What a Theory Forbids” gave a hypothesis a likelihood of zero for some outcome, and that is the right way to model a theory together with the conditions of one particular test. The conditions are the subject here.</p><div class="defbox"><span class="label">Definition &middot; Auxiliary hypothesis</span><p>An <strong>auxiliary hypothesis</strong> is an assumption, other than the theory under test, that is used to derive a prediction from it. A <strong>bridge</strong> is the assumption that links a computed quantity to what an instrument will report.</p></div><p>Write <span class="math" data-say="h">h</span> for the theory, <span class="math" data-say="A">a</span> for the auxiliary that nothing unseen disturbs the system, <span class="math" data-say="b">b</span> for the bridge, and <span class="math" data-say="e">e</span> for the predicted observation. The prediction is a conditional: if the theory, the auxiliary and the bridge are all true, then <span class="math" data-say="e">e</span>. The observation is that <span class="math" data-say="e">e</span> did not occur.</p><div class="mathblock" data-say="1, h. 2, a. 3, b. 4, if h and a and b, then e. 5, not e" tabindex="0" role="region" aria-label="Mathematical notation">1   h
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From a failed prediction to a set of claims</h2><div class="prose reading"><p>A theory by itself forbids nothing observable. “Falsification and What a Theory Forbids” gave a hypothesis a likelihood of zero for some outcome, and that is the right way to model a theory together with the conditions of one particular test. The conditions are the subject here.</p><div class="defbox"><span class="label">Definition &middot; Auxiliary hypothesis</span><p>An <strong>auxiliary hypothesis</strong> is an assumption, other than the theory under test, that is used to derive a prediction from it. A <strong>bridge</strong> is the assumption that links a computed quantity to what an instrument will report.</p></div><p>Write <span class="math" data-say="h">h</span> for the theory, <span class="math" data-say="A">a</span> for the auxiliary that nothing unseen disturbs the system, <span class="math" data-say="b">b</span> for the bridge, and <span class="math" data-say="e">e</span> for the predicted observation. The prediction is a conditional: if the theory, the auxiliary and the bridge are all true, then <span class="math" data-say="e">e</span>. The observation is that <span class="math" data-say="e">e</span> did not occur.</p><div class="mathblock" data-say="1, h. 2, a. 3, b. 4, if h and a and b, then e. 5, not e" tabindex="0" role="region" aria-label="Mathematical notation">1   h
 2   a
 3   b
 4   (h ∧ a ∧ b) → e
-5   ¬e</div><p>Sentences 1 to 4 entail <span class="math" data-say="e">e</span>, and sentence 5 denies it. So the five cannot all be true, and this is the whole logical content of a failed test. The lab runs the test of “Consistency and Belief Sets”: it finds no assignment of truth values to the four letters that makes all five true, and names the smallest subset that cannot be true as <span class="math" data-say="the set 1, 2, 3, 4, 5">{1, 2, 3, 4, 5}</span>: the whole set.</p><div class="thm"><span class="label">Theorem &middot; The refuted unit is the set</span><p>If every member of an inconsistent set is needed for the inconsistency, the set has no smaller inconsistent subset, and dropping any one member makes the rest consistent. A failed prediction therefore refutes the conjunction of everything used to derive it, and no single member by itself.</p></div><p>Duhem made this point for physics: an experiment can condemn only a whole theoretical group, never an isolated hypothesis, because the physicist reads the instrument through the theory being tested. Quine extended it to everything we believe, so that any statement can be held true come what may if enough is adjusted elsewhere, and the unit of empirical significance becomes the whole of science. The set above is Duhem's group written out in five lines. Where the two differ is whether its boundary can be drawn anywhere short of everything, and the lab, which takes the sentences it is given, cannot say.</p><p>The lab's drop control shows this. Drop sentence 1 and the other four have models; drop sentence 2 and they have models; the same holds for 3, 4 and 5. Five different repairs are equally consistent. Dropping sentence 5 means disbelieving the observation, and that is a repair too, though a costly one when the measurement was careful.</p><div class="example"><span class="label">Example &middot; Uranus and the eighth planet</span><p>By the 1840s the orbit of Uranus disagreed with the position computed from Newton's laws and the seven known planets. Astronomers who dropped the auxiliary that no further planet exists, and kept Newton, computed where an eighth would have to be, and Neptune was found close to that place in 1846. The same repair was tried for Mercury's orbit: a planet inside Mercury's orbit was proposed, none was found, and the repair that worked dropped the theory, in 1915.</p></div><p>The second and third presets are two consistent sets made from this one failure. In the second, the theory is kept and the auxiliary is replaced by its denial, so an eighth planet exists. In the third, the auxiliary is kept and the theory is denied. Each has exactly one model, and the count is the same. Nothing in the arithmetic prefers either.</p><p>What does choose is outside the set. A repair that predicts something new and checkable, such as a planet at a stated place, can be tested on its own, and one that only restores the old prediction cannot. That is a reason to try the first kind of repair first, and it is a reason of method and not of logic.</p><p>The positions can be put at full strength. The falsificationist can say that science proceeds by a decision to hold the auxiliaries fixed for the purpose of a test, so that the theory is exposed. The holist can answer that no such decision is forced by the logic, and that a decision to hold something fixed can be revised by the next test. The lab agrees with both: the set is refuted, and the choice of what to blame is made outside it.</p><p>The lab's limit is that it tests only whether sentences can all be true together. It does not weigh them, so it cannot say that the bridge is better supported than the theory. The earlier lessons supply the means for that: the posterior of each member given the observation.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Consistency and what must go</h2></div><p>Every model, and every minimal inconsistent subset</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+5   ¬e</div><p>Sentences 1 to 4 entail <span class="math" data-say="e">e</span>, and sentence 5 denies it. So the five cannot all be true, and this is the whole logical content of a failed test. The lab runs the test of “Consistency and Belief Sets”: it finds no assignment of truth values to the four letters that makes all five true, and names the smallest subset that cannot be true as <span class="math" data-say="the set 1, 2, 3, 4, 5">{1, 2, 3, 4, 5}</span>: the whole set.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Consistency and what must go</h2></div><p>Every model, and every minimal inconsistent subset</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Can they all be true together?</strong><span>a model makes every kept sentence true; a minimal inconsistent subset has none</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>T</span><span class="tone-red"><i class="legend-swatch"></i>F</span></div>
@@ -1409,10 +1452,10 @@
       <div class="table-wrap" style="margin-top:12px;" id="coMisList" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose what to drop</h3>
-          <p>The first set is the failed prediction in full. Use the drop menu to remove one sentence at a time and read the verdict, then choose the other two sets, which repair the same failure in two different ways.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose what to drop</h3>
+            <p>The first set is the failed prediction in full. Use the drop menu to remove one sentence at a time and read the verdict, then choose the other two sets, which repair the same failure in two different ways.</p>
         <div class="field">
           <label for="coPreset">Set of sentences</label>
           <select id="coPreset"><option value="duhem" selected>Theory, auxiliary, bridge and a failed prediction</option><option value="neptune">Theory kept, auxiliary denied: an eighth planet</option><option value="rival">Auxiliary kept, theory denied</option></select>
@@ -1433,12 +1476,15 @@
         </div>
         <p class="small-copy" style="margin:0;">Up to 8 sentences over up to 6 sentence letters. Type ~ for not, &amp; for and, | for or, -&gt; for if-then, or use the symbols.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; The refuted unit is the set</span><p>If every member of an inconsistent set is needed for the inconsistency, the set has no smaller inconsistent subset, and dropping any one member makes the rest consistent. A failed prediction therefore refutes the conjunction of everything used to derive it, and no single member by itself.</p></div><p>Duhem made this point for physics: an experiment can condemn only a whole theoretical group, never an isolated hypothesis, because the physicist reads the instrument through the theory being tested. Quine extended it to everything we believe, so that any statement can be held true come what may if enough is adjusted elsewhere, and the unit of empirical significance becomes the whole of science. The set above is Duhem's group written out in five lines. Where the two differ is whether its boundary can be drawn anywhere short of everything, and the lab, which takes the sentences it is given, cannot say.</p><p>The lab's drop control shows this. Drop sentence 1 and the other four have models; drop sentence 2 and they have models; the same holds for 3, 4 and 5. Five different repairs are equally consistent. Dropping sentence 5 means disbelieving the observation, and that is a repair too, though a costly one when the measurement was careful.</p><div class="example"><span class="label">Example &middot; Uranus and the eighth planet</span><p>By the 1840s the orbit of Uranus disagreed with the position computed from Newton's laws and the seven known planets. Astronomers who dropped the auxiliary that no further planet exists, and kept Newton, computed where an eighth would have to be, and Neptune was found close to that place in 1846. The same repair was tried for Mercury's orbit: a planet inside Mercury's orbit was proposed, none was found, and the repair that worked dropped the theory, in 1915.</p></div><p>The second and third presets are two consistent sets made from this one failure. In the second, the theory is kept and the auxiliary is replaced by its denial, so an eighth planet exists. In the third, the auxiliary is kept and the theory is denied. Each has exactly one model, and the count is the same. Nothing in the arithmetic prefers either.</p><p>What does choose is outside the set. A repair that predicts something new and checkable, such as a planet at a stated place, can be tested on its own, and one that only restores the old prediction cannot. That is a reason to try the first kind of repair first, and it is a reason of method and not of logic.</p><p>The positions can be put at full strength. The falsificationist can say that science proceeds by a decision to hold the auxiliaries fixed for the purpose of a test, so that the theory is exposed. The holist can answer that no such decision is forced by the logic, and that a decision to hold something fixed can be revised by the next test. The lab agrees with both: the set is refuted, and the choice of what to blame is made outside it.</p><p>The lab's limit is that it tests only whether sentences can all be true together. It does not weigh them, so it cannot say that the bridge is better supported than the theory. The earlier lessons supply the means for that: the posterior of each member given the observation.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a failed prediction</h2></div><p>Five steps, in this order, for any test that did not come out as predicted.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List what the derivation used</h3><p>Write the theory, every auxiliary, and the bridge to the instrument as separate sentences. If you cannot say what the auxiliaries were, you have not yet said what was tested.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the prediction as a conditional</h3><p>Join the theory, auxiliaries and bridge as the antecedent and the predicted outcome as the consequent. Then add the observation that the outcome failed.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the smallest inconsistent subset</h3><p>Run the set through the consistency test. If each sentence is needed, the smallest inconsistent subset is the whole set.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Drop each member in turn</h3><p>For every sentence, ask whether the rest is consistent. Each yes is a repair that the logic permits.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Ask what each repair costs</h3><p>For each repair, say what else it commits you to and whether that can be tested separately. Prefer the repair that makes a prediction of its own.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a failed prediction</h2>
+      <p class="lead-in">Five steps, in this order, for any test that did not come out as predicted.</p>
+      <ol class="key-ideas method"><li><strong>List what the derivation used.</strong> Write the theory, every auxiliary, and the bridge to the instrument as separate sentences. If you cannot say what the auxiliaries were, you have not yet said what was tested.</li><li><strong>Write the prediction as a conditional.</strong> Join the theory, auxiliaries and bridge as the antecedent and the predicted outcome as the consequent. Then add the observation that the outcome failed.</li><li><strong>Find the smallest inconsistent subset.</strong> Run the set through the consistency test. If each sentence is needed, the smallest inconsistent subset is the whole set.</li><li><strong>Drop each member in turn.</strong> For every sentence, ask whether the rest is consistent. Each yes is a repair that the logic permits.</li><li><strong>Ask what each repair costs.</strong> For each repair, say what else it commits you to and whether that can be tested separately. Prefer the repair that makes a prediction of its own.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1502,16 @@ replace a by ¬a: 1 model, h = T, a = F, b = T, e = F
 replace h by ¬h: 1 model, h = F, a = T, b = T, e = F</div><p>Both repairs are consistent, with the same number of models, and the arithmetic cannot say which was right. History chose the first for Uranus. For Mercury it tried the same repair first, a planet Vulcan, and the second repair, a new theory, was the one that worked.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a failed test refutes the theory</strong><span>The lab finds no assignment that makes <span class="math" data-say="h">h</span>, <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, the conditional and <span class="math" data-say="not e">¬e</span> all true, but it also finds that replacing <span class="math" data-say="A">a</span> by <span class="math" data-say="not a">¬a</span> leaves a consistent set that keeps <span class="math" data-say="h">h</span>. The observation refutes the conjunction of everything used to derive the prediction, so the theory is refuted only if the auxiliaries and the bridge are held fixed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that any theory can be saved, so tests prove nothing</strong><span>Each repair is consistent, but a repair is a new claim, and the claim can be tested. A rescue that predicts nothing further costs the theory its risk, which is the cost that the lesson on falsification counted in forbidden outcomes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading an inconsistent set as saying that every member is false</strong><span>Inconsistency says that at least one member is false. In the first set there are five repairs, and in each of them four of the sentences are kept.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write a prediction as a set and locate what the failed observation refutes.</strong><p>Given a theory, its auxiliaries, a bridge and a failed prediction, you should be able to write them as a set of sentences, find the smallest inconsistent subset, list the repairs that restore consistency, and say what separates a repair that can be tested from one that cannot.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The letters <span class="math" data-say="h">h</span>, <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="e">e</span> stand for whole claims, and a real derivation has many more auxiliaries than one. The lab accepts up to eight sentences and six letters, and the result does not depend on how many: the more were used, the larger the set that is refuted.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a failed test refutes the theory</strong><span>The lab finds no assignment that makes <span class="math" data-say="h">h</span>, <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, the conditional and <span class="math" data-say="not e">¬e</span> all true, but it also finds that replacing <span class="math" data-say="A">a</span> by <span class="math" data-say="not a">¬a</span> leaves a consistent set that keeps <span class="math" data-say="h">h</span>. The observation refutes the conjunction of everything used to derive the prediction, so the theory is refuted only if the auxiliaries and the bridge are held fixed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding that any theory can be saved, so tests prove nothing</strong><span>Each repair is consistent, but a repair is a new claim, and the claim can be tested. A rescue that predicts nothing further costs the theory its risk, which is the cost that the lesson on falsification counted in forbidden outcomes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading an inconsistent set as saying that every member is false</strong><span>Inconsistency says that at least one member is false. In the first set there are five repairs, and in each of them four of the sentences are kept.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write a prediction as a set and locate what the failed observation refutes.</strong><p>Given a theory, its auxiliaries, a bridge and a failed prediction, you should be able to write them as a set of sentences, find the smallest inconsistent subset, list the repairs that restore consistency, and say what separates a repair that can be tested from one that cannot.</p></div></div><div class="note"><strong>Note:</strong> The letters <span class="math" data-say="h">h</span>, <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="e">e</span> stand for whole claims, and a real derivation has many more auxiliaries than one. The lab accepts up to eight sentences and six letters, and the result does not depend on how many: the more were used, the larger the set that is refuted.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A prediction needs more than the theory</summary><p>Newton's laws say nothing about where Uranus will stand on a given night. The calculation also uses the list of planets that pull on it, their masses, and a rule that links the computed position to what a telescope reports. Each of these is an assumption added to the theory.</p></details><details class="recall"><summary>A failed prediction makes a set inconsistent</summary><p>Write the theory, the added assumptions, the link to the instruments and the claim that the predicted outcome did not occur. These cannot all be true together, and that is all the observation establishes.</p></details><details class="recall"><summary>Every member is a candidate for blame</summary><p>Dropping any single member of the set restores consistency. The logic is silent on which one to drop, and the choice rests on grounds the set does not contain.</p></details></div>
+      <h3>Summary</h3>
       <p>A theory yields a prediction only when it is joined to auxiliary hypotheses and a bridge to the instruments. When the prediction fails, the theory, the auxiliaries, the bridge and the observation cannot all be true, and the smallest inconsistent subset is the whole set. The observation refutes the conjunction and nothing smaller.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A prediction needs more than the theory.</strong> Newton's laws say nothing about where Uranus will stand on a given night. The calculation also uses the list of planets that pull on it, their masses, and a rule that links the computed position to what a telescope reports. Each of these is an assumption added to the theory.</li><li><strong>A failed prediction makes a set inconsistent.</strong> Write the theory, the added assumptions, the link to the instruments and the claim that the predicted outcome did not occur. These cannot all be true together, and that is all the observation establishes.</li><li><strong>Every member is a candidate for blame.</strong> Dropping any single member of the set restores consistency. The logic is silent on which one to drop, and the choice rests on grounds the set does not contain.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="theory plus auxiliaries plus bridge goes to prediction. prediction fails, the whole set is false. drop any one member, consistent again. logic alone cannot pick which to drop" tabindex="0" role="region" aria-label="Mathematical notation">theory + auxiliaries + bridge → prediction
 prediction fails: the whole set is false
 drop any one member: consistent again
@@ -2120,11 +2165,40 @@ logic alone cannot pick which to drop</div><figcaption>What a failed test refute
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2192,7 +2266,7 @@ logic alone cannot pick which to drop</div><figcaption>What a failed test refute
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

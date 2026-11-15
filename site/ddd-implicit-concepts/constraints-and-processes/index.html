@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Breakthroughs and Implicit Concepts</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · Making Implicit Concepts Explicit</p>
       <h1>Explicit Constraints and Processes as Domain Objects</h1>
       <p class="lesson-lede">Two kinds of concept an object model does not suggest by itself: a rule that limits what objects may do, and a procedure the business itself talks about.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Constraint</li><li>Process as a domain object</li><li>Decision points</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The argument first, then the rule moved, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Constraints make up a particularly important category of model concepts.&rdquo; Evans opens Explicit Constraints with that sentence, in the part of Chapter 9 called How to Model Less Obvious Kinds of Concepts. Read it, and Processes as Domain Objects after it, in your own copy first.</p><p>The section starts from what objects make easy. Object-oriented design leads you to look for things, even abstract ones, and the actions they take, the nouns and verbs of the introductory books. Evans names three further kinds of concept that were not obvious to him when he started with objects, and that made his designs sharper as he learned each: constraints, processes, and Specification, which has a lesson of its own after this one.</p><p>A constraint sometimes has a natural home. An object whose contents may not exceed a capacity can enforce that with a conditional in each operation that changes the contents, and while the rule is that simple, it is plain to see. Evans's move is to factor the rule into a method of its own with a name that states what the constraint means. The behaviour is the same; what changes is that the rule is now a named thing the team can discuss, its link to the model is visible, and it has room to grow, so that a more complicated rule can become longer than the method that calls it without burying that method.</p><p>Sometimes a method is not enough, and Evans gives three warning signs that a rule is distorting the object that holds it. Checking the rule needs data that does not otherwise belong in the object. Rules of the same kind turn up in several classes, so they are copied, or classes that share nothing else are made to inherit from each other. Or the design and requirements conversations keep returning to the rule while in the code it is hidden in procedural logic. Then the constraint can become an explicit object, or even a small set of objects and relationships. His example is a review of Chapter 1's overbooking policy, which was made a class of its own; the Object Constraint Language of Warmer and Kleppe is his pointer for a fuller, semiformal treatment.</p><p>Processes as Domain Objects begins with a caution: procedures should not become a prominent part of the model, since objects exist to encapsulate them. What Evans means are processes that exist in the domain itself. A Service is one way to make such a process explicit while hiding a complicated algorithm, and where the process can be carried out in several ways, each way can be an object, a Strategy, which Chapter 12 develops. His test for which processes to model is short: &ldquo;Is this something the domain experts talk about, or is it just part of the mechanism of the computer program?&rdquo;</p><p>Now a model of the lesson's own: a theatre's box office. A performance may not sell more seats than its capacity less the seats held back for wheelchair users and their companions, and on a preview night a tenth of the house is kept for members, so a non-member's purchase has a lower limit. The first listing writes that rule inline, in the method that sells seats. On the preset <code>inline-limit</code> the lab counts 5 decision points, the starting one, 2 ifs and 2 conditional ands, all of them in <span class="math" data-say="sell">sell</span>.</p><pre class="codeblock" data-say="line 1, comment, The sales limit, written inline where seats are sold.. line 2, class performance. line 3, private int capacity. line 4, private int sold. line 5, private int access held. line 6, private boolean preview. line 8, boolean sell of int seats, patron patron. line 9, int limit is set to capacity minus access held. line 10, if preview and not patron dot is member. line 11, limit is set to limit minus capacity divided by 10. line 13, if seats is greater than 0 and sold plus seats is at most limit. line 14, sold is set to sold plus seats. line 15, return true. line 17, return false" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The sales limit, written inline where seats are sold.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The argument first, then the rule moved, then the count</h2><div class="prose reading"><p>&ldquo;Constraints make up a particularly important category of model concepts.&rdquo; Evans opens Explicit Constraints with that sentence, in the part of Chapter 9 called How to Model Less Obvious Kinds of Concepts. Read it, and Processes as Domain Objects after it, in your own copy first.</p><p>The section starts from what objects make easy. Object-oriented design leads you to look for things, even abstract ones, and the actions they take, the nouns and verbs of the introductory books. Evans names three further kinds of concept that were not obvious to him when he started with objects, and that made his designs sharper as he learned each: constraints, processes, and Specification, which has a lesson of its own after this one.</p><p>A constraint sometimes has a natural home. An object whose contents may not exceed a capacity can enforce that with a conditional in each operation that changes the contents, and while the rule is that simple, it is plain to see. Evans's move is to factor the rule into a method of its own with a name that states what the constraint means. The behaviour is the same; what changes is that the rule is now a named thing the team can discuss, its link to the model is visible, and it has room to grow, so that a more complicated rule can become longer than the method that calls it without burying that method.</p><p>Sometimes a method is not enough, and Evans gives three warning signs that a rule is distorting the object that holds it. Checking the rule needs data that does not otherwise belong in the object. Rules of the same kind turn up in several classes, so they are copied, or classes that share nothing else are made to inherit from each other. Or the design and requirements conversations keep returning to the rule while in the code it is hidden in procedural logic. Then the constraint can become an explicit object, or even a small set of objects and relationships. His example is a review of Chapter 1's overbooking policy, which was made a class of its own; the Object Constraint Language of Warmer and Kleppe is his pointer for a fuller, semiformal treatment.</p><p>Processes as Domain Objects begins with a caution: procedures should not become a prominent part of the model, since objects exist to encapsulate them. What Evans means are processes that exist in the domain itself. A Service is one way to make such a process explicit while hiding a complicated algorithm, and where the process can be carried out in several ways, each way can be an object, a Strategy, which Chapter 12 develops. His test for which processes to model is short: &ldquo;Is this something the domain experts talk about, or is it just part of the mechanism of the computer program?&rdquo;</p><p>Now a model of the lesson's own: a theatre's box office. A performance may not sell more seats than its capacity less the seats held back for wheelchair users and their companions, and on a preview night a tenth of the house is kept for members, so a non-member's purchase has a lower limit. The first listing writes that rule inline, in the method that sells seats. On the preset <code>inline-limit</code> the lab counts 5 decision points, the starting one, 2 ifs and 2 conditional ands, all of them in <span class="math" data-say="sell">sell</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where a constraint&#x27;s decisions sit</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Evans gives no count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="inline-limit" selected>The sales limit written inline in sell()</option><option value="factored-caller">The seller, once the limit has a name</option><option value="factored-constraint">The limit as an object of its own</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, The sales limit, written inline where seats are sold.. line 2, class performance. line 3, private int capacity. line 4, private int sold. line 5, private int access held. line 6, private boolean preview. line 8, boolean sell of int seats, patron patron. line 9, int limit is set to capacity minus access held. line 10, if preview and not patron dot is member. line 11, limit is set to limit minus capacity divided by 10. line 13, if seats is greater than 0 and sold plus seats is at most limit. line 14, sold is set to sold plus seats. line 15, return true. line 17, return false" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The sales limit, written inline where seats are sold.</span>
 <span class="cl">class Performance {</span>
 <span class="cl">    private int capacity;</span>
 <span class="cl">    private int sold;</span>
@@ -1507,53 +1594,12 @@
 <span class="cl">        diary.add(visit);</span>
 <span class="cl">        return visit;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>A clinician's diary with a booking rule inside <span class="math" data-say="book">book</span>. Count the decision points by the lab's rule, with the breakdown. Then say which of Evans's three warning signs the rule shows, and sketch the named constraint you would move it to. Paste the listing into the lab to check the count; the design is yours.</p><p>Specification is the third kind of concept, narrower than these two and very common. The next lesson, Specification, reads it.</p></article>
+<span class="cl">}</span></code></pre><p>A clinician's diary with a booking rule inside <span class="math" data-say="book">book</span>. Count the decision points by the lab's rule, with the breakdown. Then say which of Evans's three warning signs the rule shows, and sketch the named constraint you would move it to. Paste the listing into the lab to check the count; the design is yours.</p><p>Specification is the third kind of concept, narrower than these two and very common. The next lesson, Specification, reads it.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where a constraint&#x27;s decisions sit</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Evans gives no count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="inline-limit" selected>The sales limit written inline in sell()</option><option value="factored-caller">The seller, once the limit has a name</option><option value="factored-constraint">The limit as an object of its own</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Giving a constraint a name and a home</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the rule</h3><p>In the method, mark every line that exists only to enforce the constraint, and count its decision points.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check the warning signs</h3><p>Ask whether the rule needs data the object does not otherwise need, whether related rules appear elsewhere, and whether the team discusses it more than the code shows it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name it and move it</h3><p>Factor the rule into a method or object whose name says what the constraint means. Count the caller and the constraint separately, and check that the decisions add up to the same number.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find a method in a system you know that enforces a rule the business talks about. Count its decision points, write the figure down, and write the name you would give the rule.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Giving a constraint a name and a home</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Find the rule.</strong> In the method, mark every line that exists only to enforce the constraint, and count its decision points.</li><li><strong>Check the warning signs.</strong> Ask whether the rule needs data the object does not otherwise need, whether related rules appear elsewhere, and whether the team discusses it more than the code shows it.</li><li><strong>Name it and move it.</strong> Factor the rule into a method or object whose name says what the constraint means. Count the caller and the constraint separately, and check that the decisions add up to the same number.</li><li><strong>Do it on your own code.</strong> Find a method in a system you know that enforces a rule the business talks about. Count its decision points, write the figure down, and write the name you would give the rule.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1571,17 +1617,16 @@ decisions: 4 inline, 1 + 3 factored
 the extra 1: a second routine&#x27;s start</div><p>Factoring changed where the rule lives and what it is called, not how much deciding it takes. That is Evans's claim for it: the constraint becomes visible and has room to grow, and the seller stays focused on selling.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Leaving a rule inline because it works</strong><span>Both of Evans's versions of his capacity example enforce the rule; his point is that the factored one has a clearer relation to the model and room to grow. When a rule needs data its host does not, recurs across objects, or fills the conversations while hiding in the code, it is distorting the host, and working is not the question.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting factoring a constraint out to reduce the decisions</strong><span>On the lesson's illustration the decisions number 4 before and after. Factoring moves them, names them and gives them room; it does not make the rule simpler than it is. A smaller count in the caller is a consequence of where the rule now lives.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Modelling every procedure as a domain object</strong><span>Evans begins the section by agreeing that procedures should not be a prominent part of the model. Only processes that exist in the domain, that the experts talk about, belong there; the loop that carries one out is mechanism.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can move a constraint out and say where its decisions went.</strong><p>Given a method that enforces a rule inline, count its decision points, name the warning signs it shows, and count the caller and the named constraint after factoring.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts decision points by a rule. It cannot tell a business constraint from a technical check, or a process the experts discuss from the mechanism behind it; Evans's test is a question for the experts, and the count only shows where the decisions sit.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Leaving a rule inline because it works</strong><span>Both of Evans's versions of his capacity example enforce the rule; his point is that the factored one has a clearer relation to the model and room to grow. When a rule needs data its host does not, recurs across objects, or fills the conversations while hiding in the code, it is distorting the host, and working is not the question.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting factoring a constraint out to reduce the decisions</strong><span>On the lesson's illustration the decisions number 4 before and after. Factoring moves them, names them and gives them room; it does not make the rule simpler than it is. A smaller count in the caller is a consequence of where the rule now lives.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Modelling every procedure as a domain object</strong><span>Evans begins the section by agreeing that procedures should not be a prominent part of the model. Only processes that exist in the domain, that the experts talk about, belong there; the loop that carries one out is mechanism.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can move a constraint out and say where its decisions went.</strong><p>Given a method that enforces a rule inline, count its decision points, name the warning signs it shows, and count the caller and the named constraint after factoring.</p></div></div><div class="note"><strong>Note:</strong> The lab counts decision points by a rule. It cannot tell a business constraint from a technical check, or a process the experts discuss from the mechanism behind it; Evans's test is a question for the experts, and the count only shows where the decisions sit.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Constraint</summary><p>A rule that limits the states objects may be in or the changes they may make, such as a total that may not pass a limit. Evans counts constraints among the most important model concepts, and among the most often left implicit.</p></details><details class="recall"><summary>Process as a domain object</summary><p>A procedure that the business itself recognises, such as routing, represented in the model as a Service or, where it can be carried out in several ways, as interchangeable objects, one for each way.</p></details><details class="recall"><summary>Decision points</summary><p>The lab's count: one, plus one for each if, while, for and case, and for each conditional and and conditional or. It is McConnell's measure, from Code Complete, used here to see where a rule's decisions sit.</p></details></div>
+      <h3>Summary</h3>
       <p>Things and their actions are what objects make easy to see; Chapter 9 names other kinds of concept that deserve a place in the model. Read Evans on constraints, his three signs that one is distorting its host, and his test for which processes belong in the model, then count where a theatre's sales limit puts its decisions before and after it is given a name.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Constraint.</strong> A rule that limits the states objects may be in or the changes they may make, such as a total that may not pass a limit. Evans counts constraints among the most important model concepts, and among the most often left implicit.</li><li><strong>Process as a domain object.</strong> A procedure that the business itself recognises, such as routing, represented in the model as a Service or, where it can be carried out in several ways, as interchangeable objects, one for each way.</li><li><strong>Decision points.</strong> The lab's count: one, plus one for each if, while, for and case, and for each conditional and and conditional or. It is McConnell's measure, from Code Complete, used here to see where a rule's decisions sit.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="objects suggest things, not rules. a constraint can be a named method. or an object, when it outgrows its host. three signs a host is distorted. a process the experts discuss is a concept. the test, experts, or mechanism, if so" tabindex="0" role="region" aria-label="Mathematical notation">objects suggest things, not rules
 a constraint can be a named method
 or an object, when it outgrows its host
@@ -2609,11 +2654,40 @@ the test: experts, or mechanism?</div><figcaption>Constraints and processes in s
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2681,7 +2755,7 @@ the test: experts, or mechanism?</div><figcaption>Constraints and processes in s
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

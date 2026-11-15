@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 22 · Elementary Graph Algorithms</p>
       <h1>Topological Sort and Strongly Connected Components</h1>
       <p class="lesson-lede">Sort a dag by decreasing finish time, then use the same order on the reversed graph to peel any digraph into its strongly connected components.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A topological sort</li><li>A strongly connected component</li><li>The transpose</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The sections&#x27; argument first, then the two passes</h2>
-      <article class="prose reading"><p>&ldquo;We now consider a classic application of depth-first search: decomposing a directed graph into its strongly connected components.&rdquo; That sentence opens Section 22.5, but Section 22.4 has already shown the first application. Both rest on one observation about the finish times from the lesson before: along an arc that is not a back arc, the tail finishes after the head.</p><p>Section 22.4 starts from a dag, a directed graph with no cycle, and asks for a linear order of its vertices with every arc pointing forward. Such orders model precedence: tasks before the tasks that need them. The authors' TOPOLOGICAL-SORT is three lines of prose in effect: run DFS, and as each vertex finishes put it at the front of a list. The list then holds the vertices in decreasing finish time. Depth-first search costs <span data-say="theta of the quantity V plus E">Θ(V + E)</span> and each insertion at the front costs O(1), so the sort is <span data-say="theta of the quantity V plus E">Θ(V + E)</span>.</p><p>The correctness proof needs Lemma 22.11: a digraph has no cycle exactly when one depth-first search of it finds no back edge. One direction is direct, since a back edge closes a cycle with the tree path it returns to. For the other, take the first vertex of a cycle the search discovers; at that moment the rest of the cycle is a white path from it, so by the white-path theorem the vertex just before it on the cycle becomes its descendant, and the arc back is a back edge. With that, Theorem 22.12 shows that for every arc from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> in a dag, <span class="math" data-say="v, f is less than u, f">v.f < u.f</span>: when the arc is explored, <span class="math" data-say="v">v</span> cannot be grey, and white or black both finish it before <span class="math" data-say="u">u</span>.</p><p>Section 22.5 drops the requirement that the graph be acyclic. Any digraph splits into strongly connected components, and the authors' procedure STRONGLY-CONNECTED-COMPONENTS finds them with two depth-first searches. The first runs on the graph and records finish times. The second runs on the transpose, with its outer loop taking vertices in decreasing order of those finish times. Each tree of the second forest is one component. Two searches and one transpose: <span data-say="theta of the quantity V plus E">Θ(V + E)</span> in all.</p><p>Why that order? The section extends finish times to sets, writing <span class="math" data-say="f of C">f(C)</span> for the latest finish of any vertex in a component <span class="math" data-say="C">C</span>, and proves Lemma 22.14: if an arc runs from component <span class="math" data-say="C">C</span> to component <span class="math" data-say="C prime">C′</span>, then <span class="math" data-say="f of C is greater than f of C prime">f(C) > f(C′)</span>. So the vertex that finishes last lies in a component with no arcs coming into it from other components: a source of the component graph. In the transpose every arc out of that component points into it instead, so a search started there cannot leave it. Corollary 22.15 carries the argument to every later tree, and Theorem 22.16 completes it by induction on the trees found.</p><p>The lab runs both passes in your browser, checks the components against mutual reachability computed straight from the definition, and draws the condensation, the component graph. It opens on its preset <code>dag</code>, four arcs on four vertices: 4 components of 1 vertex each, as an acyclic graph must give. The preset <code>three</code>, a triangle with a second cycle below it, has 3 components, the largest with 3 vertices, and 2 arcs in the condensation; <code>onebig</code> is a single cycle, 1 component of 4 vertices; <code>sourcefirst</code>, a source component above a sink, has 2 components and reports where the latest finish landed: component 1, with 0 arcs into it.</p><p>First the sort. Type this lesson's dag, six tasks and six arcs: <code>1>3, 2>3, 3>4, 2>5, 5>4, 4>6</code>. The first pass, listed in decreasing finish time, takes 2 (finish 12), 5 (11), 1 (8), 3 (7), 4 (6), 6 (5), and the lab finds 6 components of one vertex each. Read the vertex column top to bottom: 2, 5, 1, 3, 4, 6 is the order TOPOLOGICAL-SORT returns. Check each arc: <span class="math" data-say="1 goes to 3">1 → 3</span>, <span class="math" data-say="2 goes to 3">2 → 3</span>, <span class="math" data-say="3 goes to 4">3 → 4</span>, <span class="math" data-say="2 goes to 5">2 → 5</span>, <span class="math" data-say="5 goes to 4">5 → 4</span>, <span class="math" data-say="4 goes to 6">4 → 6</span> all point forward in it. Sorting by discovery time instead would give 1, 3, 4, 6, 2, 5, and <span class="math" data-say="2 goes to 3">2 → 3</span> would point backward.</p><p>Now the components. Type this graph of seven vertices and nine arcs: <code>1>2, 2>3, 3>1, 3>4, 4>5, 5>4, 2>6, 6>4, 7>6</code>. The lab prints 4 components, the largest of 3 vertices, 4 arcs in the condensation, and agreement with mutual reachability. The first pass finishes 7 last, at 14, then 1 at 12, 2 at 11, 6 at 10, 3 at 8, 4 at 7 and 5 at 6. The second pass, on the reversed arcs, peels {7}, then {1, 2, 3}, then {6}, then {4, 5}: two sources, a middle and a sink of the condensation. Where did the latest finish land? In component 1, {7}, with 0 arcs into it, as Lemma 22.14 requires.</p><p>Look at what the order protects against. A search of the original graph from 7 would follow <span class="math" data-say="7 goes to 6">7 → 6</span>, <span class="math" data-say="6 goes to 4">6 → 4</span> and <span class="math" data-say="4 goes to 5">4 → 5</span> and report {7, 6, 4, 5} as one piece, which is wrong: 7 reaches 6, but 6 never reaches 7. In the transpose those arcs point the other way, and the search from 7 stops at 7. The latest finishing component times are, by component, 14, 12, 10 and 7 in the order peeled: decreasing, and that order is itself a topological sort of the condensation. The Algorithms Subject's lesson Strongly Connected Components has more graphs for the same lab.</p><h3>Exercise</h3><p>Take the digraph <code>1>2, 2>1, 2>3, 3>4, 4>5, 5>3, 5>6, 6>7, 7>6</code>. Run the first depth-first search by hand from 1, with vertices and adjacency lists in numeric and typed order, list the vertices by decreasing finish time, then run the second search on the reversed arcs in that order. Name the components and draw the condensation, then type the graph into the lab to check.</p><p>The next lesson leaves directed graphs for weighted undirected ones. Minimum Spanning Trees: Kruskal and Prim reads Chapter 23, where a greedy choice is proved safe by a cut.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Strongly connected components, in two passes</h2></div><p>The finish order names a source component, which is why the second pass runs on the transpose</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The sections&#x27; argument first, then the two passes</h2><div class="prose reading"><p>&ldquo;We now consider a classic application of depth-first search: decomposing a directed graph into its strongly connected components.&rdquo; That sentence opens Section 22.5, but Section 22.4 has already shown the first application. Both rest on one observation about the finish times from the lesson before: along an arc that is not a back arc, the tail finishes after the head.</p><p>Section 22.4 starts from a dag, a directed graph with no cycle, and asks for a linear order of its vertices with every arc pointing forward. Such orders model precedence: tasks before the tasks that need them. The authors' TOPOLOGICAL-SORT is three lines of prose in effect: run DFS, and as each vertex finishes put it at the front of a list. The list then holds the vertices in decreasing finish time. Depth-first search costs <span data-say="theta of the quantity V plus E">Θ(V + E)</span> and each insertion at the front costs O(1), so the sort is <span data-say="theta of the quantity V plus E">Θ(V + E)</span>.</p><p>The correctness proof needs Lemma 22.11: a digraph has no cycle exactly when one depth-first search of it finds no back edge. One direction is direct, since a back edge closes a cycle with the tree path it returns to. For the other, take the first vertex of a cycle the search discovers; at that moment the rest of the cycle is a white path from it, so by the white-path theorem the vertex just before it on the cycle becomes its descendant, and the arc back is a back edge. With that, Theorem 22.12 shows that for every arc from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> in a dag, <span class="math" data-say="v, f is less than u, f">v.f < u.f</span>: when the arc is explored, <span class="math" data-say="v">v</span> cannot be grey, and white or black both finish it before <span class="math" data-say="u">u</span>.</p><p>Section 22.5 drops the requirement that the graph be acyclic. Any digraph splits into strongly connected components, and the authors' procedure STRONGLY-CONNECTED-COMPONENTS finds them with two depth-first searches. The first runs on the graph and records finish times. The second runs on the transpose, with its outer loop taking vertices in decreasing order of those finish times. Each tree of the second forest is one component. Two searches and one transpose: <span data-say="theta of the quantity V plus E">Θ(V + E)</span> in all.</p><p>Why that order? The section extends finish times to sets, writing <span class="math" data-say="f of C">f(C)</span> for the latest finish of any vertex in a component <span class="math" data-say="C">C</span>, and proves Lemma 22.14: if an arc runs from component <span class="math" data-say="C">C</span> to component <span class="math" data-say="C prime">C′</span>, then <span class="math" data-say="f of C is greater than f of C prime">f(C) > f(C′)</span>. So the vertex that finishes last lies in a component with no arcs coming into it from other components: a source of the component graph. In the transpose every arc out of that component points into it instead, so a search started there cannot leave it. Corollary 22.15 carries the argument to every later tree, and Theorem 22.16 completes it by induction on the trees found.</p><p>The lab runs both passes in your browser, checks the components against mutual reachability computed straight from the definition, and draws the condensation, the component graph. It opens on its preset <code>dag</code>, four arcs on four vertices: 4 components of 1 vertex each, as an acyclic graph must give. The preset <code>three</code>, a triangle with a second cycle below it, has 3 components, the largest with 3 vertices, and 2 arcs in the condensation; <code>onebig</code> is a single cycle, 1 component of 4 vertices; <code>sourcefirst</code>, a source component above a sink, has 2 components and reports where the latest finish landed: component 1, with 0 arcs into it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Strongly connected components, in two passes</h2></div><p>The finish order names a source component, which is why the second pass runs on the transpose</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two passes, and the acyclic graph of components</strong><span>the finish order names a source, so the second pass is on the transpose</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>one component</span><span class="tone-purple"><i class="legend-swatch"></i>another</span><span class="tone-muted"><i class="legend-swatch"></i>an arc between two</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scFirst"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scSecond"></table></div>
       <div class="status-banner" id="scStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two passes: finish times on the graph, then the reversed arcs</h3>
-          <p>Type arcs as <span data-say="tail is greater than head">tail&gt;head</span>. The first pass records finish times; the second runs on the reversed arcs in decreasing finish order, and each of its trees is one component, checked against mutual reachability. Paste the lesson's dag to read a topological sort off the first pass.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two passes: finish times on the graph, then the reversed arcs</h3>
+            <p>Type arcs as <span data-say="tail is greater than head">tail&gt;head</span>. The first pass records finish times; the second runs on the reversed arcs in decreasing finish order, and each of its trees is one component, checked against mutual reachability. Paste the lesson's dag to read a topological sort off the first pass.</p>
         <div class="field">
           <label for="scPreset">Worked example</label>
           <select id="scPreset"><option value="three">a triangle, a second cycle below it, and a vertex off the end</option><option value="onebig">one cycle through everything</option><option value="dag" selected>acyclic: four arcs on four vertices</option><option value="sourcefirst">a source component above a sink component</option></select>
@@ -1430,12 +1473,15 @@
           <div class="kpi"><span>Where the latest finish landed</span><strong id="scWhere">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="scHint" style="margin:0;">Two vertices are in one component when each reaches the other. The first pass only produces finishing times; the second pass takes vertices in decreasing finishing order on the <em>reversed</em> graph, and peels one component per start. Read the condensation table: the component holding the latest finish has nothing pointing into it, which is the fact the method rests on.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>First the sort. Type this lesson's dag, six tasks and six arcs: <code>1>3, 2>3, 3>4, 2>5, 5>4, 4>6</code>. The first pass, listed in decreasing finish time, takes 2 (finish 12), 5 (11), 1 (8), 3 (7), 4 (6), 6 (5), and the lab finds 6 components of one vertex each. Read the vertex column top to bottom: 2, 5, 1, 3, 4, 6 is the order TOPOLOGICAL-SORT returns. Check each arc: <span class="math" data-say="1 goes to 3">1 → 3</span>, <span class="math" data-say="2 goes to 3">2 → 3</span>, <span class="math" data-say="3 goes to 4">3 → 4</span>, <span class="math" data-say="2 goes to 5">2 → 5</span>, <span class="math" data-say="5 goes to 4">5 → 4</span>, <span class="math" data-say="4 goes to 6">4 → 6</span> all point forward in it. Sorting by discovery time instead would give 1, 3, 4, 6, 2, 5, and <span class="math" data-say="2 goes to 3">2 → 3</span> would point backward.</p><p>Now the components. Type this graph of seven vertices and nine arcs: <code>1>2, 2>3, 3>1, 3>4, 4>5, 5>4, 2>6, 6>4, 7>6</code>. The lab prints 4 components, the largest of 3 vertices, 4 arcs in the condensation, and agreement with mutual reachability. The first pass finishes 7 last, at 14, then 1 at 12, 2 at 11, 6 at 10, 3 at 8, 4 at 7 and 5 at 6. The second pass, on the reversed arcs, peels {7}, then {1, 2, 3}, then {6}, then {4, 5}: two sources, a middle and a sink of the condensation. Where did the latest finish land? In component 1, {7}, with 0 arcs into it, as Lemma 22.14 requires.</p><p>Look at what the order protects against. A search of the original graph from 7 would follow <span class="math" data-say="7 goes to 6">7 → 6</span>, <span class="math" data-say="6 goes to 4">6 → 4</span> and <span class="math" data-say="4 goes to 5">4 → 5</span> and report {7, 6, 4, 5} as one piece, which is wrong: 7 reaches 6, but 6 never reaches 7. In the transpose those arcs point the other way, and the search from 7 stops at 7. The latest finishing component times are, by component, 14, 12, 10 and 7 in the order peeled: decreasing, and that order is itself a topological sort of the condensation. The Algorithms Subject's lesson Strongly Connected Components has more graphs for the same lab.</p><h3>Exercise</h3><p>Take the digraph <code>1>2, 2>1, 2>3, 3>4, 4>5, 5>3, 5>6, 6>7, 7>6</code>. Run the first depth-first search by hand from 1, with vertices and adjacency lists in numeric and typed order, list the vertices by decreasing finish time, then run the second search on the reversed arcs in that order. Name the components and draw the condensation, then type the graph into the lab to check.</p><p>The next lesson leaves directed graphs for weighted undirected ones. Minimum Spanning Trees: Kruskal and Prim reads Chapter 23, where a greedy choice is proved safe by a cut.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sorting a dag and peeling components</h2></div><p>Five steps, the last on a graph of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Run the first search and record finish times</h3><p>Do depth-first search over every vertex and write each finish time. If you meet a back edge, the graph has a cycle and no topological sort exists.</p></article><article class="card concept-card"><div class="icon">2</div><h3>For a dag, list by decreasing finish time</h3><p>Write the vertices from the latest finish to the earliest. Check that every arc points from left to right.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reverse every arc</h3><p>Write the transpose: each arc from u to v becomes an arc from v to u. Its components are the original's.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Search the transpose in decreasing finish order</h3><p>Start from the unvisited vertex with the latest first-pass finish, collect everything the search reaches, and call it a component. Repeat until every vertex is in one.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a graph of your own</h3><p>Write the dependencies among a dozen tasks or modules of your own as arcs and type them into the lab. Note how many components there are; any component with more than one vertex is a dependency cycle.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sorting a dag and peeling components</h2>
+      <p class="lead-in">Five steps, the last on a graph of your own.</p>
+      <ol class="key-ideas method"><li><strong>Run the first search and record finish times.</strong> Do depth-first search over every vertex and write each finish time. If you meet a back edge, the graph has a cycle and no topological sort exists.</li><li><strong>For a dag, list by decreasing finish time.</strong> Write the vertices from the latest finish to the earliest. Check that every arc points from left to right.</li><li><strong>Reverse every arc.</strong> Write the transpose: each arc from u to v becomes an arc from v to u. Its components are the original's.</li><li><strong>Search the transpose in decreasing finish order.</strong> Start from the unvisited vertex with the latest first-pass finish, collect everything the search reaches, and call it a component. Repeat until every vertex is in one.</li><li><strong>Do it on a graph of your own.</strong> Write the dependencies among a dozen tasks or modules of your own as arcs and type them into the lab. Note how many components there are; any component with more than one vertex is a dependency cycle.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ from 1: {1, 2, 3}; from 6: {6}
 from 4: {4, 5}</div><p>Four components, as the lab prints, and the condensation's four arcs run {7} to {6}, {1, 2, 3} to {6}, {1, 2, 3} to {4, 5} and {6} to {4, 5}. Each component's latest finish (14, 12, 10, 7) falls along those arcs, which is Lemma 22.14 on this graph.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Running the second pass on the original graph, or in any order</strong><span>It is tempting to think the transpose is a detail and any search order will do. Lemma 22.14 says otherwise: the latest finish lies in a source component, whose arcs lead out to other components. On the lesson's graph a search of the original arcs from 7 reaches 6, 4 and 5 and would report them as one component. Only on the reversed arcs, taken in decreasing finish order, does each search stop at its component's edge.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sorting a dag by discovery time</strong><span>Discovery time looks like the natural order of a search, but Theorem 22.12 is about finish times. On the lesson's dag, increasing discovery time gives 1, 3, 4, 6, 2, 5, and the arc <span class="math" data-say="2 goes to 3">2 → 3</span> points backward. Decreasing finish time gives 2, 5, 1, 3, 4, 6, and every arc points forward.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting one topological sort</strong><span>A dag usually has several. The lesson's dag has 2, 5, 1, 3, 4, 6 from the lab's first pass, and also 1, 2, 3, 5, 4, 6 and others. The sort is unique only when consecutive vertices are always joined by an arc, as in a chain.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a dag and find a digraph&#x27;s components by hand.</strong><p>For a digraph of six to nine vertices, list the first-pass finish times, give a topological sort if the graph is acyclic, and peel the components with the second pass, naming the condensation's sources and sinks.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab runs the two passes with the vertex and adjacency order you type, and checks the components against mutual reachability on your graph. It shows Lemma 22.14 holding there. That the latest finish lands in a source on every graph is the lemma's proof, not a run.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Running the second pass on the original graph, or in any order</strong><span>It is tempting to think the transpose is a detail and any search order will do. Lemma 22.14 says otherwise: the latest finish lies in a source component, whose arcs lead out to other components. On the lesson's graph a search of the original arcs from 7 reaches 6, 4 and 5 and would report them as one component. Only on the reversed arcs, taken in decreasing finish order, does each search stop at its component's edge.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sorting a dag by discovery time</strong><span>Discovery time looks like the natural order of a search, but Theorem 22.12 is about finish times. On the lesson's dag, increasing discovery time gives 1, 3, 4, 6, 2, 5, and the arc <span class="math" data-say="2 goes to 3">2 → 3</span> points backward. Decreasing finish time gives 2, 5, 1, 3, 4, 6, and every arc points forward.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting one topological sort</strong><span>A dag usually has several. The lesson's dag has 2, 5, 1, 3, 4, 6 from the lab's first pass, and also 1, 2, 3, 5, 4, 6 and others. The sort is unique only when consecutive vertices are always joined by an arc, as in a chain.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a dag and find a digraph&#x27;s components by hand.</strong><p>For a digraph of six to nine vertices, list the first-pass finish times, give a topological sort if the graph is acyclic, and peel the components with the second pass, naming the condensation's sources and sinks.</p></div></div><div class="note"><strong>Note:</strong> The lab runs the two passes with the vertex and adjacency order you type, and checks the components against mutual reachability on your graph. It shows Lemma 22.14 holding there. That the latest finish lands in a source on every graph is the lemma's proof, not a run.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A topological sort</summary><p>A linear order of a dag's vertices in which every arc points forward, from an earlier vertex to a later one. A graph with a cycle has none, and a dag usually has several. Topological sorting arranges vertices, not values, which is why the authors remark that it differs from the sorting of Part II.</p></details><details class="recall"><summary>A strongly connected component</summary><p>A largest set of vertices in which every vertex can reach every other along arcs. Each vertex belongs to exactly one. Contract each component to a single vertex and the resulting component graph is always a dag (Lemma 22.13): two components that reached each other would be one.</p></details><details class="recall"><summary>The transpose</summary><p>The same vertices with every arc reversed. It has exactly the same strongly connected components as the original, since mutual reachability survives reversing every arc, and it can be built from adjacency lists in O(V + E) time.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 22.4 and 22.5 put depth-first search to work twice. A dag is sorted by listing its vertices in decreasing finish time; any digraph is split into strongly connected components by a second search on its transpose, started in that same order. Run both on graphs written for the lesson and see why the order of the second search is the whole algorithm.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A topological sort.</strong> A linear order of a dag's vertices in which every arc points forward, from an earlier vertex to a later one. A graph with a cycle has none, and a dag usually has several. Topological sorting arranges vertices, not values, which is why the authors remark that it differs from the sorting of Part II.</li><li><strong>A strongly connected component.</strong> A largest set of vertices in which every vertex can reach every other along arcs. Each vertex belongs to exactly one. Contract each component to a single vertex and the resulting component graph is always a dag (Lemma 22.13): two components that reached each other would be one.</li><li><strong>The transpose.</strong> The same vertices with every arc reversed. It has exactly the same strongly connected components as the original, since mutual reachability survives reversing every arc, and it can be built from adjacency lists in O(V + E) time.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="dag, no back edge, in any search. sort, decreasing finish time. both run in theta of the quantity V plus E. transpose, every arc reversed. same components in G and its transpose. latest finish, in a source component" tabindex="0" role="region" aria-label="Mathematical notation">dag: no back edge, in any search
 sort: decreasing finish time
 both run in Θ(V + E)
@@ -3190,11 +3235,40 @@ latest finish: in a source component</div><figcaption>Sections 22.4 and 22.5 in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3262,7 +3336,7 @@ latest finish: in a source component</div><figcaption>Sections 22.4 and 22.5 in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

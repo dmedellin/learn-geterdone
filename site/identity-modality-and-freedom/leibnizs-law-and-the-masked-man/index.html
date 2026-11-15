@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Identity, Modality and Freedom</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Modality</p>
       <h1>Leibniz&#x27;s Law and the Masked Man</h1>
       <p class="lesson-lede">Two sentences that are true together can still not be swapped inside a box, which is why the masked man does not refute Leibniz&#x27;s law.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Leibniz&#x27;s law</li><li>A box looks at other worlds</li><li>Being known is not a property of the man</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A true equivalence that does not survive a box</h2>
-      <article class="prose reading"><p>The old argument runs as follows. I know who my father is, so I know that my father is here. I do not know who the masked man is, so I do not know that the masked man is here. But the masked man is my father. So by Leibniz&rsquo;s law my father has a property that the masked man lacks, being known by me to be here, and they are not the same man. Since they are the same man, something has gone wrong.</p><p>The lab makes the failure exact. Let <span class="math" data-say="f">f</span> say that my father is here and <span class="math" data-say="m">m</span> that the masked man is here. At the actual world, w1, both are true: the man in the mask is my father. Read the box as &ldquo;it is known that&rdquo; and draw the arcs from w1 to the worlds compatible with what I know. There are two: w1 itself and w2. At w2 my father is here but the man in the mask is not, since for all I know the masked man is a stranger.</p><div class="mathblock" data-say="world, f, m. w 1, T, T. w 2, T, F" tabindex="0" role="region" aria-label="Mathematical notation">world   f   m
-w1      T   T
-w2      T   F</div><p>Now evaluate. <span class="math" data-say="necessarily f">□f</span> is true at w1, because <span class="math" data-say="f">f</span> holds at both worlds w1 sees. <span class="math" data-say="necessarily m">□m</span> is false at w1, because <span class="math" data-say="m">m</span> fails at w2. And <span class="math" data-say="f if and only if m">f ↔ m</span> is true at w1, since both are true there. So at one world two sentences are equivalent and their boxed versions differ in value. That is the whole of the masked man: substitution of equivalents inside a box fails, because a box consults worlds at which the equivalence need not hold.</p><p>Outside the box nothing fails. From <span class="math" data-say="f if and only if m">f ↔ m</span> at w1 you may swap <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> in any context that looks only at w1: in a conjunction, a negation, a conditional. The extensional preset shows the opposite end. With a single world the box has only that one world to look at, <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> agree there, and <span class="math" data-say="necessarily f if and only if necessarily m">□f ↔ □m</span> is true. Substitution inside the box is harmless when the box has nothing to disagree about.</p><div class="defbox"><span class="label">Definition &middot; Opaque context</span><p>A context is <strong>opaque</strong> when swapping two sentences, or two names for one thing, that agree in value at the actual world can change the value of the whole. A box is opaque whenever the worlds it looks at can disagree.</p></div><p>The same shape appears with necessity. The number of planets is eight, and eight is necessarily even, but it does not follow that the number of planets is necessarily even, since there are worlds where the planets are seven. The model is the same, with the arcs read alethically.</p><p>What survives for Leibniz is a point about what the law covers. It speaks of properties of the man, and being known to be here is not one of them, because it changes with the description. The reply is not free: it commits the reader to a distinction between properties of things and properties of things under descriptions, and some philosophers resist that. The lab computes the failure of substitution; it does not decide how to describe it. It also contains no individuals and no identity sign, so it models the sentences and not the man.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Possible worlds</h2></div><p>Modal formulas at every world, and the axioms the frame validates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A true equivalence that does not survive a box</h2><div class="prose reading"><p>The old argument runs as follows. I know who my father is, so I know that my father is here. I do not know who the masked man is, so I do not know that the masked man is here. But the masked man is my father. So by Leibniz&rsquo;s law my father has a property that the masked man lacks, being known by me to be here, and they are not the same man. Since they are the same man, something has gone wrong.</p><p>The lab makes the failure exact. Let <span class="math" data-say="f">f</span> say that my father is here and <span class="math" data-say="m">m</span> that the masked man is here. At the actual world, w1, both are true: the man in the mask is my father. Read the box as &ldquo;it is known that&rdquo; and draw the arcs from w1 to the worlds compatible with what I know. There are two: w1 itself and w2. At w2 my father is here but the man in the mask is not, since for all I know the masked man is a stranger.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Possible worlds</h2></div><p>Modal formulas at every world, and the axioms the frame validates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Worlds and what they can see</strong><span>□ holds where every visible world agrees; ◇ where one does</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the formula holds</span><span class="tone-amber"><i class="legend-swatch"></i>the world evaluated</span></div>
@@ -1406,10 +1447,10 @@ w2      T   F</div><p>Now evaluate. <span class="math" data-say="necessarily f">
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="krSvg" viewBox="0 0 520 290" role="img" aria-label="The worlds as circles with arrows for accessibility; the atoms true at each world are written inside it, and the worlds where the formula holds are filled."></svg></div>
       <div class="status-banner" id="krStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Substitute inside the box and outside it</h3>
-          <p>The box is read as it is known that. World w1 sees itself and w2. At w1 both sentences are true, at w2 only <span class="math" data-say="f">f</span>. The first three presets are the three sentences of the argument. Type <span class="math" data-say="f, at m">[]f <-> []m</span> yourself on the first model to see the boxed versions disagree.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Substitute inside the box and outside it</h3>
+            <p>The box is read as it is known that. World w1 sees itself and w2. At w1 both sentences are true, at w2 only <span class="math" data-say="f">f</span>. The first three presets are the three sentences of the argument. Type <span class="math" data-say="f, at m">[]f <-> []m</span> yourself on the first model to see the boxed versions disagree.</p>
         <div class="field">
           <label for="krPreset">Model</label>
           <select id="krPreset"><option value="known-father" selected>I know my father is here</option><option value="known-masked">I know the masked man is here</option><option value="same-man">the father is the masked man</option><option value="extensional">one world, nothing else to consider</option></select>
@@ -1446,12 +1487,17 @@ w2      T   F</div><p>Now evaluate. <span class="math" data-say="necessarily f">
         </div>
         <p class="small-copy" style="margin:0;">Type [] for the box and &lt;&gt; for the diamond, or use the symbols, with ~ &amp; | -&gt; &lt;-&gt; as usual.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="world, f, m. w 1, T, T. w 2, T, F" tabindex="0" role="region" aria-label="Mathematical notation">world   f   m
+w1      T   T
+w2      T   F</div><p>Now evaluate. <span class="math" data-say="necessarily f">□f</span> is true at w1, because <span class="math" data-say="f">f</span> holds at both worlds w1 sees. <span class="math" data-say="necessarily m">□m</span> is false at w1, because <span class="math" data-say="m">m</span> fails at w2. And <span class="math" data-say="f if and only if m">f ↔ m</span> is true at w1, since both are true there. So at one world two sentences are equivalent and their boxed versions differ in value. That is the whole of the masked man: substitution of equivalents inside a box fails, because a box consults worlds at which the equivalence need not hold.</p><p>Outside the box nothing fails. From <span class="math" data-say="f if and only if m">f ↔ m</span> at w1 you may swap <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> in any context that looks only at w1: in a conjunction, a negation, a conditional. The extensional preset shows the opposite end. With a single world the box has only that one world to look at, <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> agree there, and <span class="math" data-say="necessarily f if and only if necessarily m">□f ↔ □m</span> is true. Substitution inside the box is harmless when the box has nothing to disagree about.</p><div class="defbox"><span class="label">Definition &middot; Opaque context</span><p>A context is <strong>opaque</strong> when swapping two sentences, or two names for one thing, that agree in value at the actual world can change the value of the whole. A box is opaque whenever the worlds it looks at can disagree.</p></div><p>The same shape appears with necessity. The number of planets is eight, and eight is necessarily even, but it does not follow that the number of planets is necessarily even, since there are worlds where the planets are seven. The model is the same, with the arcs read alethically.</p><p>What survives for Leibniz is a point about what the law covers. It speaks of properties of the man, and being known to be here is not one of them, because it changes with the description. The reply is not free: it commits the reader to a distinction between properties of things and properties of things under descriptions, and some philosophers resist that. The lab computes the failure of substitution; it does not decide how to describe it. It also contains no individuals and no identity sign, so it models the sentences and not the man.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Telling a failed substitution from a counterexample to the law</h2></div><p>Four moves for any puzzle that seems to refute Leibniz's law.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the sentences that are true together</h3><p>Evaluate both at the actual world. The masked man gives <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> both true.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the box in the context that goes wrong</h3><p>Look for knowing, believing, necessity, or any operator that looks at other worlds. The property that seems to differ is built from it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Evaluate the boxed sentences separately</h3><p>Type each into the lab. If the boxed versions differ while the unboxed ones agree, the substitution failed inside an opaque context.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask whether the changing property belongs to the thing</h3><p>If it depends on how the thing is described, it is not a property of the thing, and the law was never applied to it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Telling a failed substitution from a counterexample to the law</h2>
+      <p class="lead-in">Four moves for any puzzle that seems to refute Leibniz's law.</p>
+      <ol class="key-ideas method"><li><strong>Find the sentences that are true together.</strong> Evaluate both at the actual world. The masked man gives <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> both true.</li><li><strong>Find the box in the context that goes wrong.</strong> Look for knowing, believing, necessity, or any operator that looks at other worlds. The property that seems to differ is built from it.</li><li><strong>Evaluate the boxed sentences separately.</strong> Type each into the lab. If the boxed versions differ while the unboxed ones agree, the substitution failed inside an opaque context.</li><li><strong>Ask whether the changing property belongs to the thing.</strong> If it depends on how the thing is described, it is not a property of the thing, and the law was never applied to it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1516,16 @@ swap f for m outside any box: still true
 swap f for m inside the box: the value changes</div><p>The two sentences agree where they are evaluated and differ in the worlds the box consults. That is all the failure is, and it needs no property of the man.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the masked man refutes Leibniz&#x27;s law</strong><span>The lab shows <span class="math" data-say="f if and only if m">f ↔ m</span> true at w1, <span class="math" data-say="necessarily f">□f</span> true and <span class="math" data-say="necessarily m">□m</span> false. The pair that differ are the boxed sentences, which are about the worlds compatible with what I know, and not about the man. The law was never applied to anything it covers, so nothing has refuted it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking substitution fails in every context</strong><span>Outside a box it holds. From <span class="math" data-say="f if and only if m">f ↔ m</span> at w1 you may replace one by the other inside a negation, a conjunction or a conditional and keep the value at w1. The failure belongs to contexts that look at other worlds.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the failure as a quirk of talk about knowledge</strong><span>The same arcs read as necessity give the same failure: eight is necessarily even, the number of planets is eight, and the number of planets is not necessarily even. Any operator that quantifies over worlds is opaque in this way. Reading the box as knowledge changed the words in the status line and left the computation alone.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show with a model that two true sentences differ under a box, and say why that leaves the law untouched.</strong><p>You should be able to give a model in which two sentences agree at the actual world and their boxed versions do not, say which worlds make the difference, and state what Leibniz&rsquo;s law covers that the boxed sentences are not. A claim that substitution &ldquo;fails&rdquo; without the world at which the sentences come apart has not been shown.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> World w2 sees nothing, so any box is vacuously true there. The tiles that matter in this lesson are the values at w1.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the masked man refutes Leibniz&#x27;s law</strong><span>The lab shows <span class="math" data-say="f if and only if m">f ↔ m</span> true at w1, <span class="math" data-say="necessarily f">□f</span> true and <span class="math" data-say="necessarily m">□m</span> false. The pair that differ are the boxed sentences, which are about the worlds compatible with what I know, and not about the man. The law was never applied to anything it covers, so nothing has refuted it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking substitution fails in every context</strong><span>Outside a box it holds. From <span class="math" data-say="f if and only if m">f ↔ m</span> at w1 you may replace one by the other inside a negation, a conjunction or a conditional and keep the value at w1. The failure belongs to contexts that look at other worlds.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the failure as a quirk of talk about knowledge</strong><span>The same arcs read as necessity give the same failure: eight is necessarily even, the number of planets is eight, and the number of planets is not necessarily even. Any operator that quantifies over worlds is opaque in this way. Reading the box as knowledge changed the words in the status line and left the computation alone.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show with a model that two true sentences differ under a box, and say why that leaves the law untouched.</strong><p>You should be able to give a model in which two sentences agree at the actual world and their boxed versions do not, say which worlds make the difference, and state what Leibniz&rsquo;s law covers that the boxed sentences are not. A claim that substitution &ldquo;fails&rdquo; without the world at which the sentences come apart has not been shown.</p></div></div><div class="note"><strong>Note:</strong> World w2 sees nothing, so any box is vacuously true there. The tiles that matter in this lesson are the values at w1.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Leibniz&#x27;s law</summary><p>If a and b are the same thing, then whatever is true of a is true of b. It is a principle about identity and about properties of the thing.</p></details><details class="recall"><summary>A box looks at other worlds</summary><p><span class="math" data-say="necessarily f">□f</span> is true at w1 only if <span class="math" data-say="f">f</span> is true at every world compatible with what is known there. Two sentences that agree at w1 can disagree at another such world, and then the boxes differ.</p></details><details class="recall"><summary>Being known is not a property of the man</summary><p>&ldquo;Is known by me to be here&rdquo; depends on how the man is picked out, as the father or as the masked man. It is a property of the man under a description, and the law concerns the properties of the man himself.</p></details></div>
+      <h3>Summary</h3>
       <p>I know that my father is here and I do not know that the masked man is here, yet the masked man is my father. In a model whose box is read as &ldquo;it is known that&rdquo;, the lab shows both sentences true at the actual world and the two boxes with different values. The substitution fails inside the box, and outside it the law holds.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Leibniz&#x27;s law.</strong> If a and b are the same thing, then whatever is true of a is true of b. It is a principle about identity and about properties of the thing.</li><li><strong>A box looks at other worlds.</strong> <span class="math" data-say="necessarily f">□f</span> is true at w1 only if <span class="math" data-say="f">f</span> is true at every world compatible with what is known there. Two sentences that agree at w1 can disagree at another such world, and then the boxes differ.</li><li><strong>Being known is not a property of the man.</strong> &ldquo;Is known by me to be here&rdquo; depends on how the man is picked out, as the father or as the masked man. It is a property of the man under a description, and the law concerns the properties of the man himself.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="if a is b, a and b share every property. f if and only if m, true, but, necessarily f if and only if necessarily m, false. swap freely outside a box, not inside. one world, nothing to disagree about" tabindex="0" role="region" aria-label="Mathematical notation">if a is b, a and b share every property
 f ↔ m  true, but  □f ↔ □m  false
 swap freely outside a box, not inside
@@ -2206,11 +2251,40 @@ one world: nothing to disagree about</div><figcaption>Where substitution holds a
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2278,7 +2352,7 @@ one world: nothing to disagree about</div><figcaption>Where substitution holds a
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

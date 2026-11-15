@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,33 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Paradoxes and Their Exits</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The infinite</p>
       <h1>Achilles and the Tortoise</h1>
       <p class="lesson-lede">The gaps in the race form a geometric series whose ratio is the speed ratio, and the meeting point is its limit.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Each gap is the last gap times the speed ratio</li><li>The sum of the gaps is how far Achilles runs</li><li>The ratio decides whether there is a meeting</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The race that never seems to end</h2>
-      <article class="prose reading"><p>Achilles runs ten times as fast as a tortoise, and gives it a head start of 100 metres. Zeno argues that Achilles can never catch it. To pass the tortoise he must first reach the place it started, and by then it has moved on. He must reach that place, and by then it has moved on again. Each stage leaves a gap, and a gap that is still positive means the tortoise is still ahead.</p><ol><li>Before Achilles passes the tortoise he must reach the place the tortoise has just left.</li><li>Each time he does, the tortoise has moved on, so there is a gap that is still positive.</li><li>There are infinitely many such stages, and the gap never reaches zero.</li><li>So Achilles never passes the tortoise.</li></ol><p>Premise three is true, and it is worth saying so: no stage ends with a gap of zero. The conclusion does not follow from it, and the series shows why. Achilles runs 100 metres while the tortoise runs 10; then he runs 10 while it runs 1; then 1 while it runs a tenth. The gaps are 100, 10, 1 and so on, each one tenth of the last.</p><div class="mathblock" data-say="100 plus 10 plus 1 plus 1 over 10 plus and so on. limit equals A over the quantity 1 minus r, equals 100 over the quantity 1 minus 1 over 10, equals 1000 over 9" tabindex="0" role="region" aria-label="Mathematical notation">100 + 10 + 1 + 1/10 + …
-limit = a / (1 − r) = 100 / (1 − 1/10) = 1000/9</div><p>The ratio <span class="math" data-say="r">r</span> is the tortoise's speed divided by Achilles' speed, <span class="math" data-say="1 over 10">1/10</span> here, and it is the same each stage because the speeds do not change. The first term is the head start. The lab sums the gaps exactly. After six stages Achilles has run <span class="math" data-say="111111 over 1000">111111/1000</span> metres, with <span class="math" data-say="1 over 9000">1/9000</span> still to cover, and it reports the limit as <span class="math" data-say="1000 over 9">1000/9</span> metres, a little over 111. That is the total distance Achilles has run when he draws level, and each stage of Zeno's argument takes place before that distance. After the last gap of the list, which there is not, he would be past. After all of the gaps together, which is the limit, he is level, and from there he is past.</p><p>The same figure comes from ordinary algebra. Achilles runs at 10 and the tortoise at 1 from a start 100 ahead, so he draws level when <span class="math" data-say="10 times t equals 100 plus t">10·t = 100 + t</span>, at <span class="math" data-say="t equals 100 over 9">t = 100/9</span> seconds, having run <span class="math" data-say="10 times t equals 1000 over 9">10·t = 1000/9</span> metres. The series and the equation agree because they describe one race. What the series adds is the diagnosis: premises one to three describe stages that all occur before the meeting, and say nothing about whether the meeting comes.</p><p>The second preset shows how the ratio controls the limit. Achilles runs at 10 and the tortoise at 9, so <span class="math" data-say="r equals 9 over 10">r = 9/10</span>. The gaps are 100, 90, 81, which sum to 271 after three stages, and the limit is <span class="math" data-say="1000">1000</span>. A race that closes more slowly takes more stages and a longer run, and still ends.</p><p>The third preset is the case in which Zeno is right. If the speeds are equal the ratio is 1, every gap is 100, and the sum of any number of them is 100 times the number. The lab reports no limit. The tortoise stays 100 metres ahead, and Achilles does not catch it. The structure of the argument is unchanged. What differs is the ratio, and so the series, and so the third premise's conclusion.</p><p>Which exit is this? As the argument was set out, its three premises are true and the conclusion does not follow from them: the move from the third premise to the conclusion is a step that only looked valid, which is exit two. It looked valid because it borrowed a premise that was never written down, that a list of stages with no last member must go on for ever, in distance as in time. Write that premise in and the argument becomes valid, and the exit becomes the previous lesson's: deny the added premise, and the series is the refutation. The two descriptions are one repair. A step that fails only because it leans on an unstated premise is faulted by stating the premise and denying it, and which name the repair gets depends on how much of the argument was put into standard form, which is why that is the first move of the method. The equal-speed case is the reminder that the denial is conditional on the ratio: at <span class="math" data-say="r equals 1">r = 1</span> the unstated premise is true of this race, and the tortoise stays ahead.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Exact partial sums</h2></div><p>n terms added as fractions, against the limit when there is one</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The race that never seems to end</h2><div class="prose reading"><p>Achilles runs ten times as fast as a tortoise, and gives it a head start of 100 metres. Zeno argues that Achilles can never catch it. To pass the tortoise he must first reach the place it started, and by then it has moved on. He must reach that place, and by then it has moved on again. Each stage leaves a gap, and a gap that is still positive means the tortoise is still ahead.</p><ol><li>Before Achilles passes the tortoise he must reach the place the tortoise has just left.</li><li>Each time he does, the tortoise has moved on, so there is a gap that is still positive.</li><li>There are infinitely many such stages, and the gap never reaches zero.</li><li>So Achilles never passes the tortoise.</li></ol><p>Premise three is true, and it is worth saying so: no stage ends with a gap of zero. The conclusion does not follow from it, and the series shows why. Achilles runs 100 metres while the tortoise runs 10; then he runs 10 while it runs 1; then 1 while it runs a tenth. The gaps are 100, 10, 1 and so on, each one tenth of the last.</p><div class="mathblock" data-say="100 plus 10 plus 1 plus 1 over 10 plus and so on. limit equals A over the quantity 1 minus r, equals 100 over the quantity 1 minus 1 over 10, equals 1000 over 9" tabindex="0" role="region" aria-label="Mathematical notation">100 + 10 + 1 + 1/10 + …
+limit = a / (1 − r) = 100 / (1 − 1/10) = 1000/9</div><p>The ratio <span class="math" data-say="r">r</span> is the tortoise's speed divided by Achilles' speed, <span class="math" data-say="1 over 10">1/10</span> here, and it is the same each stage because the speeds do not change. The first term is the head start. The lab sums the gaps exactly. After six stages Achilles has run <span class="math" data-say="111111 over 1000">111111/1000</span> metres, with <span class="math" data-say="1 over 9000">1/9000</span> still to cover, and it reports the limit as <span class="math" data-say="1000 over 9">1000/9</span> metres, a little over 111. That is the total distance Achilles has run when he draws level, and each stage of Zeno's argument takes place before that distance. After the last gap of the list, which there is not, he would be past. After all of the gaps together, which is the limit, he is level, and from there he is past.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Exact partial sums</h2></div><p>n terms added as fractions, against the limit when there is one</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Adding up infinitely many steps</strong><span>the sum of n terms, and what remains</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="srTable"></table></div>
       <div class="status-banner" id="srStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The gaps of a race, summed exactly</h3>
-          <p>The first term is the head start and the ratio is the tortoise's speed over Achilles'. Read the limit: it is the distance Achilles runs when he draws level. Move the number of terms to see how much of that distance the first few stages cover. Then change the ratio to 1/2, so that the tortoise is half as fast, and see the limit become 200. In the third preset the ratio is 1 and the limit tile reads none.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The gaps of a race, summed exactly</h3>
+            <p>The first term is the head start and the ratio is the tortoise's speed over Achilles'. Read the limit: it is the distance Achilles runs when he draws level. Move the number of terms to see how much of that distance the first few stages cover. Then change the ratio to 1/2, so that the tortoise is half as fast, and see the limit become 200. In the third preset the ratio is 1 and the limit tile reads none.</p>
         <div class="field">
           <label for="srPreset">Worked example</label>
           <select id="srPreset"><option value="ten-to-one" selected>ten to one, head start 100</option><option value="close-race">ten to nine, head start 100</option><option value="equal-speeds">equal speeds, head start 100</option></select>
@@ -1439,12 +1482,15 @@ limit = a / (1 − r) = 100 / (1 − 1/10) = 1000/9</div><p>The ratio <span clas
           <div class="kpi"><span>Remainder</span><strong id="srRemain">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The same figure comes from ordinary algebra. Achilles runs at 10 and the tortoise at 1 from a start 100 ahead, so he draws level when <span class="math" data-say="10 times t equals 100 plus t">10·t = 100 + t</span>, at <span class="math" data-say="t equals 100 over 9">t = 100/9</span> seconds, having run <span class="math" data-say="10 times t equals 1000 over 9">10·t = 1000/9</span> metres. The series and the equation agree because they describe one race. What the series adds is the diagnosis: premises one to three describe stages that all occur before the meeting, and say nothing about whether the meeting comes.</p><p>The second preset shows how the ratio controls the limit. Achilles runs at 10 and the tortoise at 9, so <span class="math" data-say="r equals 9 over 10">r = 9/10</span>. The gaps are 100, 90, 81, which sum to 271 after three stages, and the limit is <span class="math" data-say="1000">1000</span>. A race that closes more slowly takes more stages and a longer run, and still ends.</p><p>The third preset is the case in which Zeno is right. If the speeds are equal the ratio is 1, every gap is 100, and the sum of any number of them is 100 times the number. The lab reports no limit. The tortoise stays 100 metres ahead, and Achilles does not catch it. The structure of the argument is unchanged. What differs is the ratio, and so the series, and so the third premise's conclusion.</p><p>Which exit is this? As the argument was set out, its three premises are true and the conclusion does not follow from them: the move from the third premise to the conclusion is a step that only looked valid, which is exit two. It looked valid because it borrowed a premise that was never written down, that a list of stages with no last member must go on for ever, in distance as in time. Write that premise in and the argument becomes valid, and the exit becomes the previous lesson's: deny the added premise, and the series is the refutation. The two descriptions are one repair. A step that fails only because it leans on an unstated premise is faulted by stating the premise and denying it, and which name the repair gets depends on how much of the argument was put into standard form, which is why that is the first move of the method. The equal-speed case is the reminder that the denial is conditional on the ratio: at <span class="math" data-say="r equals 1">r = 1</span> the unstated premise is true of this race, and the tortoise stays ahead.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Setting up the race as a series</h2></div><p>Four moves. The setting-up is the philosophy, and the arithmetic is only the check.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the first gap</h3><p>It is the head start. If Achilles runs 100 metres to reach the starting place, then <span class="math" data-say="A equals 100">a = 100</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the ratio from the speeds</h3><p>While Achilles runs a gap, the tortoise runs that gap times its speed over his. That fraction is <span class="math" data-say="r">r</span>, and it does not change from stage to stage.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Sum the series, or find that it has no sum</h3><p>If <span class="math" data-say="r">r</span> is below 1, the limit is <span class="math" data-say="A over the quantity 1 minus r">a / (1 − r)</span>. If <span class="math" data-say="r">r</span> is 1 or more, the gaps do not shrink, and the series has no limit.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Interpret the limit</h3><p>A limit is the distance Achilles has run when he draws level. A series with no limit means the gap never closes.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Name the exit and its price</h3><p>The stated premises are true, and the step to the conclusion borrows one that is not: that a list with no last stage goes on for ever. Fault the step, or state that premise and deny it; the repair is the same, and its price is small.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Setting up the race as a series</h2>
+      <p class="lead-in">Four moves. The setting-up is the philosophy, and the arithmetic is only the check.</p>
+      <ol class="key-ideas method"><li><strong>Write the first gap.</strong> It is the head start. If Achilles runs 100 metres to reach the starting place, then <span class="math" data-say="A equals 100">a = 100</span>.</li><li><strong>Find the ratio from the speeds.</strong> While Achilles runs a gap, the tortoise runs that gap times its speed over his. That fraction is <span class="math" data-say="r">r</span>, and it does not change from stage to stage.</li><li><strong>Sum the series, or find that it has no sum.</strong> If <span class="math" data-say="r">r</span> is below 1, the limit is <span class="math" data-say="A over the quantity 1 minus r">a / (1 − r)</span>. If <span class="math" data-say="r">r</span> is 1 or more, the gaps do not shrink, and the series has no limit.</li><li><strong>Interpret the limit.</strong> A limit is the distance Achilles has run when he draws level. A series with no limit means the gap never closes.</li><li><strong>Name the exit and its price.</strong> The stated premises are true, and the step to the conclusion borrows one that is not: that a list with no last stage goes on for ever. Fault the step, or state that premise and deny it; the repair is the same, and its price is small.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1509,16 @@ limit = 100 / (1 − 1/10) = 1000/9
 check: 10t = 100 + t gives t = 100/9, run = 1000/9</div><p>The series and the equation give the same answer, as they must. Achilles passes the tortoise at <span class="math" data-say="1000 over 9">1000/9</span> metres from where he began, about 111.1, at <span class="math" data-say="100 over 9">100/9</span> seconds. Every stage of Zeno's list falls before that point.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Concluding that Achilles never catches the tortoise because the gaps never reach zero</strong><span>The gaps never reach zero, and that is true. What it does not give is that he never draws level. The gaps sum to <span class="math" data-say="1000 over 9">1000/9</span> metres, and Achilles reaches that point and goes on. The meeting is the limit of the stages, and it is not any stage. It is like the end of a road that has infinitely many milestones.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trusting the paradox&#x27;s form to decide the race</strong><span>The same form, the same infinite list of positive gaps, describes the equal-speed race in which the tortoise does stay ahead. The form cannot tell the two apart and the ratio can. Look at <span class="math" data-say="r">r</span>, not at the number of stages.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing up the two speed ratios</strong><span>The ratio of the series is the tortoise's speed over Achilles', which is below 1 when he is faster. Dividing the other way gives 10, a series of growing gaps, and a limit that does not exist for a race that clearly ends.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can set up a race as a series and compute where it ends.</strong><p>Given a head start and two speeds, you should be able to write the first gap and the ratio, state the limit of the gaps as an exact fraction or say that there is none, check it against the equation for the meeting time, and say which exit the result takes, naming the unstated premise it denies.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The race is a paradox whose exit is settled by a computation, which is unusual. The lesson that follows keeps the series and removes the speeds, and finds a case in which the sum is finite and the question being asked still has no answer.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Concluding that Achilles never catches the tortoise because the gaps never reach zero</strong><span>The gaps never reach zero, and that is true. What it does not give is that he never draws level. The gaps sum to <span class="math" data-say="1000 over 9">1000/9</span> metres, and Achilles reaches that point and goes on. The meeting is the limit of the stages, and it is not any stage. It is like the end of a road that has infinitely many milestones.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trusting the paradox&#x27;s form to decide the race</strong><span>The same form, the same infinite list of positive gaps, describes the equal-speed race in which the tortoise does stay ahead. The form cannot tell the two apart and the ratio can. Look at <span class="math" data-say="r">r</span>, not at the number of stages.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing up the two speed ratios</strong><span>The ratio of the series is the tortoise's speed over Achilles', which is below 1 when he is faster. Dividing the other way gives 10, a series of growing gaps, and a limit that does not exist for a race that clearly ends.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can set up a race as a series and compute where it ends.</strong><p>Given a head start and two speeds, you should be able to write the first gap and the ratio, state the limit of the gaps as an exact fraction or say that there is none, check it against the equation for the meeting time, and say which exit the result takes, naming the unstated premise it denies.</p></div></div><div class="note"><strong>Note:</strong> The race is a paradox whose exit is settled by a computation, which is unusual. The lesson that follows keeps the series and removes the speeds, and finds a case in which the sum is finite and the question being asked still has no answer.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Each gap is the last gap times the speed ratio</summary><p>While Achilles covers a gap, the tortoise covers that gap times the ratio of its speed to his. So the next gap is the last times <span class="math" data-say="r">r</span>, and the gaps form a geometric series with that ratio.</p></details><details class="recall"><summary>The sum of the gaps is how far Achilles runs</summary><p>He runs each gap in turn, and the total of the gaps is the distance he has run when he draws level. If the series has a limit, that limit is the meeting point.</p></details><details class="recall"><summary>The ratio decides whether there is a meeting</summary><p>For a ratio below 1 the sum is finite, and Achilles passes the tortoise. For a ratio of 1 or more the gaps do not shrink, the series has no limit, and he never does. The paradox's form is the same in both.</p></details></div>
+      <h3>Summary</h3>
       <p>Achilles runs ten times as fast as a tortoise that has a head start. Each time he reaches where the tortoise was, it has moved on, so the gaps shrink and never reach zero. The gaps are a geometric series with ratio the speed ratio. The lab sums them and finds the limit, 1000/9, which is where Achilles passes the tortoise, and it finds no limit when the speeds are equal.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Each gap is the last gap times the speed ratio.</strong> While Achilles covers a gap, the tortoise covers that gap times the ratio of its speed to his. So the next gap is the last times <span class="math" data-say="r">r</span>, and the gaps form a geometric series with that ratio.</li><li><strong>The sum of the gaps is how far Achilles runs.</strong> He runs each gap in turn, and the total of the gaps is the distance he has run when he draws level. If the series has a limit, that limit is the meeting point.</li><li><strong>The ratio decides whether there is a meeting.</strong> For a ratio below 1 the sum is finite, and Achilles passes the tortoise. For a ratio of 1 or more the gaps do not shrink, the series has no limit, and he never does. The paradox's form is the same in both.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="gaps, 100, 10, 1, 1 over 10. ratio r equals tortoise speed over Achilles speed. total run equals 100 over the quantity 1 minus r. r equals 1 over 10 gives 1000 over 9, r equals 1 gives none. gaps never reach 0, their sum is finite" tabindex="0" role="region" aria-label="Mathematical notation">gaps: 100, 10, 1, 1/10, ...
 ratio r = tortoise speed / Achilles speed
 total run = 100 / (1 − r)
@@ -2152,11 +2197,40 @@ gaps never reach 0; their sum is finite</div><figcaption>A race with endless gap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2224,7 +2298,7 @@ gaps never reach 0; their sum is finite</div><figcaption>A race with endless gap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

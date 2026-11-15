@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Randomised Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Randomness inside the structure</p>
       <h1>Skip Lists</h1>
       <p class="lesson-lede">Let each element choose its own number of express lanes by flipping a coin, then count the hops a search actually takes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Express lanes, each about half the one below</li><li>A level is chosen once, locally, and never revisited</li><li>The printed curve is a reference, not a count and not a bound</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A structure with no invariant to maintain</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A skip list</span><p>A <strong>skip list</strong> on a sorted set of keys is a sequence of linked lists <span class="math" data-say="L sub 0 is a superset of L sub 1 is a superset of L sub 2 is a superset of and so on">L₀ ⊇ L₁ ⊇ L₂ ⊇ …</span>. <span class="math" data-say="L sub 0">L₀</span> contains every key. Each key in <span class="math" data-say="L sub k">Lₖ</span> appears in <span class="math" data-say="L sub k plus 1">Lₖ₊₁</span> with probability <span class="math" data-say="1 over 2">1/2</span>, independently of every other key. A key's <strong>level</strong> is the highest list it appears in.</p></div><p>Equivalently, and this is how the lab builds it: each key reads the coin tape at its own position and takes the length of the run of heads there as its level. The tape is the reader's, chosen by a seed, so the structure is reproducible without being fixed &mdash; and the coins come from the prime-modulus stream, because the low bit of a power-of-two-modulus generator is not a coin and a structure built from one would have levels that repeat on a short cycle.</p><div class="defbox"><span class="label">Definition &middot; The search</span><p>To find a target, start at the leftmost node of the highest level. Repeatedly: if the next node at this level exists and its key is not greater than the target, move to it; otherwise drop one level. Stop at level 0. Each move and each drop is a <strong>hop</strong>, and the hops are what the lab counts.</p></div><div class="example"><span class="label">Example &middot; Sixteen keys from one tape</span><p>Keys <span class="math" data-say="10">10</span> to <span class="math" data-say="160">160</span>. The tape gives levels <span class="math" data-say="1, 1, 2, 0, 0, 4, 0, 1, 0, 0, 1, 4, 1, 0, 1, 1">1, 1, 2, 0, 0, 4, 0, 1, 0, 0, 1, 4, 1, 0, 1, 1</span>, so 10 of the 16 keys reach at least level 1 and two reach level 4. Searching for key 120, which is at level 4, takes 2 hops; searching for key 100, which is at level 0 and is the second of two consecutive level-0 keys, takes 8. The mean over all sixteen searches is <span class="math" data-say="77 over 16 equals 4.813">77/16 = 4.813</span> and the worst is 8.</p></div><p>Those two searches are the lesson in miniature. Key 120 is one of the two tallest nodes, so the top-level walk reaches it in two hops. Key 100 has level 0 and must be reached by descending all the way and walking, so it costs 8. Same structure, same tape, a factor of four between two lookups &mdash; and the mean of the sixteen is a fraction, because a mean of integers is.</p><h3>The level table, and where the halving is visible</h3><div class="mathblock" data-say="level, keys whose top level is this, keys present at this level, n over 2 to the power the quantity k plus 1. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation"> level   keys whose top level is this   keys present at this level   n/2^(k+1)
-   L0                 6                            16                 8.00
-   L1                 7                            10                 4.00
-   L2                 1                             3                 2.00
-   L3                 0                             2                 1.00
-   L4                 2                             2                 0.50</div><p>The right-hand column is what the geometric cascade predicts and the middle column is what this tape produced. They are in the same neighbourhood and they are not equal: 10 keys present at level 1 against a predicted 8, and 2 at level 4 against a predicted <span class="math" data-say="0.5">0.5</span>. Level 3 is the row worth staring at &mdash; no key has 3 as its top level, and two keys are nevertheless present there, because a key at level 4 appears at every level below it.</p><p>That distinction between &ldquo;top level is <span class="math" data-say="k">k</span>&rdquo; and &ldquo;present at level <span class="math" data-say="k">k</span>&rdquo; is the commonest confusion in reading a skip list, and it is why the panel prints both columns. The first is a partition of the keys and adds to <span class="math" data-say="n">n</span>; the second is a nested family and decreases as <span class="math" data-say="k">k</span> grows.</p><h3>What is guaranteed, and what the dashed curve is doing</h3><p>The expected number of levels is <span class="math" data-say="big O of log n">O(log n)</span> and the expected search cost is <span class="math" data-say="big O of log n">O(log n)</span> as well: at each level the walk passes a constant number of nodes in expectation before dropping, because the probability that the next node is present one level up is a half. This course does not prove a concentration result around that expectation &mdash; the tail bound needed is a Chernoff bound and this course excludes it &mdash; so what is available is an expectation and the counts on screen.</p><p>So the panel draws <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> as a dashed reference and labels it. At sixteen keys it reads <span class="math" data-say="8.000">8.000</span> and the counted mean is <span class="math" data-say="4.813">4.813</span>; at eight keys it reads <span class="math" data-say="6.000">6.000</span> and a different tape counted <span class="math" data-say="3.250">3.250</span>. The curve is not a bound, not an asymptote that has been proved here, and not a prediction; it is a familiar shape to read the counted points against, and the panel says so in those terms.</p><p>The search cost is also a random variable in the same way a treap's depth is, and for the same reason: the coins belong to the structure. A worst case of 8 hops on sixteen keys is this tape's worst case, and another tape gives another. Nothing here bounds it, and the honest statement is the one the panel makes &mdash; the mean is <span class="math" data-say="77 over 16">77/16</span>, the worst observed is 8, and both are counts on the structure drawn above them.</p><h3>The trade against a balanced tree</h3><p>An AVL tree guarantees a height, always, and pays with a stored height per node, a case analysis over four rotation shapes, and a rebalancing pass on every insertion and deletion. A skip list guarantees an expectation, and pays with nothing at all: an insertion writes a few pointers at the levels the coin chose, and no other node is touched. There is no global structure to maintain, which is the whole point of the design.</p><p>That absence is also what makes a skip list easy to get right and easy to make concurrent, and it is what makes its worst case unbounded. Which of those matters more is a question about the system rather than about the structure &mdash; the same question Universal Hashing asked about whether anyone can choose your keys.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Skip lists: randomness instead of rebalancing</h2></div><p>Each key picks its own level from a coin, and nothing is ever rebuilt</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A structure with no invariant to maintain</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A skip list</span><p>A <strong>skip list</strong> on a sorted set of keys is a sequence of linked lists <span class="math" data-say="L sub 0 is a superset of L sub 1 is a superset of L sub 2 is a superset of and so on">L₀ ⊇ L₁ ⊇ L₂ ⊇ …</span>. <span class="math" data-say="L sub 0">L₀</span> contains every key. Each key in <span class="math" data-say="L sub k">Lₖ</span> appears in <span class="math" data-say="L sub k plus 1">Lₖ₊₁</span> with probability <span class="math" data-say="1 over 2">1/2</span>, independently of every other key. A key's <strong>level</strong> is the highest list it appears in.</p></div><p>Equivalently, and this is how the lab builds it: each key reads the coin tape at its own position and takes the length of the run of heads there as its level. The tape is the reader's, chosen by a seed, so the structure is reproducible without being fixed &mdash; and the coins come from the prime-modulus stream, because the low bit of a power-of-two-modulus generator is not a coin and a structure built from one would have levels that repeat on a short cycle.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Skip lists: randomness instead of rebalancing</h2></div><p>Each key picks its own level from a coin, and nothing is ever rebuilt</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Express lanes from a coin tape</strong><span>hops counted, against a reference curve that is not a count</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the search path</span><span class="tone-amber"><i class="legend-swatch"></i>2 log2 n, a reference curve</span></div>
@@ -1411,10 +1449,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tsTable"></table></div>
       <div class="status-banner" id="tsStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Fix the tape, then count the hops a search takes</h3>
-          <p>Every level is the run of heads at that key's place on the tape, chosen once and never revisited, and every hop is counted by walking the list. The dashed <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> beside the counted points is a reference curve: it is sampled at double precision and no verdict on this page is read off it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Fix the tape, then count the hops a search takes</h3>
+            <p>Every level is the run of heads at that key's place on the tape, chosen once and never revisited, and every hop is counted by walking the list. The dashed <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> beside the counted points is a reference curve: it is sampled at double precision and no verdict on this page is read off it.</p>
         <div class="field" id="tsPresetField">
           <label for="tsPreset">Worked example</label>
           <select id="tsPreset"><option value="sixteen" selected>sixteen keys from one coin tape</option><option value="eight">eight keys, so every level is readable</option><option value="thirty">thirty keys</option></select>
@@ -1441,12 +1479,20 @@
         </div>
         <p class="small-copy" id="tsHint" style="margin:0;">The tape is the reader's: a key's level is the run of heads at its place on it, chosen once at insertion and never revisited. The low bit of a power-of-two-modulus generator is not a coin, so the tape comes from the prime-modulus stream where it is one.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The search</span><p>To find a target, start at the leftmost node of the highest level. Repeatedly: if the next node at this level exists and its key is not greater than the target, move to it; otherwise drop one level. Stop at level 0. Each move and each drop is a <strong>hop</strong>, and the hops are what the lab counts.</p></div><div class="example"><span class="label">Example &middot; Sixteen keys from one tape</span><p>Keys <span class="math" data-say="10">10</span> to <span class="math" data-say="160">160</span>. The tape gives levels <span class="math" data-say="1, 1, 2, 0, 0, 4, 0, 1, 0, 0, 1, 4, 1, 0, 1, 1">1, 1, 2, 0, 0, 4, 0, 1, 0, 0, 1, 4, 1, 0, 1, 1</span>, so 10 of the 16 keys reach at least level 1 and two reach level 4. Searching for key 120, which is at level 4, takes 2 hops; searching for key 100, which is at level 0 and is the second of two consecutive level-0 keys, takes 8. The mean over all sixteen searches is <span class="math" data-say="77 over 16 equals 4.813">77/16 = 4.813</span> and the worst is 8.</p></div><p>Those two searches are the lesson in miniature. Key 120 is one of the two tallest nodes, so the top-level walk reaches it in two hops. Key 100 has level 0 and must be reached by descending all the way and walking, so it costs 8. Same structure, same tape, a factor of four between two lookups &mdash; and the mean of the sixteen is a fraction, because a mean of integers is.</p><h3>The level table, and where the halving is visible</h3><div class="mathblock" data-say="level, keys whose top level is this, keys present at this level, n over 2 to the power the quantity k plus 1. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation"> level   keys whose top level is this   keys present at this level   n/2^(k+1)
+   L0                 6                            16                 8.00
+   L1                 7                            10                 4.00
+   L2                 1                             3                 2.00
+   L3                 0                             2                 1.00
+   L4                 2                             2                 0.50</div><p>The right-hand column is what the geometric cascade predicts and the middle column is what this tape produced. They are in the same neighbourhood and they are not equal: 10 keys present at level 1 against a predicted 8, and 2 at level 4 against a predicted <span class="math" data-say="0.5">0.5</span>. Level 3 is the row worth staring at &mdash; no key has 3 as its top level, and two keys are nevertheless present there, because a key at level 4 appears at every level below it.</p><p>That distinction between &ldquo;top level is <span class="math" data-say="k">k</span>&rdquo; and &ldquo;present at level <span class="math" data-say="k">k</span>&rdquo; is the commonest confusion in reading a skip list, and it is why the panel prints both columns. The first is a partition of the keys and adds to <span class="math" data-say="n">n</span>; the second is a nested family and decreases as <span class="math" data-say="k">k</span> grows.</p><h3>What is guaranteed, and what the dashed curve is doing</h3><p>The expected number of levels is <span class="math" data-say="big O of log n">O(log n)</span> and the expected search cost is <span class="math" data-say="big O of log n">O(log n)</span> as well: at each level the walk passes a constant number of nodes in expectation before dropping, because the probability that the next node is present one level up is a half. This course does not prove a concentration result around that expectation &mdash; the tail bound needed is a Chernoff bound and this course excludes it &mdash; so what is available is an expectation and the counts on screen.</p><p>So the panel draws <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> as a dashed reference and labels it. At sixteen keys it reads <span class="math" data-say="8.000">8.000</span> and the counted mean is <span class="math" data-say="4.813">4.813</span>; at eight keys it reads <span class="math" data-say="6.000">6.000</span> and a different tape counted <span class="math" data-say="3.250">3.250</span>. The curve is not a bound, not an asymptote that has been proved here, and not a prediction; it is a familiar shape to read the counted points against, and the panel says so in those terms.</p><p>The search cost is also a random variable in the same way a treap's depth is, and for the same reason: the coins belong to the structure. A worst case of 8 hops on sixteen keys is this tape's worst case, and another tape gives another. Nothing here bounds it, and the honest statement is the one the panel makes &mdash; the mean is <span class="math" data-say="77 over 16">77/16</span>, the worst observed is 8, and both are counts on the structure drawn above them.</p><h3>The trade against a balanced tree</h3><p>An AVL tree guarantees a height, always, and pays with a stored height per node, a case analysis over four rotation shapes, and a rebalancing pass on every insertion and deletion. A skip list guarantees an expectation, and pays with nothing at all: an insertion writes a few pointers at the levels the coin chose, and no other node is touched. There is no global structure to maintain, which is the whole point of the design.</p><p>That absence is also what makes a skip list easy to get right and easy to make concurrent, and it is what makes its worst case unbounded. Which of those matters more is a question about the system rather than about the structure &mdash; the same question Universal Hashing asked about whether anyone can choose your keys.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a randomised structure by walking it</h2></div><p>Count the hops. Then ask what the count is a count of.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the level of each key from the tape, not from the drawing</h3><p>A key's level is the run of heads at its position. That is the only input to the shape, and it means the structure can be rebuilt from the seed alone &mdash; which is what makes every number on the page reproducible.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Separate “top level is k” from “present at level k”</h3><p>The first partitions the keys and adds to <span class="math" data-say="n">n</span>; the second is nested and decreases. The panel prints both, and the level-3 row of the opening tape has 0 in the first column and 2 in the second.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Search two keys that differ in level</h3><p>A tall key is found from the top in a couple of hops; a level-0 key behind a tall one costs the descent and the walk. On the opening tape those are 2 hops and 8, and the spread is what the mean is a mean of.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the dashed curve as a shape, not a value</h3><p><span class="math" data-say="2 times log base 2 n">2 log₂ n</span> reads <span class="math" data-say="8.000">8.000</span> at sixteen keys where the counted mean is <span class="math" data-say="4.813">4.813</span>. It is there to show the counted points growing like a logarithm. Nothing on the page is decided by it and the panel says so.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a randomised structure by walking it</h2>
+      <p class="lead-in">Count the hops. Then ask what the count is a count of.</p>
+      <ol class="key-ideas method"><li><strong>Read the level of each key from the tape, not from the drawing.</strong> A key's level is the run of heads at its position. That is the only input to the shape, and it means the structure can be rebuilt from the seed alone &mdash; which is what makes every number on the page reproducible.</li><li><strong>Separate “top level is k” from “present at level k”.</strong> The first partitions the keys and adds to <span class="math" data-say="n">n</span>; the second is nested and decreases. The panel prints both, and the level-3 row of the opening tape has 0 in the first column and 2 in the second.</li><li><strong>Search two keys that differ in level.</strong> A tall key is found from the top in a couple of hops; a level-0 key behind a tall one costs the descent and the walk. On the opening tape those are 2 hops and 8, and the spread is what the mean is a mean of.</li><li><strong>Read the dashed curve as a shape, not a value.</strong> <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> reads <span class="math" data-say="8.000">8.000</span> at sixteen keys where the counted mean is <span class="math" data-say="4.813">4.813</span>. It is there to show the counted points growing like a logarithm. Nothing on the page is decided by it and the panel says so.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1516,16 @@ hops     4   5   3   6   7   1   6   5   7   8   6   2   3   5   4   5
   dearest search:  key 100, at L0, eight hops</div><p>Key 60 costs one hop and key 100 costs eight, and both are in the same structure. The mean <span class="math" data-say="77 over 16">77/16</span> is an exact fraction because it is the average of sixteen integers, and it is not the cost of any search: no lookup costs <span class="math" data-say="4.8125">4.8125</span> hops. That is the same distinction as everywhere else on this course, arriving here as an average over queries rather than over seeds.</p><p>The counted mean sits well below the dashed <span class="math" data-say="8.000">8.000</span>. Do not read that as the structure beating its bound &mdash; <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> is not a bound, and at <span class="math" data-say="n equals 8">n = 8</span> on another tape the counted mean was <span class="math" data-say="3.250">3.250</span> against a reference of <span class="math" data-say="6.000">6.000</span>. The curve is a shape, the points are counts, and the panel keeps them in different colours for that reason.</p><p>For a faded rehearsal, move the tape seed and predict what happens to the level column before the page redraws. The supplied first move is this: each key's level is read from its own position on the tape, so a new tape gives new levels for every key at once. Say whether the number promoted above level 0 should stay near half of 16, then check several seeds &mdash; and then say why changing <span class="math" data-say="n">n</span> instead leaves the existing keys' levels alone.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the counted mean against the dashed curve as a pass or a fail</strong><span><span class="math" data-say="77 over 16 equals 4.813">77/16 = 4.813</span> against <span class="math" data-say="2 times log base 2 16 equals 8.000">2 log₂ 16 = 8.000</span> is not the structure beating a bound, because the curve is not a bound. It is a familiar logarithmic shape drawn so that the counted points can be seen growing like one. The panel colours it differently and labels it for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing a key&#x27;s top level with the levels it occupies</strong><span>A level-4 key is present at five levels. The partition column and the presence column answer different questions and only the first adds to <span class="math" data-say="n">n</span>; on the opening tape they differ most visibly at level 3, where the first is 0 and the second is 2.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a bound on the worst search</strong><span>There is none. The worst search on the opening tape costs 8 hops on sixteen keys, another tape gives another number, and nothing in the structure prevents a tape that promotes nothing at all. If a worst case must be bounded, the structure to use is one that enforces an invariant.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a skip list from a coin tape and count a search by walking it.</strong><p>You should be able to read each key's level off the tape, describe the search as move-right-or-drop, count its hops, distinguish top level from presence at a level, and say what the dashed curve is and is not.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The last two lessons of this course spend randomness on space rather than on shape. A Bloom filter answers set membership in a few bits per key by accepting a false positive rate it can compute exactly, and &ldquo;The Count-Min Sketch&rdquo; estimates frequencies in a fixed grid of counters with a guarantee that is Markov's inequality applied once per row.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the counted mean against the dashed curve as a pass or a fail</strong><span><span class="math" data-say="77 over 16 equals 4.813">77/16 = 4.813</span> against <span class="math" data-say="2 times log base 2 16 equals 8.000">2 log₂ 16 = 8.000</span> is not the structure beating a bound, because the curve is not a bound. It is a familiar logarithmic shape drawn so that the counted points can be seen growing like one. The panel colours it differently and labels it for exactly this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing a key&#x27;s top level with the levels it occupies</strong><span>A level-4 key is present at five levels. The partition column and the presence column answer different questions and only the first adds to <span class="math" data-say="n">n</span>; on the opening tape they differ most visibly at level 3, where the first is 0 and the second is 2.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a bound on the worst search</strong><span>There is none. The worst search on the opening tape costs 8 hops on sixteen keys, another tape gives another number, and nothing in the structure prevents a tape that promotes nothing at all. If a worst case must be bounded, the structure to use is one that enforces an invariant.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a skip list from a coin tape and count a search by walking it.</strong><p>You should be able to read each key's level off the tape, describe the search as move-right-or-drop, count its hops, distinguish top level from presence at a level, and say what the dashed curve is and is not.</p></div></div><div class="note"><strong>Note:</strong> The last two lessons of this course spend randomness on space rather than on shape. A Bloom filter answers set membership in a few bits per key by accepting a false positive rate it can compute exactly, and &ldquo;The Count-Min Sketch&rdquo; estimates frequencies in a fixed grid of counters with a guarantee that is Markov's inequality applied once per row.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Express lanes, each about half the one below</summary><p>Level 0 is the sorted list of every key. A key appears at level <span class="math" data-say="k plus 1">k + 1</span> with probability a half, independently, so level <span class="math" data-say="k">k</span> holds about <span class="math" data-say="n over 2 to the power k plus 1">n/2ᵏ⁺¹</span> keys and the levels form a geometric cascade. A search starts at the top left, moves right while the next key does not overshoot the target, and drops a level when it does. Each drop roughly halves the interval that remains to be searched.</p></details><details class="recall"><summary>A level is chosen once, locally, and never revisited</summary><p>When a key is inserted it flips a coin until it comes up tails; the number of heads is its top level. That decision involves no other key, no global counter and no rebalancing, and it is never changed. The lab shows this directly: change <span class="math" data-say="n">n</span> and the existing keys' levels do not move, because each one was decided from that key's own place on the tape.</p></details><details class="recall"><summary>The printed curve is a reference, not a count and not a bound</summary><p>The expected search cost is <span class="math" data-say="big O of log n">O(log n)</span>, and the panel draws <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> as a dashed curve beside the hops it counted. That curve is sampled at double precision, no verdict is read off it, and at sixteen keys on this tape it reads <span class="math" data-say="8.000">8.000</span> where the counted mean is <span class="math" data-say="77 over 16 equals 4.813">77/16 = 4.813</span>. The counted number is the one this page computed.</p></details></div>
+      <h3>Summary</h3>
       <p>A skip list is a sorted linked list with express lanes above it. Each element picks its top lane when it is inserted, by flipping a coin until it comes up tails, and nothing is ever rebalanced. On the lab's opening tape, 10 of 16 keys reach at least the first express lane, the tallest reaches the fifth, and a search costs <span class="math" data-say="77 over 16">77/16</span> hops on average with a worst case of 8 &mdash; against a reference curve of <span class="math" data-say="2 times log base 2 n equals 8.000">2 log₂ n = 8.000</span>, which is not a count.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Express lanes, each about half the one below.</strong> Level 0 is the sorted list of every key. A key appears at level <span class="math" data-say="k plus 1">k + 1</span> with probability a half, independently, so level <span class="math" data-say="k">k</span> holds about <span class="math" data-say="n over 2 to the power k plus 1">n/2ᵏ⁺¹</span> keys and the levels form a geometric cascade. A search starts at the top left, moves right while the next key does not overshoot the target, and drops a level when it does. Each drop roughly halves the interval that remains to be searched.</li><li><strong>A level is chosen once, locally, and never revisited.</strong> When a key is inserted it flips a coin until it comes up tails; the number of heads is its top level. That decision involves no other key, no global counter and no rebalancing, and it is never changed. The lab shows this directly: change <span class="math" data-say="n">n</span> and the existing keys' levels do not move, because each one was decided from that key's own place on the tape.</li><li><strong>The printed curve is a reference, not a count and not a bound.</strong> The expected search cost is <span class="math" data-say="big O of log n">O(log n)</span>, and the panel draws <span class="math" data-say="2 times log base 2 n">2 log₂ n</span> as a dashed curve beside the hops it counted. That curve is sampled at double precision, no verdict is read off it, and at sixteen keys on this tape it reads <span class="math" data-say="8.000">8.000</span> where the counted mean is <span class="math" data-say="77 over 16 equals 4.813">77/16 = 4.813</span>. The counted number is the one this page computed.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="level 0 is the whole sorted list, level k plus 1 holds about half of level k. each key&#x27;s top level is the run of heads at its place on the tape. search, go right while the next key is not past the target, else drop a level. 16 keys, one tape, 10 promoted, tallest L 4, mean hops 77 over 16, worst 8. 2 times log base 2 n equals 8.000 is a REFERENCE CURVE, not a count and not a bound. nothing is rebuilt, every level decision is local and permanent" tabindex="0" role="region" aria-label="Mathematical notation">level 0 is the whole sorted list; level k+1 holds about half of level k
 each key&#x27;s top level is the run of heads at its place on the tape
 search: go right while the next key is not past the target, else drop a level
@@ -2955,11 +3000,40 @@ nothing is rebuilt: every level decision is local and permanent</div><figcaption
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3027,7 +3101,7 @@ nothing is rebuilt: every level decision is local and permanent</div><figcaption
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

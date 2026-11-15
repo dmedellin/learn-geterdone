@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Biases a measurement adds</p>
       <h1>Scrape Intervals and What They Cannot See</h1>
       <p class="lesson-lede">Compute the probability a spike of a given duration is caught at a given scrape interval, and the longest spike that can hide entirely.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A scrape is a sample of an instant, not a summary of an interval</li><li>A spike is caught only if a read lands inside it</li><li>A counter that went down is the only trace of a restart</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The catch probability, the invisible spike, and the counter that went backwards</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Scrape interval</span><p>The <strong>scrape interval</strong> <span class="math" data-say="I">I</span> is the period at which a monitoring system reads a target&rsquo;s current metric values. For a gauge, the value recorded is the one in effect at the instant of the read. For a counter, what is stored is the running total, and a <strong>rate</strong> is computed as the difference between two reads divided by the time between them.</p></div><div class="thm"><span class="label">Theorem &middot; The probability of catching a spike</span><p>Let a spike of duration <span class="math" data-say="d">d</span> begin at a time uniformly distributed relative to the scrape clock, and let reads occur every <span class="math" data-say="I">I</span>. If <span class="math" data-say="d is at least I">d ≥ I</span> at least one read falls inside the spike and it is caught with certainty. If <span class="math" data-say="d is less than I">d &lt; I</span> the spike covers a fraction <span class="math" data-say="d over I">d/I</span> of the scrape cycle, so</p><p><span class="math" data-say="P of caught equals the min of 1 and d over I">P(caught) = min(1, d/I)</span>.</p><p>The assumption is the uniformity. It fails exactly when the spike is produced by something on a clock of its own &mdash; a cron job, a flush every sixty seconds, or the scrape itself &mdash; in which case the phase is fixed and the probability is not <span class="math" data-say="d over I">d/I</span> but zero or one, permanently.</p></div><p>That failure mode is worth more than the formula. A spike that is always missed is indistinguishable from no spike, and a periodic job whose period shares a factor with the scrape interval produces exactly that. If a graph is suspiciously flat, changing the interval to a value coprime with your suspicions is a cheap experiment.</p><div class="mathblock" data-say="I equals 15 seconds, d equals 3 seconds. P of caught equals 3 over 15 equals 1 over 5 equals 20 percent. so four spikes in five leave no trace at all. longest spike that can fall entirely between two reads. a spike of d seconds contains a read unless it fits strictly. inside one gap, which needs d is at most I minus 1 at one-second resolution. I equals 15 seconds, goes to, 14 seconds. I equals 60 seconds, goes to, 59 seconds. I equals, 1 seconds, goes to, 0 seconds, nothing can hide" tabindex="0" role="region" aria-label="Mathematical notation">I = 15 s,  d = 3 s
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The catch probability, the invisible spike, and the counter that went backwards</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Scrape interval</span><p>The <strong>scrape interval</strong> <span class="math" data-say="I">I</span> is the period at which a monitoring system reads a target&rsquo;s current metric values. For a gauge, the value recorded is the one in effect at the instant of the read. For a counter, what is stored is the running total, and a <strong>rate</strong> is computed as the difference between two reads divided by the time between them.</p></div><div class="thm"><span class="label">Theorem &middot; The probability of catching a spike</span><p>Let a spike of duration <span class="math" data-say="d">d</span> begin at a time uniformly distributed relative to the scrape clock, and let reads occur every <span class="math" data-say="I">I</span>. If <span class="math" data-say="d is at least I">d ≥ I</span> at least one read falls inside the spike and it is caught with certainty. If <span class="math" data-say="d is less than I">d &lt; I</span> the spike covers a fraction <span class="math" data-say="d over I">d/I</span> of the scrape cycle, so</p><p><span class="math" data-say="P of caught equals the min of 1 and d over I">P(caught) = min(1, d/I)</span>.</p><p>The assumption is the uniformity. It fails exactly when the spike is produced by something on a clock of its own &mdash; a cron job, a flush every sixty seconds, or the scrape itself &mdash; in which case the phase is fixed and the probability is not <span class="math" data-say="d over I">d/I</span> but zero or one, permanently.</p></div><p>That failure mode is worth more than the formula. A spike that is always missed is indistinguishable from no spike, and a periodic job whose period shares a factor with the scrape interval produces exactly that. If a graph is suspiciously flat, changing the interval to a value coprime with your suspicions is a cheap experiment.</p><div class="mathblock" data-say="I equals 15 seconds, d equals 3 seconds. P of caught equals 3 over 15 equals 1 over 5 equals 20 percent. so four spikes in five leave no trace at all. longest spike that can fall entirely between two reads. a spike of d seconds contains a read unless it fits strictly. inside one gap, which needs d is at most I minus 1 at one-second resolution. I equals 15 seconds, goes to, 14 seconds. I equals 60 seconds, goes to, 59 seconds. I equals, 1 seconds, goes to, 0 seconds, nothing can hide" tabindex="0" role="region" aria-label="Mathematical notation">I = 15 s,  d = 3 s
 
 P(caught) = 3/15 = 1/5 = 20%
 so four spikes in five leave no trace at all
@@ -1402,22 +1446,11 @@ longest spike that can fall entirely between two reads:
 
   I = 15 s  →  14 s
   I = 60 s  →  59 s
-  I =  1 s  →   0 s      nothing can hide</div><p>Fourteen seconds is the figure to carry away. At the default fifteen-second interval that most monitoring is configured with, an outage lasting a quarter of a minute can leave a completely flat graph, and the graph is not lying: it is reporting every value it was given.</p><h3>One run is not the probability</h3><p>The lab draws a run of spikes at seeded times across five minutes and lays the scrape instants over them. At <span class="math" data-say="d equals 3">d = 3</span> and <span class="math" data-say="I equals 15">I = 15</span> the expected fraction caught is a fifth, and the fraction actually caught on a given run is some other number near it &mdash; which is what a single afternoon of monitoring is. Reseed and it changes; the probability does not.</p><p>This is the same distinction the first page of the course made about a measured ratio, arriving in a different costume. <span class="math" data-say="1 over 5">1/5</span> is a property of the configuration; &ldquo;we caught three of twelve yesterday&rdquo; is a measurement with its own error bar, and twelve spikes is a very small sample.</p><div class="example"><span class="label">Example &middot; A quarter-minute outage that nothing recorded</span><p>A service fails hard for twelve seconds and recovers. The scrape interval is fifteen seconds; the outage happens to start two seconds after a read and end one second before the next. Error-rate gauges read zero on both sides. The request counter, being cumulative, does carry the missing successes &mdash; a dip in the computed rate that is real and easy to dismiss &mdash; but every gauge-based panel and every alert built on one saw a healthy system throughout. Users saw twelve seconds of errors.</p></div><h3>The second thing the interval hides: a counter that reset</h3><p>Counters only go up, so monitoring systems compute rates by differencing consecutive reads. A process restart sets the counter back to zero, and the restart itself happens between two reads where nothing can observe it. The only evidence is that the second read is smaller than the first, and a naive difference turns that into a spectacular negative rate.</p><div class="mathblock" data-say="a counter climbing at 40 per second, read every 15 seconds, process restarts at 152 seconds. read at 150 seconds, 40 times 150, equals, 6000. read at 165 seconds, 40 times the quantity 165 minus 152, equals, 520. naive rate, the quantity 520 minus 6000, over 15, equals, negative 365.33 per second. corrected, a decrease means a restart, so take the new read. 520 over 15, equals, plus 34.67 per second. true rate, 40.00 per second. unrecoverable, 40 times the quantity 152 minus 150, equals, 80 increments" tabindex="0" role="region" aria-label="Mathematical notation">a counter climbing at 40/s, read every 15 s, process restarts at 152 s
-
-read at 150 s     40 × 150            =  6 000
-read at 165 s     40 × (165 − 152)    =    520
-
-naive rate        (520 − 6 000)/15    =  −365.33/s
-corrected         a decrease means a restart, so take the new read:
-                  520/15              =   +34.67/s
-
-true rate                                  40.00/s
-unrecoverable     40 × (152 − 150)    =     80 increments</div><p>The corrected rate is 34.67 rather than 40 and the gap is exactly the eighty increments that accumulated between the last read and the restart. They are gone: the process that held them no longer exists, and no correction applied downstream can recover a number nobody read. What the correction buys is a rate that is positive, approximately right, and does not poison every aggregate it feeds.</p><p>Notice how the error behaves if the restart happens earlier in the window. Once the counter has climbed past its previous reading before the next scrape, the difference is positive again and nothing looks wrong at all &mdash; the restart is then completely invisible, and the rate it reports is understated by however much was lost. The large negative number is the friendly case.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Spikes and the interval that reads them</h2></div><p>min(1, d/I), what a flat graph is evidence of, and a counter that went backwards</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  I =  1 s  →   0 s      nothing can hide</div><p>Fourteen seconds is the figure to carry away. At the default fifteen-second interval that most monitoring is configured with, an outage lasting a quarter of a minute can leave a completely flat graph, and the graph is not lying: it is reporting every value it was given.</p><h3>One run is not the probability</h3><p>The lab draws a run of spikes at seeded times across five minutes and lays the scrape instants over them. At <span class="math" data-say="d equals 3">d = 3</span> and <span class="math" data-say="I equals 15">I = 15</span> the expected fraction caught is a fifth, and the fraction actually caught on a given run is some other number near it &mdash; which is what a single afternoon of monitoring is. Reseed and it changes; the probability does not.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Spikes and the interval that reads them</h2></div><p>min(1, d/I), what a flat graph is evidence of, and a counter that went backwards</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>What a scrape interval cannot see</strong><span>min(1, d/I), the longest spike that can hide between two reads, and a counter that restarted</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the true signal</span><span class="tone-amber"><i class="legend-swatch"></i>scrape instants</span><span class="tone-red"><i class="legend-swatch"></i>spikes nobody saw</span></div>
@@ -1426,10 +1459,10 @@ unrecoverable     40 × (152 − 150)    =     80 increments</div><p>The correct
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scCounter"></table></div>
       <div class="status-banner" id="scStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the interval and the spike</h3>
-          <p><span class="math" data-say="the min of 1 and d over I">min(1, d/I)</span> is an exact comparison, not a rounding, and the longest invisible spike follows from the same two numbers. The run of spikes below it is one seeded draw, so the fraction it catches sits near the probability rather than on it. The second table restarts a counter mid-window and shows the naive rate, the corrected rate, and the increments neither of them can recover.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the interval and the spike</h3>
+            <p><span class="math" data-say="the min of 1 and d over I">min(1, d/I)</span> is an exact comparison, not a rounding, and the longest invisible spike follows from the same two numbers. The run of spikes below it is one seeded draw, so the fraction it catches sits near the probability rather than on it. The second table restarts a counter mid-window and shows the naive rate, the corrected rate, and the increments neither of them can recover.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="scI">Scrape interval I (seconds)</label><span class="range-value" id="scIOut">15</span></div>
           <input id="scI" type="range" min="1" max="60" step="1" value="15" />
@@ -1469,12 +1502,25 @@ unrecoverable     40 × (152 − 150)    =     80 increments</div><p>The correct
           <div class="kpi"><span>Corrected rate, and what it loses</span><strong id="scFixed">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="scHint" style="margin:0;">The probability is exact and it is a comparison, not a rounding: d/I capped at one. The run below is one particular set of spike times from a seeded stream, so the fraction it catches is near the probability and not equal to it &mdash; which is what a single afternoon of monitoring is.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This is the same distinction the first page of the course made about a measured ratio, arriving in a different costume. <span class="math" data-say="1 over 5">1/5</span> is a property of the configuration; &ldquo;we caught three of twelve yesterday&rdquo; is a measurement with its own error bar, and twelve spikes is a very small sample.</p><div class="example"><span class="label">Example &middot; A quarter-minute outage that nothing recorded</span><p>A service fails hard for twelve seconds and recovers. The scrape interval is fifteen seconds; the outage happens to start two seconds after a read and end one second before the next. Error-rate gauges read zero on both sides. The request counter, being cumulative, does carry the missing successes &mdash; a dip in the computed rate that is real and easy to dismiss &mdash; but every gauge-based panel and every alert built on one saw a healthy system throughout. Users saw twelve seconds of errors.</p></div><h3>The second thing the interval hides: a counter that reset</h3><p>Counters only go up, so monitoring systems compute rates by differencing consecutive reads. A process restart sets the counter back to zero, and the restart itself happens between two reads where nothing can observe it. The only evidence is that the second read is smaller than the first, and a naive difference turns that into a spectacular negative rate.</p><div class="mathblock" data-say="a counter climbing at 40 per second, read every 15 seconds, process restarts at 152 seconds. read at 150 seconds, 40 times 150, equals, 6000. read at 165 seconds, 40 times the quantity 165 minus 152, equals, 520. naive rate, the quantity 520 minus 6000, over 15, equals, negative 365.33 per second. corrected, a decrease means a restart, so take the new read. 520 over 15, equals, plus 34.67 per second. true rate, 40.00 per second. unrecoverable, 40 times the quantity 152 minus 150, equals, 80 increments" tabindex="0" role="region" aria-label="Mathematical notation">a counter climbing at 40/s, read every 15 s, process restarts at 152 s
+
+read at 150 s     40 × 150            =  6 000
+read at 165 s     40 × (165 − 152)    =    520
+
+naive rate        (520 − 6 000)/15    =  −365.33/s
+corrected         a decrease means a restart, so take the new read:
+                  520/15              =   +34.67/s
+
+true rate                                  40.00/s
+unrecoverable     40 × (152 − 150)    =     80 increments</div><p>The corrected rate is 34.67 rather than 40 and the gap is exactly the eighty increments that accumulated between the last read and the restart. They are gone: the process that held them no longer exists, and no correction applied downstream can recover a number nobody read. What the correction buys is a rate that is positive, approximately right, and does not poison every aggregate it feeds.</p><p>Notice how the error behaves if the restart happens earlier in the window. Once the counter has climbed past its previous reading before the next scrape, the difference is positive again and nothing looks wrong at all &mdash; the restart is then completely invisible, and the rate it reports is understated by however much was lost. The large negative number is the friendly case.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing an interval against the thing you need to see</h2></div><p>Start from the event, not from the default. The interval is a consequence of what you are willing to miss.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the shortest event you need to detect</h3><p>Ten seconds of elevated errors, a two-second pause, a thirty-second queue build-up. Until this is a number, no interval can be defended, and the default of fifteen seconds is a decision somebody else made about your system.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute min(1, d/I) at the interval you have</h3><p>If it is well below one, you are sampling the event rather than observing it, and the graph will be quiet most of the times it happens. Compute <span class="math" data-say="I minus 1">I − 1</span> as well: that is the longest such event that can leave no trace at all.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Prefer a counter to a gauge for anything you must not miss</h3><p>A counter accumulates between reads, so a burst of errors during a gap still shows up in the next difference. A gauge samples an instant and a burst between two instants is gone. Where you must use a gauge, a max-since-last-scrape or a histogram of the interval turns it back into something cumulative.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide what a decrease means before you see one</h3><p>Any rate computation over a counter needs a restart rule. Treat a decrease as a restart and use the new reading as the increment; record that the correction discards whatever accumulated since the previous read, and do not let a negative rate reach an average, a percentile or an alert threshold.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Re-check the phase assumption for anything periodic</h3><p>If the event you are hunting is produced by a scheduled job, <span class="math" data-say="d over I">d/I</span> does not apply: the phase is fixed rather than uniform, and you will either always see it or never see it. Change the interval to something coprime with the job&rsquo;s period and compare.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing an interval against the thing you need to see</h2>
+      <p class="lead-in">Start from the event, not from the default. The interval is a consequence of what you are willing to miss.</p>
+      <ol class="key-ideas method"><li><strong>Name the shortest event you need to detect.</strong> Ten seconds of elevated errors, a two-second pause, a thirty-second queue build-up. Until this is a number, no interval can be defended, and the default of fifteen seconds is a decision somebody else made about your system.</li><li><strong>Compute min(1, d/I) at the interval you have.</strong> If it is well below one, you are sampling the event rather than observing it, and the graph will be quiet most of the times it happens. Compute <span class="math" data-say="I minus 1">I − 1</span> as well: that is the longest such event that can leave no trace at all.</li><li><strong>Prefer a counter to a gauge for anything you must not miss.</strong> A counter accumulates between reads, so a burst of errors during a gap still shows up in the next difference. A gauge samples an instant and a burst between two instants is gone. Where you must use a gauge, a max-since-last-scrape or a histogram of the interval turns it back into something cumulative.</li><li><strong>Decide what a decrease means before you see one.</strong> Any rate computation over a counter needs a restart rule. Treat a decrease as a restart and use the new reading as the increment; record that the correction discards whatever accumulated since the previous read, and do not let a negative rate reach an average, a percentile or an alert threshold.</li><li><strong>Re-check the phase assumption for anything periodic.</strong> If the event you are hunting is produced by a scheduled job, <span class="math" data-say="d over I">d/I</span> does not apply: the phase is fixed rather than uniform, and you will either always see it or never see it. Change the interval to something coprime with the job&rsquo;s period and compare.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1515,17 +1561,16 @@ PART TWO — THE COUNTER
   lost   40 × (152 − 150) = 80 increments, unrecoverable</div><p>Part one is a statement about the configuration and part two is a statement about one event, and they share a cause: everything that happens strictly between two reads is invisible, and only its aftermath is available for inference.</p><p>The 34.67 is worth dwelling on. It is not the true rate, it is not a rounding of the true rate, and the difference from 40 is a known quantity &mdash; eighty increments over fifteen seconds is 5.33/s, and <span class="math" data-say="34.67 plus 5.33 equals 40">34.67 + 5.33 = 40</span>. A correction whose residual you can name is a much better thing to ship than one you cannot.</p><p>For faded practice, set the interval to 10 s and the spike to 4 s, and move the restart to 96 s. The supplied first move is that the catch probability becomes <span class="math" data-say="2 over 5">2/5</span> and the longest invisible spike becomes 9 s. Predict the two counter reads around the restart and both rates before you look, then check, and say which of the two panels changed more when you halved the interval.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a flat graph as a quiet system</strong><span>The graph shows what was sampled. At a fifteen-second interval it is consistent with fourteen seconds of total failure, repeatedly, and with a three-second spike on four out of every five occurrences. Before concluding that nothing happened, compute <span class="math" data-say="d over I">d/I</span> for the shortest event you would have wanted to see.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a shorter interval solves it</strong><span>It raises <span class="math" data-say="d over I">d/I</span> and it never reaches certainty while <span class="math" data-say="d is less than I">d &lt; I</span>; going from fifteen seconds to five turns a one-in-five chance into three in five, which is better and is not detection. It also multiplies the samples per series, which is a direct storage cost computed in &ldquo;Metric Cardinality&rdquo;. The structural answer is a cumulative metric, not a faster gauge.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Letting a negative rate through</strong><span>A restart produces one enormous negative rate, and if it reaches an average it drags a whole dashboard down, while a percentile over rates will place it at the bottom and quietly shift every rank. Decide the restart rule up front, apply it where the difference is taken, and never let the raw difference reach an aggregate.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an interval is chosen from the shortest event you must see, rather than inherited from a default.</strong><p>You should be able to compute <span class="math" data-say="the min of 1 and d over I">min(1, d/I)</span> and <span class="math" data-say="I minus 1">I − 1</span> for any interval, say what a flat graph is and is not evidence of, state when the uniform-phase assumption fails, and turn two counter reads across a restart into a naive rate, a corrected rate and the increments that are gone.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Scraping every instant is one way of not seeing an event; sampling one request in a hundred is another, and it has the more surprising arithmetic. &ldquo;Sampling and Rare Events&rdquo; computes the chance that one per cent sampling catches a ten-request problem &mdash; it is 9.56%, not one per cent &mdash; and the rate it would actually take, which is twenty-six times higher rather than ten.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a flat graph as a quiet system</strong><span>The graph shows what was sampled. At a fifteen-second interval it is consistent with fourteen seconds of total failure, repeatedly, and with a three-second spike on four out of every five occurrences. Before concluding that nothing happened, compute <span class="math" data-say="d over I">d/I</span> for the shortest event you would have wanted to see.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a shorter interval solves it</strong><span>It raises <span class="math" data-say="d over I">d/I</span> and it never reaches certainty while <span class="math" data-say="d is less than I">d &lt; I</span>; going from fifteen seconds to five turns a one-in-five chance into three in five, which is better and is not detection. It also multiplies the samples per series, which is a direct storage cost computed in &ldquo;Metric Cardinality&rdquo;. The structural answer is a cumulative metric, not a faster gauge.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Letting a negative rate through</strong><span>A restart produces one enormous negative rate, and if it reaches an average it drags a whole dashboard down, while a percentile over rates will place it at the bottom and quietly shift every rank. Decide the restart rule up front, apply it where the difference is taken, and never let the raw difference reach an aggregate.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an interval is chosen from the shortest event you must see, rather than inherited from a default.</strong><p>You should be able to compute <span class="math" data-say="the min of 1 and d over I">min(1, d/I)</span> and <span class="math" data-say="I minus 1">I − 1</span> for any interval, say what a flat graph is and is not evidence of, state when the uniform-phase assumption fails, and turn two counter reads across a restart into a naive rate, a corrected rate and the increments that are gone.</p></div></div><div class="note"><strong>Note:</strong> Scraping every instant is one way of not seeing an event; sampling one request in a hundred is another, and it has the more surprising arithmetic. &ldquo;Sampling and Rare Events&rdquo; computes the chance that one per cent sampling catches a ten-request problem &mdash; it is 9.56%, not one per cent &mdash; and the rate it would actually take, which is twenty-six times higher rather than ten.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A scrape is a sample of an instant, not a summary of an interval</summary><p>A gauge read at <span class="math" data-say="t">t</span> reports the value at <span class="math" data-say="t">t</span>. Whatever the signal did between <span class="math" data-say="t minus I">t − I</span> and <span class="math" data-say="t">t</span> is not averaged, not maximised and not recorded &mdash; it is absent. Two reads fifteen seconds apart both showing a quiet system are two facts about two instants, and the graph drawn between them is a line your plotting library invented.</p></details><details class="recall"><summary>A spike is caught only if a read lands inside it</summary><p>Reads are <span class="math" data-say="I">I</span> apart, so a spike shorter than <span class="math" data-say="I">I</span> can contain at most one of them, and whether it contains one depends on where it starts. With the start uniform relative to the scrape clock, the chance is the fraction of the cycle the spike occupies: <span class="math" data-say="d over I">d/I</span>, capped at one when <span class="math" data-say="d is at least I">d ≥ I</span>. Three seconds in fifteen is exactly <span class="math" data-say="1 over 5">1/5</span>.</p></details><details class="recall"><summary>A counter that went down is the only trace of a restart</summary><p>Counters are read as differences, so a process restart that zeroes one turns the next difference into a large negative rate &mdash; or, if the counter has already climbed past the previous read, into a small positive one that looks like a quiet spell. The fix is to treat any decrease as a restart and take the new reading as the increment, which recovers the rate and loses whatever accumulated between the last read and the restart.</p></details></div>
+      <h3>Summary</h3>
       <p>A gauge read every <span class="math" data-say="I">I</span> seconds is a sample of the signal at <span class="math" data-say="I">I</span>-second instants, and a spike of duration <span class="math" data-say="d">d</span> is caught only if a read falls inside it: probability <span class="math" data-say="the min of 1 and d over I">min(1, d/I)</span>. At the common fifteen-second interval a three-second spike is seen one time in five, and a spike of up to fourteen seconds can hide completely. The same interval hides a second thing entirely &mdash; a counter that restarted, whose only evidence is that the number went down.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A scrape is a sample of an instant, not a summary of an interval.</strong> A gauge read at <span class="math" data-say="t">t</span> reports the value at <span class="math" data-say="t">t</span>. Whatever the signal did between <span class="math" data-say="t minus I">t − I</span> and <span class="math" data-say="t">t</span> is not averaged, not maximised and not recorded &mdash; it is absent. Two reads fifteen seconds apart both showing a quiet system are two facts about two instants, and the graph drawn between them is a line your plotting library invented.</li><li><strong>A spike is caught only if a read lands inside it.</strong> Reads are <span class="math" data-say="I">I</span> apart, so a spike shorter than <span class="math" data-say="I">I</span> can contain at most one of them, and whether it contains one depends on where it starts. With the start uniform relative to the scrape clock, the chance is the fraction of the cycle the spike occupies: <span class="math" data-say="d over I">d/I</span>, capped at one when <span class="math" data-say="d is at least I">d ≥ I</span>. Three seconds in fifteen is exactly <span class="math" data-say="1 over 5">1/5</span>.</li><li><strong>A counter that went down is the only trace of a restart.</strong> Counters are read as differences, so a process restart that zeroes one turns the next difference into a large negative rate &mdash; or, if the counter has already climbed past the previous read, into a small positive one that looks like a quiet spell. The fix is to treat any decrease as a restart and take the new reading as the increment, which recovers the rate and loses whatever accumulated between the last read and the restart.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of catch a spike of length d equals the min of 1 and d over I, d equals 3, I equals 15 goes to 1 over 5. longest spike that can hide entirely equals I minus 1 seconds, I equals 15 goes to 14 seconds. a flat graph is evidence about the reads, not about the system. counter reset, reads 6000 goes to 520 over 15 seconds. naive rate the quantity 520 minus 6000, over 15 equals negative 365.33 per second, corrected 520 over 15 equals plus 34.67 per second. and 80 increments between the last read and the restart are unrecoverable" tabindex="0" role="region" aria-label="Mathematical notation">P(catch a spike of length d) = min(1, d/I)     d = 3, I = 15 → 1/5
 longest spike that can hide entirely = I − 1 s      I = 15 → 14 s
 a flat graph is evidence about the reads, not about the system
@@ -2939,11 +2984,40 @@ and 80 increments between the last read and the restart are unrecoverable</div><
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3011,7 +3085,7 @@ and 80 increments between the last read and the restart are unrecoverable</div><
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

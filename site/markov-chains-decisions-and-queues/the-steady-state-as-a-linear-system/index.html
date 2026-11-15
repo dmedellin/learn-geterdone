@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,69 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Markov Chains, Decisions and Queues</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; πP = π</p>
       <h1>The Steady State as a Linear System</h1>
       <p class="lesson-lede">Drop one dependent balance equation, put <span data-say="the sum of pi equals 1">Σπ = 1</span> in its place, and solve exactly — on one preset the answer exists and no limit does.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A steady state is defined by an equation, not by a process</li><li>The n balance equations are dependent, so one must be replaced</li><li>Solving and waiting are different, and on one matrix only one of them works</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Solving for the steady state, and watching an iteration fail to find it</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Stationary distribution</span><p>A distribution <span class="math" data-say="pi">π</span> is <strong>stationary</strong> for <span class="math" data-say="P">P</span> when <span class="math" data-say="pi P equals pi">πP = π</span>, that is <span class="math" data-say="the sum over i of pi sub i P of i j equals pi sub j">Σᵢ πᵢ P[i][j] = πⱼ</span> for every <span class="math" data-say="j">j</span>, together with <span class="math" data-say="pi sub i is at least 0">πᵢ ≥ 0</span> and <span class="math" data-say="the sum over i of pi sub i equals 1">Σᵢ πᵢ = 1</span>.</p><p>Equivalently <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span> with the normalisation attached. Nothing in this definition mentions a starting distribution, a number of steps, or a limit.</p></div><div class="thm"><span class="label">Theorem &middot; The balance equations are dependent</span><p>For any transition matrix <span class="math" data-say="P">P</span>, the columns of <span class="math" data-say="P minus I">P − I</span> sum to zero: <span class="math" data-say="the sum over j of P of i j minus I at i j equals 1 minus 1 equals 0">Σⱼ (P[i][j] − I[i][j]) = 1 − 1 = 0</span> for every row <span class="math" data-say="i">i</span>. Hence the n equations <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span> have rank at most n − 1, and one of them is implied by the rest.</p></div><div class="proof"><p>Row <span class="math" data-say="i">i</span> of <span class="math" data-say="P minus I">P − I</span> has entries <span class="math" data-say="P of i j">P[i][j]</span> for <span class="math" data-say="j is not equal to i">j ≠ i</span> and <span class="math" data-say="P of i i minus 1">P[i][i] − 1</span> at <span class="math" data-say="j equals i">j = i</span>. Its entries add to <span class="math" data-say="the sum over j of P of i j minus 1">Σⱼ P[i][j] − 1</span>, which is <span class="math" data-say="1 minus 1 equals 0">1 − 1 = 0</span> because every row of <span class="math" data-say="P">P</span> is a distribution.</p><p>So the all-ones column vector is in the null space of <span class="math" data-say="P minus I">P − I</span> acting on the right, which is exactly the statement that the columns &mdash; the equations of the system <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span> &mdash; sum to the zero functional. Adding all n equations together therefore gives <span class="math" data-say="0 equals 0">0 = 0</span>, and any one of them can be recovered from the other n − 1.</p><p><span class="qed">&#9633;</span></p></div><p>That dependency is the reason the system as written cannot be solved: it determines <span class="math" data-say="pi">π</span> only up to a multiple, and <span class="math" data-say="pi equals 0">π = 0</span> satisfies all of it. The repair is not a trick. One equation carries no information the others lack, so it is removed by name; and <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span>, which <span class="math" data-say="pi P equals pi">πP = π</span> never contained, takes its place. The lab prints the resulting system with the dropped equation named in the caption and the augmented column ruled off, and lets you choose which equation to drop. The answer does not move, and watching it not move is the point of the control.</p><h3>The solve, and the check the page performs on its own answer</h3><div class="mathblock" data-say="three brands, P equals, 7 over 10, 2 over 10, 1 over 10. a table, shown on the page. balance at state 1, 7 over 10 pi sub 1 plus 3 over 10 pi sub 2 plus 1 over 10 pi sub 3 equals pi sub 1. balance at state 2, 2 over 10 pi sub 1 plus 5 over 10 pi sub 2 plus 3 over 10 pi sub 3 equals pi sub 2. balance at state 3, 1 over 10 pi sub 1 plus 2 over 10 pi sub 2 plus 6 over 10 pi sub 3 equals pi sub 3, gets dropped. in its place, pi sub 1 plus, pi sub 2 plus, pi sub 3 equals 1. Gauss-Jordan over the rationals, 9 operations. pi equals 7 over 17, 11 over 34, 9 over 34, exactly, the rank of 3 of 3. the page then recomputes pi P from that pi. pi P equals 7 over 17, 11 over 34, 9 over 34, every entry EXACTLY equal. pi P minus pi, equals, 0, the sum of pi equals 1" tabindex="0" role="region" aria-label="Mathematical notation">three brands,  P =   7/10  2/10  1/10
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Solving for the steady state, and watching an iteration fail to find it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Stationary distribution</span><p>A distribution <span class="math" data-say="pi">π</span> is <strong>stationary</strong> for <span class="math" data-say="P">P</span> when <span class="math" data-say="pi P equals pi">πP = π</span>, that is <span class="math" data-say="the sum over i of pi sub i P of i j equals pi sub j">Σᵢ πᵢ P[i][j] = πⱼ</span> for every <span class="math" data-say="j">j</span>, together with <span class="math" data-say="pi sub i is at least 0">πᵢ ≥ 0</span> and <span class="math" data-say="the sum over i of pi sub i equals 1">Σᵢ πᵢ = 1</span>.</p><p>Equivalently <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span> with the normalisation attached. Nothing in this definition mentions a starting distribution, a number of steps, or a limit.</p></div><div class="thm"><span class="label">Theorem &middot; The balance equations are dependent</span><p>For any transition matrix <span class="math" data-say="P">P</span>, the columns of <span class="math" data-say="P minus I">P − I</span> sum to zero: <span class="math" data-say="the sum over j of P of i j minus I at i j equals 1 minus 1 equals 0">Σⱼ (P[i][j] − I[i][j]) = 1 − 1 = 0</span> for every row <span class="math" data-say="i">i</span>. Hence the n equations <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span> have rank at most n − 1, and one of them is implied by the rest.</p></div><div class="proof"><p>Row <span class="math" data-say="i">i</span> of <span class="math" data-say="P minus I">P − I</span> has entries <span class="math" data-say="P of i j">P[i][j]</span> for <span class="math" data-say="j is not equal to i">j ≠ i</span> and <span class="math" data-say="P of i i minus 1">P[i][i] − 1</span> at <span class="math" data-say="j equals i">j = i</span>. Its entries add to <span class="math" data-say="the sum over j of P of i j minus 1">Σⱼ P[i][j] − 1</span>, which is <span class="math" data-say="1 minus 1 equals 0">1 − 1 = 0</span> because every row of <span class="math" data-say="P">P</span> is a distribution.</p><p>So the all-ones column vector is in the null space of <span class="math" data-say="P minus I">P − I</span> acting on the right, which is exactly the statement that the columns &mdash; the equations of the system <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span> &mdash; sum to the zero functional. Adding all n equations together therefore gives <span class="math" data-say="0 equals 0">0 = 0</span>, and any one of them can be recovered from the other n − 1.</p><p><span class="qed">&#9633;</span></p></div><p>That dependency is the reason the system as written cannot be solved: it determines <span class="math" data-say="pi">π</span> only up to a multiple, and <span class="math" data-say="pi equals 0">π = 0</span> satisfies all of it. The repair is not a trick. One equation carries no information the others lack, so it is removed by name; and <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span>, which <span class="math" data-say="pi P equals pi">πP = π</span> never contained, takes its place. The lab prints the resulting system with the dropped equation named in the caption and the augmented column ruled off, and lets you choose which equation to drop. The answer does not move, and watching it not move is the point of the control.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The steady state is solved for, not waited for</h2></div><p>n dependent equations, one replaced by Σπ = 1, and an iteration that cannot match it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>&pi;P = &pi; is n equations, one of them redundant</strong><span>drop one by name, put &sum;&pi; = 1 in its place, and solve &mdash; exactly, once</span></div>
+        <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>the exact solution of the linear system</span><span class="tone-purple"><i class="legend-swatch"></i>a power iteration, in floating point</span><span class="tone-amber"><i class="legend-swatch"></i>the equation that was dropped</span><span class="tone-red"><i class="legend-swatch"></i>where the iteration is still wrong</span></div>
+      </div>
+      <div id="msSystem" style="margin-top:12px;"></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="msConv" viewBox="0 0 660 190" role="img" aria-label="The starting distribution pushed forward step by step, with the exact steady state drawn as a dashed line for each state."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="msCompare"></table></div>
+      <div class="status-banner" id="msStatus" style="margin-top:12px;"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose which equation to drop, and how long to iterate</h3>
+            <p>The system is built and reduced here in exact fractions, with the dropped equation named in the caption. Beside it a floating-point power iteration runs for as many steps as you like and the page prints how far short it is. Change which equation is dropped and the answer does not move; switch to the 3-cycle and the iteration never moves either.</p>
+        <div class="field">
+          <label for="msPreset">Worked example</label>
+          <select id="msPreset"><option value="market" selected>Three brands, with switching in every direction</option><option value="weather">Two states, both reachable from both</option><option value="cycle">A 3-cycle: every state steps to the next</option><option value="split">Two closed groups of two states each</option><option value="five">Five states, every entry over 20</option></select>
+        </div>
+        <div class="field">
+          <label for="msP">Transition matrix</label>
+          <input id="msP" type="text" value="7/10 2/10 1/10; 3/10 5/10 2/10; 1/10 3/10 6/10" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="msNames">State names</label>
+          <input id="msNames" type="text" value="A, B, C" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="msDrop">Balance equation to drop</label>
+          <select id="msDrop"><option value="auto" selected>the last one</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="msIter">Power-iteration steps</label><span class="range-value" id="msIterOut">60</span></div>
+          <input id="msIter" type="range" min="1" max="400" step="1" value="60" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>&pi;, exactly</span><strong id="msPiK">&mdash;</strong></div>
+          <div class="kpi"><span>Unique</span><strong id="msUniqueK">&mdash;</strong></div>
+          <div class="kpi"><span>&pi;P &minus; &pi;</span><strong id="msResidK">&mdash;</strong></div>
+          <div class="kpi"><span>&sum;&pi;</span><strong id="msSumK">&mdash;</strong></div>
+          <div class="kpi"><span>Iteration gap</span><strong id="msGapK">&mdash;</strong></div>
+          <div class="kpi"><span>Places agreed</span><strong id="msPlacesK">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="msHint" style="margin:0;">Change which equation is dropped and the answer does not move, because the equations are dependent: the columns of P &minus; I sum to zero, so any one of them is implied by the others. Then switch to the 3-cycle. The linear system still has exactly one solution and the iteration still has none, for ever &mdash; which is the difference between solving and waiting.</p>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The solve, and the check the page performs on its own answer</h3><div class="mathblock" data-say="three brands, P equals, 7 over 10, 2 over 10, 1 over 10. a table, shown on the page. balance at state 1, 7 over 10 pi sub 1 plus 3 over 10 pi sub 2 plus 1 over 10 pi sub 3 equals pi sub 1. balance at state 2, 2 over 10 pi sub 1 plus 5 over 10 pi sub 2 plus 3 over 10 pi sub 3 equals pi sub 2. balance at state 3, 1 over 10 pi sub 1 plus 2 over 10 pi sub 2 plus 6 over 10 pi sub 3 equals pi sub 3, gets dropped. in its place, pi sub 1 plus, pi sub 2 plus, pi sub 3 equals 1. Gauss-Jordan over the rationals, 9 operations. pi equals 7 over 17, 11 over 34, 9 over 34, exactly, the rank of 3 of 3. the page then recomputes pi P from that pi. pi P equals 7 over 17, 11 over 34, 9 over 34, every entry EXACTLY equal. pi P minus pi, equals, 0, the sum of pi equals 1" tabindex="0" role="region" aria-label="Mathematical notation">three brands,  P =   7/10  2/10  1/10
                      3/10  5/10  2/10
                      1/10  3/10  6/10
 
@@ -1430,61 +1525,12 @@
       (1/4, 1/4, 3/22, 4/11)      πP − π = 0     Σπ = 1
 
   and any weighting of the first two is another one
-  the page reports rank 3 against 4 unknowns, and prints no π</div><p>Note what the lab does and does not do there. It reports the rank and refuses; it does not exhibit the family. Exhibiting three members, as above, is a stronger demonstration of non-uniqueness than a rank is, because a rank is a claim about an elimination and three checked vectors are three checked vectors. Both are worth having, and they answer slightly different doubts.</p></article>
+  the page reports rank 3 against 4 unknowns, and prints no π</div><p>Note what the lab does and does not do there. It reports the rank and refuses; it does not exhibit the family. Exhibiting three members, as above, is a stronger demonstration of non-uniqueness than a rank is, because a rank is a claim about an elimination and three checked vectors are three checked vectors. Both are worth having, and they answer slightly different doubts.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The steady state is solved for, not waited for</h2></div><p>n dependent equations, one replaced by Σπ = 1, and an iteration that cannot match it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>&pi;P = &pi; is n equations, one of them redundant</strong><span>drop one by name, put &sum;&pi; = 1 in its place, and solve &mdash; exactly, once</span></div>
-        <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>the exact solution of the linear system</span><span class="tone-purple"><i class="legend-swatch"></i>a power iteration, in floating point</span><span class="tone-amber"><i class="legend-swatch"></i>the equation that was dropped</span><span class="tone-red"><i class="legend-swatch"></i>where the iteration is still wrong</span></div>
-      </div>
-      <div id="msSystem" style="margin-top:12px;"></div>
-      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="msConv" viewBox="0 0 660 190" role="img" aria-label="The starting distribution pushed forward step by step, with the exact steady state drawn as a dashed line for each state."></svg></div>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="msCompare"></table></div>
-      <div class="status-banner" id="msStatus" style="margin-top:12px;"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose which equation to drop, and how long to iterate</h3>
-          <p>The system is built and reduced here in exact fractions, with the dropped equation named in the caption. Beside it a floating-point power iteration runs for as many steps as you like and the page prints how far short it is. Change which equation is dropped and the answer does not move; switch to the 3-cycle and the iteration never moves either.</p>
-        <div class="field">
-          <label for="msPreset">Worked example</label>
-          <select id="msPreset"><option value="market" selected>Three brands, with switching in every direction</option><option value="weather">Two states, both reachable from both</option><option value="cycle">A 3-cycle: every state steps to the next</option><option value="split">Two closed groups of two states each</option><option value="five">Five states, every entry over 20</option></select>
-        </div>
-        <div class="field">
-          <label for="msP">Transition matrix</label>
-          <input id="msP" type="text" value="7/10 2/10 1/10; 3/10 5/10 2/10; 1/10 3/10 6/10" inputmode="text" autocomplete="off">
-        </div>
-        <div class="field">
-          <label for="msNames">State names</label>
-          <input id="msNames" type="text" value="A, B, C" inputmode="text" autocomplete="off">
-        </div>
-        <div class="field">
-          <label for="msDrop">Balance equation to drop</label>
-          <select id="msDrop"><option value="auto" selected>the last one</option></select>
-        </div>
-        <div>
-          <div class="range-row"><label class="small-copy" for="msIter">Power-iteration steps</label><span class="range-value" id="msIterOut">60</span></div>
-          <input id="msIter" type="range" min="1" max="400" step="1" value="60" />
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>&pi;, exactly</span><strong id="msPiK">&mdash;</strong></div>
-          <div class="kpi"><span>Unique</span><strong id="msUniqueK">&mdash;</strong></div>
-          <div class="kpi"><span>&pi;P &minus; &pi;</span><strong id="msResidK">&mdash;</strong></div>
-          <div class="kpi"><span>&sum;&pi;</span><strong id="msSumK">&mdash;</strong></div>
-          <div class="kpi"><span>Iteration gap</span><strong id="msGapK">&mdash;</strong></div>
-          <div class="kpi"><span>Places agreed</span><strong id="msPlacesK">&mdash;</strong></div>
-        </div>
-        <p class="small-copy" id="msHint" style="margin:0;">Change which equation is dropped and the answer does not move, because the equations are dependent: the columns of P &minus; I sum to zero, so any one of them is implied by the others. Then switch to the 3-cycle. The linear system still has exactly one solution and the iteration still has none, for ever &mdash; which is the difference between solving and waiting.</p>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving <span data-say="pi P equals pi">πP = π</span> by hand</h2></div><p>Five steps, and the third is the one that turns an underdetermined system into a solvable one.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write one balance equation per state</h3><p>For each <span class="math" data-say="j">j</span>, the inflow <span class="math" data-say="the sum over i of pi sub i P of i j">Σᵢ πᵢ P[i][j]</span> equals <span class="math" data-say="pi sub j">πⱼ</span>. Reading down a COLUMN of <span class="math" data-say="P">P</span> is what gives the equation for that state, which is the opposite of how you read the matrix to take a step, and is worth saying out loud the first few times.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Notice that one equation is free</h3><p>Add them all together and you get <span class="math" data-say="1 equals 1">1 = 1</span>. The system is rank n − 1, so it fixes <span class="math" data-say="pi">π</span> only up to a scale and admits the zero vector. Discovering this after an hour of elimination is the usual route; discovering it from the column sums of <span class="math" data-say="P minus I">P − I</span> takes one line.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Drop one equation and put the normalisation in its place</h3><p>Any one. Say which one you dropped, so that the system you actually solved is on the page. Then add <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span>, which is the piece of information <span class="math" data-say="pi P equals pi">πP = π</span> never carried, and you have n independent equations in n unknowns.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Eliminate in fractions</h3><p>Gauss-Jordan over the rationals. The three-brand example takes nine operations and gives <span class="math" data-say="7 over 17, 11 over 34, 9 over 34">(7/17, 11/34, 9/34)</span>, with the seventeenths there because seventeen is what the elimination produced, not because anything was rounded to it.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Verify by recomputing <span data-say="pi P">πP</span>, and check the sum</h3><p>Multiply your answer back through the matrix and compare entry by entry. This costs one matrix-vector product and catches every arithmetic slip in the elimination. If the residual is exactly zero and the entries sum to exactly one, the answer is right &mdash; and &ldquo;exactly&rdquo; is available here because nothing was a decimal.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving <span data-say="pi P equals pi">πP = π</span> by hand</h2>
+      <p class="lead-in">Five steps, and the third is the one that turns an underdetermined system into a solvable one.</p>
+      <ol class="key-ideas method"><li><strong>Write one balance equation per state.</strong> For each <span class="math" data-say="j">j</span>, the inflow <span class="math" data-say="the sum over i of pi sub i P of i j">Σᵢ πᵢ P[i][j]</span> equals <span class="math" data-say="pi sub j">πⱼ</span>. Reading down a COLUMN of <span class="math" data-say="P">P</span> is what gives the equation for that state, which is the opposite of how you read the matrix to take a step, and is worth saying out loud the first few times.</li><li><strong>Notice that one equation is free.</strong> Add them all together and you get <span class="math" data-say="1 equals 1">1 = 1</span>. The system is rank n − 1, so it fixes <span class="math" data-say="pi">π</span> only up to a scale and admits the zero vector. Discovering this after an hour of elimination is the usual route; discovering it from the column sums of <span class="math" data-say="P minus I">P − I</span> takes one line.</li><li><strong>Drop one equation and put the normalisation in its place.</strong> Any one. Say which one you dropped, so that the system you actually solved is on the page. Then add <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span>, which is the piece of information <span class="math" data-say="pi P equals pi">πP = π</span> never carried, and you have n independent equations in n unknowns.</li><li><strong>Eliminate in fractions.</strong> Gauss-Jordan over the rationals. The three-brand example takes nine operations and gives <span class="math" data-say="7 over 17, 11 over 34, 9 over 34">(7/17, 11/34, 9/34)</span>, with the seventeenths there because seventeen is what the elimination produced, not because anything was rounded to it.</li><li><strong>Verify by recomputing <span data-say="pi P">πP</span>, and check the sum.</strong> Multiply your answer back through the matrix and compare entry by entry. This costs one matrix-vector product and catches every arithmetic slip in the elimination. If the residual is exactly zero and the entries sum to exactly one, the answer is right &mdash; and &ldquo;exactly&rdquo; is available here because nothing was a decimal.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1527,17 +1573,16 @@ one leaky state    1/2 1/4 1/4 ; 0 3/4 1/4 ; 0 1/2 1/2
       π = (0, 2/3, 1/3)      unique, and the 0 is exact</div><p>Read the three-brand block first and notice what the three identical answers prove. If dropping a different equation gave a different <span class="math" data-say="pi">π</span>, the equations would be carrying different information and removing one would be a choice. They do not, so it is not.</p><p>The three-cycle block is the argument the whole of this material is for. Both columns are computed on the same matrix at the same moment: a unique exact answer on the left, and on the right a sequence with no limit whatsoever. &ldquo;It has not converged yet&rdquo; is the natural thing to say about <span class="math" data-say="6.667 e minus 1">6.667e-1</span> after four hundred steps, and it is false; there is nothing to converge to, and the exact distance <span class="math" data-say="2 over 3">2/3</span> is the same at every n rather than shrinking at any rate at all.</p><p>The leaky chain is the quiet one. Its <span class="math" data-say="pi">π</span> is unique because it has only one recurrent class, and it puts exactly <span class="math" data-say="0">0</span> on the transient state. That zero is not a small number rounded down, and no floating-point iteration could have told you the difference: at sixty steps the iteration's worst error is <span class="math" data-say="1.110 e minus 16">1.110e-16</span>, which is indistinguishable from a genuinely tiny positive answer.</p><p>For a rehearsal, take the two-state chain <span class="math" data-say="1 over 2 1 over 2, 1 over 4 3 over 4">1/2 1/2; 1/4 3/4</span> and solve it by hand. The supplied first move is the balance equation at state one: <span class="math" data-say="1 over 2 pi sub 1 plus 1 over 4 pi sub 2 equals pi sub 1">1/2 π₁ + 1/4 π₂ = π₁</span>, which gives <span class="math" data-say="pi sub 2 equals 2 pi sub 1">π₂ = 2π₁</span>. Finish with the normalisation and check your answer against the lab; then ask why the iteration on that matrix stalls at fifteen places rather than sixteen, and what it would take to get the sixteenth.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Solving the transposed system</strong><span><span class="math" data-say="pi">π</span> multiplies <span class="math" data-say="P">P</span> on the left, so the equation for state <span class="math" data-say="j">j</span> reads down the <span class="math" data-say="j">j</span>-th COLUMN of <span class="math" data-say="P">P</span>. Setting up rows instead solves <span class="math" data-say="P pi equals pi">Pπ = π</span>, which is a different system with a different answer, and on a matrix with all entries positive it will look plausible enough to survive.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trying to solve the n balance equations without replacing one</strong><span>They are dependent, so elimination will produce a row of zeros and the answer will come out as a one-parameter family or as zero. The fix is not to persevere; it is to drop one equation deliberately, say which, and add <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reporting a steady state as the limit of a power iteration</strong><span>It is defined as the solution of a linear system, and on a periodic chain there is no limit for it to be. Even where a limit exists, the iteration stops improving at about fifteen places while the solve is exact, so quoting the iterate concedes precision for nothing. Compute <span class="math" data-say="pi">π</span>; use the iteration as the thing being compared against.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the sentence a steady state is a linear system, not a limit reads as a description of what you do rather than a slogan.</strong><p>You should be able to write the n balance equations from the columns of <span class="math" data-say="P">P</span>, show that they are dependent from the row sums, drop one by name and normalise, eliminate in fractions and verify the answer by recomputing <span class="math" data-say="pi P">πP</span>, and produce a matrix on which the system has a unique solution and the powers have no limit at all.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The chains here keep moving for ever. The next question is the opposite one: what happens on a chain that can stop, where some states are exits and the interesting quantities are how long until it stops and which exit it takes. Both come out of one matrix inverse &mdash; which is really a sum of powers, and &ldquo;Absorbing States and the Fundamental Matrix&rdquo; shows the sum climbing towards it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Solving the transposed system</strong><span><span class="math" data-say="pi">π</span> multiplies <span class="math" data-say="P">P</span> on the left, so the equation for state <span class="math" data-say="j">j</span> reads down the <span class="math" data-say="j">j</span>-th COLUMN of <span class="math" data-say="P">P</span>. Setting up rows instead solves <span class="math" data-say="P pi equals pi">Pπ = π</span>, which is a different system with a different answer, and on a matrix with all entries positive it will look plausible enough to survive.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trying to solve the n balance equations without replacing one</strong><span>They are dependent, so elimination will produce a row of zeros and the answer will come out as a one-parameter family or as zero. The fix is not to persevere; it is to drop one equation deliberately, say which, and add <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reporting a steady state as the limit of a power iteration</strong><span>It is defined as the solution of a linear system, and on a periodic chain there is no limit for it to be. Even where a limit exists, the iteration stops improving at about fifteen places while the solve is exact, so quoting the iterate concedes precision for nothing. Compute <span class="math" data-say="pi">π</span>; use the iteration as the thing being compared against.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the sentence a steady state is a linear system, not a limit reads as a description of what you do rather than a slogan.</strong><p>You should be able to write the n balance equations from the columns of <span class="math" data-say="P">P</span>, show that they are dependent from the row sums, drop one by name and normalise, eliminate in fractions and verify the answer by recomputing <span class="math" data-say="pi P">πP</span>, and produce a matrix on which the system has a unique solution and the powers have no limit at all.</p></div></div><div class="note"><strong>Note:</strong> The chains here keep moving for ever. The next question is the opposite one: what happens on a chain that can stop, where some states are exits and the interesting quantities are how long until it stops and which exit it takes. Both come out of one matrix inverse &mdash; which is really a sum of powers, and &ldquo;Absorbing States and the Fundamental Matrix&rdquo; shows the sum climbing towards it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A steady state is defined by an equation, not by a process</summary><p><span class="math" data-say="pi">π</span> is stationary when one step of the chain leaves it unchanged: <span class="math" data-say="pi P equals pi">πP = π</span>. That is an algebraic condition on a vector, and it says nothing about starting anywhere, waiting, or anything converging. Read as a linear system it is n equations, one per state, saying that the probability flowing into each state equals the probability flowing out.</p></details><details class="recall"><summary>The n balance equations are dependent, so one must be replaced</summary><p><span class="math" data-say="pi P equals pi">πP = π</span> is <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span>, and every column of <span class="math" data-say="P minus I">P − I</span> sums to zero because every row of <span class="math" data-say="P">P</span> sums to one. So the n equations have a linear dependency and the system is rank n − 1 at best: it pins <span class="math" data-say="pi">π</span> only up to a scale. Dropping one equation loses nothing, and <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span> supplies the one piece of information <span class="math" data-say="pi P equals pi">πP = π</span> never had.</p></details><details class="recall"><summary>Solving and waiting are different, and on one matrix only one of them works</summary><p>Power iteration reaches about fifteen decimal places on a well-behaved chain and then stops improving, because it has run out of double rather than out of steps. On the three-cycle it never improves at all: <span class="math" data-say="P cubed">P³</span> is exactly the identity, the powers repeat for ever, and the error sits at <span class="math" data-say="2 over 3">2/3</span>. The linear system on that same matrix has one solution, and the solve had it before the iteration took its first step.</p></details></div>
+      <h3>Summary</h3>
       <p><span class="math" data-say="pi P equals pi">πP = π</span> is n equations in n unknowns and one of them is implied by the others, because every column of <span class="math" data-say="P minus I">P − I</span> sums to zero. Drop any one of them by name, put <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span> in its place, and run exact Gauss-Jordan over the rationals: the steady state is a solution of a linear system and nothing iterates. Beside the solve the page runs the thing readers think a steady state is &mdash; repeated multiplication in floating point &mdash; and prints how far short it is. On one preset it is short by <span class="math" data-say="2 over 3">2/3</span> at every step, for ever, because <span class="math" data-say="P cubed">P³</span> is exactly <span class="math" data-say="P to the power 0">P⁰</span> and no limit exists at all.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A steady state is defined by an equation, not by a process.</strong> <span class="math" data-say="pi">π</span> is stationary when one step of the chain leaves it unchanged: <span class="math" data-say="pi P equals pi">πP = π</span>. That is an algebraic condition on a vector, and it says nothing about starting anywhere, waiting, or anything converging. Read as a linear system it is n equations, one per state, saying that the probability flowing into each state equals the probability flowing out.</li><li><strong>The n balance equations are dependent, so one must be replaced.</strong> <span class="math" data-say="pi P equals pi">πP = π</span> is <span class="math" data-say="pi times the quantity P minus I, equals 0">π(P − I) = 0</span>, and every column of <span class="math" data-say="P minus I">P − I</span> sums to zero because every row of <span class="math" data-say="P">P</span> sums to one. So the n equations have a linear dependency and the system is rank n − 1 at best: it pins <span class="math" data-say="pi">π</span> only up to a scale. Dropping one equation loses nothing, and <span class="math" data-say="the sum of pi equals 1">Σπ = 1</span> supplies the one piece of information <span class="math" data-say="pi P equals pi">πP = π</span> never had.</li><li><strong>Solving and waiting are different, and on one matrix only one of them works.</strong> Power iteration reaches about fifteen decimal places on a well-behaved chain and then stops improving, because it has run out of double rather than out of steps. On the three-cycle it never improves at all: <span class="math" data-say="P cubed">P³</span> is exactly the identity, the powers repeat for ever, and the error sits at <span class="math" data-say="2 over 3">2/3</span>. The linear system on that same matrix has one solution, and the solve had it before the iteration took its first step.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="pi P equals pi, and, the sum of pi equals 1, the definition, a distribution that one step leaves alone. every column of P minus I sums to zero, so the n balance equations are dependent. drop one by name, put the sum of pi equals 1 in its place, and solve exactly, nothing iterates. three brands, pi equals 7 over 17, 11 over 34, 9 over 34 exactly, and pi P minus pi is exactly 0. the 3-cycle, pi equals 1 over 3, 1 over 3, 1 over 3 unique, P cubed equals P to the power 0, and the powers never settle. two closed classes, the rank of 3 against 4 unknowns, so the page prints no pi at all" tabindex="0" role="region" aria-label="Mathematical notation">πP = π  and  Σπ = 1          the definition: a distribution that one step leaves alone
 every column of P − I sums to zero, so the n balance equations are dependent
 drop one by name, put Σπ = 1 in its place, and solve exactly — nothing iterates
@@ -3102,11 +3147,40 @@ two closed classes:  rank 3 against 4 unknowns, so the page prints no π at all<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3174,7 +3248,7 @@ two closed classes:  rank 3 against 4 unknowns, so the page prints no π at all<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

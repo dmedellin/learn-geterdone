@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Foundations</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 1 · The Role of Algorithms in Computing</p>
       <h1>Algorithms as a Technology</h1>
       <p class="lesson-lede">An algorithm is a well-defined procedure that turns every instance of a problem into the right output, and the choice of algorithm can matter more than a machine a thousand times faster.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Problem, algorithm and instance</li><li>Correctness</li><li>Efficiency as a technology</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the race</h2>
-      <article class="prose reading"><p>&ldquo;Total system performance depends on choosing efficient algorithms as much as on choosing fast hardware.&rdquo; The authors reach that sentence in the last part of Section 1.2, just after a calculation that most readers remember long after the rest of the chapter. This lesson reads Chapter 1, The Role of Algorithms in Computing: Section 1.1 on what an algorithm is, and Section 1.2 on why its efficiency is a technology in its own right.</p><p>Section 1.1 begins informally. An algorithm accepts an input, one value or many, carries out a sequence of well-defined computational steps, and delivers an output, again one value or many. The problem it solves is stated separately, as a relation between inputs and acceptable outputs, and the authors take sorting as their running example: given a sequence of n numbers, produce a permutation of it in nondecreasing order. One particular input sequence is an instance of the problem.</p><div class="defbox"><span class="label">Definition &middot; Correct algorithm</span><p>An algorithm is <strong>correct</strong> if on each instance of its problem it halts, and halts with a right answer; a correct algorithm <strong>solves</strong> the problem. An incorrect one may fail to halt on some instance or halt with a wrong answer. The authors note that an incorrect algorithm is sometimes useful when its error rate can be controlled, and point to the primality tests of Chapter 31.</p></div><p>The rest of Section 1.1 is a tour. Sequencing a genome, routing data across the Internet, keeping electronic commerce private, and allocating scarce resources in a business are all problems whose solutions rest on algorithms the book later teaches: shortest paths, longest common subsequences, topological sorting, convex hulls, linear programming. Two features recur. Each problem has a great many candidate solutions, most of them not what is wanted, and each has practical use. The section closes with four threads the book returns to: data structures, techniques of design and analysis for problems no published algorithm covers, problems for which no efficient algorithm is known (the NP-complete problems of Chapter 34), and parallelism on multicore machines (Chapter 27).</p><p>Section 1.2 asks a question to clear the ground. If computers were infinitely fast and memory free, would algorithms still be worth studying? Yes, the authors answer, because you would still need to show that your method halts and gives the right answer; but you would then use whichever correct method was easiest to write. Real computers are fast but finite, so time and space are bounded resources, and efficiency decides how much of them a method uses.</p><p>The argument is a comparison of two sorts the next chapter analyses. Insertion sort takes time roughly <span class="math" data-say="c sub 1 times n squared">c₁·n²</span> and merge sort roughly <span class="math" data-say="c sub 2 times n times log base 2 of n">c₂·n·lg n</span>, with constants that do not depend on n, and insertion sort usually has the smaller constant. Write the two as <span class="math" data-say="c sub 1 times n times n">c₁·n·n</span> and <span class="math" data-say="c sub 2 times n times log base 2 of n">c₂·n·lg n</span> and the difference is a factor of n against a factor of <span class="math" data-say="log base 2 of n">lg n</span>. However much smaller <span class="math" data-say="c sub 1">c₁</span> is, once n is large enough the factor <span class="math" data-say="log base 2 of n">lg n</span> makes up for it, so there is always a crossover beyond which merge sort is faster. The authors then make this concrete with two computers, one a thousand times faster than the other.</p><div class="mathblock" data-say="the lesson&#x27;s own two machines, sorting 5 million keys. A, 3 n squared instructions at 5 billion a second. 3 times the quantity 5 times 10 to the power 6, squared over the quantity 5 times 10 to the power 9, equals 15000 seconds, over four hours. B, 60 n times log base 2 of n instructions at 20 million a second. 60 times 5 times 10 to the power 6 times log base 2 of the quantity 5 times 10 to the power 6, over the quantity 2 times 10 to the power 7, is approximately 333.8 seconds, under six minutes" tabindex="0" role="region" aria-label="Mathematical notation">the lesson&#x27;s own two machines, sorting 5 million keys
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the race</h2><div class="prose reading"><p>&ldquo;Total system performance depends on choosing efficient algorithms as much as on choosing fast hardware.&rdquo; The authors reach that sentence in the last part of Section 1.2, just after a calculation that most readers remember long after the rest of the chapter. This lesson reads Chapter 1, The Role of Algorithms in Computing: Section 1.1 on what an algorithm is, and Section 1.2 on why its efficiency is a technology in its own right.</p><p>Section 1.1 begins informally. An algorithm accepts an input, one value or many, carries out a sequence of well-defined computational steps, and delivers an output, again one value or many. The problem it solves is stated separately, as a relation between inputs and acceptable outputs, and the authors take sorting as their running example: given a sequence of n numbers, produce a permutation of it in nondecreasing order. One particular input sequence is an instance of the problem.</p><div class="defbox"><span class="label">Definition &middot; Correct algorithm</span><p>An algorithm is <strong>correct</strong> if on each instance of its problem it halts, and halts with a right answer; a correct algorithm <strong>solves</strong> the problem. An incorrect one may fail to halt on some instance or halt with a wrong answer. The authors note that an incorrect algorithm is sometimes useful when its error rate can be controlled, and point to the primality tests of Chapter 31.</p></div><p>The rest of Section 1.1 is a tour. Sequencing a genome, routing data across the Internet, keeping electronic commerce private, and allocating scarce resources in a business are all problems whose solutions rest on algorithms the book later teaches: shortest paths, longest common subsequences, topological sorting, convex hulls, linear programming. Two features recur. Each problem has a great many candidate solutions, most of them not what is wanted, and each has practical use. The section closes with four threads the book returns to: data structures, techniques of design and analysis for problems no published algorithm covers, problems for which no efficient algorithm is known (the NP-complete problems of Chapter 34), and parallelism on multicore machines (Chapter 27).</p><p>Section 1.2 asks a question to clear the ground. If computers were infinitely fast and memory free, would algorithms still be worth studying? Yes, the authors answer, because you would still need to show that your method halts and gives the right answer; but you would then use whichever correct method was easiest to write. Real computers are fast but finite, so time and space are bounded resources, and efficiency decides how much of them a method uses.</p><p>The argument is a comparison of two sorts the next chapter analyses. Insertion sort takes time roughly <span class="math" data-say="c sub 1 times n squared">c₁·n²</span> and merge sort roughly <span class="math" data-say="c sub 2 times n times log base 2 of n">c₂·n·lg n</span>, with constants that do not depend on n, and insertion sort usually has the smaller constant. Write the two as <span class="math" data-say="c sub 1 times n times n">c₁·n·n</span> and <span class="math" data-say="c sub 2 times n times log base 2 of n">c₂·n·lg n</span> and the difference is a factor of n against a factor of <span class="math" data-say="log base 2 of n">lg n</span>. However much smaller <span class="math" data-say="c sub 1">c₁</span> is, once n is large enough the factor <span class="math" data-say="log base 2 of n">lg n</span> makes up for it, so there is always a crossover beyond which merge sort is faster. The authors then make this concrete with two computers, one a thousand times faster than the other.</p><div class="mathblock" data-say="the lesson&#x27;s own two machines, sorting 5 million keys. A, 3 n squared instructions at 5 billion a second. 3 times the quantity 5 times 10 to the power 6, squared over the quantity 5 times 10 to the power 9, equals 15000 seconds, over four hours. B, 60 n times log base 2 of n instructions at 20 million a second. 60 times 5 times 10 to the power 6 times log base 2 of the quantity 5 times 10 to the power 6, over the quantity 2 times 10 to the power 7, is approximately 333.8 seconds, under six minutes" tabindex="0" role="region" aria-label="Mathematical notation">the lesson&#x27;s own two machines, sorting 5 million keys
 
 A: 3n² instructions at 5 billion a second
    3 · (5·10⁶)² / (5·10⁹) = 15,000 s, over four hours
 B: 60n lg n instructions at 20 million a second
-   60 · 5·10⁶ · lg(5·10⁶) / (2·10⁷) ≈ 333.8 s, under six minutes</div><p>Machine A is 250 times faster than machine B and runs code twenty times leaner, and it still loses by a factor of about 45. The book's own figures, in Section 1.2, make the same point with a still wider gap in machine speed. The point is not the particular numbers. It is that the ratio of the two times grows without bound as n grows, so for big enough inputs no lead in hardware or coding survives a worse order of growth.</p><p>The section ends by placing algorithms beside the other technologies a system depends on, such as fast hardware, graphical interfaces, object-oriented systems and networking. Even an application with no algorithmic content of its own leans on algorithms everywhere below it: the hardware was designed with them, the interface is drawn with them, the network routes with them, and the compiler that translated the program is full of them. And because computers keep getting larger, people keep solving larger problems, which is exactly where differences in efficiency show.</p><p>Now the lab. Choose a cost function and a constant for each program and a speed for each machine; each time is the constant times the cost at n, divided by the speed. The tiles are the crossover, the least n from which the program with the slower-growing cost is faster at every larger size; each program's time at your n; and which is faster there, by what factor. Every comparison involving <span class="math" data-say="log base 2 of n">lg n</span> is decided exactly, and times containing it print rounded.</p><p>The worked example <code>five-million</code> is the table above: 15,000 seconds for A, about 333.80 for B, and B about 44.9 times faster. Its crossover is n = 81,580. Choose <code>one-thousand</code>: the same two machines sorting a thousand keys, where A finishes in six ten-thousandths of a second and is about 49.8 times faster than B. The crossover has not moved, because it depends on the programs and machines, not on the n you ask about.</p><p>Two more examples show the edges of the argument. In <code>same-order</code> both programs cost <span class="math" data-say="n times log base 2 of n">n·lg n</span>, and the lab reports that there is no crossover: the ratio of the two times is a constant, here 5,000, at every n, so the faster machine and the leaner code win for good. In <code>exponential</code> program A costs <span class="math" data-say="2 to the power n">2ⁿ</span> on the fast machine and program B costs <span class="math" data-say="100 times n cubed">100·n³</span> on the slow one; the crossover is n = 30, and at n = 60 A would need about 230 million seconds, over seven years, against B's 1.08 seconds.</p><h3>Exercise</h3><p>Program A costs <span class="math" data-say="4 n squared">4n²</span> instructions on a machine that runs 2 billion a second; program B costs <span class="math" data-say="100 n times log base 2 of n">100n lg n</span> on a machine that runs 50 million a second. By hand, trying <span data-say="n equals 2 to the power 10, 2 to the power 11, 2 to the power 12">n = 2¹⁰, 2¹¹, 2¹²</span>, and so on, find the least power of 2 at which B is faster than A. Then set the lab to these programs and read the exact crossover.</p><p>The chapter argued that insertion sort loses to merge sort for large n without yet saying what either does. The next lesson, Insertion Sort and Loop Invariants, opens Chapter 2 with the first of them and with the tool the book uses to prove every loop it writes correct.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Orders of growth</h2></div><p>two programs on two machines</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   60 · 5·10⁶ · lg(5·10⁶) / (2·10⁷) ≈ 333.8 s, under six minutes</div><p>Machine A is 250 times faster than machine B and runs code twenty times leaner, and it still loses by a factor of about 45. The book's own figures, in Section 1.2, make the same point with a still wider gap in machine speed. The point is not the particular numbers. It is that the ratio of the two times grows without bound as n grows, so for big enough inputs no lead in hardware or coding survives a worse order of growth.</p><p>The section ends by placing algorithms beside the other technologies a system depends on, such as fast hardware, graphical interfaces, object-oriented systems and networking. Even an application with no algorithmic content of its own leans on algorithms everywhere below it: the hardware was designed with them, the interface is drawn with them, the network routes with them, and the compiler that translated the program is full of them. And because computers keep getting larger, people keep solving larger problems, which is exactly where differences in efficiency show.</p><p>Now the lab. Choose a cost function and a constant for each program and a speed for each machine; each time is the constant times the cost at n, divided by the speed. The tiles are the crossover, the least n from which the program with the slower-growing cost is faster at every larger size; each program's time at your n; and which is faster there, by what factor. Every comparison involving <span class="math" data-say="log base 2 of n">lg n</span> is decided exactly, and times containing it print rounded.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Orders of growth</h2></div><p>two programs on two machines</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Orders of growth</strong><span>two programs on two machines</span></div>
       </div>
@@ -1409,10 +1452,10 @@ B: 60n lg n instructions at 20 million a second
       <div class="table-wrap" id="griTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="griTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each program's time is its constant × its cost function at n, divided by its machine's speed, in seconds. The crossover is the least n from which the program with the slower-growing cost is strictly faster at every larger n: n = 1 to 64 are tried one by one, and past 64 (where the ratio of the two functions only grows) it is found by bisection up to 10^15, or 4,096 when a program costs 2^n. lg n is irrational unless n is a power of 2: times with lg n in them print rounded, and every comparison is decided exactly.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Race two programs on two machines</h3>
-          <p>A count over the situation the lesson states. Each program has a cost function, a constant and a machine speed; its time at n is the constant times the cost, divided by the speed. The lab finds the size from which the program with the slower-growing cost is always faster, and compares the two at the n you choose.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Race two programs on two machines</h3>
+            <p>A count over the situation the lesson states. Each program has a cost function, a constant and a machine speed; its time at n is the constant times the cost, divided by the speed. The lab finds the size from which the program with the slower-growing cost is always faster, and compares the two at the n you choose.</p>
         <div class="field">
           <label for="griPreset">Worked example</label>
           <select id="griPreset"><option value="five-million" selected>3n² at 5 billion a second against 60n lg n at 20 million, 5 million keys</option><option value="one-thousand">The same two machines, 1,000 keys</option><option value="same-order">Both programs n lg n, the slow machine running the costly code</option><option value="exponential">2ⁿ on the fast machine against 100n³ on the slow one, n = 60</option></select>
@@ -1452,12 +1495,15 @@ B: 60n lg n instructions at 20 million a second
           <div class="kpi"><span>Faster at n</span><strong id="griFaster">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The worked example <code>five-million</code> is the table above: 15,000 seconds for A, about 333.80 for B, and B about 44.9 times faster. Its crossover is n = 81,580. Choose <code>one-thousand</code>: the same two machines sorting a thousand keys, where A finishes in six ten-thousandths of a second and is about 49.8 times faster than B. The crossover has not moved, because it depends on the programs and machines, not on the n you ask about.</p><p>Two more examples show the edges of the argument. In <code>same-order</code> both programs cost <span class="math" data-say="n times log base 2 of n">n·lg n</span>, and the lab reports that there is no crossover: the ratio of the two times is a constant, here 5,000, at every n, so the faster machine and the leaner code win for good. In <code>exponential</code> program A costs <span class="math" data-say="2 to the power n">2ⁿ</span> on the fast machine and program B costs <span class="math" data-say="100 times n cubed">100·n³</span> on the slow one; the crossover is n = 30, and at n = 60 A would need about 230 million seconds, over seven years, against B's 1.08 seconds.</p><h3>Exercise</h3><p>Program A costs <span class="math" data-say="4 n squared">4n²</span> instructions on a machine that runs 2 billion a second; program B costs <span class="math" data-say="100 n times log base 2 of n">100n lg n</span> on a machine that runs 50 million a second. By hand, trying <span data-say="n equals 2 to the power 10, 2 to the power 11, 2 to the power 12">n = 2¹⁰, 2¹¹, 2¹²</span>, and so on, find the least power of 2 at which B is faster than A. Then set the lab to these programs and read the exact crossover.</p><p>The chapter argued that insertion sort loses to merge sort for large n without yet saying what either does. The next lesson, Insertion Sort and Loop Invariants, opens Chapter 2 with the first of them and with the tool the book uses to prove every loop it writes correct.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding a crossover by hand</h2></div><p>Four steps with a calculator, then one race of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each time as a formula</h3><p>Time is constant times cost at n, divided by machine speed. Write both, for example <span class="math" data-say="3 n squared over the quantity 5 times 10 to the power 9">3n²/(5·10⁹)</span> and <span class="math" data-say="60 n times log base 2 of n over the quantity 2 times 10 to the power 7">60n lg n/(2·10⁷)</span>, in seconds.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide one by the other</h3><p>Cancel what you can. For the lesson's machines the ratio of A's time to B's is <span class="math" data-say="n over the quantity 5000 times log base 2 of n">n/(5000·lg n)</span>, so B is faster exactly when <span class="math" data-say="n is greater than 5000 times log base 2 of n">n > 5000·lg n</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Bracket the crossover with powers of 2</h3><p>At <span class="math" data-say="n equals 2 to the power k">n = 2ᵏ</span>, <span class="math" data-say="log base 2 of n">lg n</span> is just k, so the test is arithmetic. Find the last power of 2 where the slower-growing program still loses and the first where it wins.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Narrow the bracket</h3><p>Halve the interval and test the midpoint, keeping the half where the winner changes, until it is as narrow as you need. This is what the lab does past n = 64.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Race two of your own</h3><p>Pick two programs and machines you find plausible, find the bracketing powers of 2 by hand, then enter them in the lab and check that its crossover lies in your bracket.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding a crossover by hand</h2>
+      <p class="lead-in">Four steps with a calculator, then one race of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write each time as a formula.</strong> Time is constant times cost at n, divided by machine speed. Write both, for example <span class="math" data-say="3 n squared over the quantity 5 times 10 to the power 9">3n²/(5·10⁹)</span> and <span class="math" data-say="60 n times log base 2 of n over the quantity 2 times 10 to the power 7">60n lg n/(2·10⁷)</span>, in seconds.</li><li><strong>Divide one by the other.</strong> Cancel what you can. For the lesson's machines the ratio of A's time to B's is <span class="math" data-say="n over the quantity 5000 times log base 2 of n">n/(5000·lg n)</span>, so B is faster exactly when <span class="math" data-say="n is greater than 5000 times log base 2 of n">n > 5000·lg n</span>.</li><li><strong>Bracket the crossover with powers of 2.</strong> At <span class="math" data-say="n equals 2 to the power k">n = 2ᵏ</span>, <span class="math" data-say="log base 2 of n">lg n</span> is just k, so the test is arithmetic. Find the last power of 2 where the slower-growing program still loses and the first where it wins.</li><li><strong>Narrow the bracket.</strong> Halve the interval and test the midpoint, keeping the half where the winner changes, until it is as narrow as you need. This is what the lab does past n = 64.</li><li><strong>Race two of your own.</strong> Pick two programs and machines you find plausible, find the bracketing powers of 2 by hand, then enter them in the lab and check that its crossover lies in your bracket.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1478,17 +1524,16 @@ B wins when n &gt; 5000·lg n
 2¹⁷: 131,072 &gt; 85,000, B wins</div><p>So the crossover lies between 65,536 and 131,072, and the lab's exact answer, 81,580, is inside the bracket. At five million keys B is about 45 times faster; at a thousand keys, below the crossover, A is about 50 times faster.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing faster hardware can make up for a worse algorithm</strong><span>A faster machine divides every running time by the same constant, and a leaner program multiplies it by a smaller one. A better order of growth changes the ratio itself, which grows without bound, so beyond the crossover no constant lead survives. On the lesson's illustration, a machine 250 times faster running code 20 times leaner loses by a factor of about 45 at five million keys.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the better order of growth to win at every size</strong><span>Below the crossover the program with the smaller constant wins, and the authors say that insertion sort usually beats merge sort on small inputs. On the lesson's machines the quadratic program is about 50 times faster at a thousand keys. The chapter's claim is about large enough n, and the crossover tells you where that begins for one pair of programs and machines.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a procedure correct because it passed its tests</strong><span>The definition in Section 1.1 quantifies over every instance, and a finite set of tests covers almost none of them. A test can show a procedure is wrong; showing it right needs an argument about all inputs, which is what the loop invariant of the next lesson supplies.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute where a better algorithm overtakes a faster machine.</strong><p>Given two cost formulas, two constants and two machine speeds, bracket the crossover between powers of 2 by hand, compute both times at a stated n, and say why no crossover exists when the orders of growth are equal.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's times are formulas evaluated at n, not measurements of programs; a real program's constant depends on its compiler, its machine and its memory, which the RAM model of the next lessons sets aside. The crossover it finds is exact for the formulas you give. That some crossover exists for every such pair is the chapter's argument, and it holds whatever the constants.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing faster hardware can make up for a worse algorithm</strong><span>A faster machine divides every running time by the same constant, and a leaner program multiplies it by a smaller one. A better order of growth changes the ratio itself, which grows without bound, so beyond the crossover no constant lead survives. On the lesson's illustration, a machine 250 times faster running code 20 times leaner loses by a factor of about 45 at five million keys.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the better order of growth to win at every size</strong><span>Below the crossover the program with the smaller constant wins, and the authors say that insertion sort usually beats merge sort on small inputs. On the lesson's machines the quadratic program is about 50 times faster at a thousand keys. The chapter's claim is about large enough n, and the crossover tells you where that begins for one pair of programs and machines.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Calling a procedure correct because it passed its tests</strong><span>The definition in Section 1.1 quantifies over every instance, and a finite set of tests covers almost none of them. A test can show a procedure is wrong; showing it right needs an argument about all inputs, which is what the loop invariant of the next lesson supplies.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute where a better algorithm overtakes a faster machine.</strong><p>Given two cost formulas, two constants and two machine speeds, bracket the crossover between powers of 2 by hand, compute both times at a stated n, and say why no crossover exists when the orders of growth are equal.</p></div></div><div class="note"><strong>Note:</strong> The lab's times are formulas evaluated at n, not measurements of programs; a real program's constant depends on its compiler, its machine and its memory, which the RAM model of the next lessons sets aside. The crossover it finds is exact for the formulas you give. That some crossover exists for every such pair is the chapter's argument, and it holds whatever the constants.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Problem, algorithm and instance</summary><p>A computational problem states, in general terms, which outputs are acceptable for which inputs. An algorithm is a well-defined procedure that produces such an output. An instance is one particular input: one array to sort, one map to route across.</p></details><details class="recall"><summary>Correctness</summary><p>An algorithm is correct if, on every instance, it halts with a correct output. A procedure that works on the inputs you tried has not yet been shown correct; the book's way of showing it, the loop invariant, is the next lesson.</p></details><details class="recall"><summary>Efficiency as a technology</summary><p>Two correct algorithms for one problem can differ in running time by far more than two machines do. The book asks you to treat the choice of algorithm the way you treat the choice of hardware: as a technology that decides how fast a system is.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 1 says what an algorithm is, what it means for one to be correct, and why efficiency is worth studying even on fast hardware. Its central argument is arithmetic: a quadratic sort on a fast machine against an n lg n sort on a slow one, and the size beyond which the slow machine always wins. Work that arithmetic by hand, then race two programs of your own in the lab and find their crossover.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Problem, algorithm and instance.</strong> A computational problem states, in general terms, which outputs are acceptable for which inputs. An algorithm is a well-defined procedure that produces such an output. An instance is one particular input: one array to sort, one map to route across.</li><li><strong>Correctness.</strong> An algorithm is correct if, on every instance, it halts with a correct output. A procedure that works on the inputs you tried has not yet been shown correct; the book's way of showing it, the loop invariant, is the next lesson.</li><li><strong>Efficiency as a technology.</strong> Two correct algorithms for one problem can differ in running time by far more than two machines do. The book asks you to treat the choice of algorithm the way you treat the choice of hardware: as a technology that decides how fast a system is.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="an instance is one input to a problem. correct, right output on every instance. time equals constant times cost of n over speed. a lower order of growth wins for good. the crossover can come at a modest n" tabindex="0" role="region" aria-label="Mathematical notation">an instance is one input to a problem
 correct: right output on every instance
 time = constant · cost(n) / speed
@@ -2268,11 +2313,40 @@ the crossover can come at a modest n</div><figcaption>Chapter 1 in five lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2340,7 +2414,7 @@ the crossover can come at a modest n</div><figcaption>Chapter 1 in five lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

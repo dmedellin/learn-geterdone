@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sets, Relations, and Functions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sets</p>
       <h1>Set Operations</h1>
       <p class="lesson-lede">Union, intersection, difference, complement, symmetric difference.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Union is inclusive</li><li>Complement needs a universe</li><li>Difference is not symmetric</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The five operations</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Union, intersection, difference</span><p><span class="math" data-say="A union B equals the set x such that x in A or x in B">A ∪ B = {x : x ∈ A ∨ x ∈ B}</span>, <span class="math" data-say="A intersect B equals the set x such that x in A and x in B">A ∩ B = {x : x ∈ A ∧ x ∈ B}</span>, <span class="math" data-say="A minus B equals the set x such that x in A and x not in B">A \ B = {x : x ∈ A ∧ x ∉ B}</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Complement</span><p>Relative to a <strong>universal set</strong> <span class="math" data-say="U">U</span> containing every set under discussion, <span class="math" data-say="A bar equals U minus A equals the set x in U such that x not in A">Ā = U \ A = {x ∈ U : x ∉ A}</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Symmetric difference</span><p><span class="math" data-say="A symmetric difference B equals A minus B union B minus A">A △ B = (A \ B) ∪ (B \ A)</span> &mdash; the elements in exactly one of the two. Equivalently <span class="math" data-say="A union B minus A intersect B">(A ∪ B) \ (A ∩ B)</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Disjoint</span><p><span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are <strong>disjoint</strong> when <span class="math" data-say="A intersect B equals the empty set">A ∩ B = ∅</span>. A collection is <strong>pairwise disjoint</strong> when every two distinct members of it are disjoint &mdash; the condition “Equivalence Relations and Partitions” needs for partitions.</p></div><h3>The correspondence with logic</h3><div class="mathblock" data-say="set operation, membership condition, connective. A union B, x in A, or, x in B, or. A intersect B, x in A, and, x in B, and. A bar, not x in A, not. A minus B, x in A, and, not x in B, and, not. A symmetric difference B, x in A, x or, x in B, x or. A is a subset of B, x in A, to, x in B, to" tabindex="0" role="region" aria-label="Mathematical notation">set operation        membership condition       connective
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The five operations</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Union, intersection, difference</span><p><span class="math" data-say="A union B equals the set x such that x in A or x in B">A ∪ B = {x : x ∈ A ∨ x ∈ B}</span>, <span class="math" data-say="A intersect B equals the set x such that x in A and x in B">A ∩ B = {x : x ∈ A ∧ x ∈ B}</span>, <span class="math" data-say="A minus B equals the set x such that x in A and x not in B">A \ B = {x : x ∈ A ∧ x ∉ B}</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Complement</span><p>Relative to a <strong>universal set</strong> <span class="math" data-say="U">U</span> containing every set under discussion, <span class="math" data-say="A bar equals U minus A equals the set x in U such that x not in A">Ā = U \ A = {x ∈ U : x ∉ A}</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Symmetric difference</span><p><span class="math" data-say="A symmetric difference B equals A minus B union B minus A">A △ B = (A \ B) ∪ (B \ A)</span> &mdash; the elements in exactly one of the two. Equivalently <span class="math" data-say="A union B minus A intersect B">(A ∪ B) \ (A ∩ B)</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Disjoint</span><p><span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are <strong>disjoint</strong> when <span class="math" data-say="A intersect B equals the empty set">A ∩ B = ∅</span>. A collection is <strong>pairwise disjoint</strong> when every two distinct members of it are disjoint &mdash; the condition “Equivalence Relations and Partitions” needs for partitions.</p></div><h3>The correspondence with logic</h3><div class="mathblock" data-say="set operation, membership condition, connective. A union B, x in A, or, x in B, or. A intersect B, x in A, and, x in B, and. A bar, not x in A, not. A minus B, x in A, and, not x in B, and, not. A symmetric difference B, x in A, x or, x in B, x or. A is a subset of B, x in A, to, x in B, to" tabindex="0" role="region" aria-label="Mathematical notation">set operation        membership condition       connective
 A ∪ B                x ∈ A  ∨  x ∈ B            ∨
 A ∩ B                x ∈ A  ∧  x ∈ B            ∧
 Ā                    ¬(x ∈ A)                   ¬
 A \ B                x ∈ A  ∧  ¬(x ∈ B)         ∧, ¬
 A △ B                x ∈ A  ⊕  x ∈ B            ⊕
-A ⊆ B                x ∈ A  →  x ∈ B            →</div><p>This is not an analogy. Every set identity in “Set Identities and Proofs” is a logical equivalence from “Logical Equivalence” in Logic and Proof, applied pointwise to membership. De Morgan for sets and De Morgan for propositions are the same theorem in two notations, and knowing that halves what has to be memorised.</p><div class="thm"><span class="label">Theorem &middot; Inclusion-exclusion for two sets</span><p>For finite sets, <span class="math" data-say="the size of A union B, equals the size of A, plus the size of B, minus the size of A intersect B">|A ∪ B| = |A| + |B| − |A ∩ B|</span>.</p></div><div class="proof"><p>Adding <span class="math" data-say="the size of A">|A|</span> and <span class="math" data-say="the size of B">|B|</span> counts every element of <span class="math" data-say="A intersect B">A ∩ B</span> twice &mdash; once in each term &mdash; and every other element of <span class="math" data-say="A union B">A ∪ B</span> once. Subtracting <span class="math" data-say="the size of A intersect B">|A ∩ B|</span> removes exactly the surplus.</p><p><span class="qed">&#9633;</span></p></div><p>“The Inclusion-Exclusion Principle” in Combinatorics and Counting generalises this to any number of sets, where the alternating signs are less obvious and the correction is larger. The two-set case is worth having by heart now.</p><div class="example"><span class="label">Example &middot; Difference is not symmetric</span><p>With <span class="math" data-say="A equals the set 1, 2, 3">A = {1, 2, 3}</span> and <span class="math" data-say="B equals the set 3, 4">B = {3, 4}</span>: <span class="math" data-say="A minus B equals the set 1, 2">A \ B = {1, 2}</span> and <span class="math" data-say="B minus A equals the set 4">B \ A = {4}</span>. Their union <span class="math" data-say="the set 1, 2, 4">{1, 2, 4}</span> is <span class="math" data-say="A symmetric difference B">A △ B</span>, and <span class="math" data-say="A intersect B equals the set 3">A ∩ B = {3}</span> is exactly what <span class="math" data-say="symmetric difference">△</span> excludes.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Set algebra</h2></div><p>Two expressions, one membership</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+A ⊆ B                x ∈ A  →  x ∈ B            →</div><p>This is not an analogy. Every set identity in “Set Identities and Proofs” is a logical equivalence from “Logical Equivalence” in Logic and Proof, applied pointwise to membership. De Morgan for sets and De Morgan for propositions are the same theorem in two notations, and knowing that halves what has to be memorised.</p><div class="thm"><span class="label">Theorem &middot; Inclusion-exclusion for two sets</span><p>For finite sets, <span class="math" data-say="the size of A union B, equals the size of A, plus the size of B, minus the size of A intersect B">|A ∪ B| = |A| + |B| − |A ∩ B|</span>.</p></div><div class="proof"><p>Adding <span class="math" data-say="the size of A">|A|</span> and <span class="math" data-say="the size of B">|B|</span> counts every element of <span class="math" data-say="A intersect B">A ∩ B</span> twice &mdash; once in each term &mdash; and every other element of <span class="math" data-say="A union B">A ∪ B</span> once. Subtracting <span class="math" data-say="the size of A intersect B">|A ∩ B|</span> removes exactly the surplus.</p><p><span class="qed">&#9633;</span></p></div><p>“The Inclusion-Exclusion Principle” in Combinatorics and Counting generalises this to any number of sets, where the alternating signs are less obvious and the correction is larger. The two-set case is worth having by heart now.</p><div class="example"><span class="label">Example &middot; Difference is not symmetric</span><p>With <span class="math" data-say="A equals the set 1, 2, 3">A = {1, 2, 3}</span> and <span class="math" data-say="B equals the set 3, 4">B = {3, 4}</span>: <span class="math" data-say="A minus B equals the set 1, 2">A \ B = {1, 2}</span> and <span class="math" data-say="B minus A equals the set 4">B \ A = {4}</span>. Their union <span class="math" data-say="the set 1, 2, 4">{1, 2, 4}</span> is <span class="math" data-say="A symmetric difference B">A △ B</span>, and <span class="math" data-say="A intersect B equals the set 3">A ∩ B = {3}</span> is exactly what <span class="math" data-say="symmetric difference">△</span> excludes.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Set algebra</h2></div><p>Two expressions, one membership</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Set expressions over U = {1, …, 12}</strong><span>Click an element to move it between the sets</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected by A</span><span class="tone-purple"><i class="legend-swatch"></i>selected by B</span></div>
@@ -1412,10 +1455,10 @@ A ⊆ B                x ∈ A  →  x ∈ B            →</div><p>This is not 
         <div id="vennKey" class="small-copy" style="margin-top:8px;"></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="setRows"></table></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Evaluate any expression</h3>
-          <p>Both expressions are evaluated against the same membership, and the row labelled "difference" is their symmetric difference &mdash; the elements in exactly one of them. With <span class="math" data-say="A minus B">A \ B</span> against <span class="math" data-say="B minus A">B \ A</span> at the starting membership it reads <span class="math" data-say="the set 1, 2, 3, 7, 8, 9">{1, 2, 3, 7, 8, 9}</span>: the two differences share nothing, and their union is <span class="math" data-say="A symmetric difference B">A △ B</span>. Cycle element 4 until it is in <span class="math" data-say="A">A</span> only and it joins <span class="math" data-say="A minus B">A \ B</span>. The distributive pair further down the list gives an empty row on every membership; “Set Identities and Proofs” says why.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Evaluate any expression</h3>
+            <p>Both expressions are evaluated against the same membership, and the row labelled "difference" is their symmetric difference &mdash; the elements in exactly one of them. With <span class="math" data-say="A minus B">A \ B</span> against <span class="math" data-say="B minus A">B \ A</span> at the starting membership it reads <span class="math" data-say="the set 1, 2, 3, 7, 8, 9">{1, 2, 3, 7, 8, 9}</span>: the two differences share nothing, and their union is <span class="math" data-say="A symmetric difference B">A △ B</span>. Cycle element 4 until it is in <span class="math" data-say="A">A</span> only and it joins <span class="math" data-say="A minus B">A \ B</span>. The distributive pair further down the list gives an empty row on every membership; “Set Identities and Proofs” says why.</p>
         <div class="field">
           <label for="setExprA">Expression A</label>
           <select id="setExprA"></select>
@@ -1435,12 +1478,14 @@ A ⊆ B                x ∈ A  →  x ∈ B            →</div><p>This is not 
           <div class="kpi"><span>Equal?</span><strong id="kEq">&mdash;</strong></div>
         </div>
         <div class="status-banner" id="setStatus">Pick two expressions and see whether anything separates them.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Evaluating a set expression</h2></div><p>Translate to membership conditions, then evaluate elementwise.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Rewrite the expression as a membership condition</h3><p><span class="math" data-say="x in A intersect B union C">x ∈ A ∩ (B ∪ C)</span> becomes <span class="math" data-say="x in A and the quantity x in B or x in C">x ∈ A ∧ (x ∈ B ∨ x ∈ C)</span>. From here it is propositional logic.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Decide the condition for each element in turn</h3><p>With a small universe this is quick and cannot go wrong. It is also how the lab computes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Watch the universe when complementing</h3><p><span class="math" data-say="A bar">Ā</span> depends entirely on <span class="math" data-say="U">U</span>. An expression mixing complements and an unstated universe is not well defined.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check a boundary case</h3><p>What does the expression give when <span class="math" data-say="A equals the empty set">A = ∅</span>, or when <span class="math" data-say="A equals B">A = B</span>? Degenerate cases catch misreadings faster than general ones.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Evaluating a set expression</h2>
+      <p class="lead-in">Translate to membership conditions, then evaluate elementwise.</p>
+      <ol class="key-ideas method"><li><strong>Rewrite the expression as a membership condition.</strong> <span class="math" data-say="x in A intersect B union C">x ∈ A ∩ (B ∪ C)</span> becomes <span class="math" data-say="x in A and the quantity x in B or x in C">x ∈ A ∧ (x ∈ B ∨ x ∈ C)</span>. From here it is propositional logic.</li><li><strong>Decide the condition for each element in turn.</strong> With a small universe this is quick and cannot go wrong. It is also how the lab computes.</li><li><strong>Watch the universe when complementing.</strong> <span class="math" data-say="A bar">Ā</span> depends entirely on <span class="math" data-say="U">U</span>. An expression mixing complements and an unstated universe is not well defined.</li><li><strong>Check a boundary case.</strong> What does the expression give when <span class="math" data-say="A equals the empty set">A = ∅</span>, or when <span class="math" data-say="A equals B">A = B</span>? Degenerate cases catch misreadings faster than general ones.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1461,17 +1506,16 @@ Check element by element:
   4 ∈ A and 4 ∈ B ⟹ not in A\B;  4 ∈ B and 4 ∈ C ⟹ in B∩C  ✓</div><p>Element 4 is the interesting one: it fails the first term and passes the second. Checking a few elements individually is how you catch a misplaced parenthesis, which the set-level calculation hides.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming <span class="math" data-say="A minus B equals B minus A">A \ B = B \ A</span></strong><span>Difference is not symmetric. <span class="math" data-say="A minus B">A \ B</span> keeps what is in <span class="math" data-say="A">A</span> only; <span class="math" data-say="B minus A">B \ A</span> keeps what is in <span class="math" data-say="B">B</span> only, and those are different sets.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding cardinalities without subtracting the overlap</strong><span><span class="math" data-say="the size of A union B, equals the size of A, plus the size of B">|A ∪ B| = |A| + |B|</span> holds only when <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are disjoint. Otherwise the shared elements are counted twice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Complementing without a universe</strong><span>An expression containing <span class="math" data-say="A bar">Ā</span> and no stated <span class="math" data-say="U">U</span> is incomplete. The lab pins <span class="math" data-say="U equals the set 1, and so on, 12">U = {1, …, 12}</span> for exactly this reason.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can translate any set expression into a membership condition without hesitating.</strong><p>Take <span class="math" data-say="A symmetric difference B minus C">(A △ B) \ C</span> and write the condition for <span class="math" data-say="x">x</span> to belong. If you produce <span class="math" data-say="the quantity x in A x or x in B, and x not in C">(x ∈ A ⊕ x ∈ B) ∧ x ∉ C</span>, the rest of the course's set algebra is Logic and Proof in different symbols.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> <span class="math" data-say="A symmetric difference B">A △ B</span> is associative and every element is its own inverse under it, which makes the subsets of <span class="math" data-say="U">U</span> a group under symmetric difference. That structure is why <span class="math" data-say="symmetric difference">△</span> behaves like addition modulo 2, the same connection <span class="math" data-say="x or">⊕</span> had in Logic and Proof.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming <span class="math" data-say="A minus B equals B minus A">A \ B = B \ A</span></strong><span>Difference is not symmetric. <span class="math" data-say="A minus B">A \ B</span> keeps what is in <span class="math" data-say="A">A</span> only; <span class="math" data-say="B minus A">B \ A</span> keeps what is in <span class="math" data-say="B">B</span> only, and those are different sets.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding cardinalities without subtracting the overlap</strong><span><span class="math" data-say="the size of A union B, equals the size of A, plus the size of B">|A ∪ B| = |A| + |B|</span> holds only when <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> are disjoint. Otherwise the shared elements are counted twice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Complementing without a universe</strong><span>An expression containing <span class="math" data-say="A bar">Ā</span> and no stated <span class="math" data-say="U">U</span> is incomplete. The lab pins <span class="math" data-say="U equals the set 1, and so on, 12">U = {1, …, 12}</span> for exactly this reason.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can translate any set expression into a membership condition without hesitating.</strong><p>Take <span class="math" data-say="A symmetric difference B minus C">(A △ B) \ C</span> and write the condition for <span class="math" data-say="x">x</span> to belong. If you produce <span class="math" data-say="the quantity x in A x or x in B, and x not in C">(x ∈ A ⊕ x ∈ B) ∧ x ∉ C</span>, the rest of the course's set algebra is Logic and Proof in different symbols.</p></div></div><div class="note"><strong>Note:</strong> <span class="math" data-say="A symmetric difference B">A △ B</span> is associative and every element is its own inverse under it, which makes the subsets of <span class="math" data-say="U">U</span> a group under symmetric difference. That structure is why <span class="math" data-say="symmetric difference">△</span> behaves like addition modulo 2, the same connection <span class="math" data-say="x or">⊕</span> had in Logic and Proof.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Union is inclusive</summary><p><span class="math" data-say="x in A union B">x ∈ A ∪ B</span> when <span class="math" data-say="x">x</span> is in at least one. Elements in both are in the union once &mdash; a set has no multiplicities.</p></details><details class="recall"><summary>Complement needs a universe</summary><p><span class="math" data-say="A bar">Ā</span> is meaningless without a stated universal set <span class="math" data-say="U">U</span>. The complement of the even numbers is different inside <span class="math" data-say="the integers">ℤ</span> and inside <span class="math" data-say="the reals">ℝ</span>.</p></details><details class="recall"><summary>Difference is not symmetric</summary><p><span class="math" data-say="A minus B">A \ B</span> and <span class="math" data-say="B minus A">B \ A</span> are generally different sets. Symmetric difference <span class="math" data-say="A symmetric difference B">A △ B</span> is the union of the two, and is the set analogue of <span class="math" data-say="x or">⊕</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>Five operations, each defined by a connective from Logic and Proof. Union is <span class="math" data-say="or">∨</span>, intersection is <span class="math" data-say="and">∧</span>, complement is <span class="math" data-say="not">¬</span> &mdash; which is why the set identities are the logical equivalences wearing different symbols.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Union is inclusive.</strong> <span class="math" data-say="x in A union B">x ∈ A ∪ B</span> when <span class="math" data-say="x">x</span> is in at least one. Elements in both are in the union once &mdash; a set has no multiplicities.</li><li><strong>Complement needs a universe.</strong> <span class="math" data-say="A bar">Ā</span> is meaningless without a stated universal set <span class="math" data-say="U">U</span>. The complement of the even numbers is different inside <span class="math" data-say="the integers">ℤ</span> and inside <span class="math" data-say="the reals">ℝ</span>.</li><li><strong>Difference is not symmetric.</strong> <span class="math" data-say="A minus B">A \ B</span> and <span class="math" data-say="B minus A">B \ A</span> are generally different sets. Symmetric difference <span class="math" data-say="A symmetric difference B">A △ B</span> is the union of the two, and is the set analogue of <span class="math" data-say="x or">⊕</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A union B equals the set x such that x in A, or, x in B. A intersect B equals the set x such that x in A, and, x in B. A minus B equals the set x such that x in A, and, x not in B. A bar, equals the set x in U such that x not in A, complement, relative to a universe U" tabindex="0" role="region" aria-label="Mathematical notation">A ∪ B = {x : x ∈ A  ∨  x ∈ B}
 A ∩ B = {x : x ∈ A  ∧  x ∈ B}
 A \ B = {x : x ∈ A  ∧  x ∉ B}
@@ -2006,11 +2050,40 @@ A \ B = {x : x ∈ A  ∧  x ∉ B}
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2078,7 +2151,7 @@ A \ B = {x : x ∈ A  ∧  x ∉ B}
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

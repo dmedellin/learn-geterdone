@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Statements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 19 · General Control Issues</p>
       <h1>Nesting and Complexity</h1>
       <p class="lesson-lede">Counting a routine&#x27;s decision points and its deepest nesting tells you where to look, and flattening it moves the decisions without removing them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Nesting depth</li><li>Decision points</li><li>Structured programming</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p><strong>Chapter 19, p. 460.</strong> &ldquo;Deep nesting makes a routine hard to understand. Fortunately, you can avoid it relatively easily.&rdquo; It is the second of the chapter's key points. Read Sections 19.4 to 19.6, pp. 445&ndash;460, in your own copy first.</p><p>Open the routine you have maintained that you least like to open, and you will probably find closing braces stacked down the right-hand side and a statement somewhere in the middle that runs only when five conditions hold. Section 19.4 (p. 445) calls excessive nesting one of the chief culprits in confusing code, and reports the evidence for a limit as others' findings: studies by Noam Chomsky and Gerald Weinberg, as Yourdon reports them, suggest that few people can understand more than three levels of nested <span class="math" data-say="if">if</span>s, and many researchers, Myers, Marca, and Ledgard and Tauer among them, recommend no more than three or four. These are other people's observations, made before 2004; your own code reviews can test them.</p><p>The section's remedies are a list. Retest part of a condition instead of nesting another <span class="math" data-say="if">if</span>; use a block that can be broken out of; convert a nested <span class="math" data-say="if">if</span> to a chain of if-then-else tests or to a <span class="math" data-say="case">case</span> statement; factor deeply nested code into a routine of its own; replace a case-by-case dispatch with objects and polymorphism; or redesign the code. Its summary adds techniques from other chapters: a status variable, exceptions, and the guard clauses of Unusual Control Structures. Deep nesting, the section concludes, is a warning that the code needs another look, and you should have a good reason if you leave it.</p><p>Section 19.5 (p. 454) steps back to structured programming. The book traces the term to a paper Edsger Dijkstra presented in 1969, and notes that it was soon applied to every activity in software, down to &ldquo;structured goofing off&rdquo;. Its core is that a program should use only one-in, one-out constructs, and its thesis, credited to Böhm and Jacopini in 1966, is that sequence, selection and iteration are enough to build any control flow. McConnell's view is that <span class="math" data-say="break">break</span>, <span class="math" data-say="continue">continue</span>, <span class="math" data-say="return">return</span> and exceptions deserve a critical eye for that reason. Section 19.6 (p. 456) then argues that control structures are a large part of a program's complexity, measured as the number of things a reader must hold in mind at once, and presents Tom McCabe's 1976 measure.</p><p>The book's rule, Table 19-2 (p. 458): start with 1 for the straight path through the routine; add 1 for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="repeat">repeat</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="and">and</span> and <span class="math" data-say="or">or</span>, &ldquo;or their equivalents&rdquo;; add 1 for each case of a <span class="math" data-say="case">case</span> statement. It reads the result in three bands: 0 to 5, the routine is probably fine; 6 to 10, start to think about simplifying it; 10 and more, break part of it into another routine. These are McConnell's guidance, built on McCabe's measure, not a grade, and he says so: the limit of 10 is a warning flag rather than a rule, and a long <span class="math" data-say="case">case</span> statement may be better left whole. He adds a point the lesson's lab will show: moving part of a routine into another does not reduce the program's overall complexity, it moves the decision points, though it does reduce how much you must hold at one time.</p><p>Now the count. The lab's <em>complexity</em> view applies the rule to Java: 1, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>; <span class="math" data-say="else">else</span>, <span class="math" data-say="default">default</span> and the <span class="math" data-say="if so, otherwise">?:</span> operator add nothing, the last by the kit's choice. It prints the <strong>decision points</strong>, the <strong>breakdown</strong> by keyword, the <strong>band</strong> (putting 10 in 6&ndash;10, where the book's bands overlap), the <strong>deepest nesting</strong> by the depth rule above, and the <strong>first line at that depth</strong>. Here is the <code>nested-shipping</code> preset, twenty-two lines written for the lesson:</p><pre class="codeblock" data-say="line 1, double shipping cost of order order. line 2, double cost is set to 0.0. line 3, if order is not equal to null. line 4, if order dot weight is greater than 0. line 5, if order dot is domestic. line 6, if order dot weight is less than 2 and not order dot is express. line 7, cost is set to 5.0. line 8, else. line 9, cost is set to 9.0 plus order dot weight. line 11, else. line 12, for item item in order dot items. line 13, if item dot is restricted or item dot weight is greater than 30. line 14, flagged, return minus 1.0. line 17, cost is set to 25.0 plus 2 times order dot weight. line 21, return cost" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double shippingCost(Order order) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p><strong>Chapter 19, p. 460.</strong> &ldquo;Deep nesting makes a routine hard to understand. Fortunately, you can avoid it relatively easily.&rdquo; It is the second of the chapter's key points. Read Sections 19.4 to 19.6, pp. 445&ndash;460, in your own copy first.</p><p>Open the routine you have maintained that you least like to open, and you will probably find closing braces stacked down the right-hand side and a statement somewhere in the middle that runs only when five conditions hold. Section 19.4 (p. 445) calls excessive nesting one of the chief culprits in confusing code, and reports the evidence for a limit as others' findings: studies by Noam Chomsky and Gerald Weinberg, as Yourdon reports them, suggest that few people can understand more than three levels of nested <span class="math" data-say="if">if</span>s, and many researchers, Myers, Marca, and Ledgard and Tauer among them, recommend no more than three or four. These are other people's observations, made before 2004; your own code reviews can test them.</p><p>The section's remedies are a list. Retest part of a condition instead of nesting another <span class="math" data-say="if">if</span>; use a block that can be broken out of; convert a nested <span class="math" data-say="if">if</span> to a chain of if-then-else tests or to a <span class="math" data-say="case">case</span> statement; factor deeply nested code into a routine of its own; replace a case-by-case dispatch with objects and polymorphism; or redesign the code. Its summary adds techniques from other chapters: a status variable, exceptions, and the guard clauses of Unusual Control Structures. Deep nesting, the section concludes, is a warning that the code needs another look, and you should have a good reason if you leave it.</p><p>Section 19.5 (p. 454) steps back to structured programming. The book traces the term to a paper Edsger Dijkstra presented in 1969, and notes that it was soon applied to every activity in software, down to &ldquo;structured goofing off&rdquo;. Its core is that a program should use only one-in, one-out constructs, and its thesis, credited to Böhm and Jacopini in 1966, is that sequence, selection and iteration are enough to build any control flow. McConnell's view is that <span class="math" data-say="break">break</span>, <span class="math" data-say="continue">continue</span>, <span class="math" data-say="return">return</span> and exceptions deserve a critical eye for that reason. Section 19.6 (p. 456) then argues that control structures are a large part of a program's complexity, measured as the number of things a reader must hold in mind at once, and presents Tom McCabe's 1976 measure.</p><p>The book's rule, Table 19-2 (p. 458): start with 1 for the straight path through the routine; add 1 for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="repeat">repeat</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="and">and</span> and <span class="math" data-say="or">or</span>, &ldquo;or their equivalents&rdquo;; add 1 for each case of a <span class="math" data-say="case">case</span> statement. It reads the result in three bands: 0 to 5, the routine is probably fine; 6 to 10, start to think about simplifying it; 10 and more, break part of it into another routine. These are McConnell's guidance, built on McCabe's measure, not a grade, and he says so: the limit of 10 is a warning flag rather than a rule, and a long <span class="math" data-say="case">case</span> statement may be better left whole. He adds a point the lesson's lab will show: moving part of a routine into another does not reduce the program's overall complexity, it moves the decision points, though it does reduce how much you must hold at one time.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Decision points and nesting</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by the chapter's rule as applied to Java, and the depth of each statement by its braces. The bands are McConnell's guidance for where to look, not a grade.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="nested-shipping" selected>Shipping cost, nested five deep (the lesson's routine)</option><option value="guard-clauses">The same rules as guard clauses</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Now the count. The lab's <em>complexity</em> view applies the rule to Java: 1, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>; <span class="math" data-say="else">else</span>, <span class="math" data-say="default">default</span> and the <span class="math" data-say="if so, otherwise">?:</span> operator add nothing, the last by the kit's choice. It prints the <strong>decision points</strong>, the <strong>breakdown</strong> by keyword, the <strong>band</strong> (putting 10 in 6&ndash;10, where the book's bands overlap), the <strong>deepest nesting</strong> by the depth rule above, and the <strong>first line at that depth</strong>. Here is the <code>nested-shipping</code> preset, twenty-two lines written for the lesson:</p><pre class="codeblock" data-say="line 1, double shipping cost of order order. line 2, double cost is set to 0.0. line 3, if order is not equal to null. line 4, if order dot weight is greater than 0. line 5, if order dot is domestic. line 6, if order dot weight is less than 2 and not order dot is express. line 7, cost is set to 5.0. line 8, else. line 9, cost is set to 9.0 plus order dot weight. line 11, else. line 12, for item item in order dot items. line 13, if item dot is restricted or item dot weight is greater than 30. line 14, flagged, return minus 1.0. line 17, cost is set to 25.0 plus 2 times order dot weight. line 21, return cost" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double shippingCost(Order order) {</span>
 <span class="cl">    double cost = 0.0;</span>
 <span class="cl">    if (order != null) {</span>
 <span class="cl">        if (order.weight() &gt; 0) {</span>
@@ -1491,53 +1578,12 @@
 <span class="cl">        }</span>
 <span class="cl">    }</span>
 <span class="cl">    return pct;</span>
-<span class="cl">}</span></code></pre><p>Count the decision points of <span class="math" data-say="discount percent">discountPercent</span> by the rule, with their breakdown by keyword, and the deepest nesting, by hand. Then paste the routine into the lab to check.</p><p>That ends the course, and the book's Part IV. The next course, Code Improvements, begins with The Software-Quality Landscape, which asks how much of the code these lessons produce a team's testing and reviews can be expected to make right.</p></article>
+<span class="cl">}</span></code></pre><p>Count the decision points of <span class="math" data-say="discount percent">discountPercent</span> by the rule, with their breakdown by keyword, and the deepest nesting, by hand. Then paste the routine into the lab to check.</p><p>That ends the course, and the book's Part IV. The next course, Code Improvements, begins with The Software-Quality Landscape, which asks how much of the code these lessons produce a team's testing and reviews can be expected to make right.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Decision points and nesting</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by the chapter's rule as applied to Java, and the depth of each statement by its braces. The bands are McConnell's guidance for where to look, not a grade.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="nested-shipping" selected>Shipping cost, nested five deep (the lesson's routine)</option><option value="guard-clauses">The same rules as guard clauses</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting decision points and depth</h2></div><p>Five steps, the last of which is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start at one</h3><p>Every routine has one straight path through it, and the count starts with it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Add the keywords</h3><p>Add one for each if, while, for and case, and one for each <span data-say="and">&&</span> and <span data-say="or">||</span> in their conditions. An else, a default and a return add nothing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the deepest statement</h3><p>For each statement, count the braces it sits inside below the routine's own. The largest is the routine's deepest nesting.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the count, then the code</h3><p>Place the count in the chapter's bands, then go to the deepest statement and the conditions over it, and ask which technique of Section 19.4 would bring it up.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Paste your most-nested routine into the lab, note its decision points, breakdown and deepest nesting, and write one sentence saying which of Section 19.4's techniques you would try first and why.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting decision points and depth</h2>
+      <p class="lead-in">Five steps, the last of which is yours.</p>
+      <ol class="key-ideas method"><li><strong>Start at one.</strong> Every routine has one straight path through it, and the count starts with it.</li><li><strong>Add the keywords.</strong> Add one for each if, while, for and case, and one for each <span data-say="and">&&</span> and <span data-say="or">||</span> in their conditions. An else, a default and a return add nothing.</li><li><strong>Find the deepest statement.</strong> For each statement, count the braces it sits inside below the routine's own. The largest is the routine's deepest nesting.</li><li><strong>Read the count, then the code.</strong> Place the count in the chapter's bands, then go to the deepest statement and the conditions over it, and ask which technique of Section 19.4 would bring it up.</li><li><strong>Do it on your own code.</strong> Paste your most-nested routine into the lab, note its decision points, breakdown and deepest nesting, and write one sentence saying which of Section 19.4's techniques you would try first and why.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1556,17 +1602,16 @@ total: 1 + 5 + 1 + 2 gives 9
 deepest: line 14, inside 5 levels</div><p>Nine decision points, in the band 6–10, and a statement five levels deep. Neither figure says the routine is wrong; both say where to read it first.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that flattening the code reduces its complexity</strong><span>It reduces the nesting a reader holds at once: on the lesson's routine, from 5 levels to 1. The decision points fall from 9 to 6 only because three of them, a <span class="math" data-say="for">for</span>, an <span class="math" data-say="if">if</span> and an <span class="math" data-say="or">||</span>, moved into <span class="math" data-say="international cost">internationalCost</span>, where they are still to be read. McConnell says so himself: moving part of a routine into another does not reduce the program's overall complexity, it reduces what you must juggle at one time (p. 458).</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a count of 11 means the routine is bad</strong><span>The bands are the book's guidance for where to look, after McCabe, and the book calls 10 a warning flag, not an absolute limit; it names a long case statement as something it may be foolish to break up. A count measures the paths through a routine. Whether they are too many is a judgement made by reading it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking guard clauses are the only cure for deep nesting</strong><span>Section 19.4 lists retesting part of a condition, a break block, converting to if-then-else or case, factoring code into a routine, polymorphism and redesign, and points elsewhere to status variables, exceptions and guard clauses. Which fits depends on why the code is nested.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a routine&#x27;s decision points and nesting by hand.</strong><p>For a routine of 15 to 22 lines, state the decision points with their breakdown by keyword and the deepest nesting, by the rule as the lesson states it, by hand.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab reads keywords and braces; it never runs the code. It does not count <span class="math" data-say="if so, otherwise">?:</span>, which the book's rule might count as an equivalent of <span class="math" data-say="if">if</span>, and it cannot tell whether the routine a branch moved into is easier to read than the branch was. The bands are McConnell's guidance after McCabe's measure, drawn from other people's projects; your own defect records are the test of whether they fit your code.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that flattening the code reduces its complexity</strong><span>It reduces the nesting a reader holds at once: on the lesson's routine, from 5 levels to 1. The decision points fall from 9 to 6 only because three of them, a <span class="math" data-say="for">for</span>, an <span class="math" data-say="if">if</span> and an <span class="math" data-say="or">||</span>, moved into <span class="math" data-say="international cost">internationalCost</span>, where they are still to be read. McConnell says so himself: moving part of a routine into another does not reduce the program's overall complexity, it reduces what you must juggle at one time (p. 458).</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a count of 11 means the routine is bad</strong><span>The bands are the book's guidance for where to look, after McCabe, and the book calls 10 a warning flag, not an absolute limit; it names a long case statement as something it may be foolish to break up. A count measures the paths through a routine. Whether they are too many is a judgement made by reading it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking guard clauses are the only cure for deep nesting</strong><span>Section 19.4 lists retesting part of a condition, a break block, converting to if-then-else or case, factoring code into a routine, polymorphism and redesign, and points elsewhere to status variables, exceptions and guard clauses. Which fits depends on why the code is nested.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a routine&#x27;s decision points and nesting by hand.</strong><p>For a routine of 15 to 22 lines, state the decision points with their breakdown by keyword and the deepest nesting, by the rule as the lesson states it, by hand.</p></div></div><div class="note"><strong>Note:</strong> The lab reads keywords and braces; it never runs the code. It does not count <span class="math" data-say="if so, otherwise">?:</span>, which the book's rule might count as an equivalent of <span class="math" data-say="if">if</span>, and it cannot tell whether the routine a branch moved into is easier to read than the branch was. The bands are McConnell's guidance after McCabe's measure, drawn from other people's projects; your own defect records are the test of whether they fit your code.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Nesting depth</summary><p>How many control structures a statement sits inside. The lab counts the braces around a statement below the routine's own, so a statement directly in the routine's body is at depth 0 and the body of three nested ifs is at depth 3.</p></details><details class="recall"><summary>Decision points</summary><p>McConnell's count, after McCabe: 1 for the straight path through a routine, plus 1 for each if, while, for, and and or, and 1 for each case. It measures how many paths the control flow has, not how good the routine is.</p></details><details class="recall"><summary>Structured programming</summary><p>The idea that a program should use only constructs with one entry and one exit, and the result, credited to Böhm and Jacopini, that sequence, selection and iteration are enough to build any control flow.</p></details></div>
+      <h3>Summary</h3>
       <p>The second half of Chapter 19 takes deep nesting, the structured-programming idea that any control flow can be built from sequence, selection and iteration, and McCabe's count of decision points. Count a shipping-cost routine nested five deep, flatten it with guard clauses, and see what falls and what only moves.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Nesting depth.</strong> How many control structures a statement sits inside. The lab counts the braces around a statement below the routine's own, so a statement directly in the routine's body is at depth 0 and the body of three nested ifs is at depth 3.</li><li><strong>Decision points.</strong> McConnell's count, after McCabe: 1 for the straight path through a routine, plus 1 for each if, while, for, and and or, and 1 for each case. It measures how many paths the control flow has, not how good the routine is.</li><li><strong>Structured programming.</strong> The idea that a program should use only constructs with one entry and one exit, and the result, credited to Böhm and Jacopini, that sequence, selection and iteration are enough to build any control flow.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="few readers follow three nested ifs. points, 1 plus each if, for, while, case, and, or. 0 to 5 fine, 6 to 10 think, 10 plus split. the count says where to look. moving code moves its decision points" tabindex="0" role="region" aria-label="Mathematical notation">few readers follow three nested ifs
 points: 1 + each if, for, while, case, &amp;&amp;, ||
 0–5 fine; 6–10 think; 10+ split
@@ -2580,11 +2625,40 @@ moving code moves its decision points</div><figcaption>The second half of the ch
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2652,7 +2726,7 @@ moving code moves its decision points</div><figcaption>The second half of the ch
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

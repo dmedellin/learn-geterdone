@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,59 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Variables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · Fundamental Data Types</p>
       <h1>Named Constants and Other Types</h1>
       <p class="lesson-lede">A literal in the body of a routine hides what it means and where else it must change, so the book asks for a named constant for every literal but 0 and 1, even the safe ones.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A magic number</li><li>A named constant</li><li>An enumerated type</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Sections 12.4 to 12.9, then one routine with and without constants</h2>
-      <article class="prose reading"><p>&ldquo;Even if you think a literal is safe, use named constants instead. Be a fanatic about rooting out literals in your code.&rdquo; That is from Section 12.7, on page 309. This lesson reads Sections 12.4 to 12.9, pages 297 to 318; read them in your own copy first.</p><p>Section 12.4, on characters and strings, begins where the previous lesson's section on numbers did: avoid magic characters and strings. A literal string may need to change, may need translating, takes space, and says nothing about why it is there; a constant called <span class="math" data-say="escape">ESCAPE</span> is clearer than the character code it stands for. The rest of the section is about off-by-one errors in substrings and, for C, Unicode and safe string routines; in Java every string is Unicode.</p><p>Section 12.5 uses boolean variables to document a program: assign each part of a complicated test to a boolean whose name says what it checks, and the <span class="math" data-say="if">if</span> reads as a sentence. Section 12.6 recommends enumerated types over schemes in which 1 stands for red and 2 for green, for readability, for parameters whose meaning is otherwise a guess, and for checking that a value is one of the allowed ones. Its margin note says that Java has no enumerated types as the book is written and probably will by the time it is read; Java 5 added <span class="math" data-say="enum">enum</span> the same year.</p><p>Section 12.7 is the lesson's centre. A named constant parameterises a program, putting something that might change where it can be changed once; McConnell calls this single-point control. Use named constants in declarations, such as the length of an array. Avoid literals even when they seem safe: a loop to 12 is probably over months, but the section asks whether you would bet on it, and a constant removes the doubt. Use each constant consistently, because a constant in one place and the same literal in another is a change waiting to be missed. Section 12.1's rule of thumb, that the only literals in a program's body should be 0 and 1, is the measure this lesson's lab applies.</p><p>This is where many readers part company with McConnell, over the <span class="math" data-say="2">2</span> in a midpoint or the <span class="math" data-say="100">100</span> in a percentage. The chapter's position is plain: name even the safe ones, and search your code for the digits 2 to 9 to make sure none has slipped in. The lab follows the book and counts every literal but 0 and 1.</p><p>Section 12.8 is about arrays: keep every index within bounds, consider a container accessed in sequence instead, check the first and last elements, and watch for index cross-talk in nested loops. Section 12.9 recommends creating your own types, with C's <span class="math" data-say="typedef">typedef</span> as its main example, so that changing a representation is one edit; in Java the same idea is a small class, which Chapter 6's lessons covered.</p><p>Now the code. Here is a routine that computes a monthly mortgage payment. It is the <code>magic</code> preset in the lab below.</p><pre class="codeblock" data-say="line 1, double monthly payment of double principal, int years. line 2, flagged, double rate is set to 0.0725 divided by 12. line 3, flagged, int months is set to years times 12. line 4, flagged, if months is greater than 360. line 5, flagged, months is set to 360. line 7, double factor is set to math dot pow of 1 plus rate, months. line 8, return principal times rate times factor divided by, open bracket, factor minus 1, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double monthlyPayment(double principal, int years) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Sections 12.4 to 12.9, then one routine with and without constants</h2><div class="prose reading"><p>&ldquo;Even if you think a literal is safe, use named constants instead. Be a fanatic about rooting out literals in your code.&rdquo; That is from Section 12.7, on page 309. This lesson reads Sections 12.4 to 12.9, pages 297 to 318; read them in your own copy first.</p><p>Section 12.4, on characters and strings, begins where the previous lesson's section on numbers did: avoid magic characters and strings. A literal string may need to change, may need translating, takes space, and says nothing about why it is there; a constant called <span class="math" data-say="escape">ESCAPE</span> is clearer than the character code it stands for. The rest of the section is about off-by-one errors in substrings and, for C, Unicode and safe string routines; in Java every string is Unicode.</p><p>Section 12.5 uses boolean variables to document a program: assign each part of a complicated test to a boolean whose name says what it checks, and the <span class="math" data-say="if">if</span> reads as a sentence. Section 12.6 recommends enumerated types over schemes in which 1 stands for red and 2 for green, for readability, for parameters whose meaning is otherwise a guess, and for checking that a value is one of the allowed ones. Its margin note says that Java has no enumerated types as the book is written and probably will by the time it is read; Java 5 added <span class="math" data-say="enum">enum</span> the same year.</p><p>Section 12.7 is the lesson's centre. A named constant parameterises a program, putting something that might change where it can be changed once; McConnell calls this single-point control. Use named constants in declarations, such as the length of an array. Avoid literals even when they seem safe: a loop to 12 is probably over months, but the section asks whether you would bet on it, and a constant removes the doubt. Use each constant consistently, because a constant in one place and the same literal in another is a change waiting to be missed. Section 12.1's rule of thumb, that the only literals in a program's body should be 0 and 1, is the measure this lesson's lab applies.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>numbers written into the code</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>numbers written into the code</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Numeric literals on code lines count, except 0 and 1 and except on a line that contains <code>final</code>.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Magic numbers</h3>
+            <p>A count over code, by the rules stated below the listing. The lab lists every numeric literal other than 0 and 1 outside a final declaration, with the lines it appears on, and counts them and the distinct values. It does not count strings or characters, and it cannot judge a constant's name.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="magic" selected>Magic numbers in a mortgage payment</option><option value="named">The same with named constants</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Magic numbers</span><strong id="coMagic">&mdash;</strong></div>
+          <div class="kpi"><span>Distinct</span><strong id="coDistinct">&mdash;</strong></div>
+          <div class="kpi"><span>Each, with its lines</span><strong id="coMagicList">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This is where many readers part company with McConnell, over the <span class="math" data-say="2">2</span> in a midpoint or the <span class="math" data-say="100">100</span> in a percentage. The chapter's position is plain: name even the safe ones, and search your code for the digits 2 to 9 to make sure none has slipped in. The lab follows the book and counts every literal but 0 and 1.</p><p>Section 12.8 is about arrays: keep every index within bounds, consider a container accessed in sequence instead, check the first and last elements, and watch for index cross-talk in nested loops. Section 12.9 recommends creating your own types, with C's <span class="math" data-say="typedef">typedef</span> as its main example, so that changing a representation is one edit; in Java the same idea is a small class, which Chapter 6's lessons covered.</p><p>Now the code. Here is a routine that computes a monthly mortgage payment. It is the <code>magic</code> preset in the lab below.</p><pre class="codeblock" data-say="line 1, double monthly payment of double principal, int years. line 2, flagged, double rate is set to 0.0725 divided by 12. line 3, flagged, int months is set to years times 12. line 4, flagged, if months is greater than 360. line 5, flagged, months is set to 360. line 7, double factor is set to math dot pow of 1 plus rate, months. line 8, return principal times rate times factor divided by, open bracket, factor minus 1, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double monthlyPayment(double principal, int years) {</span>
 <span class="cl flag">    double rate = 0.0725 / 12;</span>
 <span class="cl flag">    int months = years * 12;</span>
 <span class="cl flag">    if (months &gt; 360) {</span>
@@ -1471,51 +1556,12 @@
 <span class="cl">        }</span>
 <span class="cl">        sleepSeconds(900);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>This loop watches the patients on a ward. List every magic number in it with its line, say how many are distinct, and write a <span class="math" data-say="static final">static final</span> declaration with a name for each. Paste your version into the lab to check that it finds none.</p><p>Chapter 12 ends with types you make yourself. Chapter 13 turns to the unusual ones, and to global data, in the course's last lesson, &ldquo;Structures, Pointers and Global Data&rdquo;.</p></article>
+<span class="cl">}</span></code></pre><p>This loop watches the patients on a ward. List every magic number in it with its line, say how many are distinct, and write a <span class="math" data-say="static final">static final</span> declaration with a name for each. Paste your version into the lab to check that it finds none.</p><p>Chapter 12 ends with types you make yourself. Chapter 13 turns to the unusual ones, and to global data, in the course's last lesson, &ldquo;Structures, Pointers and Global Data&rdquo;.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>numbers written into the code</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>numbers written into the code</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Numeric literals on code lines count, except 0 and 1 and except on a line that contains <code>final</code>.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Magic numbers</h3>
-          <p>A count over code, by the rules stated below the listing. The lab lists every numeric literal other than 0 and 1 outside a final declaration, with the lines it appears on, and counts them and the distinct values. It does not count strings or characters, and it cannot judge a constant's name.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="magic" selected>Magic numbers in a mortgage payment</option><option value="named">The same with named constants</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Magic numbers</span><strong id="coMagic">&mdash;</strong></div>
-          <div class="kpi"><span>Distinct</span><strong id="coDistinct">&mdash;</strong></div>
-          <div class="kpi"><span>Each, with its lines</span><strong id="coMagicList">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Rooting out literals</h2></div><p>Four steps; the last is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the literals</h3><p>Go through the routine and write down every numeric literal other than 0 and 1, with the line it is on. Note strings and characters as well; the lab does not.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Group them by meaning</h3><p>Two literals with the same value and the same meaning are one constant; the same value with two meanings is two constants.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name and declare each</h3><p>Write a <span class="math" data-say="static final">static final</span> declaration for each, named for what it stands for in the problem, and replace every use.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Declare constants in your own code</h3><p>Paste a routine of your own into the lab, declare a named constant for each literal it lists, replace the literals, and paste it again until the lab finds none or you can say why a literal should stay.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Rooting out literals</h2>
+      <p class="lead-in">Four steps; the last is yours.</p>
+      <ol class="key-ideas method"><li><strong>List the literals.</strong> Go through the routine and write down every numeric literal other than 0 and 1, with the line it is on. Note strings and characters as well; the lab does not.</li><li><strong>Group them by meaning.</strong> Two literals with the same value and the same meaning are one constant; the same value with two meanings is two constants.</li><li><strong>Name and declare each.</strong> Write a <span class="math" data-say="static final">static final</span> declaration for each, named for what it stands for in the problem, and replace every use.</li><li><strong>Declare constants in your own code.</strong> Paste a routine of your own into the lab, declare a named constant for each literal it lists, replace the literals, and paste it again until the lab finds none or you can say why a literal should stay.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1533,17 +1579,16 @@ line 2 becomes: ANNUAL_RATE / MONTHS_PER_YEAR
 line 3 uses MONTHS_PER_YEAR too</div><p>One constant now carries both 12s, and a reader of line 2 no longer has to guess that the routine works in monthly terms.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that a literal used only once is harmless</strong><span>The chapter's reasons for constants are readability and a single point of change, and it asks for them even for literals you think are safe. In <code>magic</code>, <span class="math" data-say="12">12</span> appearing twice with one meaning is the case the lab's list makes obvious; the single <span class="math" data-say="0.0725">0.0725</span> is not repeated, and it still does not say that it is an annual rate. On the lesson's illustration, naming all three costs three lines and removes every guess.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Naming a constant after its value</strong><span><span class="math" data-say="twelve">TWELVE</span> passes the lab and tells a reader nothing the literal did not. Chapter 11 asks for a constant to be named for the abstract thing it represents, so that the name is still true when the value changes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Overlooking magic strings and characters</strong><span>Section 12.4 applies the same reasoning to literal strings and characters: they may change, may need translating, and say nothing about why they are there. The lab counts only numbers, so a message or a code character in quotes is for you to find.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a routine&#x27;s magic numbers and replace them.</strong><p>For a routine, list every literal other than 0 and 1 with its lines, group them by meaning, and write the named constant declarations that replace them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts numeric literals by the book's rule of thumb and nothing else: it does not count strings or characters, it ignores 0 and 1 even where they encode a meaning, and it cannot tell whether a constant's name says what it stands for. Whether every 2 deserves a name is a point on which practice varies; the book's answer is yes.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that a literal used only once is harmless</strong><span>The chapter's reasons for constants are readability and a single point of change, and it asks for them even for literals you think are safe. In <code>magic</code>, <span class="math" data-say="12">12</span> appearing twice with one meaning is the case the lab's list makes obvious; the single <span class="math" data-say="0.0725">0.0725</span> is not repeated, and it still does not say that it is an annual rate. On the lesson's illustration, naming all three costs three lines and removes every guess.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Naming a constant after its value</strong><span><span class="math" data-say="twelve">TWELVE</span> passes the lab and tells a reader nothing the literal did not. Chapter 11 asks for a constant to be named for the abstract thing it represents, so that the name is still true when the value changes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Overlooking magic strings and characters</strong><span>Section 12.4 applies the same reasoning to literal strings and characters: they may change, may need translating, and say nothing about why they are there. The lab counts only numbers, so a message or a code character in quotes is for you to find.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a routine&#x27;s magic numbers and replace them.</strong><p>For a routine, list every literal other than 0 and 1 with its lines, group them by meaning, and write the named constant declarations that replace them.</p></div></div><div class="note"><strong>Note:</strong> The lab counts numeric literals by the book's rule of thumb and nothing else: it does not count strings or characters, it ignores 0 and 1 even where they encode a meaning, and it cannot tell whether a constant's name says what it stands for. Whether every 2 deserves a name is a point on which practice varies; the book's answer is yes.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A magic number</summary><p>A literal such as <span class="math" data-say="360">360</span> or <span class="math" data-say="0.0725">0.0725</span> that appears in the middle of the code with nothing to say what it is. Strings and characters can be magic too.</p></details><details class="recall"><summary>A named constant</summary><p>A name bound to a value that cannot change once set; in Java a <code>static final</code> field. It says what the value means and gives it a single point of control: change it once and every use follows.</p></details><details class="recall"><summary>An enumerated type</summary><p>A type whose values are a fixed list of names, such as the months of the year, instead of numbers that stand for them. In Java it is an <span class="math" data-say="enum">enum</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>The second half of Chapter 12 runs through characters and strings, booleans, enumerated types, named constants, arrays and types of your own. Its sharpest advice is about literals: give each a name, even when you are sure it will never change. List a routine's magic numbers with their lines and replace them with constants.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A magic number.</strong> A literal such as <span class="math" data-say="360">360</span> or <span class="math" data-say="0.0725">0.0725</span> that appears in the middle of the code with nothing to say what it is. Strings and characters can be magic too.</li><li><strong>A named constant.</strong> A name bound to a value that cannot change once set; in Java a <code>static final</code> field. It says what the value means and gives it a single point of control: change it once and every use follows.</li><li><strong>An enumerated type.</strong> A type whose values are a fixed list of names, such as the months of the year, instead of numbers that stand for them. In Java it is an <span class="math" data-say="enum">enum</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="magic number, an unnamed literal. only 0 and 1 belong in the body. even safe literals get names. one constant, one place to change it. name what it stands for, not its value" tabindex="0" role="region" aria-label="Mathematical notation">magic number: an unnamed literal
 only 0 and 1 belong in the body
 even safe literals get names
@@ -2543,11 +2588,40 @@ name what it stands for, not its value</div><figcaption>Constants in five lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2615,7 +2689,7 @@ name what it stands for, not its value</div><figcaption>Constants in five lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

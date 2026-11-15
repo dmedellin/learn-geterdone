@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,39 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Building Blocks of a Model-Driven Design</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · A Model Expressed in Software</p>
       <h1>Entities</h1>
       <p class="lesson-lede">An object that is the same thing through every change to its attributes, and must be told apart from another that looks exactly like it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Entity</li><li>Identity operation</li><li>Changed and look-alike pairs</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s story and argument, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The model must define what it means to be the same thing.&rdquo; That is the last sentence of the pattern Entities, also called Reference Objects, in Chapter 5. This lesson reads it with the two sections that follow, Modeling Entities and Designing the Identity Operation.</p><p>Evans opens with a story from his own life, and it is worth reading in the book. Sued for damage to a flat he had never seen, he was taken for a former tenant of the same name; what saved him was an old phone book showing two listings side by side, his and his namesake's. People can resolve a mistaken identity with resourcefulness. A system that confuses two people corrupts its data.</p><p>The argument is that many things are defined by identity rather than by any attribute. A person's name, address and finances can all change, and yet the person persists, and the question that matters to a model is whether the application's users care that it is the same person. A customer in a receivables system may also live in a sales team's contact software and in an archive, in different forms, and when the phone rings it matters whether this is the customer with the overdue account. Two records may need matching though their attributes differ, and two others telling apart though their attributes agree.</p><p>Put as a rule to apply: if an object matters for who it is, let identity lead its definition, keep the class about remaining the same thing over its life, give it a way to be told apart that survives any change of storage or shape, and distrust any requirement to match such objects on their fields. The identity is an operation that never gives two objects the same answer, often a symbol attached for the purpose, and it must follow the distinctions the model draws. Evans warns that the language's own identity, Java's <code>==</code>, only says two references point at one object in memory; that means little in most domains, and it is lost whenever an object is stored and read back or sent across a network.</p><p>Identity, he insists, is not part of the things themselves; it is imposed on them because it is useful. Two equal deposits to one account on one day are still two transactions, and a cheque number is how a bank statement and a cheque register match the same transaction entered by different people on different days. A stadium's seats are entities when tickets are for numbered seats, and not when the event is general admission, where only the count of seats matters.</p><p>Modeling Entities asks that the class be kept spare: the attributes that identify the object or are commonly used to find and match it, the behaviour essential to the concept, and the rest moved to associated objects, other entities or the value objects of the next lesson. Designing the Identity Operation then lists the ways to get an identifier. Some attributes, or combinations of them, can be guaranteed unique and serve as a key, though Evans warns that such keys have exceptions; otherwise the system attaches an identifier that is unique within the class and, once assigned, never changes. It may be hidden from users, as in a contacts program that must tell two people of the same name apart, or given to them, as a parcel's tracking number is. Identifiers issued outside, a national number or a phone number, can be missing, shared or reassigned, which is why matching often ends with a person deciding.</p><p>Now the count, on a clinic whose front desk and laboratory each hold patient records. The lab takes objects as records of a name, an identifier and attributes, compares every pair, and reports the pairs the same by identity, the pairs the same by attributes, and where the two disagree. On the preset <code>patients</code> there are four records and 6 pairs. One pair is the same by identity, the desk's and the lab's record of patient P-1047, and one pair is the same by attributes, the desk's Ana Ruiz and another patient with the same name, birth year and town. They disagree on both: the first is a changed pair, since she has moved and only the lab knows, and the second a look-alike pair.</p><pre class="codeblock" data-say="line 1, final class patient. line 2, private final patient id id, comment, issued once, never changed. line 3, private person name name. line 4, private local date born. line 5, private town town. line 7, at override. line 8, public boolean equals of object o. line 9, return o is an instance of patient and, open bracket, cast to patient o, close bracket, dot id dot equals of id. line 12, at override. line 13, public int hash code. line 14, return id dot hash code" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class Patient {</span>
-<span class="cl">    private final PatientId id;   // issued once, never changed</span>
-<span class="cl">    private PersonName name;</span>
-<span class="cl">    private LocalDate born;</span>
-<span class="cl">    private Town town;</span>
-<span class="cl"></span>
-<span class="cl">    @Override</span>
-<span class="cl">    public boolean equals(Object o) {</span>
-<span class="cl">        return o instanceof Patient &amp;&amp; ((Patient) o).id.equals(id);</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    @Override</span>
-<span class="cl">    public int hashCode() {</span>
-<span class="cl">        return id.hashCode();</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Equality written as above, on the identifier alone, gives the first answer, and an equality on every field would give the second. The preset <code>patients-keyed-by-name</code> shows what happens when the identifier is built from the attributes people search by, the name with the birth year. Now 3 pairs are the same by identity, every pairing of the three records called Ana Ruiz, and the lab lists 2 changed pairs and 0 look-alikes. It reports, faithfully, that two different patients are one, because the identifier says so. That is Evans's warning about attribute keys in the lab's numbers: the count follows the identity you state, and only the model can say whether that identity is right.</p><p>So the count is a reason to look at each disagreement. A changed pair is where attribute matching would split one patient into two, and a look-alike pair where it would merge two into one; both are the mistakes a clinic cannot afford, and both are invisible to a comparison of fields. The lab does not know which records belong to which person. You do, from the identifier, and the identifier is only as good as the model behind it.</p><h3>Exercise</h3><ul><li>A library's member records, written name, identifier, attributes: <span class="math" data-say="m 1, L 301, name kim lee, joined 2019, branch north">m1, L-301, name=kim-lee, joined=2019, branch=north</span>; <span class="math" data-say="m 2, L 301, name kim lee, joined 2019, branch south">m2, L-301, name=kim-lee, joined=2019, branch=south</span>; <span class="math" data-say="m 3, L 455, name kim lee, joined 2019, branch north">m3, L-455, name=kim-lee, joined=2019, branch=north</span>; <span class="math" data-say="m 4, L 455, name kim lee, joined 2019, branch north">m4, L-455, name=kim-lee, joined=2019, branch=north</span>.</li></ul><p>Compare all six pairs. Count the pairs the same by identity and by attributes, and list the changed pairs and the look-alikes. Then say what a librarian would need to ask to know whether the identifiers are right.</p><p>Not everything deserves an identity. The next lesson, Value Objects, reads the objects whose only interest to us is what they are.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Identity and value</h2></div><p>the same by identity, or the same by value</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s story and argument, then the count</h2><div class="prose reading"><p>&ldquo;The model must define what it means to be the same thing.&rdquo; That is the last sentence of the pattern Entities, also called Reference Objects, in Chapter 5. This lesson reads it with the two sections that follow, Modeling Entities and Designing the Identity Operation.</p><p>Evans opens with a story from his own life, and it is worth reading in the book. Sued for damage to a flat he had never seen, he was taken for a former tenant of the same name; what saved him was an old phone book showing two listings side by side, his and his namesake's. People can resolve a mistaken identity with resourcefulness. A system that confuses two people corrupts its data.</p><p>The argument is that many things are defined by identity rather than by any attribute. A person's name, address and finances can all change, and yet the person persists, and the question that matters to a model is whether the application's users care that it is the same person. A customer in a receivables system may also live in a sales team's contact software and in an archive, in different forms, and when the phone rings it matters whether this is the customer with the overdue account. Two records may need matching though their attributes differ, and two others telling apart though their attributes agree.</p><p>Put as a rule to apply: if an object matters for who it is, let identity lead its definition, keep the class about remaining the same thing over its life, give it a way to be told apart that survives any change of storage or shape, and distrust any requirement to match such objects on their fields. The identity is an operation that never gives two objects the same answer, often a symbol attached for the purpose, and it must follow the distinctions the model draws. Evans warns that the language's own identity, Java's <code>==</code>, only says two references point at one object in memory; that means little in most domains, and it is lost whenever an object is stored and read back or sent across a network.</p><p>Identity, he insists, is not part of the things themselves; it is imposed on them because it is useful. Two equal deposits to one account on one day are still two transactions, and a cheque number is how a bank statement and a cheque register match the same transaction entered by different people on different days. A stadium's seats are entities when tickets are for numbered seats, and not when the event is general admission, where only the count of seats matters.</p><p>Modeling Entities asks that the class be kept spare: the attributes that identify the object or are commonly used to find and match it, the behaviour essential to the concept, and the rest moved to associated objects, other entities or the value objects of the next lesson. Designing the Identity Operation then lists the ways to get an identifier. Some attributes, or combinations of them, can be guaranteed unique and serve as a key, though Evans warns that such keys have exceptions; otherwise the system attaches an identifier that is unique within the class and, once assigned, never changes. It may be hidden from users, as in a contacts program that must tell two people of the same name apart, or given to them, as a parcel's tracking number is. Identifiers issued outside, a national number or a phone number, can be missing, shared or reassigned, which is why matching often ends with a person deciding.</p><p>Now the count, on a clinic whose front desk and laboratory each hold patient records. The lab takes objects as records of a name, an identifier and attributes, compares every pair, and reports the pairs the same by identity, the pairs the same by attributes, and where the two disagree. On the preset <code>patients</code> there are four records and 6 pairs. One pair is the same by identity, the desk's and the lab's record of patient P-1047, and one pair is the same by attributes, the desk's Ana Ruiz and another patient with the same name, birth year and town. They disagree on both: the first is a changed pair, since she has moved and only the lab knows, and the second a look-alike pair.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Identity and value</h2></div><p>the same by identity, or the same by value</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Identity and value</strong><span>the same by identity, or the same by value</span></div>
       </div>
@@ -1473,10 +1501,10 @@
       <div class="table-wrap" id="didTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="didTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Two objects are the same by identity when both carry an id and the ids are equal (ids compare exactly; - means the object has no identity, a value object, and is never the same by identity). They are the same by attributes when they have the same attribute names and every value is equal (numbers exactly, so 2 = 2.0; words exactly, letter case counted). A changed pair is the same thing with different attributes; a look-alike pair is two things, both with ids and the ids different, with the same attributes. With no pairs given, every pair is compared in record order (at most 12 objects).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Same by identity, same by attributes</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Same by identity, same by attributes</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="didPreset">Worked example</label>
           <select id="didPreset"><option value="patients" selected>A clinic's patient records, with issued identifiers</option><option value="patients-keyed-by-name">The same records keyed by name and birth year</option></select>
@@ -1497,12 +1525,30 @@
           <div class="kpi"><span>Different things, same attributes (look-alikes)</span><strong id="didLookalike">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, final class patient. line 2, private final patient id id, comment, issued once, never changed. line 3, private person name name. line 4, private local date born. line 5, private town town. line 7, at override. line 8, public boolean equals of object o. line 9, return o is an instance of patient and, open bracket, cast to patient o, close bracket, dot id dot equals of id. line 12, at override. line 13, public int hash code. line 14, return id dot hash code" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class Patient {</span>
+<span class="cl">    private final PatientId id;   // issued once, never changed</span>
+<span class="cl">    private PersonName name;</span>
+<span class="cl">    private LocalDate born;</span>
+<span class="cl">    private Town town;</span>
+<span class="cl"></span>
+<span class="cl">    @Override</span>
+<span class="cl">    public boolean equals(Object o) {</span>
+<span class="cl">        return o instanceof Patient &amp;&amp; ((Patient) o).id.equals(id);</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    @Override</span>
+<span class="cl">    public int hashCode() {</span>
+<span class="cl">        return id.hashCode();</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>Equality written as above, on the identifier alone, gives the first answer, and an equality on every field would give the second. The preset <code>patients-keyed-by-name</code> shows what happens when the identifier is built from the attributes people search by, the name with the birth year. Now 3 pairs are the same by identity, every pairing of the three records called Ana Ruiz, and the lab lists 2 changed pairs and 0 look-alikes. It reports, faithfully, that two different patients are one, because the identifier says so. That is Evans's warning about attribute keys in the lab's numbers: the count follows the identity you state, and only the model can say whether that identity is right.</p><p>So the count is a reason to look at each disagreement. A changed pair is where attribute matching would split one patient into two, and a look-alike pair where it would merge two into one; both are the mistakes a clinic cannot afford, and both are invisible to a comparison of fields. The lab does not know which records belong to which person. You do, from the identifier, and the identifier is only as good as the model behind it.</p><h3>Exercise</h3><ul><li>A library's member records, written name, identifier, attributes: <span class="math" data-say="m 1, L 301, name kim lee, joined 2019, branch north">m1, L-301, name=kim-lee, joined=2019, branch=north</span>; <span class="math" data-say="m 2, L 301, name kim lee, joined 2019, branch south">m2, L-301, name=kim-lee, joined=2019, branch=south</span>; <span class="math" data-say="m 3, L 455, name kim lee, joined 2019, branch north">m3, L-455, name=kim-lee, joined=2019, branch=north</span>; <span class="math" data-say="m 4, L 455, name kim lee, joined 2019, branch north">m4, L-455, name=kim-lee, joined=2019, branch=north</span>.</li></ul><p>Compare all six pairs. Count the pairs the same by identity and by attributes, and list the changed pairs and the look-alikes. Then say what a librarian would need to ask to know whether the identifiers are right.</p><p>Not everything deserves an identity. The next lesson, Value Objects, reads the objects whose only interest to us is what they are.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding what makes two records one thing</h2></div><p>Four steps, the last of them on records of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask whether users care which one</h3><p>For the object in question, ask whether the application's users need to know it is the same one after its attributes change. If not, it is probably not an entity.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose the identifier</h3><p>Find an attribute or combination guaranteed unique, and test it against its exceptions; failing that, assign an identifier that is unique in the system and never changes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare pairs both ways</h3><p>For each pair of records, compare identifiers and compare attributes, and list the changed pairs and the look-alikes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own records</h3><p>Take four records of the same kind from a system you know, type them into the lab, and write down each disagreement it lists with what the system would do wrong if it matched by attributes.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding what makes two records one thing</h2>
+      <p class="lead-in">Four steps, the last of them on records of your own.</p>
+      <ol class="key-ideas method"><li><strong>Ask whether users care which one.</strong> For the object in question, ask whether the application's users need to know it is the same one after its attributes change. If not, it is probably not an entity.</li><li><strong>Choose the identifier.</strong> Find an attribute or combination guaranteed unique, and test it against its exceptions; failing that, assign an identifier that is unique in the system and never changes.</li><li><strong>Compare pairs both ways.</strong> For each pair of records, compare identifiers and compare attributes, and list the changed pairs and the look-alikes.</li><li><strong>Do it on your own records.</strong> Take four records of the same kind from a system you know, type them into the lab, and write down each disagreement it lists with what the system would do wrong if it matched by attributes.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1521,17 +1567,16 @@ same by id 1, by attributes 1
 1 changed pair and 1 pair alike</div><p>Two of the six pairs are where a clinic goes wrong, and neither is where identity and attributes agree. The lab finds them; why P-1047 and P-2210 are different people is a fact only the clinic holds.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Deciding sameness by comparing every attribute</strong><span>Every attribute of an entity may change while it stays the same thing, and two different things may share every attribute. Evans asks for an identification that survives any change of shape or storage, and distrusts requirements to match on fields; on the lesson's illustration, attribute matching gets both disagreeing pairs wrong.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving every object an identity to be safe</strong><span>Identity is a meaning imposed because it is useful, and the same thing in the world may or may not be an entity in a given model, as the general admission seats show. Tracking identity costs analysis and design, and the next lesson reads Evans's case against attaching it where it is not needed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Loading the entity with every attribute and behaviour</strong><span>Modeling Entities asks for a spare class: the attributes that identify or match it, the behaviour essential to the concept, and little else. The rest moves to associated objects, entities or values, and the entity coordinates them.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what makes two records one thing.</strong><p>Given records with identifiers and attributes, find the pairs the same by identity and by attributes, list where they disagree, and say whether the identifier follows the model's distinctions.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares identifiers and attributes exactly as typed. It cannot tell whether an identifier was issued correctly, whether a key built from attributes has exceptions, or whether two records are the same person; that is the model's definition of sameness, and often a person's judgement.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Deciding sameness by comparing every attribute</strong><span>Every attribute of an entity may change while it stays the same thing, and two different things may share every attribute. Evans asks for an identification that survives any change of shape or storage, and distrusts requirements to match on fields; on the lesson's illustration, attribute matching gets both disagreeing pairs wrong.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving every object an identity to be safe</strong><span>Identity is a meaning imposed because it is useful, and the same thing in the world may or may not be an entity in a given model, as the general admission seats show. Tracking identity costs analysis and design, and the next lesson reads Evans's case against attaching it where it is not needed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Loading the entity with every attribute and behaviour</strong><span>Modeling Entities asks for a spare class: the attributes that identify or match it, the behaviour essential to the concept, and little else. The rest moves to associated objects, entities or values, and the entity coordinates them.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what makes two records one thing.</strong><p>Given records with identifiers and attributes, find the pairs the same by identity and by attributes, list where they disagree, and say whether the identifier follows the model's distinctions.</p></div></div><div class="note"><strong>Note:</strong> The lab compares identifiers and attributes exactly as typed. It cannot tell whether an identifier was issued correctly, whether a key built from attributes has exceptions, or whether two records are the same person; that is the model's definition of sameness, and often a person's judgement.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Entity</summary><p>An object defined mainly by its identity: it stays the same thing while its attributes change, sometimes across several systems and stored forms. Evans's examples include a person, a lottery ticket and a bank transaction.</p></details><details class="recall"><summary>Identity operation</summary><p>The means a design gives for deciding whether two objects are the same entity, usually by comparing an identifier that is unique in the system and never changes.</p></details><details class="recall"><summary>Changed and look-alike pairs</summary><p>The two ways identity and attributes can disagree. A changed pair is one thing whose attributes differ between two records; a look-alike pair is two things whose attributes are the same.</p></details></div>
+      <h3>Summary</h3>
       <p>Evans's first kind of model element is defined not by what it holds but by a thread of identity through its life. Read why the language's own identity will not do, how to keep an entity spare, and how to choose its identifier, then compare a clinic's patient records by identity and by attributes and find where the two disagree.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Entity.</strong> An object defined mainly by its identity: it stays the same thing while its attributes change, sometimes across several systems and stored forms. Evans's examples include a person, a lottery ticket and a bank transaction.</li><li><strong>Identity operation.</strong> The means a design gives for deciding whether two objects are the same entity, usually by comparing an identifier that is unique in the system and never changes.</li><li><strong>Changed and look-alike pairs.</strong> The two ways identity and attributes can disagree. A changed pair is one thing whose attributes differ between two records; a look-alike pair is two things whose attributes are the same.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="defined by identity, not attributes. every attribute may change. two may look alike and differ. the model defines what same means. keep the entity spare. an identifier that never changes" tabindex="0" role="region" aria-label="Mathematical notation">defined by identity, not attributes
 every attribute may change
 two may look alike and differ
@@ -2295,11 +2340,40 @@ an identifier that never changes</div><figcaption>Entities in six lines</figcapt
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2367,7 +2441,7 @@ an identifier that never changes</div><figcaption>Entities in six lines</figcapt
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

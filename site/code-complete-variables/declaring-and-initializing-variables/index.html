@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Variables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Using Variables</p>
       <h1>Declaring and Initializing Variables</h1>
       <p class="lesson-lede">Most initialisation errors are a variable holding a value you did not expect, and reading a routine line by line for a read before a set, a set twice and a set never used finds the commonest of them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An unexpected initial value</li><li>The Principle of Proximity</li><li>A data-flow anomaly</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s opening sections, then three versions of one routine</h2>
-      <article class="prose reading"><p>&ldquo;Data initialization is prone to errors, so use the initialization techniques described in this chapter to avoid the problems caused by unexpected initial values.&rdquo; That is the first of the Key Points with which Chapter 10, General Issues in Using Variables, closes on page 258. This lesson reads the chapter's first three sections, pages 237 to 244; read them in your own copy first. The rest of the chapter, from Section 10.4 on scope, is the next lesson.</p><p>Section 10.1 begins with a self-test: a list of data-type terms to score yourself against, with a scoring table and a short reading list. Three of the terms are made up, and the scoring table has a word for the reader who claims to know all of them. The point under the joke is the section's own: you cannot use data well without knowing which kinds of data there are.</p><p>Section 10.2 is about declarations. Some languages declare a variable for you the first time you use it, and McConnell counts implicit declaration among the most dangerous features a language can have: type <span class="math" data-say="acct no">acctNo</span> where you meant <span class="math" data-say="acct num">acctNum</span> and you have a second variable, silently initialised, and a bug. In a language that requires declarations the same slip takes two mistakes, a wrong name and a declaration to match it. Java is such a language, so this half of the advice is done for you; for the others the section says to turn implicit declarations off where the compiler allows it, to declare everything anyway, to adopt naming conventions for suffixes such as <span class="math" data-say="num">Num</span> and <span class="math" data-say="no">No</span>, and to read the compiler's list of the variables each routine uses.</p><p>Section 10.3 is the heart of the lesson. Improper initialisation, McConnell says, is among the richest sources of error in programming, and every case comes down to a variable holding an initial value you did not expect: it was never assigned, so it holds whatever was there; or its value is out of date; or part of it was assigned and part was not. His guidelines follow from that. Initialise each variable as it is declared, which he calls cheap insurance. Where you cannot, initialise it close to where it is first used, not in a block of initialisations at the top: a loop is later built around the code, the initialisation is left outside it, and the second pass starts with the first pass's value. That is his Principle of Proximity, keeping related actions together. Use <span class="math" data-say="final">final</span> for anything that should not change once set. Pay special attention to counters and accumulators, which are easy to forget to reset before their next use. Check input parameters before you use them, and read your compiler's warnings.</p><div class="defbox"><span class="label">Definition &middot; Three data-flow anomalies</span><p>Chapter 22, in Section 22.3 on data-flow testing (pages 509 and 510), names the patterns of what happens to a variable that deserve suspicion. This lesson's lab looks for three of them in a local variable: entered and used, a read with no set before it; defined and defined again, a set followed by another set with no read between; and defined and exited, a set that nothing reads.</p></div><p>Now the code. Here is a routine that averages an array of prices, written with its counter declared and never given a value. It is the <code>count-unset</code> preset in the lab below.</p><pre class="codeblock" data-say="line 1, double average price of array of double prices. line 2, int count. line 3, double total is set to 0.0. line 4, for int i is set to 0, i is less than prices dot length, i is incremented. line 5, total is set to total plus prices at index i. line 6, flagged, count is set to count plus 1. line 8, return total divided by count" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double averagePrice(double[] prices) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s opening sections, then three versions of one routine</h2><div class="prose reading"><p>&ldquo;Data initialization is prone to errors, so use the initialization techniques described in this chapter to avoid the problems caused by unexpected initial values.&rdquo; That is the first of the Key Points with which Chapter 10, General Issues in Using Variables, closes on page 258. This lesson reads the chapter's first three sections, pages 237 to 244; read them in your own copy first. The rest of the chapter, from Section 10.4 on scope, is the next lesson.</p><p>Section 10.1 begins with a self-test: a list of data-type terms to score yourself against, with a scoring table and a short reading list. Three of the terms are made up, and the scoring table has a word for the reader who claims to know all of them. The point under the joke is the section's own: you cannot use data well without knowing which kinds of data there are.</p><p>Section 10.2 is about declarations. Some languages declare a variable for you the first time you use it, and McConnell counts implicit declaration among the most dangerous features a language can have: type <span class="math" data-say="acct no">acctNo</span> where you meant <span class="math" data-say="acct num">acctNum</span> and you have a second variable, silently initialised, and a bug. In a language that requires declarations the same slip takes two mistakes, a wrong name and a declaration to match it. Java is such a language, so this half of the advice is done for you; for the others the section says to turn implicit declarations off where the compiler allows it, to declare everything anyway, to adopt naming conventions for suffixes such as <span class="math" data-say="num">Num</span> and <span class="math" data-say="no">No</span>, and to read the compiler's list of the variables each routine uses.</p><p>Section 10.3 is the heart of the lesson. Improper initialisation, McConnell says, is among the richest sources of error in programming, and every case comes down to a variable holding an initial value you did not expect: it was never assigned, so it holds whatever was there; or its value is out of date; or part of it was assigned and part was not. His guidelines follow from that. Initialise each variable as it is declared, which he calls cheap insurance. Where you cannot, initialise it close to where it is first used, not in a block of initialisations at the top: a loop is later built around the code, the initialisation is left outside it, and the second pass starts with the first pass's value. That is his Principle of Proximity, keeping related actions together. Use <span class="math" data-say="final">final</span> for anything that should not change once set. Pay special attention to counters and accumulators, which are easy to forget to reset before their next use. Check input parameters before you use them, and read your compiler's warnings.</p><div class="defbox"><span class="label">Definition &middot; Three data-flow anomalies</span><p>Chapter 22, in Section 22.3 on data-flow testing (pages 509 and 510), names the patterns of what happens to a variable that deserve suspicion. This lesson's lab looks for three of them in a local variable: entered and used, a read with no set before it; defined and defined again, a set followed by another set with no read between; and defined and exited, a set that nothing reads.</p></div><p>Now the code. Here is a routine that averages an array of prices, written with its counter declared and never given a value. It is the <code>count-unset</code> preset in the lab below.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>each name&#x27;s sets and reads, line by line</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>each name's sets and reads, line by line</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Used before set: a read with no earlier set (once per name). Set twice: a set followed by another set with no read between. Set, never used: the name's last event is a set. A dependency i&rarr;j: line j reads a name whose latest earlier set is on line i.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Reading a routine for data-flow anomalies</h3>
+            <p>A count over code, by the rules stated below the listing. The lab reads the listing line by line and records, for every variable, each line that sets it and each line that reads it. It reports a read with no set above it, a set followed by another set with no read between, and a set nothing reads. It does not follow branches, so it can miss what Java's compiler finds.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="count-unset" selected>A counter never initialised</option><option value="initialized">The counter initialised beside the total</option><option value="set-twice">Values set twice, and an average never used</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Anomalies</span><strong id="coAnomalies">&mdash;</strong></div>
+          <div class="kpi"><span>Used before set</span><strong id="coUsedBeforeSet">&mdash;</strong></div>
+          <div class="kpi"><span>Set twice</span><strong id="coSetTwice">&mdash;</strong></div>
+          <div class="kpi"><span>Set, never used</span><strong id="coUnused">&mdash;</strong></div>
+          <div class="kpi"><span>Dependencies (line → line)</span><strong id="coDeps">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, double average price of array of double prices. line 2, int count. line 3, double total is set to 0.0. line 4, for int i is set to 0, i is less than prices dot length, i is incremented. line 5, total is set to total plus prices at index i. line 6, flagged, count is set to count plus 1. line 8, return total divided by count" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double averagePrice(double[] prices) {</span>
 <span class="cl">    int count;</span>
 <span class="cl">    double total = 0.0;</span>
 <span class="cl">    for (int i = 0; i &lt; prices.length; i++) {</span>
@@ -1475,53 +1562,12 @@
 <span class="cl">    }</span>
 <span class="cl">    result = result + last.substring(0, 1);</span>
 <span class="cl">    return result;</span>
-<span class="cl">}</span></code></pre><p>This routine builds a person's initials. Read it top to bottom and list every anomaly the lab would report, with its line. Then say whether <span class="math" data-say="javac">javac</span> accepts it, and if not, on which path a line reads a variable nothing has set. Write your answer down before you paste the routine into the lab to check the first half; the quiz has the rest.</p><p>The values a variable holds are one half of Chapter 10. The other half is how far apart its uses lie and how long it stays live, which is the next lesson, &ldquo;Scope, Span and Live Time&rdquo;.</p></article>
+<span class="cl">}</span></code></pre><p>This routine builds a person's initials. Read it top to bottom and list every anomaly the lab would report, with its line. Then say whether <span class="math" data-say="javac">javac</span> accepts it, and if not, on which path a line reads a variable nothing has set. Write your answer down before you paste the routine into the lab to check the first half; the quiz has the rest.</p><p>The values a variable holds are one half of Chapter 10. The other half is how far apart its uses lie and how long it stays live, which is the next lesson, &ldquo;Scope, Span and Live Time&rdquo;.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>each name&#x27;s sets and reads, line by line</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>each name's sets and reads, line by line</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Used before set: a read with no earlier set (once per name). Set twice: a set followed by another set with no read between. Set, never used: the name's last event is a set. A dependency i&rarr;j: line j reads a name whose latest earlier set is on line i.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Reading a routine for data-flow anomalies</h3>
-          <p>A count over code, by the rules stated below the listing. The lab reads the listing line by line and records, for every variable, each line that sets it and each line that reads it. It reports a read with no set above it, a set followed by another set with no read between, and a set nothing reads. It does not follow branches, so it can miss what Java's compiler finds.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="count-unset" selected>A counter never initialised</option><option value="initialized">The counter initialised beside the total</option><option value="set-twice">Values set twice, and an average never used</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Anomalies</span><strong id="coAnomalies">&mdash;</strong></div>
-          <div class="kpi"><span>Used before set</span><strong id="coUsedBeforeSet">&mdash;</strong></div>
-          <div class="kpi"><span>Set twice</span><strong id="coSetTwice">&mdash;</strong></div>
-          <div class="kpi"><span>Set, never used</span><strong id="coUnused">&mdash;</strong></div>
-          <div class="kpi"><span>Dependencies (line → line)</span><strong id="coDeps">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a routine for anomalies</h2></div><p>Five steps; the last is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Number the lines</h3><p>Count every line from 1, the header included, so that each set and each read has an address you can write down.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Track each variable</h3><p>For each variable, list in order the lines that set it (a declaration with a value, an assignment, a parameter on the header's line) and the lines that read it. An assignment like <span class="math" data-say="count is set to count plus 1">count = count + 1</span> reads first and then sets.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Flag the three patterns</h3><p>A read with no earlier set; a set followed by another set with no read between; a set with nothing after it. Write each with its variable and line.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask what the compiler does</h3><p>For each flag, say whether Java's compiler rejects it (a local read before it is definitely assigned) or accepts it (everything else), and look along every path through an <span class="math" data-say="if">if</span>, which the line-by-line reading does not.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Read a routine of your own</h3><p>Paste a routine of your own into the lab and note each anomaly it reports. Compile the routine and write beside each anomaly whether the compiler rejected it, warned about it or said nothing.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a routine for anomalies</h2>
+      <p class="lead-in">Five steps; the last is yours.</p>
+      <ol class="key-ideas method"><li><strong>Number the lines.</strong> Count every line from 1, the header included, so that each set and each read has an address you can write down.</li><li><strong>Track each variable.</strong> For each variable, list in order the lines that set it (a declaration with a value, an assignment, a parameter on the header's line) and the lines that read it. An assignment like <span class="math" data-say="count is set to count plus 1">count = count + 1</span> reads first and then sets.</li><li><strong>Flag the three patterns.</strong> A read with no earlier set; a set followed by another set with no read between; a set with nothing after it. Write each with its variable and line.</li><li><strong>Ask what the compiler does.</strong> For each flag, say whether Java's compiler rejects it (a local read before it is definitely assigned) or accepts it (everything else), and look along every path through an <span class="math" data-say="if">if</span>, which the line-by-line reading does not.</li><li><strong>Read a routine of your own.</strong> Paste a routine of your own into the lab and note each anomaly it reports. Compile the routine and write beside each anomaly whether the compiler rejected it, warned about it or said nothing.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1540,17 +1586,16 @@ line 8: total and count read
 anomalies: 1, count used before set on line 6</div><p>One anomaly, and it is the one Java's compiler rejects. Give <span class="math" data-say="count">count</span> a value where it is declared and the lab finds none; the routine is then correct for any array with at least one price.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that if it compiles, every variable holds the value you meant</strong><span>Java's compiler does reject a local variable read before it is definitely assigned, on any path, and that is a real check, stronger than this lesson's lab. But <code>set-twice</code> compiles and throws away two initial values, returning the first price over the count; and a field declared <span class="math" data-say="int count">int count;</span> starts at 0 and is read without a word from the compiler. McConnell's diagnosis is an initial value you did not expect, and a compiler can only rule out some of the ways of getting one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Initialising everything in a block at the top</strong><span>It looks orderly, and Section 10.3 argues against it. A block of initialisations far from the code that uses them suggests that every variable is used throughout the routine, and when a loop is later built around part of the code, the initialisation stays outside it. McConnell asks for each variable to be initialised where it is declared, close to its first use.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an unused variable as harmless</strong><span>It does nothing at run time, but Section 10.8 asks you to make sure every declared variable is used, and the book cites Card, Church and Agresti (1986), who found unreferenced variables correlated with higher fault rates. An unused variable is often the sign of code that was meant to use it and does not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find a routine&#x27;s data-flow anomalies by reading it.</strong><p>For a short routine, list every variable read before it is set, set twice with no use between, or set and never used, each with its line, and say which of them Java's compiler rejects.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab reads the lines in order and never follows a branch or a loop; Java's compiler checks every path, so for locals it is stronger than the lab. The lab also cannot see a value that has gone stale, or a variable that is set correctly and holds the wrong thing; and a field it flags as read before set is one Java silently starts at 0.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that if it compiles, every variable holds the value you meant</strong><span>Java's compiler does reject a local variable read before it is definitely assigned, on any path, and that is a real check, stronger than this lesson's lab. But <code>set-twice</code> compiles and throws away two initial values, returning the first price over the count; and a field declared <span class="math" data-say="int count">int count;</span> starts at 0 and is read without a word from the compiler. McConnell's diagnosis is an initial value you did not expect, and a compiler can only rule out some of the ways of getting one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Initialising everything in a block at the top</strong><span>It looks orderly, and Section 10.3 argues against it. A block of initialisations far from the code that uses them suggests that every variable is used throughout the routine, and when a loop is later built around part of the code, the initialisation stays outside it. McConnell asks for each variable to be initialised where it is declared, close to its first use.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an unused variable as harmless</strong><span>It does nothing at run time, but Section 10.8 asks you to make sure every declared variable is used, and the book cites Card, Church and Agresti (1986), who found unreferenced variables correlated with higher fault rates. An unused variable is often the sign of code that was meant to use it and does not.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find a routine&#x27;s data-flow anomalies by reading it.</strong><p>For a short routine, list every variable read before it is set, set twice with no use between, or set and never used, each with its line, and say which of them Java's compiler rejects.</p></div></div><div class="note"><strong>Note:</strong> The lab reads the lines in order and never follows a branch or a loop; Java's compiler checks every path, so for locals it is stronger than the lab. The lab also cannot see a value that has gone stale, or a variable that is set correctly and holds the wrong thing; and a field it flags as read before set is one Java silently starts at 0.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An unexpected initial value</summary><p>McConnell's diagnosis of every initialisation error. A variable was never given a value, or was given one that has since gone stale, or had only part of itself set, and the code reads it as if it held what you meant.</p></details><details class="recall"><summary>The Principle of Proximity</summary><p>Keep related actions together. Applied to variables it means declaring and initialising each one close to where it is first used, so that the line that gives it a value and the lines that rely on that value can be read together.</p></details><details class="recall"><summary>A data-flow anomaly</summary><p>A suspicious order of what happens to a variable, read along the code: used before anything set it, set twice with no use between, or set and then never used. Section 22.3 names the patterns; finding one is a reason to look, not proof of a bug.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 10 opens Part III with the variable itself: how it is declared and how it gets its first value. McConnell traces initialisation errors to a value you did not expect and asks for each variable to be initialised where it is declared, or close to its first use. Read three versions of a short routine top to bottom, find the variable read before it is set, the values set twice and thrown away and the result never used, and say which of them Java's compiler catches.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An unexpected initial value.</strong> McConnell's diagnosis of every initialisation error. A variable was never given a value, or was given one that has since gone stale, or had only part of itself set, and the code reads it as if it held what you meant.</li><li><strong>The Principle of Proximity.</strong> Keep related actions together. Applied to variables it means declaring and initialising each one close to where it is first used, so that the line that gives it a value and the lines that rely on that value can be read together.</li><li><strong>A data-flow anomaly.</strong> A suspicious order of what happens to a variable, read along the code: used before anything set it, set twice with no use between, or set and then never used. Section 22.3 names the patterns; finding one is a reason to look, not proof of a bug.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="initialise each variable where it is declared. or as close to its first use as you can. used before set, read with no set above. set twice, two sets with no read between. set, never used, nothing reads the last set. javac rejects any local read before set" tabindex="0" role="region" aria-label="Mathematical notation">initialise each variable where it is declared
 or as close to its first use as you can
 used before set: read with no set above
@@ -2569,11 +2614,40 @@ javac rejects any local read before set</div><figcaption>Initialisation in six l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2641,7 +2715,7 @@ javac rejects any local read before set</div><figcaption>Initialisation in six l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

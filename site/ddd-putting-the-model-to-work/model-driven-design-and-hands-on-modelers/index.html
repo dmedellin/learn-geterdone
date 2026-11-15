@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Putting the Domain Model to Work</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Binding Model and Implementation</p>
       <h1>Model-Driven Design and Hands-On Modelers</h1>
       <p class="lesson-lede">One model for analysis and for the code, mapped so literally that changing the code can change the model, and modelled by people who code.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Analysis model</li><li>Model-Driven Design</li><li>Modules a change reaches</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the patterns, then the count</h2>
-      <article class="prose reading"><p>&ldquo;MODEL-DRIVEN DESIGN discards the dichotomy of analysis model and design to search out a single model that serves both purposes.&rdquo; That is the pattern Model-Driven Design, the heart of Chapter 3, Binding Model and Implementation. This lesson reads the chapter whole: its opening, Model-Driven Design, Modeling Paradigms and Tool Support, Letting the Bones Show, and Hands-On Modelers.</p><p>The chapter opens with two projects. On the first, analysts and experts had spent months on a detailed model, printed across a wall; it captured real knowledge, but its tangle of associations gave no units the developers could store and change safely, so they concluded that a conceptual model could not be the basis of their design and built an ad hoc one. The second project was rewriting an old program that had never had a model at all. The two ended in much the same place: working, bloated software whose code said little about what the system was for.</p><p>Evans's diagnosis is the analysis model. Many methods ask for one, made to understand the domain without regard to software, and then a design loosely related to it. Much of what the analysis learned is lost when coding begins; the analysis misses things only implementation reveals, so it is soon abandoned; and keeping a complex mapping between it and the design current is, in practice, impossible. Software without a concept at its foundation does useful things without explaining them.</p><p>The pattern binds the two. Some part of the code is written to be the model, class for concept, so that anyone can see which is which; when the model resists that, the model is reworked as well as the code, and deepened as it goes; and one model has to carry both jobs and the team's language too. When a model cannot be implemented practically, or does not express the domain's key concepts, the team looks for another. Because the code now expresses the model, editing the code can amount to editing the model, and the rest of the project's work has to follow such an edit.</p><p>Modeling Paradigms and Tool Support says the binding needs a language that can express the model's constructs directly. Object languages can, and so can Prolog for a model of rules and facts; a procedural language such as C has no modelling paradigm to match, although Fortran suits a domain that is mathematics. The example is the circuit-board domain again: engineers who wanted rules applied to whole buses of nets had written scripts that sorted and pattern-matched the tool's files, inferring the bus without ever naming it. Evans's model makes the bus an object that carries rules, and the rest becomes nearly trivial and testable unit by unit.</p><p>Letting the Bones Show turns to the user. A browser's bookmarks, presented as a list of names but stored as files, reject or silently alter names a file system will not accept, and the user is left asking which file is meant. Evans's remedy is a single model: either show the user that bookmarks are files, or store them so that they follow the rules of what they name. Hands-On Modelers then tells his own story: kept from coding by a management that thought modellers should model, he saw a sound model lose its intent in the hand-off and its feedback arrive months late, until the developers built without it. &ldquo;Programmers are modelers, whether anyone likes it or not.&rdquo; From this the pattern follows: whoever helps shape the model also works in the code, and whoever works in the code learns to make it say what the model says.</p><p>Now a domain of the lesson's own: a public library's lending. Nine pieces of code each carry part of the model: a loan's due date, renewal and overdue rule; a hold's queue, expiry and notice; a fine's daily rate, cap and waiver. Each record gives a piece, its module when the code follows the model (loans, holds, fines), and its module in a design built screen by screen and job by job, as a team working from a separate analysis model might have built it.</p><pre class="codeblock" data-say="line 1, loan dot due date, loans, checkout screen. line 2, loan dot renewal, loans, renewal screen. line 3, loan dot overdue, loans, nightly job. line 4, hold dot queue, holds, holds screen. line 5, hold dot expiry, holds, nightly job. line 6, hold dot notice, holds, mailer script. line 7, fine dot daily rate, fines, nightly job. line 8, fine dot cap, fines, checkout screen. line 9, fine dot waiver, fines, desk screen" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">loan.due_date, loans, checkout_screen;</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the patterns, then the count</h2><div class="prose reading"><p>&ldquo;MODEL-DRIVEN DESIGN discards the dichotomy of analysis model and design to search out a single model that serves both purposes.&rdquo; That is the pattern Model-Driven Design, the heart of Chapter 3, Binding Model and Implementation. This lesson reads the chapter whole: its opening, Model-Driven Design, Modeling Paradigms and Tool Support, Letting the Bones Show, and Hands-On Modelers.</p><p>The chapter opens with two projects. On the first, analysts and experts had spent months on a detailed model, printed across a wall; it captured real knowledge, but its tangle of associations gave no units the developers could store and change safely, so they concluded that a conceptual model could not be the basis of their design and built an ad hoc one. The second project was rewriting an old program that had never had a model at all. The two ended in much the same place: working, bloated software whose code said little about what the system was for.</p><p>Evans's diagnosis is the analysis model. Many methods ask for one, made to understand the domain without regard to software, and then a design loosely related to it. Much of what the analysis learned is lost when coding begins; the analysis misses things only implementation reveals, so it is soon abandoned; and keeping a complex mapping between it and the design current is, in practice, impossible. Software without a concept at its foundation does useful things without explaining them.</p><p>The pattern binds the two. Some part of the code is written to be the model, class for concept, so that anyone can see which is which; when the model resists that, the model is reworked as well as the code, and deepened as it goes; and one model has to carry both jobs and the team's language too. When a model cannot be implemented practically, or does not express the domain's key concepts, the team looks for another. Because the code now expresses the model, editing the code can amount to editing the model, and the rest of the project's work has to follow such an edit.</p><p>Modeling Paradigms and Tool Support says the binding needs a language that can express the model's constructs directly. Object languages can, and so can Prolog for a model of rules and facts; a procedural language such as C has no modelling paradigm to match, although Fortran suits a domain that is mathematics. The example is the circuit-board domain again: engineers who wanted rules applied to whole buses of nets had written scripts that sorted and pattern-matched the tool's files, inferring the bus without ever naming it. Evans's model makes the bus an object that carries rules, and the rest becomes nearly trivial and testable unit by unit.</p><p>Letting the Bones Show turns to the user. A browser's bookmarks, presented as a list of names but stored as files, reject or silently alter names a file system will not accept, and the user is left asking which file is meant. Evans's remedy is a single model: either show the user that bookmarks are files, or store them so that they follow the rules of what they name. Hands-On Modelers then tells his own story: kept from coding by a management that thought modellers should model, he saw a sound model lose its intent in the hand-off and its feedback arrive months late, until the developers built without it. &ldquo;Programmers are modelers, whether anyone likes it or not.&rdquo; From this the pattern follows: whoever helps shape the model also works in the code, and whoever works in the code learns to make it say what the model says.</p><p>Now a domain of the lesson's own: a public library's lending. Nine pieces of code each carry part of the model: a loan's due date, renewal and overdue rule; a hold's queue, expiry and notice; a fine's daily rate, cap and waiver. Each record gives a piece, its module when the code follows the model (loans, holds, fines), and its module in a design built screen by screen and job by job, as a team working from a separate analysis model might have built it.</p><pre class="codeblock" data-say="line 1, loan dot due date, loans, checkout screen. line 2, loan dot renewal, loans, renewal screen. line 3, loan dot overdue, loans, nightly job. line 4, hold dot queue, holds, holds screen. line 5, hold dot expiry, holds, nightly job. line 6, hold dot notice, holds, mailer script. line 7, fine dot daily rate, fines, nightly job. line 8, fine dot cap, fines, checkout screen. line 9, fine dot waiver, fines, desk screen" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">loan.due_date, loans, checkout_screen;</span>
 <span class="cl">loan.renewal, loans, renewal_screen;</span>
 <span class="cl">loan.overdue, loans, nightly_job;</span>
 <span class="cl">hold.queue, holds, holds_screen;</span>
@@ -1455,12 +1499,11 @@
 <span class="cl">fine.cap, fines, checkout_screen;</span>
 <span class="cl">fine.waiver, fines, desk_screen;</span></code></pre><p>Four changes to the model touch the code: a shorter loan period, a pickup window for holds, a cap on fines per item, and a rule that a loan cannot be renewed while someone holds the item. On the preset <code>lending-changes</code>, with the code following the model, the changes reach 1, 1, 1 and 2 modules, 5 module touches in all, 3 changes confined to one module, and the largest is the renewal rule, at 2. With the code following screens and jobs, they reach 2, 2, 3 and 2, 9 touches in all, none confined to one module, and the largest is the fine cap, spread over the nightly job, the checkout screen and the desk screen.</p><p>Two things keep that count honest. The renewal rule joins two concepts, loans and holds, and reaches two modules either way; following the model does not make a change local when the model says it is not. And the preset <code>model-drifts</code> shows what Hands-On Modelers warns of: a developer who did not see that changing code changes the model has put the fine cap into the loans code to save a call. The fine-cap change now reaches 2 modules, and the total rises from 5 to 6. The model is weaker by one misplaced piece, and nothing in the code says so.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, student loans, loan dot due date. line 2, student loans, fine dot daily rate. line 3, student loans, loan dot renewal" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">student_loans, loan.due_date;</span>
 <span class="cl">student_loans, fine.daily_rate;</span>
-<span class="cl">student_loans, loan.renewal;</span></code></pre><p>A fifth change: student loans, with their own due date, their own daily fine and their own renewal limit, touching the three pieces listed. Using the module map above, count by hand the modules the change reaches when the code follows the model and when it follows screens and jobs. Then put the records in place of the lab's changes.</p><p>This closes Part I. The next course, The Building Blocks of a Model-Driven Design, begins with Layered Architecture, the first of the patterns that let the code express the model.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Modules and dependencies</h2></div><p>the modules each change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">student_loans, loan.renewal;</span></code></pre><p>A fifth change: student loans, with their own due date, their own daily fine and their own renewal limit, touching the three pieces listed. Using the module map above, count by hand the modules the change reaches when the code follows the model and when it follows screens and jobs. Then put the records in place of the lab's changes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Modules and dependencies</h2></div><p>the modules each change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Modules and dependencies</strong><span>the modules each change reaches</span></div>
       </div>
@@ -1468,10 +1511,10 @@
       <div class="table-wrap" id="dmoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dmoTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each element sits in one module of each packaging; with a third column (module2) the view counts a second packaging of the same elements and prints its tiles second. A change touches every element it lists, and through them every module those elements sit in, each module counted once per change however many of its elements the change touches. The total adds those counts over the changes. Changes are listed in the order first given; the largest is the change touching the most modules, a tie going to the first given (the status line names the others).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>How far a change in the model reaches</h3>
-          <p>A count over the small model the lesson states. Here it is a module map: each piece of code with its module in two packagings, and each change with the pieces it touches. The lab counts the modules each change reaches in each packaging. It counts one consequence of one way of packaging the code; the choice is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>How far a change in the model reaches</h3>
+            <p>A count over the small model the lesson states. Here it is a module map: each piece of code with its module in two packagings, and each change with the pieces it touches. The lab counts the modules each change reaches in each packaging. It counts one consequence of one way of packaging the code; the choice is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dmoPreset">Worked example</label>
           <select id="dmoPreset"><option value="lending-changes" selected>Four model changes, code by concept against code by screen</option><option value="model-drifts">The same, with the fine cap moved into the loans code</option></select>
@@ -1512,12 +1555,15 @@ renew_with_hold, hold.queue;</textarea>
           <div class="kpi"><span>The largest change, by screen and job</span><strong id="dmoLargest2">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This closes Part I. The next course, The Building Blocks of a Model-Driven Design, begins with Layered Architecture, the first of the patterns that let the code express the model.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Mapping the model to the code</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the model&#x27;s pieces in the code</h3><p>For each concept of the model, list the pieces of code that carry its rules and data.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write down where each piece lives</h3><p>Give each piece its module, package or file, as the code is organised now.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Trace recent changes through the map</h3><p>For each of a few recent changes to what the experts asked for, list the pieces it touched and count the modules they are in.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Take three changes from a system you work on, count the modules each reached, and say for the one that reached the most whether the code or the model divided the concept.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Mapping the model to the code</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the model&#x27;s pieces in the code.</strong> For each concept of the model, list the pieces of code that carry its rules and data.</li><li><strong>Write down where each piece lives.</strong> Give each piece its module, package or file, as the code is organised now.</li><li><strong>Trace recent changes through the map.</strong> For each of a few recent changes to what the experts asked for, list the pieces it touched and count the modules they are in.</li><li><strong>Do it on your own code.</strong> Take three changes from a system you work on, count the modules each reached, and say for the one that reached the most whether the code or the model divided the concept.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1536,17 +1582,16 @@ total touches: 5 by concept, 9 by screen
 confined to one module: 3 by concept, 0 by screen</div><p>The nightly job appears in three of the four changes on the right, because it holds a piece of every concept. That is the shape Evans finds in the scripts that inferred a bus from a sort of net names: the concept the engineers think in is in none of the code, only implied by where things happen to sit.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keeping the analysis model apart so that implementation cannot muddy it</strong><span>That is the reason methods give for it, and Evans states it fairly. His answer is that a pure analysis model fails even at understanding, because crucial discoveries come during implementation, and that it is abandoned soon after coding starts, with much of its ground covered again. Model-Driven Design asks for one model that works as analysis and as design; on the lesson's illustration the code that follows its model keeps three of four changes in one module.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating modelling as a senior role that should not touch the code</strong><span>Hands-On Modelers is Evans's own case against it: forbidden to program, he watched a sound model lose its intent in the hand-off and its feedback arrive too late, until the developers built without it. The pattern does not abolish specialised roles; it says that modelling and coding cannot be handed to different people: the modeller works in the code, and the programmer makes the code carry the model.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Giving users a friendlier model than the one underneath</strong><span>Letting the Bones Show argues that an illusion of another model confuses users unless it is perfect, as the bookmarks stored as files show when a name breaks a file-system rule. A single model, shown to the user or changed to fit the user's, is Evans's remedy.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can map a model to its code and trace a change through the map.</strong><p>Given the pieces of code that carry a model, their modules in two packagings, and the pieces a change touches, count the modules the change reaches in each and say which packaging follows the model.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts modules a change reaches on the map it is given. It cannot tell whether the map follows the model or only claims to, whether a module's name matches the concept inside it, or what a change costs in a module it reaches; Evans's test is whether the code says what the model says.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keeping the analysis model apart so that implementation cannot muddy it</strong><span>That is the reason methods give for it, and Evans states it fairly. His answer is that a pure analysis model fails even at understanding, because crucial discoveries come during implementation, and that it is abandoned soon after coding starts, with much of its ground covered again. Model-Driven Design asks for one model that works as analysis and as design; on the lesson's illustration the code that follows its model keeps three of four changes in one module.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating modelling as a senior role that should not touch the code</strong><span>Hands-On Modelers is Evans's own case against it: forbidden to program, he watched a sound model lose its intent in the hand-off and its feedback arrive too late, until the developers built without it. The pattern does not abolish specialised roles; it says that modelling and coding cannot be handed to different people: the modeller works in the code, and the programmer makes the code carry the model.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Giving users a friendlier model than the one underneath</strong><span>Letting the Bones Show argues that an illusion of another model confuses users unless it is perfect, as the bookmarks stored as files show when a name breaks a file-system rule. A single model, shown to the user or changed to fit the user's, is Evans's remedy.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can map a model to its code and trace a change through the map.</strong><p>Given the pieces of code that carry a model, their modules in two packagings, and the pieces a change touches, count the modules the change reaches in each and say which packaging follows the model.</p></div></div><div class="note"><strong>Note:</strong> The lab counts modules a change reaches on the map it is given. It cannot tell whether the map follows the model or only claims to, whether a module's name matches the concept inside it, or what a change costs in a module it reaches; Evans's test is whether the code says what the model says.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Analysis model</summary><p>A model of the domain made to understand it, with no thought for the part it will play in software, and usually handed to other people to design from. Evans's argument is against keeping one apart from the design.</p></details><details class="recall"><summary>Model-Driven Design</summary><p>The pattern of one model serving both analysis and design: part of the code is the model, readably, and the model is reshaped until it can be.</p></details><details class="recall"><summary>Modules a change reaches</summary><p>In the lab, the number of distinct modules holding the pieces of code a change to the model touches. One module means the change stays where the concept lives.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3: why a model on paper that the code does not follow is of little use, the pattern Model-Driven Design that binds them, the tools that make the binding possible, what happens when the user is shown a different model, and why the modeller must code. Map a library's lending code to modules two ways and count how far each change in the model reaches.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Analysis model.</strong> A model of the domain made to understand it, with no thought for the part it will play in software, and usually handed to other people to design from. Evans's argument is against keeping one apart from the design.</li><li><strong>Model-Driven Design.</strong> The pattern of one model serving both analysis and design: part of the code is the model, readably, and the model is reshaped until it can be.</li><li><strong>Modules a change reaches.</strong> In the lab, the number of distinct modules holding the pieces of code a change to the model touches. One module means the change stays where the concept lives.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a single model for analysis and design. the code expresses the model. change the code, change the model. object languages make the map literal. show users the model, not an illusion. modelers code, coders model" tabindex="0" role="region" aria-label="Mathematical notation">a single model for analysis and design
 the code expresses the model
 change the code: change the model
@@ -2332,11 +2377,40 @@ modelers code; coders model</div><figcaption>Model-Driven Design in six lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2404,7 +2478,7 @@ modelers code; coders model</div><figcaption>Model-Driven Design in six lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

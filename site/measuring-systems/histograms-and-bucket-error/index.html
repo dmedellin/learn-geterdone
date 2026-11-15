@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Aggregates that lie</p>
       <h1>Histograms and Bucket Error</h1>
       <p class="lesson-lede">Report a percentile read from a histogram as the interval it is actually known to, and compute that interval&#x27;s relative width.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A histogram keeps counts and discards values</li><li>Logarithmic boundaries give a constant relative error</li><li>Bucket error is systematic, so traffic does not fix it</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Reading a percentile off counts, and the width of the answer</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Histogram, and the percentile read from one</span><p>A <strong>histogram</strong> over boundaries <span class="math" data-say="e sub 0 is less than e sub 1 is less than and so on is less than e sub k">e₀ &lt; e₁ &lt; … &lt; e_k</span> stores, for each bucket <span class="math" data-say="e sub i, e sub i plus 1">[eᵢ, eᵢ₊₁)</span>, the count of observations falling in it, plus an underflow count below <span class="math" data-say="e sub 0">e₀</span> and an overflow count at or above <span class="math" data-say="e sub k">e_k</span>. The <strong>bucketed q-th percentile</strong> is the bucket containing rank <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span> in the cumulative counts. Its value is that bucket, not a number inside it.</p></div><p>Boundaries are chosen once, before any data arrives, and they are chosen geometrically because latency spans orders of magnitude: a millisecond and a second belong in the same picture, and equal-width buckets that resolve the first give thousands of empty ones before the second. The lab&rsquo;s preset starts at 25 ms and doubles.</p><div class="mathblock" data-say="edges, 25, 50, 100, 200, 400, 800, 1600 milliseconds, base 25, ratio 2. a table, shown on the page. n equals 100. bucket, count, cumulative. a table, shown on the page. p 99, rank the ceiling of 0.99 times 100, equals 99, first reached in, at 100, 200" tabindex="0" role="region" aria-label="Mathematical notation">edges   25, 50, 100, 200, 400, 800, 1 600 ms        base 25, ratio 2
-
-sample  30×40   45×25   60×15   85×10   120×6   137×3   400×1
-                                                  n = 100
-
-bucket        count   cumulative
-  [25, 50)      65        65        30×40 and 45×25
-  [50, 100)     25        90        60×15 and 85×10
-  [100, 200)     9        99        120×6 and 137×3
-  [200, 400)     0        99
-  [400, 800)     1       100
-
-p99   rank ⌈0.99×100⌉ = 99   first reached in  [100, 200)</div><p>The exact p99 of that sample is 137 ms: sort the hundred values and take the 99th. The histogram cannot say 137. It can say that the 99th value is at least 100 and less than 200, which is true, useful, and a hundred milliseconds wide.</p><div class="thm"><span class="label">Theorem &middot; The relative width of a geometric bucket</span><p>Let the boundaries be <span class="math" data-say="e sub i equals b times r to the power i">eᵢ = b·rⁱ</span> with <span class="math" data-say="r is greater than 1">r &gt; 1</span>. A value reported as lying in <span class="math" data-say="e sub i, e sub i plus 1">[eᵢ, eᵢ₊₁)</span> is known to within an absolute width <span class="math" data-say="e sub i plus 1 minus e sub i equals e sub i times the quantity r minus 1">eᵢ₊₁ − eᵢ = eᵢ(r − 1)</span>, so relative to the smallest value it could be, the width is</p><p><span class="math" data-say="the quantity e sub i plus 1 minus e sub i, over e sub i equals r minus 1">(eᵢ₊₁ − eᵢ)/eᵢ = r − 1</span>,</p><p>independent of <span class="math" data-say="i">i</span>. At <span class="math" data-say="r equals 2">r = 2</span> every bucketed answer is known to within a factor of two &mdash; 100% &mdash; and at <span class="math" data-say="r equals 5 over 4">r = 5/4</span> to within 25%. The price of the smaller <span class="math" data-say="r">r</span> is buckets: covering the same range needs <span class="math" data-say="the natural log of 2 divided by the natural log of the quantity 5 over 4, is approximately 3.1">ln 2 ÷ ln(5/4) ≈ 3.1</span> times as many.</p></div><p>That factor of 3.1 is not free, and the bill arrives in a different lesson. Every bucket is a time series with its own label value, so tripling the buckets triples the series count and the storage, which is the arithmetic of &ldquo;Metric Cardinality&rdquo;. Resolution in a histogram is bought with cardinality, and the exchange rate is known in advance.</p><div class="example"><span class="label">Example &middot; Two histograms of the same requests</span><p>On the sample above with <span class="math" data-say="r equals 2">r = 2</span>, the p99 is <span class="math" data-say="100, 200">[100, 200)</span> &mdash; a width of 100 ms around a true value of 137. Refine to <span class="math" data-say="r equals 5 over 4">r = 5/4</span> starting at the same 25 ms and the boundaries near the answer become <span class="math" data-say="and so on, 119.21, 149.01, and so on">…, 119.21, 149.01, …</span>; the same rank now lands in <span class="math" data-say="119.21, 149.01">[119.21, 149.01)</span>, a width of about 30 ms. The true value did not move and no new requests were collected. The report got narrower because the boundaries did.</p></div><h3>Interpolating inside the bucket</h3><p>It is tempting, and most metrics systems do it: assume the observations are spread evenly across the bucket and read off a point. On the sample above, linear interpolation inside <span class="math" data-say="100, 200">[100, 200)</span> returns a confident 200 ms &mdash; the top of the bucket, since rank 99 is the last of the nine observations in it &mdash; against a true 137. The assumption of uniformity is wrong in the direction that matters, because latency inside a bucket is not uniform; it is concentrated near the bottom, which is why the bucket boundaries were geometric in the first place.</p><p>Interpolation does not add information. It converts an honest interval into a point whose error you can no longer see, and the point is not even guaranteed to be inside the range of the data. Report the interval; if it is too wide to act on, change the boundaries rather than the arithmetic.</p><h3>What the histogram is still good for</h3><p>Everything the previous page needed. Counts add, so histograms from many hosts merge exactly, and a percentile read from the merged histogram is a real fleet percentile with a known interval around it. That is a strictly better object than an averaged per-host percentile, which has no interval around it because it is not an estimate of anything.</p><p>It is also the right place to be honest about what a dashboard can promise. A p99 of &ldquo;about 150 ms&rdquo; from <span class="math" data-say="r equals 2">r = 2</span> buckets means somewhere in <span class="math" data-say="100, 200">[100, 200)</span>; a regression from 137 ms to 195 ms would not move the reported bucket at all, and a regression from 199 to 201 would move it a whole bucket. Alerting on a bucketed percentile inherits both behaviours, and choosing boundaries so that the values you care about are not near an edge is part of the design.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A percentile is only as sharp as its bucket</h2></div><p>The interval a histogram can actually report, and the factor it is known to</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Reading a percentile off counts, and the width of the answer</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Histogram, and the percentile read from one</span><p>A <strong>histogram</strong> over boundaries <span class="math" data-say="e sub 0 is less than e sub 1 is less than and so on is less than e sub k">e₀ &lt; e₁ &lt; … &lt; e_k</span> stores, for each bucket <span class="math" data-say="e sub i, e sub i plus 1">[eᵢ, eᵢ₊₁)</span>, the count of observations falling in it, plus an underflow count below <span class="math" data-say="e sub 0">e₀</span> and an overflow count at or above <span class="math" data-say="e sub k">e_k</span>. The <strong>bucketed q-th percentile</strong> is the bucket containing rank <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span> in the cumulative counts. Its value is that bucket, not a number inside it.</p></div><p>Boundaries are chosen once, before any data arrives, and they are chosen geometrically because latency spans orders of magnitude: a millisecond and a second belong in the same picture, and equal-width buckets that resolve the first give thousands of empty ones before the second. The lab&rsquo;s preset starts at 25 ms and doubles.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A percentile is only as sharp as its bucket</h2></div><p>The interval a histogram can actually report, and the factor it is known to</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A histogram knows its buckets, not its requests</strong><span>the containing bucket, its width, and the factor the answer is known to</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>bucket counts</span><span class="tone-amber"><i class="legend-swatch"></i>the reported bucket</span><span class="tone-purple"><i class="legend-swatch"></i>the exact percentile</span></div>
@@ -1416,10 +1447,10 @@ p99   rank ⌈0.99×100⌉ = 99   first reached in  [100, 200)</div><p>The exact
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="hgPlot" viewBox="0 0 660 200" role="img" aria-label="The bucket counts as bars, with the bucket the percentile falls in highlighted and the exact value marked inside it."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hgTable"></table></div>
       <div class="status-banner" id="hgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the buckets and the sample</h3>
-          <p>The exact percentile of the sample and the bucket the histogram can report are computed by the same nearest-rank function, one on the values and one on the cumulative counts. Change the ratio from 2 to 5/4 and watch the interval narrow while the exact value stays exactly where it was; then add ten times as many requests and watch the interval not narrow at all.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the buckets and the sample</h3>
+            <p>The exact percentile of the sample and the bucket the histogram can report are computed by the same nearest-rank function, one on the values and one on the cumulative counts. Change the ratio from 2 to 5/4 and watch the interval narrow while the exact value stays exactly where it was; then add ten times as many requests and watch the interval not narrow at all.</p>
         <div class="field">
           <label for="hgSample">The requests (ms; v:count repeats a value)</label>
           <input id="hgSample" type="text" value="30:40, 45:25, 60:15, 85:10, 120:6, 137:3, 400:1" inputmode="text" autocomplete="off">
@@ -1449,12 +1480,27 @@ p99   rank ⌈0.99×100⌉ = 99   first reached in  [100, 200)</div><p>The exact
           <div class="kpi"><span>Requests past the last edge</span><strong id="hgOver">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="hgHint" style="margin:0;">Both answers use the same rank. The exact one reads the request at that rank; the histogram only knows which bucket the rank fell in, so its answer is an interval. At ratio r every bucket is r times its own lower edge wide, which is why the error is a constant percentage rather than a constant number of milliseconds.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="edges, 25, 50, 100, 200, 400, 800, 1600 milliseconds, base 25, ratio 2. a table, shown on the page. n equals 100. bucket, count, cumulative. a table, shown on the page. p 99, rank the ceiling of 0.99 times 100, equals 99, first reached in, at 100, 200" tabindex="0" role="region" aria-label="Mathematical notation">edges   25, 50, 100, 200, 400, 800, 1 600 ms        base 25, ratio 2
+
+sample  30×40   45×25   60×15   85×10   120×6   137×3   400×1
+                                                  n = 100
+
+bucket        count   cumulative
+  [25, 50)      65        65        30×40 and 45×25
+  [50, 100)     25        90        60×15 and 85×10
+  [100, 200)     9        99        120×6 and 137×3
+  [200, 400)     0        99
+  [400, 800)     1       100
+
+p99   rank ⌈0.99×100⌉ = 99   first reached in  [100, 200)</div><p>The exact p99 of that sample is 137 ms: sort the hundred values and take the 99th. The histogram cannot say 137. It can say that the 99th value is at least 100 and less than 200, which is true, useful, and a hundred milliseconds wide.</p><div class="thm"><span class="label">Theorem &middot; The relative width of a geometric bucket</span><p>Let the boundaries be <span class="math" data-say="e sub i equals b times r to the power i">eᵢ = b·rⁱ</span> with <span class="math" data-say="r is greater than 1">r &gt; 1</span>. A value reported as lying in <span class="math" data-say="e sub i, e sub i plus 1">[eᵢ, eᵢ₊₁)</span> is known to within an absolute width <span class="math" data-say="e sub i plus 1 minus e sub i equals e sub i times the quantity r minus 1">eᵢ₊₁ − eᵢ = eᵢ(r − 1)</span>, so relative to the smallest value it could be, the width is</p><p><span class="math" data-say="the quantity e sub i plus 1 minus e sub i, over e sub i equals r minus 1">(eᵢ₊₁ − eᵢ)/eᵢ = r − 1</span>,</p><p>independent of <span class="math" data-say="i">i</span>. At <span class="math" data-say="r equals 2">r = 2</span> every bucketed answer is known to within a factor of two &mdash; 100% &mdash; and at <span class="math" data-say="r equals 5 over 4">r = 5/4</span> to within 25%. The price of the smaller <span class="math" data-say="r">r</span> is buckets: covering the same range needs <span class="math" data-say="the natural log of 2 divided by the natural log of the quantity 5 over 4, is approximately 3.1">ln 2 ÷ ln(5/4) ≈ 3.1</span> times as many.</p></div><p>That factor of 3.1 is not free, and the bill arrives in a different lesson. Every bucket is a time series with its own label value, so tripling the buckets triples the series count and the storage, which is the arithmetic of &ldquo;Metric Cardinality&rdquo;. Resolution in a histogram is bought with cardinality, and the exchange rate is known in advance.</p><div class="example"><span class="label">Example &middot; Two histograms of the same requests</span><p>On the sample above with <span class="math" data-say="r equals 2">r = 2</span>, the p99 is <span class="math" data-say="100, 200">[100, 200)</span> &mdash; a width of 100 ms around a true value of 137. Refine to <span class="math" data-say="r equals 5 over 4">r = 5/4</span> starting at the same 25 ms and the boundaries near the answer become <span class="math" data-say="and so on, 119.21, 149.01, and so on">…, 119.21, 149.01, …</span>; the same rank now lands in <span class="math" data-say="119.21, 149.01">[119.21, 149.01)</span>, a width of about 30 ms. The true value did not move and no new requests were collected. The report got narrower because the boundaries did.</p></div><h3>Interpolating inside the bucket</h3><p>It is tempting, and most metrics systems do it: assume the observations are spread evenly across the bucket and read off a point. On the sample above, linear interpolation inside <span class="math" data-say="100, 200">[100, 200)</span> returns a confident 200 ms &mdash; the top of the bucket, since rank 99 is the last of the nine observations in it &mdash; against a true 137. The assumption of uniformity is wrong in the direction that matters, because latency inside a bucket is not uniform; it is concentrated near the bottom, which is why the bucket boundaries were geometric in the first place.</p><p>Interpolation does not add information. It converts an honest interval into a point whose error you can no longer see, and the point is not even guaranteed to be inside the range of the data. Report the interval; if it is too wide to act on, change the boundaries rather than the arithmetic.</p><h3>What the histogram is still good for</h3><p>Everything the previous page needed. Counts add, so histograms from many hosts merge exactly, and a percentile read from the merged histogram is a real fleet percentile with a known interval around it. That is a strictly better object than an averaged per-host percentile, which has no interval around it because it is not an estimate of anything.</p><p>It is also the right place to be honest about what a dashboard can promise. A p99 of &ldquo;about 150 ms&rdquo; from <span class="math" data-say="r equals 2">r = 2</span> buckets means somewhere in <span class="math" data-say="100, 200">[100, 200)</span>; a regression from 137 ms to 195 ms would not move the reported bucket at all, and a regression from 199 to 201 would move it a whole bucket. Alerting on a bucketed percentile inherits both behaviours, and choosing boundaries so that the values you care about are not near an edge is part of the design.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reporting a percentile from bucket counts</h2></div><p>Four steps, and the last one is the difference between a measurement and a number.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the rank you are looking for</h3><p><span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span> where <span class="math" data-say="n">n</span> is the total count across every bucket, including the underflow and the overflow. Getting <span class="math" data-say="n">n</span> wrong by forgetting the overflow bucket moves the rank and can move the answer by a whole bucket.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Walk the cumulative counts until they reach it</h3><p>Add the bucket counts from the bottom. The first bucket whose cumulative total reaches the rank is the containing bucket. If the rank is only reached in the overflow bucket, the honest answer is &ldquo;at least <span class="math" data-say="e sub k">e_k</span>&rdquo; and the boundaries are too low for this workload.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Report the bucket, with both ends</h3><p><span class="math" data-say="100, 200">[100, 200)</span>, not 150 and not 137. The half-open interval matters when a boundary is also a common value &mdash; a 100 ms timeout piles requests exactly on an edge, and which side they land is a convention you should know rather than discover.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Quote the relative width alongside it</h3><p><span class="math" data-say="r minus 1">r − 1</span>. It is the same number for every bucket and it is the honest precision of every percentile the histogram will ever report. If it is wider than the change you need to detect, the boundaries are wrong and no amount of traffic will fix them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reporting a percentile from bucket counts</h2>
+      <p class="lead-in">Four steps, and the last one is the difference between a measurement and a number.</p>
+      <ol class="key-ideas method"><li><strong>Find the rank you are looking for.</strong> <span class="math" data-say="the ceiling of q times n">⌈q·n⌉</span> where <span class="math" data-say="n">n</span> is the total count across every bucket, including the underflow and the overflow. Getting <span class="math" data-say="n">n</span> wrong by forgetting the overflow bucket moves the rank and can move the answer by a whole bucket.</li><li><strong>Walk the cumulative counts until they reach it.</strong> Add the bucket counts from the bottom. The first bucket whose cumulative total reaches the rank is the containing bucket. If the rank is only reached in the overflow bucket, the honest answer is &ldquo;at least <span class="math" data-say="e sub k">e_k</span>&rdquo; and the boundaries are too low for this workload.</li><li><strong>Report the bucket, with both ends.</strong> <span class="math" data-say="100, 200">[100, 200)</span>, not 150 and not 137. The half-open interval matters when a boundary is also a common value &mdash; a 100 ms timeout piles requests exactly on an edge, and which side they land is a convention you should know rather than discover.</li><li><strong>Quote the relative width alongside it.</strong> <span class="math" data-say="r minus 1">r − 1</span>. It is the same number for every bucket and it is the honest precision of every percentile the histogram will ever report. If it is wider than the change you need to detect, the boundaries are wrong and no amount of traffic will fix them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1490,17 +1536,16 @@ true value 137 is inside the interval, and the interval is all
 the histogram knows — with 10× or 1 000× the traffic, still all</div><p>The last line is the one that separates this error from the one on the first page of the course. Sampling noise shrinks as <span class="math" data-say="1 over the square root of n">1/√n</span>; bucket width does not shrink at all. A dashboard showing a bucketed p99 over a month of traffic is showing an interval exactly as wide as the one it showed after five minutes.</p><p>Notice the empty <span class="math" data-say="200, 400">[200, 400)</span> bucket and the single observation in <span class="math" data-say="400, 800">[400, 800)</span>. That lone request is the p100, and the histogram places it within a factor of two as well: somewhere in <span class="math" data-say="400, 800">[400, 800)</span>. If your maximum matters, <span class="math" data-say="r equals 2">r = 2</span> says it to one significant figure.</p><p>For faded practice, keep the sample and the base of 25 and set the ratio to 3/2. The supplied first move is that the boundaries become <span class="math" data-say="25, 37.5, 56.25, 84.375, 126.5625, 189.84 and so on">25, 37.5, 56.25, 84.375, 126.5625, 189.84…</span>. Predict which bucket rank 99 lands in and what the relative width becomes, then check both in the lab and count how many buckets it now takes to reach 800 ms.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reporting a bucketed percentile as a number</strong><span>&ldquo;p99 = 150 ms&rdquo; from <span class="math" data-say="r equals 2">r = 2</span> buckets is an interval <span class="math" data-say="100, 200">[100, 200)</span> with a midpoint printed in place of it, and the midpoint is not more likely than either end &mdash; inside a geometric bucket the mass sits low. Report the bucket. If a single number is unavoidable, report the lower edge and say it is a lower bound.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting more traffic to sharpen the answer</strong><span>It sharpens the rank and not the bucket. A team that waits for a longer window to settle an argument about whether the p99 is 130 or 190 ms will wait for ever, because both are <span class="math" data-say="100, 200">[100, 200)</span> and the histogram has no opinion. The fix is boundaries, and it is retroactive only if the raw requests were kept.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing linear buckets for a latency distribution</strong><span>Equal-width buckets give a relative error of <span class="math" data-say="width over x">width/x</span>, which is enormous at the bottom of the range and negligible at the top &mdash; exactly backwards for latency, where the interesting structure is at small values and the tail is one long thin thing. Ten-millisecond buckets resolve a 1 000 ms p999 to 1% and a 5 ms median to 200%.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a percentile read from a histogram is reported as an interval without being asked.</strong><p>You should be able to locate a rank in cumulative bucket counts, name the containing bucket with both ends, compute the relative width <span class="math" data-say="r minus 1">r − 1</span>, say how many buckets a finer ratio costs over the same range, and explain why neither number moves when the traffic does.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both aggregates so far were computed from requests that were actually served. The next two pages are about requests that were not: &ldquo;Coordinated Omission&rdquo; puts back the ones a stalled load generator never sent, which moves a p99 from 2 ms to 990 ms on one trace, and &ldquo;Scrape Intervals and What They Cannot See&rdquo; counts the spikes that happened between two reads.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reporting a bucketed percentile as a number</strong><span>&ldquo;p99 = 150 ms&rdquo; from <span class="math" data-say="r equals 2">r = 2</span> buckets is an interval <span class="math" data-say="100, 200">[100, 200)</span> with a midpoint printed in place of it, and the midpoint is not more likely than either end &mdash; inside a geometric bucket the mass sits low. Report the bucket. If a single number is unavoidable, report the lower edge and say it is a lower bound.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting more traffic to sharpen the answer</strong><span>It sharpens the rank and not the bucket. A team that waits for a longer window to settle an argument about whether the p99 is 130 or 190 ms will wait for ever, because both are <span class="math" data-say="100, 200">[100, 200)</span> and the histogram has no opinion. The fix is boundaries, and it is retroactive only if the raw requests were kept.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing linear buckets for a latency distribution</strong><span>Equal-width buckets give a relative error of <span class="math" data-say="width over x">width/x</span>, which is enormous at the bottom of the range and negligible at the top &mdash; exactly backwards for latency, where the interesting structure is at small values and the tail is one long thin thing. Ten-millisecond buckets resolve a 1 000 ms p999 to 1% and a 5 ms median to 200%.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a percentile read from a histogram is reported as an interval without being asked.</strong><p>You should be able to locate a rank in cumulative bucket counts, name the containing bucket with both ends, compute the relative width <span class="math" data-say="r minus 1">r − 1</span>, say how many buckets a finer ratio costs over the same range, and explain why neither number moves when the traffic does.</p></div></div><div class="note"><strong>Note:</strong> Both aggregates so far were computed from requests that were actually served. The next two pages are about requests that were not: &ldquo;Coordinated Omission&rdquo; puts back the ones a stalled load generator never sent, which moves a p99 from 2 ms to 990 ms on one trace, and &ldquo;Scrape Intervals and What They Cannot See&rdquo; counts the spikes that happened between two reads.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A histogram keeps counts and discards values</summary><p>Each request increments the counter for the bucket its latency fell in, and the latency itself is gone. What survives is enough to say how many requests were below any boundary, which is enough to find which bucket a given rank falls in &mdash; and not enough to say where inside that bucket it fell. The percentile is therefore an interval: the bucket, reported as <span class="math" data-say="lower, upper">[lower, upper)</span>.</p></details><details class="recall"><summary>Logarithmic boundaries give a constant relative error</summary><p>With edges in a geometric progression <span class="math" data-say="b, b times r, b times r squared, and so on">b, b·r, b·r², …</span>, a bucket starting at <span class="math" data-say="x">x</span> ends at <span class="math" data-say="r times x">r·x</span>, so its width relative to its own position is <span class="math" data-say="the quantity r times x minus x, over x equals r minus 1">(r·x − x)/x = r − 1</span> everywhere. At <span class="math" data-say="r equals 2">r = 2</span> that is 100% in every bucket, at the bottom of the range and at the top. The choice of <span class="math" data-say="r">r</span> is a choice of precision, made once, and it applies uniformly.</p></details><details class="recall"><summary>Bucket error is systematic, so traffic does not fix it</summary><p>The error bar of &ldquo;SLIs as Ratios&rdquo; shrinks as <span class="math" data-say="1 over the square root of n">1/√n</span>; this one does not shrink at all. Ten times the requests put ten times the counts in the same buckets and the answer is still an interval of the same relative width. The two errors compose: a percentile from a histogram is uncertain by a rank that moves with the noise <em>and</em> by a bucket that does not move at all.</p></details></div>
+      <h3>Summary</h3>
       <p>A histogram keeps counts per bucket and throws the values away, so a percentile read from it is known only to the width of the bucket it lands in. On logarithmic boundaries every bucket has the same relative width, <span class="math" data-say="ratio minus 1">ratio − 1</span>, so the usual ratio of two means every percentile is known to within a factor of two &mdash; a hundred per cent relative error that does not shrink with more traffic, because it is not noise.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A histogram keeps counts and discards values.</strong> Each request increments the counter for the bucket its latency fell in, and the latency itself is gone. What survives is enough to say how many requests were below any boundary, which is enough to find which bucket a given rank falls in &mdash; and not enough to say where inside that bucket it fell. The percentile is therefore an interval: the bucket, reported as <span class="math" data-say="lower, upper">[lower, upper)</span>.</li><li><strong>Logarithmic boundaries give a constant relative error.</strong> With edges in a geometric progression <span class="math" data-say="b, b times r, b times r squared, and so on">b, b·r, b·r², …</span>, a bucket starting at <span class="math" data-say="x">x</span> ends at <span class="math" data-say="r times x">r·x</span>, so its width relative to its own position is <span class="math" data-say="the quantity r times x minus x, over x equals r minus 1">(r·x − x)/x = r − 1</span> everywhere. At <span class="math" data-say="r equals 2">r = 2</span> that is 100% in every bucket, at the bottom of the range and at the top. The choice of <span class="math" data-say="r">r</span> is a choice of precision, made once, and it applies uniformly.</li><li><strong>Bucket error is systematic, so traffic does not fix it.</strong> The error bar of &ldquo;SLIs as Ratios&rdquo; shrinks as <span class="math" data-say="1 over the square root of n">1/√n</span>; this one does not shrink at all. Ten times the requests put ten times the counts in the same buckets and the answer is still an interval of the same relative width. The two errors compose: a percentile from a histogram is uncertain by a rank that moves with the noise <em>and</em> by a bucket that does not move at all.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="edges, b, b times r, b times r squared, and so on, here 25, 50, 100, 200, 400, 800, 1600 milliseconds. exact p 99 of the sample equals 137 milliseconds. from the histogram, p 99 in 100, 200, the bucket, and no finer. relative width, the quantity r times x minus x, over x equals r minus 1, r equals 2 goes to 100 percent, every bucket. r equals 5 over 4 goes to 25 percent, at 3.1 times as many buckets to cover the same range. bucket error is systematic, ten times the traffic does not narrow it" tabindex="0" role="region" aria-label="Mathematical notation">edges  b, b·r, b·r², …        here 25, 50, 100, 200, 400, 800, 1 600 ms
 exact p99 of the sample = 137 ms
 from the histogram:  p99 ∈ [100, 200)          the bucket, and no finer
@@ -2924,11 +2969,40 @@ bucket error is systematic: ten times the traffic does not narrow it</div><figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2996,7 +3070,7 @@ bucket error is systematic: ten times the traffic does not narrow it</div><figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

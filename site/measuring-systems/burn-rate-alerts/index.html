@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measuring Systems</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sizing samples and alerts</p>
       <h1>Burn-rate Alerts</h1>
       <p class="lesson-lede">Compute the fraction of an error budget a window consumes at a given burn rate, and the time to exhaustion, and choose the pairs that page at the right moment.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An objective is a budget, and the period is part of the definition</li><li>The burn rate is a multiple, not a rate</li><li>A pair (b, w) is an alert, and one pair is never enough</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The budget, the burn, the exhaustion time, and the pairs</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Error budget and burn rate</span><p>For an objective <span class="math" data-say="o">o</span> over a period <span class="math" data-say="P">P</span>, the <strong>error budget</strong> is <span class="math" data-say="the quantity 1 minus o, times P">(1 − o)·P</span> &mdash; the quantity of failure permitted. The <strong>burn rate</strong> <span class="math" data-say="b">b</span> is the current failure rate divided by <span class="math" data-say="1 minus o">1 − o</span>, so <span class="math" data-say="b equals 1">b = 1</span> spends the budget exactly over <span class="math" data-say="P">P</span>. A window of length <span class="math" data-say="w">w</span> at burn <span class="math" data-say="b">b</span> consumes</p><p><span class="math" data-say="b times w over P">b·w/P</span> of the budget, and exhausts it after <span class="math" data-say="P over b">P/b</span>.</p></div><div class="mathblock" data-say="objective 99.9 percent, period 30 days equals 43200 minutes. budget, equals the quantity 1 minus 999 over 1000, times 43200. equals 43200 over 1000, equals, 216 over 5, equals, 43.2 minutes, exactly. the other convention, used by the availability course. a month of 2628000 seconds equals 43800 minutes, a twelfth of 365 days. budget equals 43800 over 1000 equals 43.8 minutes, also exactly. 43.2 and 43.8 are the same objective over two different months" tabindex="0" role="region" aria-label="Mathematical notation">objective 99.9%,  period 30 days = 43 200 minutes
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The budget, the burn, the exhaustion time, and the pairs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Error budget and burn rate</span><p>For an objective <span class="math" data-say="o">o</span> over a period <span class="math" data-say="P">P</span>, the <strong>error budget</strong> is <span class="math" data-say="the quantity 1 minus o, times P">(1 − o)·P</span> &mdash; the quantity of failure permitted. The <strong>burn rate</strong> <span class="math" data-say="b">b</span> is the current failure rate divided by <span class="math" data-say="1 minus o">1 − o</span>, so <span class="math" data-say="b equals 1">b = 1</span> spends the budget exactly over <span class="math" data-say="P">P</span>. A window of length <span class="math" data-say="w">w</span> at burn <span class="math" data-say="b">b</span> consumes</p><p><span class="math" data-say="b times w over P">b·w/P</span> of the budget, and exhausts it after <span class="math" data-say="P over b">P/b</span>.</p></div><div class="mathblock" data-say="objective 99.9 percent, period 30 days equals 43200 minutes. budget, equals the quantity 1 minus 999 over 1000, times 43200. equals 43200 over 1000, equals, 216 over 5, equals, 43.2 minutes, exactly. the other convention, used by the availability course. a month of 2628000 seconds equals 43800 minutes, a twelfth of 365 days. budget equals 43800 over 1000 equals 43.8 minutes, also exactly. 43.2 and 43.8 are the same objective over two different months" tabindex="0" role="region" aria-label="Mathematical notation">objective 99.9%,  period 30 days = 43 200 minutes
 
 budget  = (1 − 999/1000) × 43 200
         = 43 200/1000  =  216/5  =  43.2 minutes      exactly
@@ -1406,12 +1450,11 @@ the other convention, used by the availability course:
   14.4×     1 hour      1/50         2%   = 0.864 min   50 hours
    6×       6 hours     1/20         5%   = 2.16 min     5 days
    3×       1 day       1/10         10%  = 4.32 min    10 days
-   1×       3 days      1/10         10%  = 4.32 min    30 days</div><p>Read the last column and the fourth column together. The fast pair fires having spent 2% of the budget, which is why it can afford to page a human at three in the morning: almost everything is still there. The slow pair fires having spent 10%, over three days, at a burn the fast pair never notices &mdash; a burn of 1 is exactly the rate that spends the budget by the end of the period, so it is not an emergency, and it is also not sustainable.</p><p>A single pair cannot do both jobs. Choose only the fast one and a service failing 0.15% of requests for a fortnight blows the budget without ever tripping it; choose only the slow one and a total outage pages you after it has already cost a third of the quarter&rsquo;s allowance. The multi-window rule is not sophistication, it is the minimum number of pairs that covers both failure shapes.</p><div class="example"><span class="label">Example &middot; The same incident under two rules</span><p>A deploy at 02:00 takes the error rate to 1.44%, a burn of 14.4. Under a raw-rate alert at &ldquo;more than 1% errors for five minutes&rdquo; it pages at 02:05 and would equally have paged for a 1.1% blip lasting six minutes that costs 0.02% of the budget.</p><p>Under the burn-rate rule it pages at 03:00, having spent 0.864 of the 43.2 minutes, and it does not page for the blip at all. The difference is not the threshold; it is that one rule is about the instantaneous rate and the other is about the quantity of budget the rate is consuming.</p></div><h3>An SLO is not an SLA</h3><p>The arithmetic above is identical for both. What differs is what happens when the last row runs out. An <strong>objective</strong> is an internal target: missing it spends a budget your own organisation owns, and the usual consequence is a freeze on feature work until it recovers. An <strong>agreement</strong> is a contract: missing it spends money, because a refund or a credit is attached to it.</p><p>Because the consequences differ by an order of magnitude, an agreement is normally set looser than the objective it is measured against &mdash; 99.5% promised against 99.9% targeted &mdash; so that the internal alarm fires long before the external one does. A team that sets both to the same number has arranged for the first warning and the financial penalty to arrive on the same day.</p><p>One more distinction worth keeping: the budget is measured in one unit or the other, minutes or requests, and they are not interchangeable. Forty-three minutes of total unavailability and 0.1% of requests failing all month are both &ldquo;the whole budget&rdquo;, and they are very different experiences for a user. Which unit the objective is written in decides which of them you have agreed to.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Spending an error budget</h2></div><p>What a burn rate costs per window, and when it runs out</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   1×       3 days      1/10         10%  = 4.32 min    30 days</div><p>Read the last column and the fourth column together. The fast pair fires having spent 2% of the budget, which is why it can afford to page a human at three in the morning: almost everything is still there. The slow pair fires having spent 10%, over three days, at a burn the fast pair never notices &mdash; a burn of 1 is exactly the rate that spends the budget by the end of the period, so it is not an emergency, and it is also not sustainable.</p><p>A single pair cannot do both jobs. Choose only the fast one and a service failing 0.15% of requests for a fortnight blows the budget without ever tripping it; choose only the slow one and a total outage pages you after it has already cost a third of the quarter&rsquo;s allowance. The multi-window rule is not sophistication, it is the minimum number of pairs that covers both failure shapes.</p><div class="example"><span class="label">Example &middot; The same incident under two rules</span><p>A deploy at 02:00 takes the error rate to 1.44%, a burn of 14.4. Under a raw-rate alert at &ldquo;more than 1% errors for five minutes&rdquo; it pages at 02:05 and would equally have paged for a 1.1% blip lasting six minutes that costs 0.02% of the budget.</p><p>Under the burn-rate rule it pages at 03:00, having spent 0.864 of the 43.2 minutes, and it does not page for the blip at all. The difference is not the threshold; it is that one rule is about the instantaneous rate and the other is about the quantity of budget the rate is consuming.</p></div><h3>An SLO is not an SLA</h3><p>The arithmetic above is identical for both. What differs is what happens when the last row runs out. An <strong>objective</strong> is an internal target: missing it spends a budget your own organisation owns, and the usual consequence is a freeze on feature work until it recovers. An <strong>agreement</strong> is a contract: missing it spends money, because a refund or a credit is attached to it.</p><p>Because the consequences differ by an order of magnitude, an agreement is normally set looser than the objective it is measured against &mdash; 99.5% promised against 99.9% targeted &mdash; so that the internal alarm fires long before the external one does. A team that sets both to the same number has arranged for the first warning and the financial penalty to arrive on the same day.</p><p>One more distinction worth keeping: the budget is measured in one unit or the other, minutes or requests, and they are not interchangeable. Forty-three minutes of total unavailability and 0.1% of requests failing all month are both &ldquo;the whole budget&rdquo;, and they are very different experiences for a user. Which unit the objective is written in decides which of them you have agreed to.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Spending an error budget</h2></div><p>What a burn rate costs per window, and when it runs out</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Burn rate against the budget</strong><span>b &times; w &divide; period of the budget, and period &divide; b until it is gone</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>budget left</span><span class="tone-red"><i class="legend-swatch"></i>spent in this window</span><span class="tone-amber"><i class="legend-swatch"></i>time to exhaustion</span></div>
@@ -1419,10 +1462,10 @@ the other convention, used by the availability course:
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="brPlot" viewBox="0 0 660 200" role="img" aria-label="The error budget as a bar with the window's spend taken out, and the period with the exhaustion point marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="brTable"></table></div>
       <div class="status-banner" id="brStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the objective and the burn</h3>
-          <p>The budget, the share a window spends and the time to exhaustion are exact fractions of a minute. The banner names which period convention the figures assume and what the other one would give, so that two pages of this library quoting 43.2 and 43.8 for the same objective can be reconciled rather than mistrusted. Slide the period to 30 days and the budget reads 216/5 exactly.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the objective and the burn</h3>
+            <p>The budget, the share a window spends and the time to exhaustion are exact fractions of a minute. The banner names which period convention the figures assume and what the other one would give, so that two pages of this library quoting 43.2 and 43.8 for the same objective can be reconciled rather than mistrusted. Slide the period to 30 days and the budget reads 216/5 exactly.</p>
         <div class="field">
           <label for="brObj">The objective</label>
           <select id="brObj"><option value="99/100">99% &mdash; two nines</option><option value="995/1000">99.5%</option><option value="999/1000" selected>99.9% &mdash; three nines</option><option value="9995/10000">99.95%</option><option value="9999/10000">99.99% &mdash; four nines</option></select>
@@ -1448,12 +1491,14 @@ the other convention, used by the availability course:
           <div class="kpi"><span>Budget left when it pages</span><strong id="brLeft">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="brHint" style="margin:0;">A burn rate of 1 spends the whole budget exactly at the end of the period. A burn of 14.4 spends 2% of it in an hour, which is why that pair pages fast; a burn of 1 over three days spends 10% of it, which is why that pair pages slowly and catches the quiet leak the fast one cannot see.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Turning an objective into an alert</h2></div><p>The first two steps are definitions, the third is the arithmetic, and the fourth is the one that gets skipped.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the objective, the period and the unit</h3><p>99.9% of requests over 30 days is a different promise from 99.9% of minutes over a twelfth of a year, and both are called three nines. Write all three down before computing anything, and put them on the dashboard beside the number.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the budget</h3><p><span class="math" data-say="the quantity 1 minus o, times P">(1 − o) × P</span> in whatever unit the objective is written in. For 99.9% over 30 days that is 43.2 minutes; keep it as <span class="math" data-say="216 over 5">216/5</span> while you are doing arithmetic with it, because the fractions stay exact and the decimals invite rounding.</p></article><article class="card concept-card"><div class="icon">3</div><h3>For each candidate pair, compute <span data-say="b times w over P">b·w/P</span> and P/b</h3><p>The first says how much of the budget is gone when this pair fires; the second says how long you have if the burn continues. A pair that fires after 30% of the budget is gone is a pair that pages too late, whatever its burn rate looks like.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Take at least one fast pair and one slow pair</h3><p>Fast catches the outage, slow catches the leak, and neither substitutes for the other. The standard four are <span data-say="14.4 times">14.4×</span> over an hour, <span data-say="6 times">6×</span> over six hours, <span data-say="3 times">3×</span> over a day and <span data-say="1 times">1×</span> over three days; two of them is a reasonable minimum.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Decide what the page means before it arrives</h3><p>A burn-rate page says a quantity of budget is being consumed at a rate, not that anything is broken. The response to the fast pair is to stop the bleeding; the response to the slow pair is usually to plan work, and waking someone for it is how a good alert becomes an ignored one.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Turning an objective into an alert</h2>
+      <p class="lead-in">The first two steps are definitions, the third is the arithmetic, and the fourth is the one that gets skipped.</p>
+      <ol class="key-ideas method"><li><strong>State the objective, the period and the unit.</strong> 99.9% of requests over 30 days is a different promise from 99.9% of minutes over a twelfth of a year, and both are called three nines. Write all three down before computing anything, and put them on the dashboard beside the number.</li><li><strong>Compute the budget.</strong> <span class="math" data-say="the quantity 1 minus o, times P">(1 − o) × P</span> in whatever unit the objective is written in. For 99.9% over 30 days that is 43.2 minutes; keep it as <span class="math" data-say="216 over 5">216/5</span> while you are doing arithmetic with it, because the fractions stay exact and the decimals invite rounding.</li><li><strong>For each candidate pair, compute <span data-say="b times w over P">b·w/P</span> and P/b.</strong> The first says how much of the budget is gone when this pair fires; the second says how long you have if the burn continues. A pair that fires after 30% of the budget is gone is a pair that pages too late, whatever its burn rate looks like.</li><li><strong>Take at least one fast pair and one slow pair.</strong> Fast catches the outage, slow catches the leak, and neither substitutes for the other. The standard four are <span data-say="14.4 times">14.4×</span> over an hour, <span data-say="6 times">6×</span> over six hours, <span data-say="3 times">3×</span> over a day and <span data-say="1 times">1×</span> over three days; two of them is a reasonable minimum.</li><li><strong>Decide what the page means before it arrives.</strong> A burn-rate page says a quantity of budget is being consumed at a rate, not that anything is broken. The response to the fast pair is to stop the bleeding; the response to the slow pair is usually to plan work, and waking someone for it is how a good alert becomes an ignored one.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1493,17 +1538,16 @@ THE FOUR PAIRS
     1×     3 days     1/10     4.32  min      30 days</div><p>The fourth column is why these particular pairs are the standard ones. Every row fires having spent a single-figure percentage of the budget, so every row leaves room to respond; and the rows span burn rates from 14.4 down to 1, so between them they catch a total outage and a leak small enough that nobody would call it an incident.</p><p>The bottom row deserves a second look. A burn of exactly 1 is the rate at which the budget is spent precisely on schedule &mdash; not an emergency by any instantaneous measure, and exactly the rate that leaves you with nothing at the end of the period. It is the case a raw error-rate threshold can never be tuned to catch, because at a 99.9% objective the raw rate is 0.1% and no threshold distinguishes that from healthy noise in a five-minute window.</p><p>For faded practice, take a 99.95% objective over 30 days. The supplied first move is that the budget halves to 21.6 minutes. Compute what the <span data-say="14.4 times">14.4×</span> pair over one hour now spends as a fraction and in minutes, and say whether the fraction changed &mdash; then explain in one sentence why, which is the whole reason burn is expressed as a multiple.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Alerting on the raw error rate rather than on the budget</strong><span>A threshold on the instantaneous rate fires for a two-minute blip that costs 0.05% of the budget and stays quiet through a fortnight at 0.15% that spends all of it. The budget framing makes severity and duration one quantity &mdash; <span class="math" data-say="b times w over P">b·w/P</span> &mdash; which is the whole reason for the change of variable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a budget without the period it is a budget for</strong><span>43.2 and 43.8 minutes are the same objective over 30 days and over a twelfth of a year, and a budget counted in failed requests is a third quantity again. Two teams comparing numbers without their periods will eventually conclude that one of the two systems is broken, and neither will be.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Running one burn-rate pair</strong><span>A single fast pair is blind to the slow leak that is spending the budget on schedule; a single slow pair arrives after a severe outage has already taken a third of the allowance. The pairs are not alternatives to be chosen between &mdash; they cover different shapes of failure, and the minimum useful configuration has one of each.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a budget is quoted with its period and its unit, and an alert is a (b, w) pair rather than a threshold.</strong><p>You should be able to compute <span class="math" data-say="the quantity 1 minus o, times P">(1 − o)·P</span> exactly, convert a failure rate into a burn multiple, compute <span class="math" data-say="b times w over P">b·w/P</span> and <span class="math" data-say="P over b">P/b</span> for any pair, say which of two budget figures assumes which period, and explain why an agreement is set looser than the objective behind it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A burn-rate rule fires on a quantity that is genuinely being spent. A plain threshold on a noisy ratio fires on the sample, and it fires whether or not anything has changed: &ldquo;Threshold Alerts and False Alarms&rdquo; computes that a 2% threshold on 200-request windows at a true 1% error rate trips 5.175% of the time, which is 104.32 pages a week from a perfectly healthy service.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Alerting on the raw error rate rather than on the budget</strong><span>A threshold on the instantaneous rate fires for a two-minute blip that costs 0.05% of the budget and stays quiet through a fortnight at 0.15% that spends all of it. The budget framing makes severity and duration one quantity &mdash; <span class="math" data-say="b times w over P">b·w/P</span> &mdash; which is the whole reason for the change of variable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting a budget without the period it is a budget for</strong><span>43.2 and 43.8 minutes are the same objective over 30 days and over a twelfth of a year, and a budget counted in failed requests is a third quantity again. Two teams comparing numbers without their periods will eventually conclude that one of the two systems is broken, and neither will be.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Running one burn-rate pair</strong><span>A single fast pair is blind to the slow leak that is spending the budget on schedule; a single slow pair arrives after a severe outage has already taken a third of the allowance. The pairs are not alternatives to be chosen between &mdash; they cover different shapes of failure, and the minimum useful configuration has one of each.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a budget is quoted with its period and its unit, and an alert is a (b, w) pair rather than a threshold.</strong><p>You should be able to compute <span class="math" data-say="the quantity 1 minus o, times P">(1 − o)·P</span> exactly, convert a failure rate into a burn multiple, compute <span class="math" data-say="b times w over P">b·w/P</span> and <span class="math" data-say="P over b">P/b</span> for any pair, say which of two budget figures assumes which period, and explain why an agreement is set looser than the objective behind it.</p></div></div><div class="note"><strong>Note:</strong> A burn-rate rule fires on a quantity that is genuinely being spent. A plain threshold on a noisy ratio fires on the sample, and it fires whether or not anything has changed: &ldquo;Threshold Alerts and False Alarms&rdquo; computes that a 2% threshold on 200-request windows at a true 1% error rate trips 5.175% of the time, which is 104.32 pages a week from a perfectly healthy service.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An objective is a budget, and the period is part of the definition</summary><p>99.9% over 30 days permits <span class="math" data-say="0.001 times 43200 equals 43.2">0.001 × 43 200 = 43.2</span> minutes of failure, and nothing about that figure is meaningful without the 30 days. The same objective over a 2 628 000-second month &mdash; a twelfth of a 365-day year, which is what &ldquo;Error Budgets&rdquo; on the Availability and Failure course uses &mdash; permits 43.8 minutes. Both are exact, neither is a rounding of the other, and a budget quoted without its period cannot be compared with anything.</p></details><details class="recall"><summary>The burn rate is a multiple, not a rate</summary><p>A burn rate of 1 is the error rate that would spend exactly the whole budget exactly at the end of the period. At a 99.9% objective that is 0.1% of requests failing. A burn of 14.4 means 1.44% of requests failing, and a burn of 0 means none. Expressing it this way makes the arithmetic independent of the objective: <span class="math" data-say="b equals 14.4">b = 14.4</span> spends 2% of the budget in an hour whether the objective is three nines or five.</p></details><details class="recall"><summary>A pair (b, w) is an alert, and one pair is never enough</summary><p>A short window at a high burn catches a severe outage within minutes and is blind to a slow leak; a long window at a low burn catches the leak and arrives hours after a severe outage has spent everything. The standard set is two or four pairs together: <span data-say="14.4 times">14.4×</span> over 1 hour, <span data-say="6 times">6×</span> over 6 hours, <span data-say="3 times">3×</span> over 1 day, <span data-say="1 times">1×</span> over 3 days &mdash; spending 2%, 5%, 10% and 10% of the budget respectively by the time each fires.</p></details></div>
+      <h3>Summary</h3>
       <p>An objective over a period implies a budget: 99.9% over 30 days is exactly 216/5 = 43.2 minutes of failure. A burn rate <span class="math" data-say="b">b</span> is a multiple of the rate that would spend the budget exactly at the end of the period, so a window <span class="math" data-say="w">w</span> at burn <span class="math" data-say="b">b</span> consumes <span class="math" data-say="b times w over period">b·w/period</span> of it and exhausts the budget in <span class="math" data-say="period over b">period/b</span>. Alerting on the budget rather than on the raw error rate is what makes a fast page and a slow page into two settings of one rule.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An objective is a budget, and the period is part of the definition.</strong> 99.9% over 30 days permits <span class="math" data-say="0.001 times 43200 equals 43.2">0.001 × 43 200 = 43.2</span> minutes of failure, and nothing about that figure is meaningful without the 30 days. The same objective over a 2 628 000-second month &mdash; a twelfth of a 365-day year, which is what &ldquo;Error Budgets&rdquo; on the Availability and Failure course uses &mdash; permits 43.8 minutes. Both are exact, neither is a rounding of the other, and a budget quoted without its period cannot be compared with anything.</li><li><strong>The burn rate is a multiple, not a rate.</strong> A burn rate of 1 is the error rate that would spend exactly the whole budget exactly at the end of the period. At a 99.9% objective that is 0.1% of requests failing. A burn of 14.4 means 1.44% of requests failing, and a burn of 0 means none. Expressing it this way makes the arithmetic independent of the objective: <span class="math" data-say="b equals 14.4">b = 14.4</span> spends 2% of the budget in an hour whether the objective is three nines or five.</li><li><strong>A pair (b, w) is an alert, and one pair is never enough.</strong> A short window at a high burn catches a severe outage within minutes and is blind to a slow leak; a long window at a low burn catches the leak and arrives hours after a severe outage has spent everything. The standard set is two or four pairs together: <span data-say="14.4 times">14.4×</span> over 1 hour, <span data-say="6 times">6×</span> over 6 hours, <span data-say="3 times">3×</span> over 1 day, <span data-say="1 times">1×</span> over 3 days &mdash; spending 2%, 5%, 10% and 10% of the budget respectively by the time each fires.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="budget equals the quantity 1 minus objective, times period. 99.9 percent of 30 days equals 0.001 times 43200 minutes equals 216 over 5 equals 43.2 minutes exactly. 99.9 percent of a 2628000 seconds month equals 43.8 minutes, a different month, also exact. a window w at burn b spends b times w over period, 14.4 times for 1 h goes to 2 percent. time to exhaustion equals period divided by b, 14.4 times goes to 50 hours. an SLO is not an SLA, one arithmetic, two consequences" tabindex="0" role="region" aria-label="Mathematical notation">budget = (1 − objective) × period
 99.9% of 30 days = 0.001 × 43 200 min = 216/5 = 43.2 minutes exactly
 99.9% of a 2 628 000 s month = 43.8 minutes — a different month, also exact
@@ -2883,11 +2927,40 @@ an SLO is not an SLA: one arithmetic, two consequences</div><figcaption>A budget
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2955,7 +3028,7 @@ an SLO is not an SLA: one arithmetic, two consequences</div><figcaption>A budget
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

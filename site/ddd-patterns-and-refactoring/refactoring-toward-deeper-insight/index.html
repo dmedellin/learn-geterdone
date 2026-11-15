@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,57 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Analysis Patterns, Design Patterns and Refactoring</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Refactoring Toward Deeper Insight</p>
       <h1>Refactoring Toward Deeper Insight</h1>
       <p class="lesson-lede">Changing the model, and the code with it, because the team has understood the domain better, not only because the code is untidy.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Refactoring toward deeper insight</li><li>Exploration team</li><li>Modules a change touches</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;If you wait until you can make a complete justification for a change, you've waited too long.&rdquo; That is the first sentence of Timing, in Chapter 13, Refactoring Toward Deeper Insight. The chapter is short and gathers the five before it into one account. Read it in your own copy first.</p><p>Evans opens with three things to focus on: live in the domain, keep changing the angle you look at it from, and keep an unbroken dialogue with the domain experts. He then places the chapter beside the classic picture of refactoring, a developer or two at the keyboard improving code in small steps with unit tests to confirm nothing broke, the practice read in Code Complete's lesson Refactoring Safely. That should go on all the time, he says, but it is not the whole story; Part III has laid an expanded view over it.</p><p>Initiation says where the expanded kind begins. It may begin with a problem in the code, an awkwardness whose root the developers sense is in the model, a concept missing or a relationship wrong. Unlike the conventional kind, it may also begin when the code looks tidy: when the model's language has drifted from the experts', when new requirements do not fit naturally, or when a developer has simply learned more. Finding where the trouble lies is often the least certain step; then the team can search deliberately, with colleagues, experts and written patterns.</p><p>Exploration Teams says who does the searching when a change needs more than a few hours. The initiators gather a few people who know the area or model well, with a domain expert where there are subtleties, and brainstorm for between half an hour and an hour and a half, sketching and walking through scenarios; then they code what they found or sleep on it and meet again a couple of days later. Evans names three keys: self-determination, since the team forms and disbands with no standing structure; scope and sleep, a few short meetings over a few days, and a smaller piece of the problem if the team is stuck; and exercising the Ubiquitous Language, whose refinement is what the developers take back and put into code.</p><p>Prior Art says where ideas come from: books about the domain itself, analysis patterns such as the two this course has read, design patterns where they fit both the implementation and the concept, and formalisms such as arithmetic or predicate logic where one fits part of the domain. A Design for Developers recalls why it matters: software is also for the developers who change it again and again, and a supple design lets them anticipate what code does and so what changing it will do.</p><p>Timing makes the chapter's sharpest claim. Teams are too cautious: what they notice is the danger in touching code and the hours a change takes, and what they miss is the danger of living with a clumsy design and the hours spent coding around it. Demanding a justification first sounds reasonable, Evans says, and tends to stop refactoring or drive it underground, because the costs and benefits cannot be calculated accurately. So, he says, refactor when the design no longer says what the team now understands, when important concepts are implicit and you see how to make them explicit, or when you see a chance to make an important part suppler. And he fences it: not the day before a release, not supple designs that show off technique but miss the core of the domain, not a deeper model a domain expert would not use. Be undogmatic, he ends, but lean toward refactoring.</p><p>Crisis as Opportunity closes with a story from biology. For a century after Darwin, evolution was pictured as steady change; in the 1970s, with the punctuated-equilibrium model that Niles Eldredge and Stephen Jay Gould proposed (names Evans does not give), it came to be seen as long stability broken by short bursts. Evans's point is that refactoring toward deeper insight has that rhythm too. A breakthrough often arrives looking like a crisis, a model suddenly seen to be inadequate or wrong, and it means the team now understands more; then steady refinement starts again. Breakthrough, in Breakthroughs and Implicit Concepts, read his story of one.</p><p>Now the lab, on a clinic's appointment system. Its rule for late cancellation, a 24-hour window with urgent visits exempt, is nowhere a concept: the booking screen, the reminder job and the invoice run each work it out, and urgency is a flag on the patient record. On the preset <code>rule-implicit</code> the lab takes 6 classes in 4 modules and 4 change requests, and counts the modules each touches: widening the window to 48 hours 3, exempting urgent visits 3, a new fee amount 1, a new reminder text 1. That is 8 module touches in all, and 2 changes confined to one module. The window change and the exemption tie for the largest, at 3; the tile shows the first given, and the status line names both.</p><pre class="codeblock" data-say="line 1, comment, The rule the screen, the reminders and the invoices each used to repeat.. line 2, final class cancellation policy. line 3, private final duration window, comment, 24 hours today. line 5, cancellation policy of duration window. line 6, this dot window is set to window. line 9, instant last free cancellation of appointment A. line 10, return A dot start dot minus of window. line 13, boolean is late of appointment A, instant cancelled at. line 14, if A dot is urgent. line 15, return false, comment, urgent visits are exempt. line 17, return cancelled at dot is after of last free cancellation of A" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The rule the screen, the reminders and the invoices each used to repeat.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;If you wait until you can make a complete justification for a change, you've waited too long.&rdquo; That is the first sentence of Timing, in Chapter 13, Refactoring Toward Deeper Insight. The chapter is short and gathers the five before it into one account. Read it in your own copy first.</p><p>Evans opens with three things to focus on: live in the domain, keep changing the angle you look at it from, and keep an unbroken dialogue with the domain experts. He then places the chapter beside the classic picture of refactoring, a developer or two at the keyboard improving code in small steps with unit tests to confirm nothing broke, the practice read in Code Complete's lesson Refactoring Safely. That should go on all the time, he says, but it is not the whole story; Part III has laid an expanded view over it.</p><p>Initiation says where the expanded kind begins. It may begin with a problem in the code, an awkwardness whose root the developers sense is in the model, a concept missing or a relationship wrong. Unlike the conventional kind, it may also begin when the code looks tidy: when the model's language has drifted from the experts', when new requirements do not fit naturally, or when a developer has simply learned more. Finding where the trouble lies is often the least certain step; then the team can search deliberately, with colleagues, experts and written patterns.</p><p>Exploration Teams says who does the searching when a change needs more than a few hours. The initiators gather a few people who know the area or model well, with a domain expert where there are subtleties, and brainstorm for between half an hour and an hour and a half, sketching and walking through scenarios; then they code what they found or sleep on it and meet again a couple of days later. Evans names three keys: self-determination, since the team forms and disbands with no standing structure; scope and sleep, a few short meetings over a few days, and a smaller piece of the problem if the team is stuck; and exercising the Ubiquitous Language, whose refinement is what the developers take back and put into code.</p><p>Prior Art says where ideas come from: books about the domain itself, analysis patterns such as the two this course has read, design patterns where they fit both the implementation and the concept, and formalisms such as arithmetic or predicate logic where one fits part of the domain. A Design for Developers recalls why it matters: software is also for the developers who change it again and again, and a supple design lets them anticipate what code does and so what changing it will do.</p><p>Timing makes the chapter's sharpest claim. Teams are too cautious: what they notice is the danger in touching code and the hours a change takes, and what they miss is the danger of living with a clumsy design and the hours spent coding around it. Demanding a justification first sounds reasonable, Evans says, and tends to stop refactoring or drive it underground, because the costs and benefits cannot be calculated accurately. So, he says, refactor when the design no longer says what the team now understands, when important concepts are implicit and you see how to make them explicit, or when you see a chance to make an important part suppler. And he fences it: not the day before a release, not supple designs that show off technique but miss the core of the domain, not a deeper model a domain expert would not use. Be undogmatic, he ends, but lean toward refactoring.</p><p>Crisis as Opportunity closes with a story from biology. For a century after Darwin, evolution was pictured as steady change; in the 1970s, with the punctuated-equilibrium model that Niles Eldredge and Stephen Jay Gould proposed (names Evans does not give), it came to be seen as long stability broken by short bursts. Evans's point is that refactoring toward deeper insight has that rhythm too. A breakthrough often arrives looking like a crisis, a model suddenly seen to be inadequate or wrong, and it means the team now understands more; then steady refinement starts again. Breakthrough, in Breakthroughs and Implicit Concepts, read his story of one.</p><p>Now the lab, on a clinic's appointment system. Its rule for late cancellation, a 24-hour window with urgent visits exempt, is nowhere a concept: the booking screen, the reminder job and the invoice run each work it out, and urgency is a flag on the patient record. On the preset <code>rule-implicit</code> the lab takes 6 classes in 4 modules and 4 change requests, and counts the modules each touches: widening the window to 48 hours 3, exempting urgent visits 3, a new fee amount 1, a new reminder text 1. That is 8 module touches in all, and 2 changes confined to one module. The window change and the exemption tie for the largest, at 3; the tile shows the first given, and the status line names both.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Modules and dependencies</h2></div><p>the modules each change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Modules and dependencies</strong><span>the modules each change reaches</span></div>
+      </div>
+      <div class="status-banner" id="dmoStatus" style="margin-top:12px;" aria-live="polite"></div>
+      <div class="table-wrap" id="dmoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dmoTable"></table></div>
+      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each element sits in one module of each packaging; with a third column (module2) the view counts a second packaging of the same elements and prints its tiles second. A change touches every element it lists, and through them every module those elements sit in, each module counted once per change however many of its elements the change touches. The total adds those counts over the changes. Changes are listed in the order first given; the largest is the change touching the most modules, a tie going to the first given (the status line names the others).</p>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The modules each change request reaches</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+        <div class="field">
+          <label for="dmoPreset">Worked example</label>
+          <select id="dmoPreset"><option value="rule-implicit" selected>A clinic's late-cancellation rule written into three modules</option><option value="rule-explicit">The same system with the rule as an explicit CancellationPolicy</option></select>
+        </div>
+        <div class="field">
+          <label for="dmoInElements">Elements (element, module)</label>
+          <textarea id="dmoInElements" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">AppointmentScreen, ui; Calendar, scheduling; ReminderJob, scheduling; InvoiceRun, billing; FeeTable, billing; PatientRecord, patients</textarea>
+        </div>
+        <div class="field">
+          <label for="dmoInChanges">Changes (change, an element it touches; one record per element)</label>
+          <textarea id="dmoInChanges" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">window-48h, AppointmentScreen; window-48h, ReminderJob; window-48h, InvoiceRun; urgent-exempt, AppointmentScreen; urgent-exempt, InvoiceRun; urgent-exempt, PatientRecord; fee-amount, FeeTable; reminder-text, ReminderJob</textarea>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Changes</span><strong id="dmoChanges">&mdash;</strong></div>
+          <div class="kpi"><span>Modules touched per change</span><strong id="dmoPer">&mdash;</strong></div>
+          <div class="kpi"><span>Total module touches</span><strong id="dmoTotal">&mdash;</strong></div>
+          <div class="kpi"><span>Changes confined to one module</span><strong id="dmoConfined">&mdash;</strong></div>
+          <div class="kpi"><span>The largest change</span><strong id="dmoLargest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, The rule the screen, the reminders and the invoices each used to repeat.. line 2, final class cancellation policy. line 3, private final duration window, comment, 24 hours today. line 5, cancellation policy of duration window. line 6, this dot window is set to window. line 9, instant last free cancellation of appointment A. line 10, return A dot start dot minus of window. line 13, boolean is late of appointment A, instant cancelled at. line 14, if A dot is urgent. line 15, return false, comment, urgent visits are exempt. line 17, return cancelled at dot is after of last free cancellation of A" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The rule the screen, the reminders and the invoices each used to repeat.</span>
 <span class="cl">final class CancellationPolicy {</span>
 <span class="cl">    private final Duration window;   // 24 hours today</span>
 <span class="cl"></span>
@@ -1475,49 +1558,12 @@
 <span class="cl">ExamPlanner, exams; ReportCard, reports; Period, periods</span>
 <span class="cl">// after: changes</span>
 <span class="cl">longer-periods, Period; short-fridays, Period;</span>
-<span class="cl">attendance, ReportCard</span></code></pre><p>A school timetable, before and after the length of a period becomes a Period class in its own module. By hand, give the modules each change touches in each design, the total module touches and the changes confined to one module. Then enter both designs into the lab to check.</p><p>That ends Part III. The next course, Maintaining Model Integrity, opens Part IV with Bounded Context: what happens when more than one model is at work in a system, and how to keep each one consistent.</p></article>
+<span class="cl">attendance, ReportCard</span></code></pre><p>A school timetable, before and after the length of a period becomes a Period class in its own module. By hand, give the modules each change touches in each design, the total module touches and the changes confined to one module. Then enter both designs into the lab to check.</p><p>That ends Part III. The next course, Maintaining Model Integrity, opens Part IV with Bounded Context: what happens when more than one model is at work in a system, and how to keep each one consistent.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Modules and dependencies</h2></div><p>the modules each change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Modules and dependencies</strong><span>the modules each change reaches</span></div>
-      </div>
-      <div class="status-banner" id="dmoStatus" style="margin-top:12px;" aria-live="polite"></div>
-      <div class="table-wrap" id="dmoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dmoTable"></table></div>
-      <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each element sits in one module of each packaging; with a third column (module2) the view counts a second packaging of the same elements and prints its tiles second. A change touches every element it lists, and through them every module those elements sit in, each module counted once per change however many of its elements the change touches. The total adds those counts over the changes. Changes are listed in the order first given; the largest is the change touching the most modules, a tie going to the first given (the status line names the others).</p>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The modules each change request reaches</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
-        <div class="field">
-          <label for="dmoPreset">Worked example</label>
-          <select id="dmoPreset"><option value="rule-implicit" selected>A clinic's late-cancellation rule written into three modules</option><option value="rule-explicit">The same system with the rule as an explicit CancellationPolicy</option></select>
-        </div>
-        <div class="field">
-          <label for="dmoInElements">Elements (element, module)</label>
-          <textarea id="dmoInElements" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">AppointmentScreen, ui; Calendar, scheduling; ReminderJob, scheduling; InvoiceRun, billing; FeeTable, billing; PatientRecord, patients</textarea>
-        </div>
-        <div class="field">
-          <label for="dmoInChanges">Changes (change, an element it touches; one record per element)</label>
-          <textarea id="dmoInChanges" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:0.85rem;line-height:1.5;">window-48h, AppointmentScreen; window-48h, ReminderJob; window-48h, InvoiceRun; urgent-exempt, AppointmentScreen; urgent-exempt, InvoiceRun; urgent-exempt, PatientRecord; fee-amount, FeeTable; reminder-text, ReminderJob</textarea>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Changes</span><strong id="dmoChanges">&mdash;</strong></div>
-          <div class="kpi"><span>Modules touched per change</span><strong id="dmoPer">&mdash;</strong></div>
-          <div class="kpi"><span>Total module touches</span><strong id="dmoTotal">&mdash;</strong></div>
-          <div class="kpi"><span>Changes confined to one module</span><strong id="dmoConfined">&mdash;</strong></div>
-          <div class="kpi"><span>The largest change</span><strong id="dmoLargest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting what a deeper model changes</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the classes and modules</h3><p>Write each class with the module it lives in, before the refactoring and after it, including any class the refactoring adds.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the change requests</h3><p>For each request the system has had or expects, write the classes it alters in each design. Use the same requests for both.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the modules</h3><p>For each request, count the distinct modules among its classes. Add them for the total, and count the requests that stay inside one module.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a system of your own</h3><p>Pick a rule in a system you know that is worked out in more than one place. Count the modules your last three changes to it touched, and say in a sentence which of Evans's three reasons in Timing applies, if any.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting what a deeper model changes</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the classes and modules.</strong> Write each class with the module it lives in, before the refactoring and after it, including any class the refactoring adds.</li><li><strong>List the change requests.</strong> For each request the system has had or expects, write the classes it alters in each design. Use the same requests for both.</li><li><strong>Count the modules.</strong> For each request, count the distinct modules among its classes. Add them for the total, and count the requests that stay inside one module.</li><li><strong>Do it on a system of your own.</strong> Pick a rule in a system you know that is worked out in more than one place. Count the modules your last three changes to it touched, and say in a sentence which of Evans's three reasons in Timing applies, if any.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1537,17 +1583,16 @@ confined to one module: 2
 after: 1 + 2 + 1 + 1 = 5, confined 3</div><p>The two requests that were about the rule fall from three modules to one and two; the two that were not stay where they were. That is the shape of the gain, on these requests and no others.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Waiting to refactor until the change can be fully justified</strong><span>Evans's Timing argues that by then the costs are already being paid and the code is harder to change, and that development is not predictable enough for a change's benefits, or the cost of not making it, to be calculated accurately. On the lesson's illustration the lab counts how far four requests reach in each design; it cannot price the refactoring, and neither, he says, can anyone.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Refactoring only when the code smells</strong><span>The conventional trigger is awkward code. Evans adds triggers that can appear while the code looks tidy: a model whose language has drifted from the experts', requirements that do not fit naturally, or a developer who has learned enough to see a better model.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the case for refactoring as licence for any change</strong><span>Evans fences his own advice: not the day before a release, not supple designs that show off technique without reaching the core of the domain, not a deeper model a domain expert would not use. He asks teams to lean toward refactoring without being absolute about it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say why and when to refactor toward a deeper model.</strong><p>Given a system before and after a concept is made explicit, count the modules each change touches in both, and name the reason in Timing that applies.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts modules over the requests listed. It cannot choose which requests are likely, weigh the cost of the refactoring, or say whether the new concept is one the experts recognise; Evans's last condition, a model the expert would use, is the one no count reaches.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Waiting to refactor until the change can be fully justified</strong><span>Evans's Timing argues that by then the costs are already being paid and the code is harder to change, and that development is not predictable enough for a change's benefits, or the cost of not making it, to be calculated accurately. On the lesson's illustration the lab counts how far four requests reach in each design; it cannot price the refactoring, and neither, he says, can anyone.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Refactoring only when the code smells</strong><span>The conventional trigger is awkward code. Evans adds triggers that can appear while the code looks tidy: a model whose language has drifted from the experts', requirements that do not fit naturally, or a developer who has learned enough to see a better model.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the case for refactoring as licence for any change</strong><span>Evans fences his own advice: not the day before a release, not supple designs that show off technique without reaching the core of the domain, not a deeper model a domain expert would not use. He asks teams to lean toward refactoring without being absolute about it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say why and when to refactor toward a deeper model.</strong><p>Given a system before and after a concept is made explicit, count the modules each change touches in both, and name the reason in Timing that applies.</p></div></div><div class="note"><strong>Note:</strong> The lab counts modules over the requests listed. It cannot choose which requests are likely, weigh the cost of the refactoring, or say whether the new concept is one the experts recognise; Evans's last condition, a model the expert would use, is the one no count reaches.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Refactoring toward deeper insight</summary><p>Restructuring code because the model behind it has improved: a missing concept found, a relationship corrected, a design made suppler. It sits on top of ordinary refactoring, the small behaviour-preserving changes made at the keyboard, which goes on all the time.</p></details><details class="recall"><summary>Exploration team</summary><p>A small group gathered for one design problem, some developers who know that area or model well and, where there are subtleties, a domain expert, meeting two or three times over a few days and then disbanding.</p></details><details class="recall"><summary>Modules a change touches</summary><p>For one change request, the number of distinct modules holding the classes it alters. A rule written in three modules sends one change to three; the same rule as one concept sends it to one.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 13 gathers Part III into one account of refactoring driven by insight into the domain: how it starts, who explores, where ideas come from, when to do it and when not. Read it, then count the modules a clinic's change requests reach before and after a rule that lived in three places becomes one explicit concept.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Refactoring toward deeper insight.</strong> Restructuring code because the model behind it has improved: a missing concept found, a relationship corrected, a design made suppler. It sits on top of ordinary refactoring, the small behaviour-preserving changes made at the keyboard, which goes on all the time.</li><li><strong>Exploration team.</strong> A small group gathered for one design problem, some developers who know that area or model well and, where there are subtleties, a domain expert, meeting two or three times over a few days and then disbanding.</li><li><strong>Modules a change touches.</strong> For one change request, the number of distinct modules holding the classes it alters. A rule written in three modules sends one change to three; the same rule as one concept sends it to one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="live in the domain. keep looking at things differently. keep talking with the experts. small teams, short sessions, sleep. refactor before you can justify it. not the day before a release. a crisis can be a breakthrough" tabindex="0" role="region" aria-label="Mathematical notation">live in the domain
 keep looking at things differently
 keep talking with the experts
@@ -2334,11 +2379,40 @@ a crisis can be a breakthrough</div><figcaption>Chapter 13 in seven lines</figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2406,7 +2480,7 @@ a crisis can be a breakthrough</div><figcaption>Chapter 13 in seven lines</figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

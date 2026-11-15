@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Objects and Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · Object-Relational Structural Patterns</p>
       <h1>Identity Field and Foreign Keys</h1>
       <p class="lesson-lede">Objects link by reference and tables by key, so each object keeps its row&#x27;s key, and rows must be written parents first unless the database waits to check.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Identity Field</li><li>Foreign Key Mapping</li><li>Referential integrity</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The mismatch first, then the keys</h2>
-      <article class="prose reading"><p>&ldquo;Relational databases handle links by forming a key into another table.&rdquo; Chapter 3's Mapping Relationships says it of the first of two problems, and this lesson reads it with the four Chapter 12 patterns that answer them: Identity Field, Foreign Key Mapping, Association Table Mapping and Dependent Mapping. Read the section and the first two patterns in your own copy first.</p><p>The chapter's question is how an object's links survive a trip to the database. Objects hold references, which mean something only in a running program; rows hold keys. And objects hold collections, where a normalized table cannot hold a many-valued field, so the structure is reversed: an order holds its lines, but the line row holds the order's key, and the order row knows nothing of its lines. Fowler's answer to the first problem is to keep each object's key in the object, and to translate between references and keys on every load and save, with the Identity Map of Identity Map as the lookup table.</p><p>Identity Field is that key in the object, and it is a tool with choices. Fowler's first concern is meaningful against meaningless keys. A meaningful one, such as a national identity number, should be unique and immutable, and human error makes it neither: mistype it and fix the mistake, and every row that refers to it must change too. So he takes, in his words, &ldquo;a rare stand on the side of meaninglessness&rdquo;, allowing that small or very stable systems may get away with a meaningful key. He then weighs simple against compound keys, a long integer as the usual type, and keys unique to a table against keys unique across the database, which allow a single Identity Map.</p><p>Getting a new key is harder than it sounds. A field the database auto-generates is the easiest, until you insert an order and its lines and need the order's key for the lines' foreign keys before the transaction commits. A GUID is unique without asking anyone, but long, hard to type and read, and a possible strain on indexes. A database counter, such as a sequence, avoids the auto-generated field's problem, and Fowler calls it perfect where you have one, but it is nonstandard. If you roll your own, he prefers a separate key table to scanning for the largest key: a row per table with the next free value, read and updated in its own short transaction so that it does not lock out everyone else who wants a key. The pattern's examples, one of them by Matt Foemmel and Fowler, are in the book.</p><p>Foreign Key Mapping turns a reference into a key, and reverses a collection into keys held by the children; updating such a collection means deciding which children were added and which removed. A many-to-many link has no single-valued end to hold the key, so Association Table Mapping adds a table whose rows are pairs of keys. And where the children belong to one owner and nothing else refers to them, Dependent Mapping lets the owner's mapper save them too, often by deleting and reinserting them all. These two the lesson names and leaves to the book.</p><p>Then the order of writes. Chapter 3 says that where the database can defer its referential integrity checks to the end of the transaction, there is no reason not to: the order then does not matter. Otherwise the database checks every write, and the updates must go in the right order, for which one technique is a topological sort of the writes, an ordering that puts every table after the tables it depends on, and another a fixed order coded by hand. Unit of Work's discussion, in Chapter 11, makes the same point, and adds that a fixed order of tables also reduces deadlocks.</p><p>Here is a save written for this lesson, against a database that checks every statement. It takes the order's key from a key table on line 3, inserts the parent row on line 4, and only then, on line 7, inserts each line with the order's key in it. Reverse lines 4 and 7 and the first line row would name an order that is not there yet.</p><pre class="codeblock" data-say="line 1, comment, Saves a new order and its lines the parent row goes first.. line 2, void save new of order order throws SQL exception. line 3, long order id is set to keys dot next of orders. line 4, insert order of order id, order dot customer id. line 5, for line line in order dot lines. line 6, long line id is set to keys dot next of line. line 7, insert line of line id, order id, line dot sku, line dot qty" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Saves a new order and its lines: the parent row goes first.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The mismatch first, then the keys</h2><div class="prose reading"><p>&ldquo;Relational databases handle links by forming a key into another table.&rdquo; Chapter 3's Mapping Relationships says it of the first of two problems, and this lesson reads it with the four Chapter 12 patterns that answer them: Identity Field, Foreign Key Mapping, Association Table Mapping and Dependent Mapping. Read the section and the first two patterns in your own copy first.</p><p>The chapter's question is how an object's links survive a trip to the database. Objects hold references, which mean something only in a running program; rows hold keys. And objects hold collections, where a normalized table cannot hold a many-valued field, so the structure is reversed: an order holds its lines, but the line row holds the order's key, and the order row knows nothing of its lines. Fowler's answer to the first problem is to keep each object's key in the object, and to translate between references and keys on every load and save, with the Identity Map of Identity Map as the lookup table.</p><p>Identity Field is that key in the object, and it is a tool with choices. Fowler's first concern is meaningful against meaningless keys. A meaningful one, such as a national identity number, should be unique and immutable, and human error makes it neither: mistype it and fix the mistake, and every row that refers to it must change too. So he takes, in his words, &ldquo;a rare stand on the side of meaninglessness&rdquo;, allowing that small or very stable systems may get away with a meaningful key. He then weighs simple against compound keys, a long integer as the usual type, and keys unique to a table against keys unique across the database, which allow a single Identity Map.</p><p>Getting a new key is harder than it sounds. A field the database auto-generates is the easiest, until you insert an order and its lines and need the order's key for the lines' foreign keys before the transaction commits. A GUID is unique without asking anyone, but long, hard to type and read, and a possible strain on indexes. A database counter, such as a sequence, avoids the auto-generated field's problem, and Fowler calls it perfect where you have one, but it is nonstandard. If you roll your own, he prefers a separate key table to scanning for the largest key: a row per table with the next free value, read and updated in its own short transaction so that it does not lock out everyone else who wants a key. The pattern's examples, one of them by Matt Foemmel and Fowler, are in the book.</p><p>Foreign Key Mapping turns a reference into a key, and reverses a collection into keys held by the children; updating such a collection means deciding which children were added and which removed. A many-to-many link has no single-valued end to hold the key, so Association Table Mapping adds a table whose rows are pairs of keys. And where the children belong to one owner and nothing else refers to them, Dependent Mapping lets the owner's mapper save them too, often by deleting and reinserting them all. These two the lesson names and leaves to the book.</p><p>Then the order of writes. Chapter 3 says that where the database can defer its referential integrity checks to the end of the transaction, there is no reason not to: the order then does not matter. Otherwise the database checks every write, and the updates must go in the right order, for which one technique is a topological sort of the writes, an ordering that puts every table after the tables it depends on, and another a fixed order coded by hand. Unit of Work's discussion, in Chapter 11, makes the same point, and adds that a fixed order of tables also reduces deadlocks.</p><p>Here is a save written for this lesson, against a database that checks every statement. It takes the order's key from a key table on line 3, inserts the parent row on line 4, and only then, on line 7, inserts each line with the order's key in it. Reverse lines 4 and 7 and the first line row would name an order that is not there yet.</p><pre class="codeblock" data-say="line 1, comment, Saves a new order and its lines the parent row goes first.. line 2, void save new of order order throws SQL exception. line 3, long order id is set to keys dot next of orders. line 4, insert order of order id, order dot customer id. line 5, for line line in order dot lines. line 6, long line id is set to keys dot next of line. line 7, insert line of line id, order id, line dot sku, line dot qty" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Saves a new order and its lines: the parent row goes first.</span>
 <span class="cl">void saveNew(Order order) throws SQLException {</span>
 <span class="cl">    long orderId = keys.next(&quot;orders&quot;);</span>
 <span class="cl">    insertOrder(orderId, order.customerId());</span>
@@ -1453,12 +1497,11 @@
 <span class="cl">        long lineId = keys.next(&quot;line&quot;);</span>
 <span class="cl">        insertLine(lineId, orderId, line.sku(), line.qty());</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab reads foreign keys as records <span class="math" data-say="child, parent">child, parent</span>, meaning the child's table holds a key to the parent's, and an order to check if you give one. Its three tiles are an insert order with every parent first, taking the alphabetically first ready table at each step; the delete order, its reverse; and the keys the order given breaks, each a child placed before its parent. In <code>order-schema</code> the keys are <span class="math" data-say="orders, customer, line, orders, line, product, payment, orders">orders, customer; line, orders; line, product; payment, orders</span>, and the insert order is <span class="math" data-say="customer, orders, payment, product, line">customer, orders, payment, product, line</span>, the delete order <span class="math" data-say="line, product, payment, orders, customer">line, product, payment, orders, customer</span>.</p><p>The order to check in <code>order-schema</code> is <span class="math" data-say="line orders customer product payment">line orders customer product payment</span>, the tables as someone happened to list them, and it breaks <span class="math" data-say="3, orders before customer, line before orders, line before product">3: orders before customer, line before orders, line before product</span>. The preset <code>schema-only</code> gives the same keys with no order to check, and prints the same two orders, with a dash for the broken keys, since there is no order to break them. Ties are broken alphabetically, so the insert order is one valid order of several; <span class="math" data-say="product">product</span> could equally go first. And the lab models a database that checks every statement: deferred to commit, none of these orders would matter.</p><h3>Exercise</h3><p>A booking schema has the keys <span class="math" data-say="booking, guest, booking, room, room, hotel, charge, booking">booking, guest; booking, room; room, hotel; charge, booking</span>. Someone proposes to insert in the order <span class="math" data-say="hotel guest booking room charge">hotel guest booking room charge</span>. By hand, find the keys that order breaks, write a valid insert order and a valid delete order, and check them in the lab.</p><p>Keys link objects that have rows of their own. The next lesson, Embedded Value and Serialized LOB, reads Chapter 12's two answers for objects that are not worth a table.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Unit of Work</h2></div><p>the order foreign keys put writes in</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The lab reads foreign keys as records <span class="math" data-say="child, parent">child, parent</span>, meaning the child's table holds a key to the parent's, and an order to check if you give one. Its three tiles are an insert order with every parent first, taking the alphabetically first ready table at each step; the delete order, its reverse; and the keys the order given breaks, each a child placed before its parent. In <code>order-schema</code> the keys are <span class="math" data-say="orders, customer, line, orders, line, product, payment, orders">orders, customer; line, orders; line, product; payment, orders</span>, and the insert order is <span class="math" data-say="customer, orders, payment, product, line">customer, orders, payment, product, line</span>, the delete order <span class="math" data-say="line, product, payment, orders, customer">line, product, payment, orders, customer</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Unit of Work</h2></div><p>the order foreign keys put writes in</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Unit of Work</strong><span>the order foreign keys put writes in</span></div>
       </div>
@@ -1466,10 +1509,10 @@
       <div class="table-wrap" id="uwTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="uwTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each key is child, parent: the child's table holds a key to the parent's. Inserts go parents first, taking the alphabetically first table that is ready at each step; deletes go in the reverse order. A key breaks the order given when its child comes before its parent.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The order foreign keys put writes in</h3>
-          <p>A count over the situation the lesson states. Each record is one foreign key, child table then parent table. The lab writes an insert order with every parent first and a delete order with every child first, and lists the keys an order you give breaks. It models a database that checks every statement; with the checks deferred to commit, the order would not matter. The schemas are the lesson's, and illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The order foreign keys put writes in</h3>
+            <p>A count over the situation the lesson states. Each record is one foreign key, child table then parent table. The lab writes an insert order with every parent first and a delete order with every child first, and lists the keys an order you give breaks. It models a database that checks every statement; with the checks deferred to commit, the order would not matter. The schemas are the lesson's, and illustrative.</p>
         <div class="field">
           <label for="uwPreset">Worked example</label>
           <select id="uwPreset"><option value="order-schema" selected>An order schema, with the tables in the order someone listed them</option><option value="schema-only">The same schema, with no order to check</option></select>
@@ -1488,12 +1531,15 @@
           <div class="kpi"><span>Keys the order given breaks</span><strong id="uwBroken">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The order to check in <code>order-schema</code> is <span class="math" data-say="line orders customer product payment">line orders customer product payment</span>, the tables as someone happened to list them, and it breaks <span class="math" data-say="3, orders before customer, line before orders, line before product">3: orders before customer, line before orders, line before product</span>. The preset <code>schema-only</code> gives the same keys with no order to check, and prints the same two orders, with a dash for the broken keys, since there is no order to break them. Ties are broken alphabetically, so the insert order is one valid order of several; <span class="math" data-say="product">product</span> could equally go first. And the lab models a database that checks every statement: deferred to commit, none of these orders would matter.</p><h3>Exercise</h3><p>A booking schema has the keys <span class="math" data-say="booking, guest, booking, room, room, hotel, charge, booking">booking, guest; booking, room; room, hotel; charge, booking</span>. Someone proposes to insert in the order <span class="math" data-say="hotel guest booking room charge">hotel guest booking room charge</span>. By hand, find the keys that order breaks, write a valid insert order and a valid delete order, and check them in the lab.</p><p>Keys link objects that have rows of their own. The next lesson, Embedded Value and Serialized LOB, reads Chapter 12's two answers for objects that are not worth a table.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Ordering writes by their keys</h2></div><p>Four steps, the last of them on a schema of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List what each table depends on</h3><p>For each table, write the tables its foreign keys refer to. A table that refers to nothing can be written first.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write an insert order</h3><p>Repeatedly take a table whose parents are all already written, and write it down. When several are ready, any of them will do. Reverse the list for a delete order.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check a proposed order</h3><p>For each key, see whether the child comes before its parent in the order given. Each such key is broken: its first insert would name a row not yet there.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a schema of your own</h3><p>Take one schema you know, write its tables in an order that inserts safely, and find one foreign key whose column holds a meaningful value, such as an email address or a code. Write both down.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Ordering writes by their keys</h2>
+      <p class="lead-in">Four steps, the last of them on a schema of your own.</p>
+      <ol class="key-ideas method"><li><strong>List what each table depends on.</strong> For each table, write the tables its foreign keys refer to. A table that refers to nothing can be written first.</li><li><strong>Write an insert order.</strong> Repeatedly take a table whose parents are all already written, and write it down. When several are ready, any of them will do. Reverse the list for a delete order.</li><li><strong>Check a proposed order.</strong> For each key, see whether the child comes before its parent in the order given. Each such key is broken: its first insert would name a row not yet there.</li><li><strong>Do it on a schema of your own.</strong> Take one schema you know, write its tables in an order that inserts safely, and find one foreign key whose column holds a meaningful value, such as an email address or a code. Write both down.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1513,17 +1559,16 @@ inserts: customer, orders, payment,
 deletes: the same list reversed</div><p><span class="math" data-say="line">line</span> waits for two parents, so it goes last whatever else is chosen. <span class="math" data-say="product">product</span> could have gone first; the lab breaks the tie alphabetically, and a database deferring its checks would not care at all.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using a meaningful key to save a column</strong><span>An email address or an account code is already unique, so it looks wasteful to add a number. Fowler takes &ldquo;a rare stand on the side of meaninglessness&rdquo;: a meaningful key can change or be mistyped, and every foreign key holding it must change with it, where a meaningless key never needs to. He allows that small or very stable systems may get away with a meaningful one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the object&#x27;s structure in the tables</strong><span>In memory an order holds its lines, so it seems the order row should hold its lines' keys. The table structure is the reverse: the child holds the parent's key, because a row cannot hold a many-valued field. That reversal is what makes saving a collection awkward, and Foreign Key Mapping's update options deal with it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ordering writes when the database can wait</strong><span>A topological sort of the writes is a real technique, and the lab performs one. But Chapter 3's first advice is to defer the integrity checks to commit where the database allows it, and then no order is needed. Ordering is the answer only for a database that checks every statement.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can order a schema&#x27;s writes by hand.</strong><p>Given which tables hold foreign keys to which, write an insert order and a delete order, and find the broken pairs in an order given.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab orders whole tables. Real writes are rows, and a table that refers to itself, a manager column in a staff table, needs its rows ordered, which the lab refuses to attempt. It also cannot tell you whether your database defers its checks; if it does, the order it prints is one you no longer need.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using a meaningful key to save a column</strong><span>An email address or an account code is already unique, so it looks wasteful to add a number. Fowler takes &ldquo;a rare stand on the side of meaninglessness&rdquo;: a meaningful key can change or be mistyped, and every foreign key holding it must change with it, where a meaningless key never needs to. He allows that small or very stable systems may get away with a meaningful one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the object&#x27;s structure in the tables</strong><span>In memory an order holds its lines, so it seems the order row should hold its lines' keys. The table structure is the reverse: the child holds the parent's key, because a row cannot hold a many-valued field. That reversal is what makes saving a collection awkward, and Foreign Key Mapping's update options deal with it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ordering writes when the database can wait</strong><span>A topological sort of the writes is a real technique, and the lab performs one. But Chapter 3's first advice is to defer the integrity checks to commit where the database allows it, and then no order is needed. Ordering is the answer only for a database that checks every statement.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can order a schema&#x27;s writes by hand.</strong><p>Given which tables hold foreign keys to which, write an insert order and a delete order, and find the broken pairs in an order given.</p></div></div><div class="note"><strong>Note:</strong> The lab orders whole tables. Real writes are rows, and a table that refers to itself, a manager column in a staff table, needs its rows ordered, which the lab refuses to attempt. It also cannot tell you whether your database defers its checks; if it does, the order it prints is one you no longer need.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Identity Field</summary><p>A field in an object that holds its row's primary key, so that the object can be written back to the right row. Fowler calls it mind-numbingly simple, and then spends pages on the choices: what kind of key, unique to what, and how to get a new one.</p></details><details class="recall"><summary>Foreign Key Mapping</summary><p>An object reference saved as a foreign key between tables. A single reference becomes a key in the referring row; a collection is reversed, so each child's row holds the key of its parent.</p></details><details class="recall"><summary>Referential integrity</summary><p>The database's guarantee that every foreign key names a row that exists. A database that checks it on every statement makes the order of writes matter; one that defers the check to commit does not.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3's Mapping Relationships sets out the mismatch: objects link by reference, tables by key, and a collection's direction is reversed in the tables. Chapter 12 answers with Identity Field and Foreign Key Mapping, with Association Table Mapping and Dependent Mapping for the harder cases. Order inserts and deletes so that no row refers to a row that is not there, and find the broken pairs in an order given.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Identity Field.</strong> A field in an object that holds its row's primary key, so that the object can be written back to the right row. Fowler calls it mind-numbingly simple, and then spends pages on the choices: what kind of key, unique to what, and how to get a new one.</li><li><strong>Foreign Key Mapping.</strong> An object reference saved as a foreign key between tables. A single reference becomes a key in the referring row; a collection is reversed, so each child's row holds the key of its parent.</li><li><strong>Referential integrity.</strong> The database's guarantee that every foreign key names a row that exists. A database that checks it on every statement makes the order of writes matter; one that defers the check to commit does not.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="objects link by reference, rows by key. the child row holds the key of its parent. defer the checks to commit if you can. otherwise, parents first on insert. and children first on delete. prefer keys that mean nothing" tabindex="0" role="region" aria-label="Mathematical notation">objects link by reference, rows by key
 the child row holds the key of its parent
 defer the checks to commit if you can
@@ -2224,11 +2269,40 @@ prefer keys that mean nothing</div><figcaption>Keys and their order in six lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2296,7 +2370,7 @@ prefer keys that mean nothing</div><figcaption>Keys and their order in six lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

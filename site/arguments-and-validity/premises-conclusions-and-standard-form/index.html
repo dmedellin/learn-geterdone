@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Arguments and Validity</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What an argument is</p>
       <h1>Premises, Conclusions and Standard Form</h1>
       <p class="lesson-lede">Find the claim a passage defends, and lay out what is offered for it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Premise and conclusion are roles</li><li>Position is not a guide</li><li>A case is a row</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From a passage to standard form</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Argument</span><p>An <strong>argument</strong> is a set of sentences in which one, the <strong>conclusion</strong>, is offered as supported by the others, the <strong>premises</strong>. A passage that states claims and offers no support for any of them is a description, not an argument.</p></div><p>Everyday passages do not come in that layout. They begin with the conclusion, trail off into asides, repeat themselves and leave out the step that everyone is assumed to grant. Writing the passage in standard form means deciding, sentence by sentence, which job it is doing.</p><div class="example"><span class="label">Example &middot; A passage in standard form</span><p>&ldquo;The streets are wet. Streets here are only wet after rain. So it rained.&rdquo; The last sentence is flagged by &ldquo;so&rdquo;. Set out, it reads: P1, the streets are wet; P2, streets here are wet only after rain; C, it rained.</p></div><p>Three kinds of sentence turn up in a passage, and only the first two belong in the standard form. Premises give the support. The conclusion is what the support is for. Everything else &mdash; a digression, a repetition, a flourish &mdash; does no work, and the test is whether deleting the sentence changes what the passage gives you reason to accept.</p><p>The conclusion is the sentence the others are offered in support of. Find it by asking what the passage wants you to believe or do, not by looking at the end. &ldquo;The bus will be late, since the road is closed&rdquo; puts the conclusion first and the premise last.</p><p>A table of cases makes the idea of support exact. Let <span class="math" data-say="p">p</span> stand for &ldquo;the streets are wet&rdquo; and <span class="math" data-say="q">q</span> for &ldquo;it rained&rdquo;. With two sentences there are two possibilities each, so four cases.</p><div class="mathblock" data-say="case, p, q. 1, T, T. 2, T, F. 3, F, T. 4, F, F" tabindex="0" role="region" aria-label="Mathematical notation">case    p   q
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From a passage to standard form</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Argument</span><p>An <strong>argument</strong> is a set of sentences in which one, the <strong>conclusion</strong>, is offered as supported by the others, the <strong>premises</strong>. A passage that states claims and offers no support for any of them is a description, not an argument.</p></div><p>Everyday passages do not come in that layout. They begin with the conclusion, trail off into asides, repeat themselves and leave out the step that everyone is assumed to grant. Writing the passage in standard form means deciding, sentence by sentence, which job it is doing.</p><div class="example"><span class="label">Example &middot; A passage in standard form</span><p>&ldquo;The streets are wet. Streets here are only wet after rain. So it rained.&rdquo; The last sentence is flagged by &ldquo;so&rdquo;. Set out, it reads: P1, the streets are wet; P2, streets here are wet only after rain; C, it rained.</p></div><p>Three kinds of sentence turn up in a passage, and only the first two belong in the standard form. Premises give the support. The conclusion is what the support is for. Everything else &mdash; a digression, a repetition, a flourish &mdash; does no work, and the test is whether deleting the sentence changes what the passage gives you reason to accept.</p><p>The conclusion is the sentence the others are offered in support of. Find it by asking what the passage wants you to believe or do, not by looking at the end. &ldquo;The bus will be late, since the road is closed&rdquo; puts the conclusion first and the premise last.</p><p>A table of cases makes the idea of support exact. Let <span class="math" data-say="p">p</span> stand for &ldquo;the streets are wet&rdquo; and <span class="math" data-say="q">q</span> for &ldquo;it rained&rdquo;. With two sentences there are two possibilities each, so four cases.</p><div class="mathblock" data-say="case, p, q. 1, T, T. 2, T, F. 3, F, T. 4, F, F" tabindex="0" role="region" aria-label="Mathematical notation">case    p   q
 -------------
 1       T   T
 2       T   F
 3       F   T
-4       F   F</div><p>The lab below takes premises and a conclusion and lists these cases. It marks any case in which every premise is true and the conclusion false, because that is the case in which the support has failed. Later in this course the same table decides validity; here it is used only to show why one premise <span class="math" data-say="p">p</span> does not support a different sentence <span class="math" data-say="q">q</span>, and why adding a premise that is not used changes nothing.</p><p>One limit, stated once. The lab works with simple sentences named by single letters. Whether &ldquo;it rained&rdquo; is the right way to put the author's claim is a judgement you make while writing the standard form, and no lab checks it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Validity by cases</h2></div><p>Every row, every counterexample, and the form</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+4       F   F</div><p>The lab below takes premises and a conclusion and lists these cases. It marks any case in which every premise is true and the conclusion false, because that is the case in which the support has failed. Later in this course the same table decides validity; here it is used only to show why one premise <span class="math" data-say="p">p</span> does not support a different sentence <span class="math" data-say="q">q</span>, and why adding a premise that is not used changes nothing.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Validity by cases</h2></div><p>Every row, every counterexample, and the form</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Every row, and the rows that refute</strong><span>a counterexample row makes every premise true and the conclusion false</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>T</span><span class="tone-red"><i class="legend-swatch"></i>F</span><span class="tone-amber"><i class="legend-swatch"></i>counterexample row</span></div>
@@ -1409,10 +1452,10 @@
       <div class="lab-stage"><div class="table-wrap" id="vaTable" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="vaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which cases would break the support</h3>
-          <p>Each row is a case: a true or false for every simple sentence. A row is highlighted when every premise is true and the conclusion false. Choose the leap preset first and find the one highlighted row, then choose the padding preset and compare how many rows there are with how many are highlighted.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which cases would break the support</h3>
+            <p>Each row is a case: a true or false for every simple sentence. A row is highlighted when every premise is true and the conclusion false. Choose the leap preset first and find the one highlighted row, then choose the padding preset and compare how many rows there are with how many are highlighted.</p>
         <div class="field">
           <label for="vaPreset">Argument</label>
           <select id="vaPreset"><option value="bare" selected>p and q, so p</option><option value="leap">p, so q</option><option value="padding">p, q and r, so p</option></select>
@@ -1437,12 +1480,15 @@
         </div>
         <p class="small-copy" style="margin:0;">Sentence letters are words such as p or q; type ~ for not, &amp; for and, | for or, -&gt; for if-then and &lt;-&gt; for if and only if, or use the symbols.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>One limit, stated once. The lab works with simple sentences named by single letters. Whether &ldquo;it rained&rdquo; is the right way to put the author's claim is a judgement you make while writing the standard form, and no lab checks it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Setting out a passage</h2></div><p>Four moves, in this order. The third is the one people skip.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find what is being defended</h3><p>Ask what the passage wants you to accept. That sentence is the conclusion, wherever it stands. If you cannot find one, the passage may be a description, and there is nothing to set out.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the indicator words</h3><p>&ldquo;Therefore&rdquo;, &ldquo;so&rdquo; and &ldquo;hence&rdquo; point to a conclusion; &ldquo;since&rdquo; and &ldquo;because&rdquo; point to a premise. Treat each as a clue and check it against the first move.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Strike the sentences that do no work</h3><p>Delete a sentence in your head. If the support for the conclusion is unchanged, it was padding: an aside, a repetition, a rhetorical flourish. Leave it out of the standard form.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Write it out</h3><p>Number the premises, draw a line, write the conclusion once. Put each claim as a complete sentence, and add a missing premise only when the passage plainly depends on it, saying so.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Setting out a passage</h2>
+      <p class="lead-in">Four moves, in this order. The third is the one people skip.</p>
+      <ol class="key-ideas method"><li><strong>Find what is being defended.</strong> Ask what the passage wants you to accept. That sentence is the conclusion, wherever it stands. If you cannot find one, the passage may be a description, and there is nothing to set out.</li><li><strong>Mark the indicator words.</strong> &ldquo;Therefore&rdquo;, &ldquo;so&rdquo; and &ldquo;hence&rdquo; point to a conclusion; &ldquo;since&rdquo; and &ldquo;because&rdquo; point to a premise. Treat each as a clue and check it against the first move.</li><li><strong>Strike the sentences that do no work.</strong> Delete a sentence in your head. If the support for the conclusion is unchanged, it was padding: an aside, a repetition, a rhetorical flourish. Leave it out of the standard form.</li><li><strong>Write it out.</strong> Number the premises, draw a line, write the conclusion once. Put each claim as a complete sentence, and add a missing premise only when the passage plainly depends on it, saying so.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ P2.  Streets here are wet only after rain.
 C.   It rained.</div><p>The lab cannot take P2 yet, because P2 is a conditional and the connectives come in the next lessons. What it can take is P1 alone. In the leap preset, <span class="math" data-say="p">p</span> is the only premise and <span class="math" data-say="q">q</span> the conclusion, and the lab finds one row where the support fails: <span class="math" data-say="p">p</span> true and <span class="math" data-say="q">q</span> false, the streets wet and no rain. P2 is exactly the sentence that rules that row out, which is why the passage needed it, and why an author who leaves it unstated is still relying on it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the conclusion to be whatever comes last</strong><span>Authors often state the conclusion first and give reasons after it: &ldquo;The bus will be late, since the road is closed.&rdquo; The conclusion is the sentence the others are offered in support of, and you find it by asking what the passage wants you to accept.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating every sentence as a premise</strong><span>A passage carries asides and repetitions that support nothing. Delete a sentence; if the support for the conclusion is unchanged, it was padding and does not go into the standard form. The padding preset shows the same thing in the table: two extra premises, four extra rows, and not one more highlighted.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading “because” as the mark of an argument</strong><span>&ldquo;The streets are wet because it rained&rdquo; may explain a fact that nobody doubts, rather than argue for a claim somebody does. An argument tries to give you a reason to accept something. An explanation assumes you accept it and says why it is so.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can set out a passage and defend each choice.</strong><p>Given a short passage, write numbered premises and one conclusion, name the sentences you left out and say why each does no work, and say which sentence the others are offered in support of. A layout without those reasons is a guess.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab is here for its rows, not its verdicts. The word valid is defined in the next lesson; for now, read a highlighted row as a case in which the support has failed.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the conclusion to be whatever comes last</strong><span>Authors often state the conclusion first and give reasons after it: &ldquo;The bus will be late, since the road is closed.&rdquo; The conclusion is the sentence the others are offered in support of, and you find it by asking what the passage wants you to accept.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating every sentence as a premise</strong><span>A passage carries asides and repetitions that support nothing. Delete a sentence; if the support for the conclusion is unchanged, it was padding and does not go into the standard form. The padding preset shows the same thing in the table: two extra premises, four extra rows, and not one more highlighted.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading “because” as the mark of an argument</strong><span>&ldquo;The streets are wet because it rained&rdquo; may explain a fact that nobody doubts, rather than argue for a claim somebody does. An argument tries to give you a reason to accept something. An explanation assumes you accept it and says why it is so.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can set out a passage and defend each choice.</strong><p>Given a short passage, write numbered premises and one conclusion, name the sentences you left out and say why each does no work, and say which sentence the others are offered in support of. A layout without those reasons is a guess.</p></div></div><div class="note"><strong>Note:</strong> The lab is here for its rows, not its verdicts. The word valid is defined in the next lesson; for now, read a highlighted row as a case in which the support has failed.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Premise and conclusion are roles</summary><p>No sentence is a premise or a conclusion in itself. The same sentence is a conclusion in one passage and a premise in the next. The role is fixed by what the author is trying to get you to accept, and by what is offered for it.</p></details><details class="recall"><summary>Position is not a guide</summary><p>The conclusion may come first, last or in the middle. Words such as &ldquo;therefore&rdquo; and &ldquo;hence&rdquo; flag a conclusion; &ldquo;since&rdquo; and &ldquo;because&rdquo; flag a premise. They are clues to the author's intention, not a rule.</p></details><details class="recall"><summary>A case is a row</summary><p>To ask whether the support could fail, we need the ways the world might be, so far as the sentences are concerned. With two simple sentences there are four: both true, only the first, only the second, neither. Each is a row of a table.</p></details></div>
+      <h3>Summary</h3>
       <p>An argument is a set of sentences, one of which the others are offered in support of. Rewrite a passage as numbered premises and a single conclusion, strike the sentences that do no work, and see in a table of cases what it would take for the support to fail.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Premise and conclusion are roles.</strong> No sentence is a premise or a conclusion in itself. The same sentence is a conclusion in one passage and a premise in the next. The role is fixed by what the author is trying to get you to accept, and by what is offered for it.</li><li><strong>Position is not a guide.</strong> The conclusion may come first, last or in the middle. Words such as &ldquo;therefore&rdquo; and &ldquo;hence&rdquo; flag a conclusion; &ldquo;since&rdquo; and &ldquo;because&rdquo; flag a premise. They are clues to the author's intention, not a rule.</li><li><strong>A case is a row.</strong> To ask whether the support could fail, we need the ways the world might be, so far as the sentences are concerned. With two simple sentences there are four: both true, only the first, only the second, neither. Each is a row of a table.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="argument equals premises plus one conclusion. the conclusion is what the rest support. indicators, since, because, therefore. a case, true or false for each sentence. two sentences, four cases, three, eight" tabindex="0" role="region" aria-label="Mathematical notation">argument = premises + one conclusion
 the conclusion is what the rest support
 indicators: since, because, therefore
@@ -2164,11 +2209,40 @@ two sentences, four cases; three, eight</div><figcaption>Standard form in five l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2236,7 +2310,7 @@ two sentences, four cases; three, eight</div><figcaption>Standard form in five l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

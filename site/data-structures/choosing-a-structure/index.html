@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sets and choices</p>
       <h1>Choosing a Structure</h1>
       <p class="lesson-lede">Cost an operation mix on every structure at once, rank them, and name what the winner cannot answer at all.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The mix decides, and the data does not</li><li>A cost table is the instrument, and it has to include the refusals</li><li>A measured total ranks structures on one mix, and only that mix</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The cost table, the refusals, and one mix ranked by execution</h2>
-      <article class="prose reading"><p>This course has built eight structures and proved a bound for each. Putting the useful five in one table is the whole of the method, and the table is not new information &mdash; every entry in it was proved in one of the thirteen lessons before this one.</p><div class="mathblock" data-say="search, insert, delete, min, predecessor, range, ordered walk. sorted array, log n, n, n, 1, log n, log n plus k, n. hash table, 1 times e to the of, 1 times e to the of, 1 times e to the of, n. AVL tree, log n, log n, log n, log n, log n, log n plus k, n. binary heap, n, log n, log n, 1. union to find. hash table, expected, under simple uniform hashing, theta of n worst case. binary heap, delete of a known position, finding the key first costs n. union to find, same-set tests and merges only, at log n per operation" tabindex="0" role="region" aria-label="Mathematical notation">                search    insert   delete    min   predecessor   range     ordered walk
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The cost table, the refusals, and one mix ranked by execution</h2><div class="prose reading"><p>This course has built eight structures and proved a bound for each. Putting the useful five in one table is the whole of the method, and the table is not new information &mdash; every entry in it was proved in one of the thirteen lessons before this one.</p><div class="mathblock" data-say="search, insert, delete, min, predecessor, range, ordered walk. sorted array, log n, n, n, 1, log n, log n plus k, n. hash table, 1 times e to the of, 1 times e to the of, 1 times e to the of, n. AVL tree, log n, log n, log n, log n, log n, log n plus k, n. binary heap, n, log n, log n, 1. union to find. hash table, expected, under simple uniform hashing, theta of n worst case. binary heap, delete of a known position, finding the key first costs n. union to find, same-set tests and merges only, at log n per operation" tabindex="0" role="region" aria-label="Mathematical notation">                search    insert   delete    min   predecessor   range     ordered walk
 
 sorted array     log n         n        n      1        log n    log n + k        n
 hash table       1 exp     1 exp    1 exp      n            —            —        —
@@ -1401,25 +1445,11 @@ union–find           —         —        —      —            —       
 
   hash table: expected, under simple uniform hashing;  Θ(n) worst case
   binary heap: delete of a known position;  finding the key first costs n
-  union–find: same-set tests and merges only, at log n per operation</div><p>Three entries in that table deserve saying out loud. The hash table&rsquo;s three <span class="math" data-say="1">1</span>s are <em>expected</em> under an assumption about the keys, with a <span class="math" data-say="theta of n">Θ(n)</span> worst case that no hash function removes. The heap&rsquo;s <span class="math" data-say="min">min</span> is <span class="math" data-say="1">1</span> but its <span class="math" data-say="search">search</span> is <span class="math" data-say="n">n</span>, because it keeps no order between siblings. And union&ndash;find&rsquo;s row is dashes all the way across, because it is not a container at all: it answers &ldquo;are these two together&rdquo; and holds no retrievable keys.</p><h3>The refusals, which are where most choices are actually made</h3><p>A hash table cannot answer <strong>predecessor</strong> (&ldquo;the largest key below <span class="math" data-say="k">k</span>&rdquo;), cannot answer a <strong>range</strong> query, and cannot produce the keys in order without sorting them from scratch. This is not slowness: hashing deliberately destroys the order, which is how it gets its constant. The dash is the right entry, and a column of numbers with a large number in that cell would be a lie.</p><p>That refusal is the in-memory form of a mistake System Design counts in I/O. &ldquo;Hash vs Tree for Ranges&rdquo; prices a hash index and a B-tree on a workload of nine hundred point lookups and a hundred small ranges a second, and the hash index &mdash; which wins the point lookup one I/O to three &mdash; loses the mix by a factor of nearly a hundred and seventy, because its only way to answer a range is to read the whole table. Same mistake, with a disk attached and a number on it.</p><h3>One mix, executed</h3><p>The lab costs a mix by running it. It ranks the five sequence representations whose cost model it can execute &mdash; dynamic array, sorted array, doubly-linked list, stack and queue &mdash; rather than the five in the table above, because those are the five with a per-operation cost model already proved on this course. The lesson it teaches is the same one, and it is about the refusals:</p><div class="mathblock" data-say="n equals 32, mostly lookups, 12 search, 2 index, 2 delete, 2 minutes. sorted array, 108, cheapest, binary search. dynamic array, 478, scans. doubly-linked list, 513, scans, and pays to reach a position. stack, cannot search, index, delete or take a min. queue, the same four refusals. n equals 32, insert at one end, remove at the other, 8 plus 8. doubly-linked list, 168, cheapest. dynamic array, 440, shifts on every front insertion. sorted array, cannot be told where to insert. stack, queue, cannot delete at a position" tabindex="0" role="region" aria-label="Mathematical notation">n = 32,  mostly lookups:  12 search, 2 index, 2 delete, 2 min
-
-  sorted array            108        cheapest; binary search
-  dynamic array           478        scans
-  doubly-linked list      513        scans, and pays to reach a position
-  stack                     —        cannot search, index, delete or take a min
-  queue                     —        the same four refusals
-
-n = 32,  insert at one end, remove at the other:  8 + 8
-
-  doubly-linked list      168        cheapest
-  dynamic array           440        shifts on every front insertion
-  sorted array              —        cannot be told where to insert
-  stack, queue              —        cannot delete at a position</div><p>Two mixes, and the winner changed and the refusals changed with it. The sorted array is four to five times cheaper than anything else on the lookup-heavy mix and cannot run the second one at all &mdash; not slowly, at all &mdash; because an insertion at a caller-chosen position is not an operation a sorted array has. That is the shape of a real structure choice far more often than a factor of two on a shared operation.</p><p>And the ranking is a measurement of one mix at one size. <span class="math" data-say="108">108</span> against <span class="math" data-say="513">513</span> is a fact about eighteen operations on thirty-two elements. Move the proportions and the order changes; move <span class="math" data-say="n">n</span> and the gaps change, because <span class="math" data-say="log n">log n</span> and <span class="math" data-say="n">n</span> diverge. The table of bounds is what generalises, the measured ranking is what convinces, and the honest report uses both &mdash; the bound to say what will happen and the count to show it happening.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Choosing from the operation mix</h2></div><p>Totals where a structure can answer, a refusal where it cannot</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  union–find: same-set tests and merges only, at log n per operation</div><p>Three entries in that table deserve saying out loud. The hash table&rsquo;s three <span class="math" data-say="1">1</span>s are <em>expected</em> under an assumption about the keys, with a <span class="math" data-say="theta of n">Θ(n)</span> worst case that no hash function removes. The heap&rsquo;s <span class="math" data-say="min">min</span> is <span class="math" data-say="1">1</span> but its <span class="math" data-say="search">search</span> is <span class="math" data-say="n">n</span>, because it keeps no order between siblings. And union&ndash;find&rsquo;s row is dashes all the way across, because it is not a container at all: it answers &ldquo;are these two together&rdquo; and holds no retrievable keys.</p><h3>The refusals, which are where most choices are actually made</h3><p>A hash table cannot answer <strong>predecessor</strong> (&ldquo;the largest key below <span class="math" data-say="k">k</span>&rdquo;), cannot answer a <strong>range</strong> query, and cannot produce the keys in order without sorting them from scratch. This is not slowness: hashing deliberately destroys the order, which is how it gets its constant. The dash is the right entry, and a column of numbers with a large number in that cell would be a lie.</p><p>That refusal is the in-memory form of a mistake System Design counts in I/O. &ldquo;Hash vs Tree for Ranges&rdquo; prices a hash index and a B-tree on a workload of nine hundred point lookups and a hundred small ranges a second, and the hash index &mdash; which wins the point lookup one I/O to three &mdash; loses the mix by a factor of nearly a hundred and seventy, because its only way to answer a range is to read the whole table. Same mistake, with a disk attached and a number on it.</p><h3>One mix, executed</h3><p>The lab costs a mix by running it. It ranks the five sequence representations whose cost model it can execute &mdash; dynamic array, sorted array, doubly-linked list, stack and queue &mdash; rather than the five in the table above, because those are the five with a per-operation cost model already proved on this course. The lesson it teaches is the same one, and it is about the refusals:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Choosing from the operation mix</h2></div><p>Totals where a structure can answer, a refusal where it cannot</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The mix decides the structure</strong><span>five representations, one operation mix, and the operations each refuses</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>total cost</span><span class="tone-red"><i class="legend-swatch"></i>cannot answer</span></div>
@@ -1427,10 +1457,10 @@ n = 32,  insert at one end, remove at the other:  8 + 8
       <div class="lab-stage" id="wlStage" tabindex="0" role="region" aria-label="Total cost of the operation mix on each structure, with refusals named rather than costed."><svg id="wlBars" style="min-width:520px" viewBox="0 0 520 200" role="img" aria-label="Total cost of the operation mix on each structure, with refusals named rather than costed."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wlTable"></table></div>
       <div class="status-banner" id="wlStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the mix, and every structure runs it</h3>
-          <p>Set the proportions of each operation and the size. Every representation runs the mix with a counter, the totals are ranked, and a structure that cannot perform an operation in the mix is reported as refusing it rather than given a large number. Change the proportions and watch both the winner and the set of refusals change.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the mix, and every structure runs it</h3>
+            <p>Set the proportions of each operation and the size. Every representation runs the mix with a counter, the totals are ranked, and a structure that cannot perform an operation in the mix is reported as refusing it rather than given a large number. Change the proportions and watch both the winner and the set of refusals change.</p>
         <div class="field" id="wlPresetField">
           <label for="wlPreset">Workload</label>
           <select id="wlPreset"><option value="lookup-heavy" selected>mostly lookups, and the smallest now and then</option><option value="queue-like">insert at one end, remove at the other</option><option value="priority-like">insert, then repeatedly take the minimum</option><option value="everything">a little of every operation</option></select>
@@ -1472,12 +1502,28 @@ n = 32,  insert at one end, remove at the other:  8 + 8
           <div class="kpi"><span>Dearest : cheapest</span><strong id="wlSpread">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="n equals 32, mostly lookups, 12 search, 2 index, 2 delete, 2 minutes. sorted array, 108, cheapest, binary search. dynamic array, 478, scans. doubly-linked list, 513, scans, and pays to reach a position. stack, cannot search, index, delete or take a min. queue, the same four refusals. n equals 32, insert at one end, remove at the other, 8 plus 8. doubly-linked list, 168, cheapest. dynamic array, 440, shifts on every front insertion. sorted array, cannot be told where to insert. stack, queue, cannot delete at a position" tabindex="0" role="region" aria-label="Mathematical notation">n = 32,  mostly lookups:  12 search, 2 index, 2 delete, 2 min
+
+  sorted array            108        cheapest; binary search
+  dynamic array           478        scans
+  doubly-linked list      513        scans, and pays to reach a position
+  stack                     —        cannot search, index, delete or take a min
+  queue                     —        the same four refusals
+
+n = 32,  insert at one end, remove at the other:  8 + 8
+
+  doubly-linked list      168        cheapest
+  dynamic array           440        shifts on every front insertion
+  sorted array              —        cannot be told where to insert
+  stack, queue              —        cannot delete at a position</div><p>Two mixes, and the winner changed and the refusals changed with it. The sorted array is four to five times cheaper than anything else on the lookup-heavy mix and cannot run the second one at all &mdash; not slowly, at all &mdash; because an insertion at a caller-chosen position is not an operation a sorted array has. That is the shape of a real structure choice far more often than a factor of two on a shared operation.</p><p>And the ranking is a measurement of one mix at one size. <span class="math" data-say="108">108</span> against <span class="math" data-say="513">513</span> is a fact about eighteen operations on thirty-two elements. Move the proportions and the order changes; move <span class="math" data-say="n">n</span> and the gaps change, because <span class="math" data-say="log n">log n</span> and <span class="math" data-say="n">n</span> diverge. The table of bounds is what generalises, the measured ranking is what convinces, and the honest report uses both &mdash; the bound to say what will happen and the count to show it happening.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a structure from a workload</h2></div><p>Four steps, and the third eliminates more candidates than the fourth ranks.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the operation mix down as proportions</h3><p>&ldquo;Mostly reads&rdquo; is not a workload. Twelve searches, two indexes, two deletions and two minima at <span class="math" data-say="n equals 32">n = 32</span> is. Include the operations that happen rarely: a single range query per hour still eliminates every hash table.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask the three questions that decide</h3><p>Does anything need the keys in order? Does the set change after it is built? Is any single operation on a latency deadline, as opposed to the sequence being fast on average? The first eliminates hashing, the second eliminates a sorted array, the third eliminates anything amortised.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Cross out every structure that cannot answer something in the mix</h3><p>This is the step that does the work. A dash is not a large number and it cannot be traded against a small one. Do this before totalling anything, because a structure that refuses one operation in the mix is not a candidate at any cost.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Total the survivors, then name what the winner cannot do</h3><p>Rank by counted cost on the mix. Then state, explicitly, the operations the winner refuses &mdash; because the next requirement to arrive will be one of them, and having named them is the difference between a choice and a guess.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing a structure from a workload</h2>
+      <p class="lead-in">Four steps, and the third eliminates more candidates than the fourth ranks.</p>
+      <ol class="key-ideas method"><li><strong>Write the operation mix down as proportions.</strong> &ldquo;Mostly reads&rdquo; is not a workload. Twelve searches, two indexes, two deletions and two minima at <span class="math" data-say="n equals 32">n = 32</span> is. Include the operations that happen rarely: a single range query per hour still eliminates every hash table.</li><li><strong>Ask the three questions that decide.</strong> Does anything need the keys in order? Does the set change after it is built? Is any single operation on a latency deadline, as opposed to the sequence being fast on average? The first eliminates hashing, the second eliminates a sorted array, the third eliminates anything amortised.</li><li><strong>Cross out every structure that cannot answer something in the mix.</strong> This is the step that does the work. A dash is not a large number and it cannot be traded against a small one. Do this before totalling anything, because a structure that refuses one operation in the mix is not a candidate at any cost.</li><li><strong>Total the survivors, then name what the winner cannot do.</strong> Rank by counted cost on the mix. Then state, explicitly, the operations the winner refuses &mdash; because the next requirement to arrive will be one of them, and having named them is the difference between a choice and a guess.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1516,17 +1562,16 @@ measured, mix A at n = 32 in the lab&#x27;s five representations:
     sorted array 108,  dynamic array 478,  list 513,  stack and queue refuse</div><p>Every one of the three answers was decided by a refusal rather than by a ratio. The hash table lost A and B because it cannot do ranges; the sorted array lost B because it cannot insert cheaply; the heap won C and the sentence naming what it cannot do &mdash; find a task by name &mdash; is the most useful line in the analysis, because that is the requirement that will arrive next.</p><p>Notice what the AVL tree is in workload A: correct, general, and wrong. It answers everything the mix asks at the same asymptotic cost as the sorted array, with larger constants, in exchange for an update ability the workload never exercises. Choosing the more capable structure by default is a real cost paid for a real reason that does not apply.</p><p>For a faded rehearsal, take workload D: a union-of-components problem &mdash; repeated &ldquo;are these two connected&rdquo; and &ldquo;merge these two groups&rdquo;, with no key ever retrieved. The supplied observation is that four of the five structures in the table have a dash in every column that matters, because none of them maintains a partition. Name the structure, quote its proved bound from this course, and then say what it cannot do &mdash; the list is long, and that is the point.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a hash table is always the fastest map</strong><span>It cannot answer predecessor, cannot answer a range, and cannot produce the keys in order &mdash; not slowly, at all, because hashing destroys the order that those operations are about. Its constant-time lookup is also expected rather than worst-case. System Design&rsquo;s &ldquo;Hash vs Tree for Ranges&rdquo; is the same mistake with an I/O count attached: the hash index wins the point lookup and loses the mix by a factor of nearly a hundred and seventy.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing from the data rather than from the mix</strong><span>&ldquo;They are integers, so use a hash table&rdquo; and &ldquo;there are a lot of them, so use a tree&rdquo; are both non-arguments. The same million integers want a sorted array if they never change and are scanned in ranges, an AVL tree if they change, a heap if only the smallest is ever wanted, and a disjoint-set forest if the question is connectivity. The data is identical in all four.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a measured ranking as a general result</strong><span>The lab&rsquo;s <span class="math" data-say="108">108</span> against <span class="math" data-say="513">513</span> is one mix at one size. Change the proportions and the winner changes; change <span class="math" data-say="n">n</span> and the ratios change, because the structures being compared have different growth rates. The cost table is what generalises and the measurement is what makes it concrete, and a report that offers only one of the two is either unconvincing or unjustified.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when your first question about a workload is which operations it contains rather than what the data is.</strong><p>You should be able to reproduce the cost table for the five structures with the dashes in the right places, eliminate candidates on refusals before totalling anything, rank the survivors on a stated mix, and state in one sentence what your chosen structure cannot do at all.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every cost in that table was produced by running an operation sequence on the structure and counting, and every bound beside it was proved once. The next course spends them: Sorting and Selection uses the heap directly for heapsort and for merging many runs, and turns the expected-height argument left open in &ldquo;The Shape Problem and Random BSTs&rdquo; into the exact expectation <span class="math" data-say="2 times the quantity n plus 1, times H sub n minus 4 n">2(n+1)Hₙ − 4n</span> that randomised quicksort pays on every input.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a hash table is always the fastest map</strong><span>It cannot answer predecessor, cannot answer a range, and cannot produce the keys in order &mdash; not slowly, at all, because hashing destroys the order that those operations are about. Its constant-time lookup is also expected rather than worst-case. System Design&rsquo;s &ldquo;Hash vs Tree for Ranges&rdquo; is the same mistake with an I/O count attached: the hash index wins the point lookup and loses the mix by a factor of nearly a hundred and seventy.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing from the data rather than from the mix</strong><span>&ldquo;They are integers, so use a hash table&rdquo; and &ldquo;there are a lot of them, so use a tree&rdquo; are both non-arguments. The same million integers want a sorted array if they never change and are scanned in ranges, an AVL tree if they change, a heap if only the smallest is ever wanted, and a disjoint-set forest if the question is connectivity. The data is identical in all four.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a measured ranking as a general result</strong><span>The lab&rsquo;s <span class="math" data-say="108">108</span> against <span class="math" data-say="513">513</span> is one mix at one size. Change the proportions and the winner changes; change <span class="math" data-say="n">n</span> and the ratios change, because the structures being compared have different growth rates. The cost table is what generalises and the measurement is what makes it concrete, and a report that offers only one of the two is either unconvincing or unjustified.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when your first question about a workload is which operations it contains rather than what the data is.</strong><p>You should be able to reproduce the cost table for the five structures with the dashes in the right places, eliminate candidates on refusals before totalling anything, rank the survivors on a stated mix, and state in one sentence what your chosen structure cannot do at all.</p></div></div><div class="note"><strong>Note:</strong> Every cost in that table was produced by running an operation sequence on the structure and counting, and every bound beside it was proved once. The next course spends them: Sorting and Selection uses the heap directly for heapsort and for merging many runs, and turns the expected-height argument left open in &ldquo;The Shape Problem and Random BSTs&rdquo; into the exact expectation <span class="math" data-say="2 times the quantity n plus 1, times H sub n minus 4 n">2(n+1)Hₙ − 4n</span> that randomised quicksort pays on every input.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The mix decides, and the data does not</summary><p>&ldquo;What kind of data is it&rdquo; is almost always the wrong question. The questions that decide are: which operations happen and in what proportion; does anything need the keys in order; does the set change or is it built once. The same million integers want a sorted array for a read-only range workload and an AVL tree if they change, and the integers are identical.</p></details><details class="recall"><summary>A cost table is the instrument, and it has to include the refusals</summary><p>Write the operations as rows and the structures as columns and fill in the bounds this course proved. Then fill in a dash wherever the structure cannot answer the operation at all. The dashes decide more choices than the numbers do, and a table of numbers alone silently suggests that every structure can do everything at some price.</p></details><details class="recall"><summary>A measured total ranks structures on one mix, and only that mix</summary><p>The lab runs a stated mix on every representation it can execute and ranks them by counted cost. Change the proportions and the ranking changes &mdash; on a lookup-heavy mix at <span class="math" data-say="n equals 32">n = 32</span> the sorted array costs <span class="math" data-say="108">108</span> and the linked list <span class="math" data-say="513">513</span>; change it to insert-at-one-end and remove-at-the-other and the sorted array cannot run at all while the list costs <span class="math" data-say="168">168</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>The operation mix decides the structure: which operations, whether order matters, whether the set changes. The data does not decide. The instrument is a cost table with a &ldquo;not supported&rdquo; column, because the reason not to use a hash table is usually not that it is slow at predecessor &mdash; it is that it cannot answer predecessor at any speed.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The mix decides, and the data does not.</strong> &ldquo;What kind of data is it&rdquo; is almost always the wrong question. The questions that decide are: which operations happen and in what proportion; does anything need the keys in order; does the set change or is it built once. The same million integers want a sorted array for a read-only range workload and an AVL tree if they change, and the integers are identical.</li><li><strong>A cost table is the instrument, and it has to include the refusals.</strong> Write the operations as rows and the structures as columns and fill in the bounds this course proved. Then fill in a dash wherever the structure cannot answer the operation at all. The dashes decide more choices than the numbers do, and a table of numbers alone silently suggests that every structure can do everything at some price.</li><li><strong>A measured total ranks structures on one mix, and only that mix.</strong> The lab runs a stated mix on every representation it can execute and ranks them by counted cost. Change the proportions and the ranking changes &mdash; on a lookup-heavy mix at <span class="math" data-say="n equals 32">n = 32</span> the sorted array costs <span class="math" data-say="108">108</span> and the linked list <span class="math" data-say="513">513</span>; change it to insert-at-one-end and remove-at-the-other and the sorted array cannot run at all while the list costs <span class="math" data-say="168">168</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="search, insert, delete, min, predecessor, range, ordered walk. sorted array, log n, n, n, 1, log n, log n plus k, n. hash table, 1 times e to the of, 1 times e to the of, 1 times e to the of, n. AVL tree, log n, log n, log n, log n, log n, log n plus k, n. binary heap, n, log n, log n, 1. union to find. the dashes are the answer, not supported, at any speed" tabindex="0" role="region" aria-label="Mathematical notation">                 search    insert   delete   min     predecessor   range    ordered walk
 sorted array     log n         n        n      1         log n     log n + k        n
 hash table       1 exp     1 exp    1 exp      n             —            —         —
@@ -3062,11 +3107,40 @@ the dashes are the answer:  not supported, at any speed</div><figcaption>Five st
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3134,7 +3208,7 @@ the dashes are the answer:  not supported, at any speed</div><figcaption>Five st
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

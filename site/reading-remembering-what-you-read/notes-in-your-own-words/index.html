@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,25 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Remembering What You Read</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Keeping it</p>
       <h1>Notes in Your Own Words</h1>
       <p class="lesson-lede">Write a three-sentence summary from memory, and count how many of the passage&#x27;s ideas it holds for its length.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Coverage</li><li>Cost</li><li>Written from memory</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What a summary is for</h2>
-      <article class="prose reading"><p>The drill times one reading of Where Autumn Colours Come From, 377 words, at your usual pace. When you press Done the passage disappears and the box asks for a summary of three sentences in your own words. Write it, press Finished writing, and tick the passage's ten idea units that your summary holds. The kit counts the words you wrote.</p><p>The tight preset is a summary of 40 words that holds 6 of the 10 units: coverage 6/10 = 60% (the lab prints it reduced, 3/5), and 40 / 6 &asymp; 6.7 words per unit. The copied preset is a summary of 90 words that holds 4 units: 40%, and 90 / 4 = 22.5 words per unit. Both readers took 94.25 seconds over the 377 words, 240 words a minute, so their recalled rates are 144 and 96 words a minute.</p><div class="mathblock" data-say="tight, 40 over 6 is approximately 6.7 words per unit, 6 over 10 equals 60 percent. copied, 90 over 4 equals 22.5 words per unit, 4 over 10 equals 40 percent" tabindex="0" role="region" aria-label="Mathematical notation">tight:   40 / 6 ≈ 6.7 words per unit,  6/10 = 60%
-copied:  90 / 4 = 22.5 words per unit,  4/10 = 40%</div><p>The copied summary is more than twice as long and holds fewer ideas. Picture it as the passage's opening, nearly word for word: the chlorophyll, the sunlight, the sugar, the summer's repairs, and the three sentences have run out before the reds and the falling leaves. The tight summary names the cause and the colours and stops.</p><p>So what does a good summary leave out? Roughly, anything whose loss leaves the passage's claims standing:</p><ul><li>examples, once the claim they illustrate is kept: the maple and the birch can go once the green is explained;</li><li>the members of a list, when what they are a list of will do: that brown is what is left when the other pigments break down can stay, and the word tannins can go;</li><li>detail of a mechanism that the main claim does not need: the layer of cells at the base of the leaf stalk;</li><li>and the passage's own phrasing.</li></ul><p>Dunlosky and colleagues (2013) rated common learning techniques by how well the evidence supports them. They rated highlighting, rereading and summarisation all of low utility, and practice testing and distributed practice high. Summarisation helped learners who had been trained to do it well, and untrained summaries helped little.</p><p>That answers the misconception. Highlighting marks a text while you look at it, and a summary copied from the open page is little more. A summary written from memory, with the passage hidden, is a different act: it turns the summary into retrieval practice, the kind of study the review rated high, and that is what this drill makes it.</p><p>The drill logs your reading as other, apart from the free recall from Free Recall, so a summary does not enter your recall tests. The two shares are not the same measure: a three-sentence summary is not asked to hold every unit, so expect a lower share here, and compare a summary with your next summary.</p><p>That ends Remembering What You Read. The next course, Your Training Plan, puts your log to work, beginning with A Practice Week, which reviews the routine you have kept since The Daily Drill and plans the week ahead.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A summary in your own words</h2></div><p>what is kept, measured by you</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What a summary is for</h2><div class="prose reading"><p>The drill times one reading of Where Autumn Colours Come From, 377 words, at your usual pace. When you press Done the passage disappears and the box asks for a summary of three sentences in your own words. Write it, press Finished writing, and tick the passage's ten idea units that your summary holds. The kit counts the words you wrote.</p><p>The tight preset is a summary of 40 words that holds 6 of the 10 units: coverage 6/10 = 60% (the lab prints it reduced, 3/5), and 40 / 6 &asymp; 6.7 words per unit. The copied preset is a summary of 90 words that holds 4 units: 40%, and 90 / 4 = 22.5 words per unit. Both readers took 94.25 seconds over the 377 words, 240 words a minute, so their recalled rates are 144 and 96 words a minute.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A summary in your own words</h2></div><p>what is kept, measured by you</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A summary in your own words</strong><span>what is kept, measured by you</span></div>
       </div>
@@ -1414,10 +1456,10 @@ copied:  90 / 4 = 22.5 words per unit,  4/10 = 40%</div><p>The copied summary is
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="reTable"></table></div>
       <div class="status-banner" id="reStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What three sentences kept</h3>
-          <p>Your measurement, scored by your own ticks; the kit counts the words you wrote. Before you do the drill, the boxes hold the tight preset: 40 words holding 6 of the 10 idea units.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What three sentences kept</h3>
+            <p>Your measurement, scored by your own ticks; the kit counts the words you wrote. Before you do the drill, the boxes hold the tight preset: 40 words holding 6 of the 10 idea units.</p>
         <div class="field">
           <label for="rePreset">Worked example</label>
           <select id="rePreset"><option value="tight" selected>Tight: 40 words, 6 units</option><option value="copied">Copied: 90 words, 4 units</option></select>
@@ -1448,12 +1490,16 @@ copied:  90 / 4 = 22.5 words per unit,  4/10 = 40%</div><p>The copied summary is
           <div class="kpi"><span>Words written per unit recalled</span><strong id="reWordsPerUnit">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="tight, 40 over 6 is approximately 6.7 words per unit, 6 over 10 equals 60 percent. copied, 90 over 4 equals 22.5 words per unit, 4 over 10 equals 40 percent" tabindex="0" role="region" aria-label="Mathematical notation">tight:   40 / 6 ≈ 6.7 words per unit,  6/10 = 60%
+copied:  90 / 4 = 22.5 words per unit,  4/10 = 40%</div><p>The copied summary is more than twice as long and holds fewer ideas. Picture it as the passage's opening, nearly word for word: the chlorophyll, the sunlight, the sugar, the summer's repairs, and the three sentences have run out before the reds and the falling leaves. The tight summary names the cause and the colours and stops.</p><p>So what does a good summary leave out? Roughly, anything whose loss leaves the passage's claims standing:</p><ul><li>examples, once the claim they illustrate is kept: the maple and the birch can go once the green is explained;</li><li>the members of a list, when what they are a list of will do: that brown is what is left when the other pigments break down can stay, and the word tannins can go;</li><li>detail of a mechanism that the main claim does not need: the layer of cells at the base of the leaf stalk;</li><li>and the passage's own phrasing.</li></ul><p>Dunlosky and colleagues (2013) rated common learning techniques by how well the evidence supports them. They rated highlighting, rereading and summarisation all of low utility, and practice testing and distributed practice high. Summarisation helped learners who had been trained to do it well, and untrained summaries helped little.</p><p>That answers the misconception. Highlighting marks a text while you look at it, and a summary copied from the open page is little more. A summary written from memory, with the passage hidden, is a different act: it turns the summary into retrieval practice, the kind of study the review rated high, and that is what this drill makes it.</p><p>The drill logs your reading as other, apart from the free recall from Free Recall, so a summary does not enter your recall tests. The two shares are not the same measure: a three-sentence summary is not asked to hold every unit, so expect a lower share here, and compare a summary with your next summary.</p><p>That ends Remembering What You Read. The next course, Your Training Plan, puts your log to work, beginning with A Practice Week, which reviews the routine you have kept since The Daily Drill and plans the week ahead.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Notes on a text you need</h2></div><p>Five steps. The first and the third are what make it retrieval.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read once, then close the text</h3><p>Read at your usual pace, to the end, and put the text out of sight before you write anything.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write three sentences from memory</h3><p>The main claim, the most important reason or mechanism, and what follows from it, in your own words, without looking back.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check against the text</h3><p>Open it and mark what your summary got wrong or left out that matters. Add the correction where you can see it later.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count units and words</h3><p>The units the summary holds, and its words per unit. A cost far above the tight preset's is a sign of sentences kept rather than compressed.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Run The Daily Drill as usual; a summary drill sits beside it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Notes on a text you need</h2>
+      <p class="lead-in">Five steps. The first and the third are what make it retrieval.</p>
+      <ol class="key-ideas method"><li><strong>Read once, then close the text.</strong> Read at your usual pace, to the end, and put the text out of sight before you write anything.</li><li><strong>Write three sentences from memory.</strong> The main claim, the most important reason or mechanism, and what follows from it, in your own words, without looking back.</li><li><strong>Check against the text.</strong> Open it and mark what your summary got wrong or left out that matters. Add the correction where you can see it later.</li><li><strong>Count units and words.</strong> The units the summary holds, and its words per unit. A cost far above the tight preset's is a sign of sentences kept rather than compressed.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Run The Daily Drill as usual; a summary drill sits beside it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1469,17 +1515,16 @@ copied:  90 / 4 = 22.5 words per unit
 coverage:  6/10 = 60% against 4/10 = 40%</div><p>The tight summary spends less than a third as many words on each idea and holds half as many ideas again.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Highlighting is studying</strong><span>Dunlosky and colleagues (2013) rated highlighting, rereading and summarisation all of low utility, and practice testing high. Highlighting marks a text while you look at it. A summary written from memory, with the passage hidden, is retrieval practice, which is what this drill makes it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>A longer summary is a better one</strong><span>The copied preset is more than twice as long as the tight one and holds fewer units, 4 against 6. Length is cost; a summary is judged by the ideas it holds for its words, and three sentences force the choice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Writing the summary with the text open</strong><span>With the page in front of you a summary is copying, the low-utility version. Close the text first, write, and check against it afterwards.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare two summaries and choose.</strong><p>Given two summaries' word counts and the idea units each holds, compute each one's coverage and words per unit, choose the better, and name one kind of thing a good summary leaves out. Both figures right for both summaries and a reasoned choice is the pass.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One summary of one passage: how many units three sentences can hold depends on the passage and on how strictly you tick. The drill cannot say whether your summary will help you on a test next month; Retrieval Beats Rereading and Spacing Your Reviews say what the research found about that.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Highlighting is studying</strong><span>Dunlosky and colleagues (2013) rated highlighting, rereading and summarisation all of low utility, and practice testing high. Highlighting marks a text while you look at it. A summary written from memory, with the passage hidden, is retrieval practice, which is what this drill makes it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>A longer summary is a better one</strong><span>The copied preset is more than twice as long as the tight one and holds fewer units, 4 against 6. Length is cost; a summary is judged by the ideas it holds for its words, and three sentences force the choice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Writing the summary with the text open</strong><span>With the page in front of you a summary is copying, the low-utility version. Close the text first, write, and check against it afterwards.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare two summaries and choose.</strong><p>Given two summaries' word counts and the idea units each holds, compute each one's coverage and words per unit, choose the better, and name one kind of thing a good summary leaves out. Both figures right for both summaries and a reasoned choice is the pass.</p></div></div><div class="note"><strong>Note:</strong> One summary of one passage: how many units three sentences can hold depends on the passage and on how strictly you tick. The drill cannot say whether your summary will help you on a test next month; Retrieval Beats Rereading and Spacing Your Reviews say what the research found about that.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Coverage</summary><p>How many of the passage's idea units the summary holds, over how many the passage has. Three sentences cannot hold ten units in full, and should not try.</p></details><details class="recall"><summary>Cost</summary><p>Words written per unit recalled. A summary that spends many words on each idea has kept the passage's sentences rather than compressing them.</p></details><details class="recall"><summary>Written from memory</summary><p>A summary written with the text open is copying. Written with the text hidden, it is a recall, and recalling is the kind of study the research rates highly.</p></details></div>
+      <h3>Summary</h3>
       <p>Read a passage once, then write a summary of three sentences with the page hidden and tick the idea units it contains. The units over the passage's ten give its coverage, and the words written over the units give its cost. A summary written from memory is a retrieval, and the question is what a good one leaves out.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Coverage.</strong> How many of the passage's idea units the summary holds, over how many the passage has. Three sentences cannot hold ten units in full, and should not try.</li><li><strong>Cost.</strong> Words written per unit recalled. A summary that spends many words on each idea has kept the passage's sentences rather than compressing them.</li><li><strong>Written from memory.</strong> A summary written with the text open is copying. Written with the text hidden, it is a recall, and recalling is the kind of study the research rates highly.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="coverage equals units in summary over units. words per unit equals words over units. 40 over 6 is approximately 6.7 words per unit. 90 over 4 equals 22.5 words per unit. write it from memory, then check" tabindex="0" role="region" aria-label="Mathematical notation">coverage = units in summary / units
 words per unit = words / units
 40 / 6 ≈ 6.7 words per unit
@@ -2514,11 +2559,40 @@ write it from memory, then check</div><figcaption>A summary in five lines</figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2586,7 +2660,7 @@ write it from memory, then check</div><figcaption>A summary in five lines</figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

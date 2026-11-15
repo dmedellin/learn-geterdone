@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Geometric Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Segments, and the zero sign</p>
       <h1>The Sweep Line and the Work It Does Not Save</h1>
       <p class="lesson-lede">Sorting the endpoints lets a sweep skip pairs whose x ranges never overlap, and on one input it skips none of them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The status list is what makes the skipping legal</li><li>The work is the sum of the status-list sizes</li><li>The saving depends on the input, and can be zero</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What a sweep skips, and the input where it skips nothing</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Events, the status list, and the sweep</span><p>Given <span class="math" data-say="k">k</span> segments, the <strong>events</strong> are their <span class="math" data-say="2 k">2k</span> endpoints sorted by <span class="math" data-say="x">x</span>, each labelled as the start or the end of its segment. The sweep processes events in order, maintaining a <strong>status list</strong> of the segments whose start has been seen and whose end has not. On a start event the new segment is tested against every segment currently on the list; on an end event its segment is removed.</p></div><div class="thm"><span class="label">Theorem &middot; The sweep finds every crossing</span><p>Every pair of segments that intersect is tested by the sweep.</p></div><div class="proof"><p>Let segments <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> intersect at a point with abscissa <span class="math" data-say="x star">x*</span>. Both <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> have their start event at or before <span class="math" data-say="x star">x*</span> and their end event at or after it, since an intersection point lies on both segments and therefore inside both <span class="math" data-say="x">x</span> ranges.</p><p>Consider whichever of the two has the later start event; say it is <span class="math" data-say="B">B</span>. At the moment <span class="math" data-say="B">B</span>'s start event is processed, <span class="math" data-say="A">A</span> has already started and has not yet ended, so <span class="math" data-say="A">A</span> is on the status list. The start event for <span class="math" data-say="B">B</span> therefore tests <span class="math" data-say="B">B</span> against <span class="math" data-say="A">A</span>. (Ties in <span class="math" data-say="x">x</span> are broken so that start events precede end events at the same abscissa, which is what makes this argument hold when two segments share an endpoint.)</p><p><span class="qed">&#9633;</span></p></div><p>Notice what the proof does not claim: it does not say the sweep tests FEWER pairs, only that it tests enough of them. Those are separate questions, and the second one has an answer that depends on the input while the first does not. The lab checks the first by re-testing every pair on every redraw and comparing the two crossing sets.</p><div class="example"><span class="label">Example &middot; Four segments, six tests, six pairs</span><p>Take <span class="math" data-say="0, 0 to 8, 8">(0, 0)–(8, 8)</span>, <span class="math" data-say="0, 8 to 8, 0">(0, 8)–(8, 0)</span>, <span class="math" data-say="0, 4 to 8, 4">(0, 4)–(8, 4)</span> and <span class="math" data-say="4, 0 to 4, 8">(4, 0)–(4, 8)</span>: two diagonals, a horizontal and a vertical, all spanning the same square. The lab reports 4 segments, 8 events, 6 pair tests, 6 pairs there are, and 6 crossings found. The status list reaches size 4. The sweep did every test the brute force would do, and paid for a sort on top.</p></div><p>This is the preset that stops the saving being read as a bound, and it is worth dwelling on. Nothing has gone wrong: the algorithm is correct, the answer is right, and the crossing set matches the brute force exactly. What is absent is the improvement. The comparison in the status line reads &ldquo;the sweep made every test the brute force would&rdquo;, and it says so in amber rather than hiding it.</p><h3>The same algorithm on an input it likes</h3><p>Six segments strung out along the <span class="math" data-say="x">x</span> axis in three separated pairs give a very different picture. The lab reports 6 segments, 12 events, 3 pair tests against 15 pairs, and 3 crossings. Twelve pairs were skipped because their <span class="math" data-say="x">x</span> ranges never overlapped, and no test could have found a crossing between two segments that are never on the line together.</p><p>Three tests against fifteen is a real saving and it is a measurement of those six segments. The general claim is different and weaker: the sweep does <span class="math" data-say="big O of the quantity k plus I, times log k">O((k + I) log k)</span> work for <span class="math" data-say="k">k</span> segments and <span class="math" data-say="I">I</span> intersections, and when <span class="math" data-say="I">I</span> is <span class="math" data-say="theta of k squared">Θ(k²)</span> &mdash; as in the four-segment bundle, where 6 of the 6 pairs cross &mdash; that is no better than quadratic. The bound is honest about this and the intuition usually is not.</p><h3>Shared endpoints are a decision the page states</h3><p>A staircase of four segments, each ending where the next begins, has three shared endpoints. Do those count as crossings? This kit says yes: &ldquo;meet&rdquo; is the relation from the previous two lessons, and a shared endpoint is a shared point. The lab reports 3 crossings on that input and the brute force, using the parametric oracle, agrees. A different convention would be defensible and would have to be stated; what is not defensible is leaving it to the reader to find out.</p><p>That matters more than it sounds, because the status-list machinery makes it easy to get inconsistent: a sweep that skips the test when one segment's end event and another's start event share an abscissa will silently adopt a different convention from its own brute-force check. The lab's tie-break puts start events before end events at equal <span class="math" data-say="x">x</span>, which is what keeps the two agreeing on the staircase.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Sorting the work down, and the input where it sorts nothing down</h2></div><p>Pair tests the sweep line made, against every pair there is</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What a sweep skips, and the input where it skips nothing</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Events, the status list, and the sweep</span><p>Given <span class="math" data-say="k">k</span> segments, the <strong>events</strong> are their <span class="math" data-say="2 k">2k</span> endpoints sorted by <span class="math" data-say="x">x</span>, each labelled as the start or the end of its segment. The sweep processes events in order, maintaining a <strong>status list</strong> of the segments whose start has been seen and whose end has not. On a start event the new segment is tested against every segment currently on the list; on an end event its segment is removed.</p></div><div class="thm"><span class="label">Theorem &middot; The sweep finds every crossing</span><p>Every pair of segments that intersect is tested by the sweep.</p></div><div class="proof"><p>Let segments <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> intersect at a point with abscissa <span class="math" data-say="x star">x*</span>. Both <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> have their start event at or before <span class="math" data-say="x star">x*</span> and their end event at or after it, since an intersection point lies on both segments and therefore inside both <span class="math" data-say="x">x</span> ranges.</p><p>Consider whichever of the two has the later start event; say it is <span class="math" data-say="B">B</span>. At the moment <span class="math" data-say="B">B</span>'s start event is processed, <span class="math" data-say="A">A</span> has already started and has not yet ended, so <span class="math" data-say="A">A</span> is on the status list. The start event for <span class="math" data-say="B">B</span> therefore tests <span class="math" data-say="B">B</span> against <span class="math" data-say="A">A</span>. (Ties in <span class="math" data-say="x">x</span> are broken so that start events precede end events at the same abscissa, which is what makes this argument hold when two segments share an endpoint.)</p><p><span class="qed">&#9633;</span></p></div><p>Notice what the proof does not claim: it does not say the sweep tests FEWER pairs, only that it tests enough of them. Those are separate questions, and the second one has an answer that depends on the input while the first does not. The lab checks the first by re-testing every pair on every redraw and comparing the two crossing sets.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Sorting the work down, and the input where it sorts nothing down</h2></div><p>Pair tests the sweep line made, against every pair there is</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The sweep line, and the pairs it never tests</strong><span>tests actually made against every pair there is</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>on the status list right now</span><span class="tone-muted"><i class="legend-swatch"></i>not yet, or already gone</span><span class="tone-red"><i class="legend-swatch"></i>a crossing pair</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="swPlot" viewBox="0 0 660 280" role="img" aria-label="The segments with the sweep line at the chosen event, the active segments drawn heavy."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="swEvents"></table></div>
       <div class="status-banner" id="swStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Four segments where the sweep saves nothing, and the count that says so</h3>
-          <p>Step the line across the events and watch the status list grow to hold all four at once. The two counts to compare are the pair tests the sweep made and the number of pairs there are; on this input they are equal. Switch to the spread-out worked example and they become 3 and 15.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Four segments where the sweep saves nothing, and the count that says so</h3>
+            <p>Step the line across the events and watch the status list grow to hold all four at once. The two counts to compare are the pair tests the sweep made and the number of pairs there are; on this input they are equal. Switch to the spread-out worked example and they become 3 and 15.</p>
         <div class="field">
           <label for="swPreset">Worked example</label>
           <select id="swPreset"><option value="spread">six segments spread along the line</option><option value="bundle" selected>everything crossing everything</option><option value="chain">a staircase, each meeting only the next</option><option value="none">six segments and no crossing at all</option></select>
@@ -1429,12 +1472,15 @@
           <div class="kpi"><span>Crossings by testing every pair</span><strong id="swOracle">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="swHint" style="margin:0;">Two points make a segment, so the count must be even. The sweep sorts the endpoints by x and keeps a status list of the segments the line currently crosses; a new segment is tested only against that list. The saving is real and it is not a bound: on the second worked example the list holds everything and the sweep does every test the brute force does.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; Four segments, six tests, six pairs</span><p>Take <span class="math" data-say="0, 0 to 8, 8">(0, 0)–(8, 8)</span>, <span class="math" data-say="0, 8 to 8, 0">(0, 8)–(8, 0)</span>, <span class="math" data-say="0, 4 to 8, 4">(0, 4)–(8, 4)</span> and <span class="math" data-say="4, 0 to 4, 8">(4, 0)–(4, 8)</span>: two diagonals, a horizontal and a vertical, all spanning the same square. The lab reports 4 segments, 8 events, 6 pair tests, 6 pairs there are, and 6 crossings found. The status list reaches size 4. The sweep did every test the brute force would do, and paid for a sort on top.</p></div><p>This is the preset that stops the saving being read as a bound, and it is worth dwelling on. Nothing has gone wrong: the algorithm is correct, the answer is right, and the crossing set matches the brute force exactly. What is absent is the improvement. The comparison in the status line reads &ldquo;the sweep made every test the brute force would&rdquo;, and it says so in amber rather than hiding it.</p><h3>The same algorithm on an input it likes</h3><p>Six segments strung out along the <span class="math" data-say="x">x</span> axis in three separated pairs give a very different picture. The lab reports 6 segments, 12 events, 3 pair tests against 15 pairs, and 3 crossings. Twelve pairs were skipped because their <span class="math" data-say="x">x</span> ranges never overlapped, and no test could have found a crossing between two segments that are never on the line together.</p><p>Three tests against fifteen is a real saving and it is a measurement of those six segments. The general claim is different and weaker: the sweep does <span class="math" data-say="big O of the quantity k plus I, times log k">O((k + I) log k)</span> work for <span class="math" data-say="k">k</span> segments and <span class="math" data-say="I">I</span> intersections, and when <span class="math" data-say="I">I</span> is <span class="math" data-say="theta of k squared">Θ(k²)</span> &mdash; as in the four-segment bundle, where 6 of the 6 pairs cross &mdash; that is no better than quadratic. The bound is honest about this and the intuition usually is not.</p><h3>Shared endpoints are a decision the page states</h3><p>A staircase of four segments, each ending where the next begins, has three shared endpoints. Do those count as crossings? This kit says yes: &ldquo;meet&rdquo; is the relation from the previous two lessons, and a shared endpoint is a shared point. The lab reports 3 crossings on that input and the brute force, using the parametric oracle, agrees. A different convention would be defensible and would have to be stated; what is not defensible is leaving it to the reader to find out.</p><p>That matters more than it sounds, because the status-list machinery makes it easy to get inconsistent: a sweep that skips the test when one segment's end event and another's start event share an abscissa will silently adopt a different convention from its own brute-force check. The lab's tie-break puts start events before end events at equal <span class="math" data-say="x">x</span>, which is what keeps the two agreeing on the staircase.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring what a sweep actually saved</h2></div><p>Count the tests, not the segments, and then look at the status list that produced the count.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the pair tests, not the events</h3><p>The event count is always twice the segment count and tells you nothing about the work. What varies is how many segments each start event finds already on the list, and the sum of those is the figure to compare against <span class="math" data-say="k times the quantity k minus 1, over 2">k(k − 1)/2</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the maximum status-list size</h3><p>It is the single best predictor of whether the sweep helped. A list that never exceeds two on six segments means almost everything was skipped; a list that reaches <span class="math" data-say="k">k</span> means nothing was.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the crossing set against every pair</h3><p>Correctness and efficiency are separate claims and only one of them is in question here. The lab tests all <span class="math" data-say="k times the quantity k minus 1, over 2">k(k − 1)/2</span> pairs on every redraw and compares the two sets, so a sweep that skipped something it should not have would show as a set difference rather than as a smaller count.</p></article><article class="card concept-card"><div class="icon">4</div><h3>State your convention on shared endpoints before measuring anything</h3><p>Whether touching counts as crossing changes the answer on the staircase input and on any layout with abutting segments. Decide, write it down, and make sure the checking route uses the same convention &mdash; otherwise a disagreement between them is a disagreement about the question.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring what a sweep actually saved</h2>
+      <p class="lead-in">Count the tests, not the segments, and then look at the status list that produced the count.</p>
+      <ol class="key-ideas method"><li><strong>Count the pair tests, not the events.</strong> The event count is always twice the segment count and tells you nothing about the work. What varies is how many segments each start event finds already on the list, and the sum of those is the figure to compare against <span class="math" data-say="k times the quantity k minus 1, over 2">k(k − 1)/2</span>.</li><li><strong>Read the maximum status-list size.</strong> It is the single best predictor of whether the sweep helped. A list that never exceeds two on six segments means almost everything was skipped; a list that reaches <span class="math" data-say="k">k</span> means nothing was.</li><li><strong>Check the crossing set against every pair.</strong> Correctness and efficiency are separate claims and only one of them is in question here. The lab tests all <span class="math" data-say="k times the quantity k minus 1, over 2">k(k − 1)/2</span> pairs on every redraw and compares the two sets, so a sweep that skipped something it should not have would show as a set difference rather than as a smaller count.</li><li><strong>State your convention on shared endpoints before measuring anything.</strong> Whether touching counts as crossing changes the answer on the staircase input and on any layout with abutting segments. Decide, write it down, and make sure the checking route uses the same convention &mdash; otherwise a disagreement between them is a disagreement about the question.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1469,17 +1515,16 @@ SPREAD OUT     6 segments, 12 events
   crossings found   3        by testing every pair   3</div><p>Read the bundle's size column downwards: 1, 2, 3, 4. The pair tests made at each start event are the size of the list it JOINED, so 0, 1, 2 and 3, and those sum to 6. There are 6 pairs. The arithmetic is not a coincidence &mdash; when every segment is on the list when every other one arrives, the sum telescopes to exactly <span class="math" data-say="k times the quantity k minus 1, over 2">k(k − 1)/2</span>.</p><p>The other half of the picture is that the bundle also has 6 crossings. Every pair of those four segments really does cross, so the output is quadratic in the input, and a bound that is linear in the output size cannot be subquadratic here. The sweep is not failing to exploit structure; there is no structure to exploit.</p><p>For a faded rehearsal, predict the pair-test count for five segments all spanning the same interval, then for five segments in a diagonal staircase where each overlaps only its neighbour in <span class="math" data-say="x">x</span>. The supplied first move is that the first is the telescoping sum again. Work out both, and then say what maximum status-list size each one reaches.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting the tests-skipped figure as the algorithm&#x27;s behaviour</strong><span>&ldquo;3 instead of 15&rdquo; is a measurement of six particular segments. The same algorithm on four segments in the same lab makes every test there is. Any sentence beginning &ldquo;the sweep reduces the work to&rdquo; needs to end with a quantity that mentions the output size, not just the input size.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing the event count with the work</strong><span>Events are always <span class="math" data-say="2 k">2k</span> and are sorted once. The pair tests are what vary, and they are the sum of the status-list sizes at start events. A page that reported the event count as the cost would report the same number for the bundle and for a set of four segments that never meet.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the shared-endpoint convention implicit</strong><span>It changes the answer on any layout with abutting segments, and it has to match between the sweep and whatever is checking it. This kit counts a shared endpoint as a crossing, states it, and orders start events before end events at equal <span class="math" data-say="x">x</span> so that the sweep's own tie-break agrees with that decision.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict a sweep&#x27;s pair-test count from the status-list sizes, and name an input on which it saves nothing.</strong><p>You should be able to build the event list and trace the status list, prove that no crossing can be skipped, compute the pair tests as a sum over start events, and state the bound in terms of both the input and the output size rather than the input alone.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Segments are done. The last module changes the object: a closed polygon, where the same determinant summed over the edges gives an area and a sign, and where &ldquo;is this point inside&rdquo; turns out to have two different definitions that agree only under a hypothesis the page checks.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting the tests-skipped figure as the algorithm&#x27;s behaviour</strong><span>&ldquo;3 instead of 15&rdquo; is a measurement of six particular segments. The same algorithm on four segments in the same lab makes every test there is. Any sentence beginning &ldquo;the sweep reduces the work to&rdquo; needs to end with a quantity that mentions the output size, not just the input size.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing the event count with the work</strong><span>Events are always <span class="math" data-say="2 k">2k</span> and are sorted once. The pair tests are what vary, and they are the sum of the status-list sizes at start events. A page that reported the event count as the cost would report the same number for the bundle and for a set of four segments that never meet.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the shared-endpoint convention implicit</strong><span>It changes the answer on any layout with abutting segments, and it has to match between the sweep and whatever is checking it. This kit counts a shared endpoint as a crossing, states it, and orders start events before end events at equal <span class="math" data-say="x">x</span> so that the sweep's own tie-break agrees with that decision.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict a sweep&#x27;s pair-test count from the status-list sizes, and name an input on which it saves nothing.</strong><p>You should be able to build the event list and trace the status list, prove that no crossing can be skipped, compute the pair tests as a sum over start events, and state the bound in terms of both the input and the output size rather than the input alone.</p></div></div><div class="note"><strong>Note:</strong> Segments are done. The last module changes the object: a closed polygon, where the same determinant summed over the edges gives an area and a sign, and where &ldquo;is this point inside&rdquo; turns out to have two different definitions that agree only under a hypothesis the page checks.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The status list is what makes the skipping legal</summary><p>Two segments whose <span class="math" data-say="x">x</span> ranges do not overlap are never on the sweep line at the same moment, and two segments that cross are both on the line at the crossing's <span class="math" data-say="x">x</span>. So testing each new segment against the segments currently on the list cannot miss a crossing. That is the correctness argument, and it is completely independent of how much work it saves.</p></details><details class="recall"><summary>The work is the sum of the status-list sizes</summary><p>Each start event makes as many pair tests as there are segments already on the list. So the total is the sum over start events of the list size at that moment, which is exactly what the event table on the page displays column by column. On six spread-out segments the list never holds more than two, and the total is 3.</p></details><details class="recall"><summary>The saving depends on the input, and can be zero</summary><p>Put four segments so that all of them span the middle of the picture. The list reaches size four, every start event tests against everything before it, and the sweep makes 6 tests out of 6 possible. It has done every test the brute force would, plus a sort. That is not a flaw in the sweep: it is what its bound says, because the bound is about the output size as well as the input.</p></details></div>
+      <h3>Summary</h3>
       <p>A sweep line moves left to right over the endpoints, keeping a status list of the segments it currently crosses, and tests a new segment only against that list. On six spread-out segments that is 3 pair tests instead of 15. On four segments that all cross the middle of the picture it is 6 out of 6: the status list holds everything at once, and sorting the endpoints bought nothing at all. Both numbers are measured, and only one of them is what people remember.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The status list is what makes the skipping legal.</strong> Two segments whose <span class="math" data-say="x">x</span> ranges do not overlap are never on the sweep line at the same moment, and two segments that cross are both on the line at the crossing's <span class="math" data-say="x">x</span>. So testing each new segment against the segments currently on the list cannot miss a crossing. That is the correctness argument, and it is completely independent of how much work it saves.</li><li><strong>The work is the sum of the status-list sizes.</strong> Each start event makes as many pair tests as there are segments already on the list. So the total is the sum over start events of the list size at that moment, which is exactly what the event table on the page displays column by column. On six spread-out segments the list never holds more than two, and the total is 3.</li><li><strong>The saving depends on the input, and can be zero.</strong> Put four segments so that all of them span the middle of the picture. The list reaches size four, every start event tests against everything before it, and the sweep makes 6 tests out of 6 possible. It has done every test the brute force would, plus a sort. That is not a flaw in the sweep: it is what its bound says, because the bound is about the output size as well as the input.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="events, two per segment, sorted by x, status list equals what the line crosses now. a start event tests the new segment against the list it joins. spread out, 6 segments, 12 events, 3 pair tests against 15 pairs. all crossing, 4 segments, 8 events, 6 pair tests against 6 pairs. the crossings found are checked against testing every pair, every redraw. the saving is in the work and never in the answer" tabindex="0" role="region" aria-label="Mathematical notation">events: two per segment, sorted by x; status list = what the line crosses now
 a start event tests the new segment against the list it joins
 spread out: 6 segments, 12 events, 3 pair tests against 15 pairs
@@ -2595,11 +2640,40 @@ the saving is in the work and never in the answer</div><figcaption>Events, the s
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2667,7 +2741,7 @@ the saving is in the work and never in the answer</div><figcaption>Events, the s
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Shedding and overload</p>
       <h1>Transient Overload and Draining the Backlog</h1>
       <p class="lesson-lede">Compute the peak backlog, the drain time and the worst consumer lag from a piecewise arrival rate.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A backlog is an area, not a rate</li><li>It drains at the headroom, not at <span class="math" data-say="mu">μ</span></li><li>The lag peaks when the spike ends</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The area a spike leaves behind</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The episode</span><p>A system drains at <span class="math" data-say="mu">μ</span>. The arrival rate is <span class="math" data-say="lambda sub before">λ_before</span> until the spike, <span class="math" data-say="lambda sub spike">λ_spike</span> for <span class="math" data-say="d">d</span> seconds, then <span class="math" data-say="lambda sub after">λ_after</span>. The <strong>excess</strong> is <span class="math" data-say="lambda sub spike minus mu">λ_spike − μ</span>, the <strong>peak backlog</strong> is that excess times <span class="math" data-say="d">d</span> when positive and zero otherwise, the <strong>headroom</strong> afterwards is <span class="math" data-say="mu minus lambda sub after">μ − λ_after</span>, and the <strong>drain time</strong> is the backlog divided by the headroom.</p></div><p>Two conditions are worth checking before any of it: the system must have been stable before the spike, or the backlog did not start at zero; and the headroom afterwards must be positive, or there is no drain time at all and the backlog is permanent.</p><div class="mathblock" data-say="mu equals 1000 per second, lambda sub before equals 800 per second. lambda sub spike equals 1500 per second for d equals 60 seconds, lambda sub after equals 800 per second. excess, 1500 minus 1000 equals 500 per second. peak, 500 times 60, equals 30000 waiting, at the end of the spike. headroom, 1000 minus 800, equals 200 per second. drain, 30000 divided by 200 equals 150 seconds. lag, 30000 divided by 1000 equals 30 seconds, the worst a consumer is behind. total, 60 plus 150, equals 210 seconds" tabindex="0" role="region" aria-label="Mathematical notation">μ = 1000 / s     λ_before = 800 / s
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The area a spike leaves behind</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The episode</span><p>A system drains at <span class="math" data-say="mu">μ</span>. The arrival rate is <span class="math" data-say="lambda sub before">λ_before</span> until the spike, <span class="math" data-say="lambda sub spike">λ_spike</span> for <span class="math" data-say="d">d</span> seconds, then <span class="math" data-say="lambda sub after">λ_after</span>. The <strong>excess</strong> is <span class="math" data-say="lambda sub spike minus mu">λ_spike − μ</span>, the <strong>peak backlog</strong> is that excess times <span class="math" data-say="d">d</span> when positive and zero otherwise, the <strong>headroom</strong> afterwards is <span class="math" data-say="mu minus lambda sub after">μ − λ_after</span>, and the <strong>drain time</strong> is the backlog divided by the headroom.</p></div><p>Two conditions are worth checking before any of it: the system must have been stable before the spike, or the backlog did not start at zero; and the headroom afterwards must be positive, or there is no drain time at all and the backlog is permanent.</p><div class="mathblock" data-say="mu equals 1000 per second, lambda sub before equals 800 per second. lambda sub spike equals 1500 per second for d equals 60 seconds, lambda sub after equals 800 per second. excess, 1500 minus 1000 equals 500 per second. peak, 500 times 60, equals 30000 waiting, at the end of the spike. headroom, 1000 minus 800, equals 200 per second. drain, 30000 divided by 200 equals 150 seconds. lag, 30000 divided by 1000 equals 30 seconds, the worst a consumer is behind. total, 60 plus 150, equals 210 seconds" tabindex="0" role="region" aria-label="Mathematical notation">μ = 1000 / s     λ_before = 800 / s
 λ_spike = 1500 / s for d = 60 s      λ_after = 800 / s
 
 excess    1500 − 1000 = 500 / s
@@ -1399,12 +1443,11 @@ peak      500 × 60    = 30 000 waiting, at the end of the spike
 headroom  1000 − 800  = 200 / s
 drain     30 000 ÷ 200 = 150 s
 lag       30 000 ÷ 1000 = 30 s        the worst a consumer is behind
-total     60 + 150      = 210 s</div><p>A minute of overload, three and a half minutes of incident. The asymmetry is entirely in the two rates: work arrived 500 a second faster than it could be handled and leaves only 200 a second faster, so every second of the spike costs two and a half seconds of recovery.</p><p>That ratio is the useful generalisation: the recovery is <span class="math" data-say="excess divided by headroom">excess ÷ headroom</span> times the length of the spike. Systems run close to <span class="math" data-say="mu">μ</span> have very little headroom, so their recovery multiplier is large &mdash; another form of the knee, and another reason a target utilisation is chosen rather than a maximum one.</p><h3>What the consumer sees</h3><p>The backlog rises linearly to <span class="math" data-say="30000">30 000</span> at <span class="math" data-say="t equals 60">t = 60</span>, then falls linearly to zero at <span class="math" data-say="t equals 210">t = 210</span>, so at <span class="math" data-say="t equals 30">t = 30</span> it is <span class="math" data-say="15000">15 000</span> on the way up and at <span class="math" data-say="t equals 135">t = 135</span> it is <span class="math" data-say="15000">15 000</span> again on the way down. Lag follows the same shape divided by <span class="math" data-say="mu">μ</span>: nothing, then thirty seconds at the moment the surge ends, then a slow return. An alert on lag fires late in the spike and clears long after it, which is exactly what the arithmetic says should happen.</p><div class="example"><span class="label">Example &middot; A spike with nowhere to drain</span><p>Keep everything the same but let the arrival rate return to <span class="math" data-say="1000">1000</span> rather than <span class="math" data-say="800">800</span>. The headroom is now zero, the drain time is undefined, and the 30 000 that accumulated is permanent: the system is stable in the sense that the backlog stops growing, and the lag stays at thirty seconds for ever. Recovery is not a property of a spike ending; it is a property of the headroom that follows it.</p></div><div class="example"><span class="label">Example &middot; A spike that is not one</span><p>A surge to <span class="math" data-say="900">900</span> a second against <span class="math" data-say="mu equals 1000">μ = 1000</span> builds nothing at all, however long it lasts. There is no excess, so there is no area. What that surge does do is raise <span class="math" data-say="rho">ρ</span> from <span class="math" data-say="4 over 5">4/5</span> to <span class="math" data-say="9 over 10">9/10</span>, which the knee says multiplies the response time by two &mdash; a real effect, and a different one from a backlog.</p></div><p>The controls are the familiar ones, in a new arrangement. More headroom shortens the drain and every other quantity on this page. A bounded queue or a token bucket caps the area by refusing part of the spike, trading the backlog for loss. And smoothing the arrivals &mdash; the variability lesson's <span class="math" data-say="c sub a squared">c_a²</span> &mdash; reduces how much of a surge is a spike at all.</p><p>This is also the lesson that says when the rest of the course applies. Every steady-state formula here describes a system whose load has been constant long enough to settle; during a spike, none of them is true, and the honest calculation is the area. Afterwards they become true again, which is what the drain time is measuring &mdash; the time until the model's assumption is met.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Transient overload and the backlog</h2></div><p>A spike is an area, and the drain is longer than the spike</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+total     60 + 150      = 210 s</div><p>A minute of overload, three and a half minutes of incident. The asymmetry is entirely in the two rates: work arrived 500 a second faster than it could be handled and leaves only 200 a second faster, so every second of the spike costs two and a half seconds of recovery.</p><p>That ratio is the useful generalisation: the recovery is <span class="math" data-say="excess divided by headroom">excess ÷ headroom</span> times the length of the spike. Systems run close to <span class="math" data-say="mu">μ</span> have very little headroom, so their recovery multiplier is large &mdash; another form of the knee, and another reason a target utilisation is chosen rather than a maximum one.</p><h3>What the consumer sees</h3><p>The backlog rises linearly to <span class="math" data-say="30000">30 000</span> at <span class="math" data-say="t equals 60">t = 60</span>, then falls linearly to zero at <span class="math" data-say="t equals 210">t = 210</span>, so at <span class="math" data-say="t equals 30">t = 30</span> it is <span class="math" data-say="15000">15 000</span> on the way up and at <span class="math" data-say="t equals 135">t = 135</span> it is <span class="math" data-say="15000">15 000</span> again on the way down. Lag follows the same shape divided by <span class="math" data-say="mu">μ</span>: nothing, then thirty seconds at the moment the surge ends, then a slow return. An alert on lag fires late in the spike and clears long after it, which is exactly what the arithmetic says should happen.</p><div class="example"><span class="label">Example &middot; A spike with nowhere to drain</span><p>Keep everything the same but let the arrival rate return to <span class="math" data-say="1000">1000</span> rather than <span class="math" data-say="800">800</span>. The headroom is now zero, the drain time is undefined, and the 30 000 that accumulated is permanent: the system is stable in the sense that the backlog stops growing, and the lag stays at thirty seconds for ever. Recovery is not a property of a spike ending; it is a property of the headroom that follows it.</p></div><div class="example"><span class="label">Example &middot; A spike that is not one</span><p>A surge to <span class="math" data-say="900">900</span> a second against <span class="math" data-say="mu equals 1000">μ = 1000</span> builds nothing at all, however long it lasts. There is no excess, so there is no area. What that surge does do is raise <span class="math" data-say="rho">ρ</span> from <span class="math" data-say="4 over 5">4/5</span> to <span class="math" data-say="9 over 10">9/10</span>, which the knee says multiplies the response time by two &mdash; a real effect, and a different one from a backlog.</p></div><p>The controls are the familiar ones, in a new arrangement. More headroom shortens the drain and every other quantity on this page. A bounded queue or a token bucket caps the area by refusing part of the spike, trading the backlog for loss. And smoothing the arrivals &mdash; the variability lesson's <span class="math" data-say="c sub a squared">c_a²</span> &mdash; reduces how much of a surge is a spike at all.</p><p>This is also the lesson that says when the rest of the course applies. Every steady-state formula here describes a system whose load has been constant long enough to settle; during a spike, none of them is true, and the honest calculation is the area. Afterwards they become true again, which is what the drain time is measuring &mdash; the time until the model's assumption is met.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Transient overload and the backlog</h2></div><p>A spike is an area, and the drain is longer than the spike</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Transient overload</strong><span>the area a spike leaves behind, and how long it takes to give it back</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>&lambda;(t)</span><span class="tone-green"><i class="legend-swatch"></i>&mu;</span><span class="tone-red"><i class="legend-swatch"></i>backlog</span><span class="tone-amber"><i class="legend-swatch"></i>consumer lag</span></div>
@@ -1412,10 +1455,10 @@ total     60 + 150      = 210 s</div><p>A minute of overload, three and a half m
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="blPlot" viewBox="0 0 520 210" role="img" aria-label="The arrival rate against the service rate over an episode, with the accumulated backlog below it."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="blTable"></table></div>
       <div class="status-banner" id="blStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Shape the episode</h3>
-          <p>Set the drain rate and the three arrival rates and the accumulated area, its peak, the drain time and the lag curve are drawn together. Take the headroom after the spike to zero and watch the drain time disappear rather than grow large.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Shape the episode</h3>
+            <p>Set the drain rate and the three arrival rates and the accumulated area, its peak, the drain time and the lag curve are drawn together. Take the headroom after the spike to zero and watch the drain time disappear rather than grow large.</p>
         <div>
           <div class="range-row"><label class="small-copy" id="blMuLab" for="blMu">&mu; &mdash; what the consumer can drain (per second)</label><span class="range-value" id="blMuOut">1000</span></div>
           <input id="blMu" type="range" min="100" max="3000" step="50" value="1000" />
@@ -1443,12 +1486,14 @@ total     60 + 150      = 210 s</div><p>A minute of overload, three and a half m
           <div class="kpi"><span>Total episode</span><strong id="blTotal">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="blHint" style="margin:0;">The backlog is an <em>area</em>: the excess rate multiplied by the time it lasts. It drains at the headroom you have left afterwards, so a one-minute spike can take ten minutes to clear &mdash; latency does not recover when the spike ends, it recovers when the area does.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working out an overload episode</h2></div><p>Everything is one area and two divisions, in this order.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check the system was stable before the spike</h3><p><span class="math" data-say="lambda sub before is less than mu">λ_before < μ</span>. If it was not, the backlog did not start at zero and the peak is larger than the area of the spike alone.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the excess and multiply by the duration</h3><p><span class="math" data-say="the quantity lambda sub spike minus mu, times d">(λ_spike − μ) × d</span> is the peak backlog, and it occurs at the end of the spike rather than at its start. A negative excess means no backlog at all.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the headroom afterwards</h3><p><span class="math" data-say="mu minus lambda sub after">μ − λ_after</span>. If this is zero or negative, stop: there is no drain time, and the backlog is permanent until something else changes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Divide twice</h3><p>Backlog over headroom is the drain time; backlog over <span class="math" data-say="mu">μ</span> is the worst lag. The total episode is the spike plus the drain.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare the total with whatever it is measured against</h3><p>A retention window, an alerting threshold, a customer's patience. The answer that matters is rarely the peak backlog itself but the time the system spends away from normal.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working out an overload episode</h2>
+      <p class="lead-in">Everything is one area and two divisions, in this order.</p>
+      <ol class="key-ideas method"><li><strong>Check the system was stable before the spike.</strong> <span class="math" data-say="lambda sub before is less than mu">λ_before < μ</span>. If it was not, the backlog did not start at zero and the peak is larger than the area of the spike alone.</li><li><strong>Compute the excess and multiply by the duration.</strong> <span class="math" data-say="the quantity lambda sub spike minus mu, times d">(λ_spike − μ) × d</span> is the peak backlog, and it occurs at the end of the spike rather than at its start. A negative excess means no backlog at all.</li><li><strong>Compute the headroom afterwards.</strong> <span class="math" data-say="mu minus lambda sub after">μ − λ_after</span>. If this is zero or negative, stop: there is no drain time, and the backlog is permanent until something else changes.</li><li><strong>Divide twice.</strong> Backlog over headroom is the drain time; backlog over <span class="math" data-say="mu">μ</span> is the worst lag. The total episode is the spike plus the drain.</li><li><strong>Compare the total with whatever it is measured against.</strong> A retention window, an alerting threshold, a customer's patience. The answer that matters is rarely the peak backlog itself but the time the system spends away from normal.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1477,17 +1522,16 @@ backlog at t = 135  15 000        falling
 backlog at t = 210       0        recovered</div><p>The two halves of the episode are not symmetric and nothing makes them so. The backlog is built at 500 a second and removed at 200, so it takes two and a half times as long to leave as it took to arrive.</p><p>Note where the worst lag sits: at <span class="math" data-say="t equals 60">t = 60</span>, the instant the arrival rate returns to normal. A dashboard watched during the surge shows lag still climbing as the traffic falls, which is confusing only if the backlog is being thought of as a rate rather than as an area.</p><p>For a faded rehearsal, keep everything but let the spike last thirty seconds instead of sixty. The supplied first move is that the excess is unchanged at 500 a second, so the peak halves. Predict the drain time, the worst lag and the total episode before computing them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting latency to recover when the spike ends</strong><span>The spike ending stops the backlog growing. Removing it takes <span class="math" data-say="backlog divided by headroom">backlog ÷ headroom</span>, which on the worked example is two and a half times as long as the spike itself. The worst moment of the incident is the first moment of the recovery, and an alert that clears when traffic normalises is clearing early.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing from the peak rate instead of the area</strong><span>Two spikes with the same peak and different durations leave different backlogs, and it is the backlog that sets the lag and the drain. Multiply the excess by the duration; a very high spike for two seconds may be a smaller event than a mild one for ten minutes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using a steady-state formula during the surge</strong><span><span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> describes a system that has settled, and a system with <span class="math" data-say="rho is greater than 1">ρ > 1</span> has not and will not. During the spike the honest calculation is the accumulating area; the steady-state results become applicable again only once the backlog has drained.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a spike reads as an area with a recovery multiplier attached to it.</strong><p>You should be able to compute the peak backlog, the drain time, the worst lag and the total episode from a piecewise arrival rate, say when there is no drain time at all, and explain why the steady-state formulas of this course do not apply while it is happening.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the four controls and the course. Every number here has been a consequence of <span class="math" data-say="rho">ρ</span> and of how irregularly work arrives; the next course changes <span class="math" data-say="lambda">λ</span> at the source instead. “Caching and Hit Rates” asks what a cache is worth, and the answer is that a hit rate of <span class="math" data-say="h">h</span> sends <span class="math" data-say="1 minus h lambda">(1 − h)λ</span> to the backend &mdash; a utilisation problem wearing different clothes.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting latency to recover when the spike ends</strong><span>The spike ending stops the backlog growing. Removing it takes <span class="math" data-say="backlog divided by headroom">backlog ÷ headroom</span>, which on the worked example is two and a half times as long as the spike itself. The worst moment of the incident is the first moment of the recovery, and an alert that clears when traffic normalises is clearing early.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing from the peak rate instead of the area</strong><span>Two spikes with the same peak and different durations leave different backlogs, and it is the backlog that sets the lag and the drain. Multiply the excess by the duration; a very high spike for two seconds may be a smaller event than a mild one for ten minutes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using a steady-state formula during the surge</strong><span><span class="math" data-say="W equals S over the quantity 1 minus rho">W = S/(1 − ρ)</span> describes a system that has settled, and a system with <span class="math" data-say="rho is greater than 1">ρ > 1</span> has not and will not. During the spike the honest calculation is the accumulating area; the steady-state results become applicable again only once the backlog has drained.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a spike reads as an area with a recovery multiplier attached to it.</strong><p>You should be able to compute the peak backlog, the drain time, the worst lag and the total episode from a piecewise arrival rate, say when there is no drain time at all, and explain why the steady-state formulas of this course do not apply while it is happening.</p></div></div><div class="note"><strong>Note:</strong> That closes the four controls and the course. Every number here has been a consequence of <span class="math" data-say="rho">ρ</span> and of how irregularly work arrives; the next course changes <span class="math" data-say="lambda">λ</span> at the source instead. “Caching and Hit Rates” asks what a cache is worth, and the answer is that a hit rate of <span class="math" data-say="h">h</span> sends <span class="math" data-say="1 minus h lambda">(1 − h)λ</span> to the backend &mdash; a utilisation problem wearing different clothes.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A backlog is an area, not a rate</summary><p>While <span class="math" data-say="lambda is greater than mu">λ > μ</span> the amount waiting grows at <span class="math" data-say="lambda minus mu">λ − μ</span> per second, so the total left at the end of the spike is that excess multiplied by how long it lasted. Two spikes with the same peak and different durations leave completely different backlogs, and the peak alone does not predict the incident.</p></details><details class="recall"><summary>It drains at the headroom, not at <span class="math" data-say="mu">μ</span></summary><p>Once the spike ends the consumer is still receiving <span class="math" data-say="lambda sub after">λ_after</span>, so only <span class="math" data-say="mu minus lambda sub after">μ − λ_after</span> per second is available to work through the backlog. Headroom, again: the same quantity the knee was a function of, doing the same job in a different form.</p></details><details class="recall"><summary>The lag peaks when the spike ends</summary><p>Consumer lag &mdash; how far behind the newest message the reader is, in time &mdash; is the backlog divided by <span class="math" data-say="mu">μ</span>. It rises throughout the spike, reaches its worst at the instant the arrival rate returns to normal, and only then starts to fall. Latency does not recover when the spike ends; it recovers when the area does.</p></details></div>
+      <h3>Summary</h3>
       <p>Every formula so far assumed a steady state. A spike above <span class="math" data-say="mu">μ</span> has none: it accumulates a backlog equal to the area of <span class="math" data-say="lambda minus mu">λ − μ</span> over its duration, and that area drains afterwards at whatever headroom is left. A sixty-second spike can be a three-and-a-half-minute incident, and the worst lag arrives at the moment the spike ends.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A backlog is an area, not a rate.</strong> While <span class="math" data-say="lambda is greater than mu">λ > μ</span> the amount waiting grows at <span class="math" data-say="lambda minus mu">λ − μ</span> per second, so the total left at the end of the spike is that excess multiplied by how long it lasted. Two spikes with the same peak and different durations leave completely different backlogs, and the peak alone does not predict the incident.</li><li><strong>It drains at the headroom, not at <span class="math" data-say="mu">μ</span>.</strong> Once the spike ends the consumer is still receiving <span class="math" data-say="lambda sub after">λ_after</span>, so only <span class="math" data-say="mu minus lambda sub after">μ − λ_after</span> per second is available to work through the backlog. Headroom, again: the same quantity the knee was a function of, doing the same job in a different form.</li><li><strong>The lag peaks when the spike ends.</strong> Consumer lag &mdash; how far behind the newest message the reader is, in time &mdash; is the backlog divided by <span class="math" data-say="mu">μ</span>. It rises throughout the spike, reaches its worst at the instant the arrival rate returns to normal, and only then starts to fall. Latency does not recover when the spike ends; it recovers when the area does.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="backlog equals area of lambda minus mu over the spike, 500 per second times 60 seconds equals 30000. drains at the headroom mu minus lambda sub after, 1000 minus 800 equals 200 per second. drain time equals backlog divided by headroom, 30000 divided by 200 equals 150 seconds. worst lag, equals backlog divided by mu, 30000 divided by 1000 equals 30 seconds. total episode equals 60 plus 150 equals 210 seconds, three and a half times the spike" tabindex="0" role="region" aria-label="Mathematical notation">backlog = area of (λ − μ) over the spike     500/s × 60 s = 30 000
 drains at the headroom μ − λ_after            1000 − 800 = 200 / s
 drain time = backlog ÷ headroom               30 000 ÷ 200 = 150 s
@@ -2843,11 +2887,40 @@ total episode = 60 + 150 = 210 s              three and a half times the spike</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2915,7 +2988,7 @@ total episode = 60 + 150 = 210 s              three and a half times the spike</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

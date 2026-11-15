@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Justice and Collective Choice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Collective choice</p>
       <h1>Independence and Arrow&#x27;s Theorem</h1>
       <p class="lesson-lede">Strike a losing candidate from every ballot and the winner can change, though no voter&#x27;s view of the others did.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Unanimity and non-dictatorship</li><li>Independence of irrelevant alternatives</li><li>The test is a removal</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Striking a loser</h2>
-      <article class="prose reading"><p>The Condorcet paradox is a failure of a particular rule, majority rule, to produce a ranking. Arrow's question was larger: is there any rule that turns every profile of rankings into a group ranking and behaves sensibly? He made &ldquo;sensibly&rdquo; precise with three conditions, and the second is the one that fails in practice.</p><ul><li><strong>Unanimity.</strong> If every voter ranks <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span>, the group ranks <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span>.</li><li><strong>Independence of irrelevant alternatives</strong> (IIA). The group's ranking of <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> depends only on how each voter ranks <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>.</li><li><strong>Non-dictatorship.</strong> No one voter is such that the group ranking always equals theirs.</li></ul><p>Return to the nine voters of the last lesson: four rank the candidates <span class="math" data-say="A B C">A B C</span>, three rank them <span class="math" data-say="B C A">B C A</span>, and two rank them <span class="math" data-say="C B A">C B A</span>. Under plurality <span class="math" data-say="A">A</span> wins with <span class="math" data-say="4">4</span> first places, against <span class="math" data-say="3">3</span> for <span class="math" data-say="B">B</span> and <span class="math" data-say="2">2</span> for <span class="math" data-say="C">C</span>. Now strike <span class="math" data-say="C">C</span> from every ballot. The four <span class="math" data-say="A B C">A B C</span> voters become <span class="math" data-say="A B">A B</span>, the three <span class="math" data-say="B C A">B C A</span> voters become <span class="math" data-say="B A">B A</span>, and the two <span class="math" data-say="C B A">C B A</span> voters become <span class="math" data-say="B A">B A</span>. Plurality now counts <span class="math" data-say="4">4</span> for <span class="math" data-say="A">A</span> and <span class="math" data-say="5">5</span> for <span class="math" data-say="B">B</span>, and <span class="math" data-say="B">B</span> wins.</p><p>No voter has changed a view about <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>. Before the removal, <span class="math" data-say="4">4</span> voters ranked <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span> and <span class="math" data-say="5">5</span> ranked <span class="math" data-say="B">B</span> above <span class="math" data-say="A">A</span>; after it, the same <span class="math" data-say="4">4</span> and the same <span class="math" data-say="5">5</span>. Yet the group's ranking of the pair has reversed, because the voters who ranked <span class="math" data-say="C">C</span> first have had their first places handed to <span class="math" data-say="B">B</span>. The presence of <span class="math" data-say="C">C</span> decided the contest between <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>, and <span class="math" data-say="C">C</span> was never going to win.</p><p>The lab finds this when the removal menu is set to nobody: it tries each losing candidate in turn and names the first whose removal changes the winner. Here that is <span class="math" data-say="B">B</span>, since without <span class="math" data-say="B">B</span> the contest is between <span class="math" data-say="A">A</span> with <span class="math" data-say="4">4</span> and <span class="math" data-say="C">C</span> with <span class="math" data-say="5">5</span>, and <span class="math" data-say="C">C</span> wins. Set the menu to <span class="math" data-say="C">C</span> and the winner becomes <span class="math" data-say="B">B</span>, as above.</p><div class="defbox"><span class="label">Definition &middot; Independence of irrelevant alternatives</span><p>A rule satisfies <strong>independence of irrelevant alternatives</strong> when the group's ranking of two candidates depends only on the voters' rankings of those two. The lab's test is a close and visible cousin: it asks whether the winner changes when a losing candidate is struck from every ballot.</p></div><h3>A rule that counts more fails too</h3><p>It is tempting to blame plurality for reading only first places. Take nine voters: two rank them <span class="math" data-say="A C B">A C B</span>, two <span class="math" data-say="B A C">B A C</span>, two <span class="math" data-say="B C A">B C A</span> and three <span class="math" data-say="C B A">C B A</span>. Plurality elects <span class="math" data-say="B">B</span>, with <span class="math" data-say="4">4</span> first places. Borda also elects <span class="math" data-say="B">B</span>, with <span class="math" data-say="11">11</span> points against <span class="math" data-say="10">10</span> for <span class="math" data-say="C">C</span> and <span class="math" data-say="6">6</span> for <span class="math" data-say="A">A</span>. But <span class="math" data-say="C">C</span> beats <span class="math" data-say="B">B</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span>, <span class="math" data-say="C">C</span> beats <span class="math" data-say="A">A</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span>, and <span class="math" data-say="C">C</span> is the Condorcet winner.</p><p>Strike <span class="math" data-say="A">A</span>, who loses under every rule. With two candidates left, both plurality and Borda reduce to majority rule between <span class="math" data-say="B">B</span> and <span class="math" data-say="C">C</span>, and <span class="math" data-say="C">C</span> wins <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span>. Both rules fail the removal test on this profile, and the lab says so under either rule.</p><h3>The theorem</h3><div class="thm"><span class="label">Theorem &middot; Arrow&#x27;s theorem</span><p>Suppose there are at least three candidates, and a rule turns every profile of complete, transitive rankings into a complete, transitive group ranking. If the rule satisfies unanimity and independence of irrelevant alternatives, it is a dictatorship: some one voter's ranking is the group ranking on every profile.</p></div><p>The proof is not reproduced here. The conditions, on the other hand, can all be read on a profile, and the theorem says that no choice of rule stops the removal test from failing somewhere. It is a statement about a specific kind of rule, and three things it does not say are worth stating.</p><ul><li>It does not say elections cannot be held. It says no single rule of this kind has all three properties on all profiles.</li><li>It does not apply to two candidates. Majority rule between two satisfies all three conditions.</li><li>It does not say every rule fails the same way. Borda gives up independence, majority rule gives up always producing a ranking, and restricting the profiles, for example to voters who place the candidates on one left-to-right line, lets majority rule work.</li></ul><p>The lab's rules all respect unanimity, and the only dictatorship it can show is the degenerate one of a single voter. Its removal test is about the winner, while Arrow's condition is about the ranking of a pair, so a pass on one profile is a pass on that profile and nothing more.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Striking a loser</h2><div class="prose reading"><p>The Condorcet paradox is a failure of a particular rule, majority rule, to produce a ranking. Arrow's question was larger: is there any rule that turns every profile of rankings into a group ranking and behaves sensibly? He made &ldquo;sensibly&rdquo; precise with three conditions, and the second is the one that fails in practice.</p><ul><li><strong>Unanimity.</strong> If every voter ranks <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span>, the group ranks <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span>.</li><li><strong>Independence of irrelevant alternatives</strong> (IIA). The group's ranking of <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> depends only on how each voter ranks <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>.</li><li><strong>Non-dictatorship.</strong> No one voter is such that the group ranking always equals theirs.</li></ul><p>Return to the nine voters of the last lesson: four rank the candidates <span class="math" data-say="A B C">A B C</span>, three rank them <span class="math" data-say="B C A">B C A</span>, and two rank them <span class="math" data-say="C B A">C B A</span>. Under plurality <span class="math" data-say="A">A</span> wins with <span class="math" data-say="4">4</span> first places, against <span class="math" data-say="3">3</span> for <span class="math" data-say="B">B</span> and <span class="math" data-say="2">2</span> for <span class="math" data-say="C">C</span>. Now strike <span class="math" data-say="C">C</span> from every ballot. The four <span class="math" data-say="A B C">A B C</span> voters become <span class="math" data-say="A B">A B</span>, the three <span class="math" data-say="B C A">B C A</span> voters become <span class="math" data-say="B A">B A</span>, and the two <span class="math" data-say="C B A">C B A</span> voters become <span class="math" data-say="B A">B A</span>. Plurality now counts <span class="math" data-say="4">4</span> for <span class="math" data-say="A">A</span> and <span class="math" data-say="5">5</span> for <span class="math" data-say="B">B</span>, and <span class="math" data-say="B">B</span> wins.</p><p>No voter has changed a view about <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>. Before the removal, <span class="math" data-say="4">4</span> voters ranked <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span> and <span class="math" data-say="5">5</span> ranked <span class="math" data-say="B">B</span> above <span class="math" data-say="A">A</span>; after it, the same <span class="math" data-say="4">4</span> and the same <span class="math" data-say="5">5</span>. Yet the group's ranking of the pair has reversed, because the voters who ranked <span class="math" data-say="C">C</span> first have had their first places handed to <span class="math" data-say="B">B</span>. The presence of <span class="math" data-say="C">C</span> decided the contest between <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>, and <span class="math" data-say="C">C</span> was never going to win.</p><p>The lab finds this when the removal menu is set to nobody: it tries each losing candidate in turn and names the first whose removal changes the winner. Here that is <span class="math" data-say="B">B</span>, since without <span class="math" data-say="B">B</span> the contest is between <span class="math" data-say="A">A</span> with <span class="math" data-say="4">4</span> and <span class="math" data-say="C">C</span> with <span class="math" data-say="5">5</span>, and <span class="math" data-say="C">C</span> wins. Set the menu to <span class="math" data-say="C">C</span> and the winner becomes <span class="math" data-say="B">B</span>, as above.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>From individual verdicts to a group's</strong><span>every winner recomputed from the profile as typed</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="voTable"></table></div>
       <div class="status-banner" id="voStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Test independence by removal</h3>
-          <p>The independence tile compares the winner with everyone standing to the winner after each losing candidate is struck out. Choose a candidate under Remove a candidate to see the profile without them.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Test independence by removal</h3>
+            <p>The independence tile compares the winner with everyone standing to the winner after each losing candidate is struck out. Choose a candidate under Remove a candidate to see the profile without them.</p>
         <div class="field">
           <label for="voPreset">Worked example</label>
           <select id="voPreset"><option value="iia-plurality" selected>Nine voters, A leads on first places</option><option value="iia-borda">Nine voters, a Condorcet winner behind</option><option value="dictator">One voter alone</option></select>
@@ -1436,12 +1479,15 @@
           <div class="kpi"><span>One vote decisive</span><strong id="voPivot">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Independence of irrelevant alternatives</span><p>A rule satisfies <strong>independence of irrelevant alternatives</strong> when the group's ranking of two candidates depends only on the voters' rankings of those two. The lab's test is a close and visible cousin: it asks whether the winner changes when a losing candidate is struck from every ballot.</p></div><h3>A rule that counts more fails too</h3><p>It is tempting to blame plurality for reading only first places. Take nine voters: two rank them <span class="math" data-say="A C B">A C B</span>, two <span class="math" data-say="B A C">B A C</span>, two <span class="math" data-say="B C A">B C A</span> and three <span class="math" data-say="C B A">C B A</span>. Plurality elects <span class="math" data-say="B">B</span>, with <span class="math" data-say="4">4</span> first places. Borda also elects <span class="math" data-say="B">B</span>, with <span class="math" data-say="11">11</span> points against <span class="math" data-say="10">10</span> for <span class="math" data-say="C">C</span> and <span class="math" data-say="6">6</span> for <span class="math" data-say="A">A</span>. But <span class="math" data-say="C">C</span> beats <span class="math" data-say="B">B</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span>, <span class="math" data-say="C">C</span> beats <span class="math" data-say="A">A</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span>, and <span class="math" data-say="C">C</span> is the Condorcet winner.</p><p>Strike <span class="math" data-say="A">A</span>, who loses under every rule. With two candidates left, both plurality and Borda reduce to majority rule between <span class="math" data-say="B">B</span> and <span class="math" data-say="C">C</span>, and <span class="math" data-say="C">C</span> wins <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span>. Both rules fail the removal test on this profile, and the lab says so under either rule.</p><h3>The theorem</h3><div class="thm"><span class="label">Theorem &middot; Arrow&#x27;s theorem</span><p>Suppose there are at least three candidates, and a rule turns every profile of complete, transitive rankings into a complete, transitive group ranking. If the rule satisfies unanimity and independence of irrelevant alternatives, it is a dictatorship: some one voter's ranking is the group ranking on every profile.</p></div><p>The proof is not reproduced here. The conditions, on the other hand, can all be read on a profile, and the theorem says that no choice of rule stops the removal test from failing somewhere. It is a statement about a specific kind of rule, and three things it does not say are worth stating.</p><ul><li>It does not say elections cannot be held. It says no single rule of this kind has all three properties on all profiles.</li><li>It does not apply to two candidates. Majority rule between two satisfies all three conditions.</li><li>It does not say every rule fails the same way. Borda gives up independence, majority rule gives up always producing a ranking, and restricting the profiles, for example to voters who place the candidates on one left-to-right line, lets majority rule work.</li></ul><p>The lab's rules all respect unanimity, and the only dictatorship it can show is the degenerate one of a single voter. Its removal test is about the winner, while Arrow's condition is about the ranking of a pair, so a pass on one profile is a pass on that profile and nothing more.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing independence on a profile</h2></div><p>Five moves. The first four are the removal test and the last relates it to the theorem.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the winner with everyone standing</h3><p>Use the rule you are testing and write the winner down. A candidate who wins cannot be the one removed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Pick a loser and strike it from every ballot</h3><p>Delete it from each ranking and close the gap. Everyone else keeps their relative order, so every voter's view of every remaining pair is unchanged.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Recount under the same rule</h3><p>The counts, and for Borda the points, are recomputed from the shortened ballots.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the winners</h3><p>If the new winner differs, independence fails on this profile, and no voter changed their mind about the pair that now ranks differently. If every loser's removal leaves the winner alone, the test passes on this profile only.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Ask which condition the rule gave up</h3><p>A rule that fails the test is one of the rules the theorem says must give something up. It does not contradict the theorem, and it does not show that a better rule is missing from the profile.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing independence on a profile</h2>
+      <p class="lead-in">Five moves. The first four are the removal test and the last relates it to the theorem.</p>
+      <ol class="key-ideas method"><li><strong>Find the winner with everyone standing.</strong> Use the rule you are testing and write the winner down. A candidate who wins cannot be the one removed.</li><li><strong>Pick a loser and strike it from every ballot.</strong> Delete it from each ranking and close the gap. Everyone else keeps their relative order, so every voter's view of every remaining pair is unchanged.</li><li><strong>Recount under the same rule.</strong> The counts, and for Borda the points, are recomputed from the shortened ballots.</li><li><strong>Compare the winners.</strong> If the new winner differs, independence fails on this profile, and no voter changed their mind about the pair that now ranks differently. If every loser's removal leaves the winner alone, the test passes on this profile only.</li><li><strong>Ask which condition the rule gave up.</strong> A rule that fails the test is one of the rules the theorem says must give something up. It does not contradict the theorem, and it does not show that a better rule is missing from the profile.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ A over B:   4 voters, before and after
 B over A:   5 voters, before and after</div><p>The group's ranking of A and B reversed, and the voters' rankings of A and B did not move. The failure is a property of the rule applied to the whole ballot, which is what independence forbids.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that Arrow proved democracy impossible</strong><span>The theorem is about rules that turn every profile of rankings into a full group ranking and satisfy three stated conditions. With two candidates, majority rule satisfies all three. With more, each real rule gives up something visible: plurality and Borda give up independence, as the removal of one loser above shows, and majority rule gives up always producing a ranking, as the cycle did. What the theorem forbids is getting everything at once.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading an independence failure as a voter changing their mind</strong><span>When C is struck from the nine-voter profile, the same 4 voters still rank A above B and the same 5 still rank B above A. The group's verdict reversed because the rule gave the voters who ranked C first to B, and no one's view of A or B moved. The failure belongs to the rule.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Hearing “dictator” as a tyrant</strong><span>Non-dictatorship rules out a voter whose ranking is the group's on every profile. The dictator need not be powerful or malicious: a rule that copies the first voter's ballot and ignores the rest is a dictatorship by the definition. With one voter alone, as in the last preset, every rule here is one.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test independence by removing a loser and state what Arrow&#x27;s theorem says and does not say.</strong><p>Given a profile and a rule, strike a losing candidate, recount, and report whether the winner changed; then state the three conditions and the theorem, and name two things the theorem does not claim.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Set the rule to Borda on the first preset and strike each candidate in turn: the Borda winner is B, and the removal test passes on that profile. Independence fails on a profile, not for a rule in general, and the lab can show you only the profiles you type.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that Arrow proved democracy impossible</strong><span>The theorem is about rules that turn every profile of rankings into a full group ranking and satisfy three stated conditions. With two candidates, majority rule satisfies all three. With more, each real rule gives up something visible: plurality and Borda give up independence, as the removal of one loser above shows, and majority rule gives up always producing a ranking, as the cycle did. What the theorem forbids is getting everything at once.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading an independence failure as a voter changing their mind</strong><span>When C is struck from the nine-voter profile, the same 4 voters still rank A above B and the same 5 still rank B above A. The group's verdict reversed because the rule gave the voters who ranked C first to B, and no one's view of A or B moved. The failure belongs to the rule.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Hearing “dictator” as a tyrant</strong><span>Non-dictatorship rules out a voter whose ranking is the group's on every profile. The dictator need not be powerful or malicious: a rule that copies the first voter's ballot and ignores the rest is a dictatorship by the definition. With one voter alone, as in the last preset, every rule here is one.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test independence by removing a loser and state what Arrow&#x27;s theorem says and does not say.</strong><p>Given a profile and a rule, strike a losing candidate, recount, and report whether the winner changed; then state the three conditions and the theorem, and name two things the theorem does not claim.</p></div></div><div class="note"><strong>Note:</strong> Set the rule to Borda on the first preset and strike each candidate in turn: the Borda winner is B, and the removal test passes on that profile. Independence fails on a profile, not for a rule in general, and the lab can show you only the profiles you type.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Unanimity and non-dictatorship</summary><p>Unanimity says that if every voter ranks <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span>, so does the group. Non-dictatorship says there is no voter whose ranking becomes the group's ranking whatever the others think. Both are modest conditions.</p></details><details class="recall"><summary>Independence of irrelevant alternatives</summary><p>The group's ranking of <span class="math" data-say="A">A</span> against <span class="math" data-say="B">B</span> should depend only on how each voter ranks <span class="math" data-say="A">A</span> against <span class="math" data-say="B">B</span>. A third candidate who is ranked above or below them by various voters is irrelevant to that comparison, and should not change it.</p></details><details class="recall"><summary>The test is a removal</summary><p>Strike a losing candidate from every ballot, keeping the order of the others, and recount under the same rule. No voter has changed their view of the candidates who remain, so if the winner changes, independence has failed on that profile.</p></details></div>
+      <h3>Summary</h3>
       <p>Arrow asked what a rule that turns voters' rankings into a group ranking should satisfy, and proposed three conditions: unanimity, independence of irrelevant alternatives and non-dictatorship. On a profile the independence condition can be tested by removing a losing candidate and recounting. The theorem says that with three or more candidates no such rule meets all three on every profile. The wrong model is that Arrow proved democracy impossible.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Unanimity and non-dictatorship.</strong> Unanimity says that if every voter ranks <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span>, so does the group. Non-dictatorship says there is no voter whose ranking becomes the group's ranking whatever the others think. Both are modest conditions.</li><li><strong>Independence of irrelevant alternatives.</strong> The group's ranking of <span class="math" data-say="A">A</span> against <span class="math" data-say="B">B</span> should depend only on how each voter ranks <span class="math" data-say="A">A</span> against <span class="math" data-say="B">B</span>. A third candidate who is ranked above or below them by various voters is irrelevant to that comparison, and should not change it.</li><li><strong>The test is a removal.</strong> Strike a losing candidate from every ballot, keeping the order of the others, and recount under the same rule. No voter has changed their view of the candidates who remain, so if the winner changes, independence has failed on that profile.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="unanimity, all prefer A, so the group does. IIA, A against B depends on A against B. n o n-dictatorship, no voter always wins. strike a loser and the winner can change. 3 plus candidates, no ranking rule has all" tabindex="0" role="region" aria-label="Mathematical notation">unanimity: all prefer A, so the group does
 IIA: A against B depends on A against B
 non-dictatorship: no voter always wins
@@ -2452,11 +2497,40 @@ strike a loser and the winner can change
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2524,7 +2598,7 @@ strike a loser and the winner can change
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

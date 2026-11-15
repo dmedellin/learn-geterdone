@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Organizing Domain Logic</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · Domain Logic Patterns</p>
       <h1>Domain Model</h1>
       <p class="lesson-lede">Objects that carry both the data and the rules of the business, each taking the part of the logic that concerns it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Domain Model</li><li>Simple and rich</li><li>Polymorphism</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Rather than one routine having all the logic for a user action, each object takes a part of the logic that's relevant to it.&rdquo; That is Chapter 2's description of what object-oriented people mean by the paradigm shift. This lesson reads Chapter 2 on Domain Model, as argument, and the pattern in Chapter 9, as a tool. Read both in your own copy first.</p><p>Fowler's case begins where the last lesson's ended: objects are his answer to complicated logic. A Domain Model is organised, to a first approximation, around the nouns of the domain, with a class for each thing the business talks about, and the validations and calculations go into those classes. A procedure for some action may still exist, but it quickly hands the work to the model. He admits the cost to a newcomer: you hunt from one object to the next for the behaviour you want.</p><p>Its value, the chapter argues, is that once you are used to it there are techniques for handling ever more complex logic in an organised way. When a new rule arrives, a Domain Model adds a new object, such as a new strategy, where a Transaction Script adds another condition to its conditional logic. Its costs are the effort of learning it, which can take months and which, he says, a significant minority of developers seem unable to make, and the database mapping: the richer the model, the more complex the mapping, usually a Data Mapper. Fowler, who calls himself an object bigot, says that once the shift is made it usually lasts a lifetime.</p><p>Chapter 9 gives the pattern. A Domain Model adds a layer of objects that stand for the business area, mingling data and process, with multivalued attributes, a web of associations and inheritance. Fowler sees two styles in practice. In the simple one the model mirrors the database design, mostly one object for each table, and can use Active Record. A rich one can look different, with inheritance, strategies and other design patterns, and needs a Data Mapper. Because business rules change so often, he wants the model easy to modify, build and test, with as few dependencies on the other layers as possible.</p><p>He takes up a common worry: bloated domain objects, an order class swollen with behaviour that only one screen needs. Moving such behaviour into a class for the use case, he answers, leads to duplication, because behaviour kept apart from the order is easy to miss, so it gets written a second time. In his experience bloat happens much less often than predicted and is easy to see and fix, so his advice is to put behaviour in the object that is its natural fit and deal with bloat only if and when it becomes a problem. When to Use It turns on the complexity of the behaviour: complicated, ever-changing rules of validation, calculation and derivation want an object model; a few checks for missing values and some totals are better as a Transaction Script.</p><p>Now the count. The lab counts decision points by a stated rule: one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, with <span class="math" data-say="else">else</span> adding nothing. It also prints a band, the deepest nesting and the first line at that depth. The bands, 0–5, 6–10 and 10+, are McConnell's, from <em>Code Complete</em>; Fowler gives no count. On <code>price-by-kind</code>, one routine that prices every kind of product, it counts 5, broken down as 1 + if <span data-say="3 plus and 1">3 + && 1</span>, in the band 0–5, with the deepest nesting 1, first reached at line 5.</p><pre class="codeblock" data-say="line 1, comment, One routine prices every kind of product.. line 2, long price of product p, int qty. line 3, long cents is set to p dot unit cents times qty. line 4, if p dot kind equals kind dot book. line 5, cents is set to cents minus cents divided by 20. line 6, else if p dot kind equals kind dot alcohol. line 7, cents is set to cents plus cents divided by 5. line 8, else if p dot kind equals kind dot food and qty is greater than 10. line 9, cents is set to cents minus cents divided by 10. line 11, return cents" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One routine prices every kind of product.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Rather than one routine having all the logic for a user action, each object takes a part of the logic that's relevant to it.&rdquo; That is Chapter 2's description of what object-oriented people mean by the paradigm shift. This lesson reads Chapter 2 on Domain Model, as argument, and the pattern in Chapter 9, as a tool. Read both in your own copy first.</p><p>Fowler's case begins where the last lesson's ended: objects are his answer to complicated logic. A Domain Model is organised, to a first approximation, around the nouns of the domain, with a class for each thing the business talks about, and the validations and calculations go into those classes. A procedure for some action may still exist, but it quickly hands the work to the model. He admits the cost to a newcomer: you hunt from one object to the next for the behaviour you want.</p><p>Its value, the chapter argues, is that once you are used to it there are techniques for handling ever more complex logic in an organised way. When a new rule arrives, a Domain Model adds a new object, such as a new strategy, where a Transaction Script adds another condition to its conditional logic. Its costs are the effort of learning it, which can take months and which, he says, a significant minority of developers seem unable to make, and the database mapping: the richer the model, the more complex the mapping, usually a Data Mapper. Fowler, who calls himself an object bigot, says that once the shift is made it usually lasts a lifetime.</p><p>Chapter 9 gives the pattern. A Domain Model adds a layer of objects that stand for the business area, mingling data and process, with multivalued attributes, a web of associations and inheritance. Fowler sees two styles in practice. In the simple one the model mirrors the database design, mostly one object for each table, and can use Active Record. A rich one can look different, with inheritance, strategies and other design patterns, and needs a Data Mapper. Because business rules change so often, he wants the model easy to modify, build and test, with as few dependencies on the other layers as possible.</p><p>He takes up a common worry: bloated domain objects, an order class swollen with behaviour that only one screen needs. Moving such behaviour into a class for the use case, he answers, leads to duplication, because behaviour kept apart from the order is easy to miss, so it gets written a second time. In his experience bloat happens much less often than predicted and is easy to see and fix, so his advice is to put behaviour in the object that is its natural fit and deal with bloat only if and when it becomes a problem. When to Use It turns on the complexity of the behaviour: complicated, ever-changing rules of validation, calculation and derivation want an object model; a few checks for missing values and some totals are better as a Transaction Script.</p><p>Now the count. The lab counts decision points by a stated rule: one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, with <span class="math" data-say="else">else</span> adding nothing. It also prints a band, the deepest nesting and the first line at that depth. The bands, 0–5, 6–10 and 10+, are McConnell's, from <em>Code Complete</em>; Fowler gives no count. On <code>price-by-kind</code>, one routine that prices every kind of product, it counts 5, broken down as 1 + if <span data-say="3 plus and 1">3 + && 1</span>, in the band 0–5, with the deepest nesting 1, first reached at line 5.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where the decisions go in a Domain Model</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="price-by-kind" selected>One routine prices every kind of product</option><option value="price-delegated">Each kind of product carries its own rule</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, One routine prices every kind of product.. line 2, long price of product p, int qty. line 3, long cents is set to p dot unit cents times qty. line 4, if p dot kind equals kind dot book. line 5, cents is set to cents minus cents divided by 20. line 6, else if p dot kind equals kind dot alcohol. line 7, cents is set to cents plus cents divided by 5. line 8, else if p dot kind equals kind dot food and qty is greater than 10. line 9, cents is set to cents minus cents divided by 10. line 11, return cents" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One routine prices every kind of product.</span>
 <span class="cl">long price(Product p, int qty) {</span>
 <span class="cl">    long cents = p.unitCents() * qty;</span>
 <span class="cl">    if (p.kind() == Kind.BOOK) {</span>
@@ -1485,53 +1572,12 @@
 <span class="cl">        return 0;</span>
 <span class="cl">    }</span>
 <span class="cl">    return 999;</span>
-<span class="cl">}</span></code></pre><p>Count this routine's decision points by the lab's rule, with the breakdown. Then say which classes its branches would move to if each shipping method carried its own rule, keeping every price the routine gives for every parcel, staff parcels included. Paste it into the lab to check the count; the classes are yours.</p><p>A Domain Model gives each thing the business tracks an object of its own. The next lesson, Table Module, and Making a Choice, reads the pattern that gives a whole table one object, and Fowler's advice on choosing among the three.</p></article>
+<span class="cl">}</span></code></pre><p>Count this routine's decision points by the lab's rule, with the breakdown. Then say which classes its branches would move to if each shipping method carried its own rule, keeping every price the routine gives for every parcel, staff parcels included. Paste it into the lab to check the count; the classes are yours.</p><p>A Domain Model gives each thing the business tracks an object of its own. The next lesson, Table Module, and Making a Choice, reads the pattern that gives a whole table one object, and Fowler's advice on choosing among the three.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where the decisions go in a Domain Model</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="price-by-kind" selected>One routine prices every kind of product</option><option value="price-delegated">Each kind of product carries its own rule</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Moving a type switch into classes</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the decisions</h3><p>Count one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Group the branches by kind</h3><p>For each branch, write which kind of thing it tests for. Tests on the same kind belong together, and so do tests on a value that only one kind has.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write one class a kind, and a default</h3><p>Give each kind a class whose method holds its branch, and give the base class the behaviour of the final <span class="math" data-say="return">return</span>, for every kind with no rule of its own. Check that every input still gets the price it got before.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find one <span class="math" data-say="switch">switch</span> or <span class="math" data-say="if">if</span> chain on a type code in a system you know. Count its branches, write the figure down, and name the class each branch would move to.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Moving a type switch into classes</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the decisions.</strong> Count one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing.</li><li><strong>Group the branches by kind.</strong> For each branch, write which kind of thing it tests for. Tests on the same kind belong together, and so do tests on a value that only one kind has.</li><li><strong>Write one class a kind, and a default.</strong> Give each kind a class whose method holds its branch, and give the base class the behaviour of the final <span class="math" data-say="return">return</span>, for every kind with no rule of its own. Check that every input still gets the price it got before.</li><li><strong>Do it on your own code.</strong> Find one <span class="math" data-say="switch">switch</span> or <span class="math" data-say="if">if</span> chain on a type code in a system you know. Count its branches, write the figure down, and name the class each branch would move to.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1550,17 +1596,16 @@ line 8: the &amp;&amp; on quantity: 5
 else adds nothing: 5 in all</div><p>All five are in one routine, and every new kind of product would add another. In <code>price-delegated</code> four of them go: three became classes, and one, the test on quantity, moved into <span class="math" data-say="food">Food</span> as its only <span class="math" data-say="if">if</span>, which with the starting one makes 2.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a Domain Model is a set of classes that mirror the tables</strong><span>Fowler's distinction between a simple Domain Model, close to the tables, and a rich one, with inheritance, strategies and webs of small objects, is exactly that it need not mirror them. What makes it a domain model is that the objects carry the behaviour: each takes the part of the logic that concerns it. A set of classes that only hold the columns is data, whatever it is called.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking polymorphism removes the decisions</strong><span>It moves each one to the class it concerns. On the lesson's illustration one <span class="math" data-say="if">if</span> remains, in <span class="math" data-say="food">Food</span>, because Food really does depend on quantity, and the question of which kind a product is moves to wherever the object is made. The count falls because the decision is asked once, not because it went away.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Splitting every use case&#x27;s behaviour out of the domain objects</strong><span>It looks like a cure for bloated classes. Fowler argues it causes the worse problem: behaviour kept away from the object it concerns is harder to find, so it gets written again. His advice is to put it in the natural object and deal with bloat only if it appears.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can see where a type switch&#x27;s decisions go in a Domain Model.</strong><p>Given a routine that switches on a kind, count its decision points with the breakdown, and write the subclass method that takes one of its branches.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts decision points in the listing it is given. It cannot see the decision that moves to where an object is made, and it cannot say whether a model is simple or rich, or whether the classes are the right ones; Fowler says the choice turns on the complexity of the behaviour, which no count settles. The bands are McConnell's guidance for routines, not Fowler's.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a Domain Model is a set of classes that mirror the tables</strong><span>Fowler's distinction between a simple Domain Model, close to the tables, and a rich one, with inheritance, strategies and webs of small objects, is exactly that it need not mirror them. What makes it a domain model is that the objects carry the behaviour: each takes the part of the logic that concerns it. A set of classes that only hold the columns is data, whatever it is called.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking polymorphism removes the decisions</strong><span>It moves each one to the class it concerns. On the lesson's illustration one <span class="math" data-say="if">if</span> remains, in <span class="math" data-say="food">Food</span>, because Food really does depend on quantity, and the question of which kind a product is moves to wherever the object is made. The count falls because the decision is asked once, not because it went away.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Splitting every use case&#x27;s behaviour out of the domain objects</strong><span>It looks like a cure for bloated classes. Fowler argues it causes the worse problem: behaviour kept away from the object it concerns is harder to find, so it gets written again. His advice is to put it in the natural object and deal with bloat only if it appears.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can see where a type switch&#x27;s decisions go in a Domain Model.</strong><p>Given a routine that switches on a kind, count its decision points with the breakdown, and write the subclass method that takes one of its branches.</p></div></div><div class="note"><strong>Note:</strong> The lab counts decision points in the listing it is given. It cannot see the decision that moves to where an object is made, and it cannot say whether a model is simple or rich, or whether the classes are the right ones; Fowler says the choice turns on the complexity of the behaviour, which no count settles. The bands are McConnell's guidance for routines, not Fowler's.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Domain Model</summary><p>A model of the business made of objects, each holding its data and the behaviour that uses it. Its objects stand for meaningful things, as large as a company or as small as one line on an order, and the rules sit beside the data they use.</p></details><details class="recall"><summary>Simple and rich</summary><p>Fowler's two styles. A simple Domain Model looks much like the database, mostly one class to a table. A rich one can look quite different, with inheritance, strategies and webs of small objects, and is harder to map to the database.</p></details><details class="recall"><summary>Polymorphism</summary><p>Calling one method on objects of different classes and letting each class decide what it does. A chain of tests on a type code can become one call, with the branches moved into the classes.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 2's second pattern, and Chapter 9's account of it: a model of the domain in which each object takes the part of the logic relevant to it, simple when it mirrors the tables and rich when it does not. Count the decision points in a routine that prices every kind of product, then see where they go when each kind carries its own rule.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Domain Model.</strong> A model of the business made of objects, each holding its data and the behaviour that uses it. Its objects stand for meaningful things, as large as a company or as small as one line on an order, and the rules sit beside the data they use.</li><li><strong>Simple and rich.</strong> Fowler's two styles. A simple Domain Model looks much like the database, mostly one class to a table. A rich one can look quite different, with inheritance, strategies and webs of small objects, and is harder to map to the database.</li><li><strong>Polymorphism.</strong> Calling one method on objects of different classes and letting each class decide what it does. A chain of tests on a type code can become one call, with the branches moved into the classes.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="objects with both data and behaviour. each object takes its part of the logic. simple model, close to the tables. rich model, inheritance, strategies. a type switch becomes subclasses. decisions move, they do not vanish" tabindex="0" role="region" aria-label="Mathematical notation">objects with both data and behaviour
 each object takes its part of the logic
 simple model: close to the tables
@@ -2588,11 +2633,40 @@ decisions move; they do not vanish</div><figcaption>Domain Model in six lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2660,7 +2734,7 @@ decisions move; they do not vanish</div><figcaption>Domain Model in six lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

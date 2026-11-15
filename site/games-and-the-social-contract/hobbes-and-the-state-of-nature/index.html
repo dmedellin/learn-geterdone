@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,38 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Many players</p>
       <h1>Hobbes and the State of Nature</h1>
       <p class="lesson-lede">Without a sovereign, two rational and uncertain people attack each other, and a penalty on attacking changes the equilibrium.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The state of nature is a game without enforcement</li><li>Attack can pay from greed or from fear</li><li>A sovereign changes the payoffs</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>War of all against all, and what ends it</h2>
-      <article class="prose reading"><p>Hobbes finds three causes of quarrel in human nature: competition, diffidence and glory. Competition makes men invade for gain, diffidence for safety, and glory for reputation. Without a common power to keep them all in awe, he writes, they are in a condition of war &mdash; &ldquo;of every man against every man&rdquo; &mdash; and life is &ldquo;solitary, poor, nasty, brutish, and short.&rdquo; Competition and diffidence can be tabulated; glory cannot, and the lab leaves it out.</p><p>Take competition first. Two people each choose peace or attack. If both keep the peace each gets <span class="math" data-say="3">3</span>. An attacker who finds the other at peace takes <span class="math" data-say="5">5</span>, and the victim gets <span class="math" data-say="0">0</span>. If both attack, each gets <span class="math" data-say="1">1</span>.</p><div class="mathblock" data-say="other, peace, other, attack. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 other: peace    other: attack
-     peace           3, 3             0, 5
-     attack          5, 0             1, 1</div><p>This is the table of “The Prisoner's Dilemma” with new labels. Attack pays <span class="math" data-say="5">5</span> against peace and <span class="math" data-say="1">1</span> against attack, and peace pays <span class="math" data-say="3">3</span> and <span class="math" data-say="0">0</span>, so attack dominates. Both attack, each collects <span class="math" data-say="1">1</span>, and both would have collected <span class="math" data-say="3">3</span> at peace. The model needs no wicked people to get there: only that each prefers more to less and cannot count on the other.</p><h3>The sovereign</h3><p>Now let a sovereign fine whoever attacks, by <span class="math" data-say="4">4</span>, whatever the target does. Subtract <span class="math" data-say="4">4</span> from every payoff in which the person attacks. An attacker who finds the other at peace now gets <span class="math" data-say="1">1</span>, and two attackers each get <span class="math" data-say="negative 3">−3</span>. The victim's payoffs do not change.</p><div class="mathblock" data-say="other, peace, other, attack. a table, shown on the page. attack, 1, 0, negative 3, negative 3" tabindex="0" role="region" aria-label="Mathematical notation">                 other: peace    other: attack
-     peace           3, 3             0, 1
-     attack          1, 0            −3, −3</div><p>Against peace, peace pays <span class="math" data-say="3">3</span> and attack pays <span class="math" data-say="1">1</span>. Against attack, peace pays <span class="math" data-say="0">0</span> and attack pays <span class="math" data-say="negative 3">−3</span>. Peace now dominates, the only equilibrium is peace with peace, and each collects <span class="math" data-say="3">3</span>. Nobody is fined there, so the penalty is never collected: a threat that works costs nothing to carry out. Hobbes's remark that covenants without the sword are but words is, in the table, the observation that a promise changes no payoff: only the sword does, and it has to change them by enough. A penalty of <span class="math" data-say="2">2</span> or less does not make peace dominate, since at <span class="math" data-say="1">1</span> attacking a peaceful neighbour still pays <span class="math" data-say="4">4</span> against <span class="math" data-say="3">3</span>, and at <span class="math" data-say="2">2</span> the two tie. The lab's dominance tile reports strict dominance only, so it turns at a penalty of <span class="math" data-say="3">3</span>.</p><h3>Fear without greed</h3><p>The third table has no gain from attacking at all. Peace with peace pays <span class="math" data-say="4">4</span> each. Attacking pays <span class="math" data-say="3">3</span> whatever the other does, because the attacker gets only the safety of not being caught unprepared, and a peaceful victim gets <span class="math" data-say="0">0</span>. This is the stag hunt of “Coordination, Conventions and the Stag Hunt”, and it has two equilibria: peace with peace and attack with attack.</p><p>Hobbes's point about diffidence is that the second equilibrium can be reached by people who want nothing the other has. Peace is worth keeping only if the neighbour keeps it with probability at least <span class="math" data-say="3 over 4">3/4</span>; short of that, attacking first is the better bet. What the sovereign supplies in this version is assurance. The remedy is a common power that makes each person's expectation of the other safe.</p><p>The lab does not say who watches the sovereign, who pays him, or why he would fine anyone: the penalty is an assumption of the model, and Hobbes's own argument for an authority that can be trusted to apply it is the part the table leaves out.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>War of all against all, and what ends it</h2><div class="prose reading"><p>Hobbes finds three causes of quarrel in human nature: competition, diffidence and glory. Competition makes men invade for gain, diffidence for safety, and glory for reputation. Without a common power to keep them all in awe, he writes, they are in a condition of war &mdash; &ldquo;of every man against every man&rdquo; &mdash; and life is &ldquo;solitary, poor, nasty, brutish, and short.&rdquo; Competition and diffidence can be tabulated; glory cannot, and the lab leaves it out.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A game in a table</h2></div><p>best responses, equilibria, dominance and efficiency, computed from the payoffs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two players, payoffs row first</strong><span>an equilibrium is a cell where both are best-responding</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gaTable"></table></div>
       <div class="status-banner" id="gaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Subtract a penalty from the attack cells</h3>
-          <p>Start from the anarchy table, then lower every payoff of an attacker by the same amount and watch the dominance tile move. Try a penalty of 1, then 2, then 3.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Subtract a penalty from the attack cells</h3>
+            <p>Start from the anarchy table, then lower every payoff of an attacker by the same amount and watch the dominance tile move. Try a penalty of 1, then 2, then 3.</p>
         <div class="field">
           <label for="gaPreset">Worked example</label>
           <select id="gaPreset"><option value="anarchy" selected>Competition: attacking a peaceful neighbour pays 5</option><option value="sovereign">A penalty of 4 on every attack</option><option value="assurance">Diffidence: attacking pays 3 whatever the other does</option></select>
@@ -1438,12 +1477,19 @@
           <div class="kpi"><span>Pareto</span><strong id="gaPareto">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Take competition first. Two people each choose peace or attack. If both keep the peace each gets <span class="math" data-say="3">3</span>. An attacker who finds the other at peace takes <span class="math" data-say="5">5</span>, and the victim gets <span class="math" data-say="0">0</span>. If both attack, each gets <span class="math" data-say="1">1</span>.</p><div class="mathblock" data-say="other, peace, other, attack. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 other: peace    other: attack
+     peace           3, 3             0, 5
+     attack          5, 0             1, 1</div><p>This is the table of “The Prisoner's Dilemma” with new labels. Attack pays <span class="math" data-say="5">5</span> against peace and <span class="math" data-say="1">1</span> against attack, and peace pays <span class="math" data-say="3">3</span> and <span class="math" data-say="0">0</span>, so attack dominates. Both attack, each collects <span class="math" data-say="1">1</span>, and both would have collected <span class="math" data-say="3">3</span> at peace. The model needs no wicked people to get there: only that each prefers more to less and cannot count on the other.</p><h3>The sovereign</h3><p>Now let a sovereign fine whoever attacks, by <span class="math" data-say="4">4</span>, whatever the target does. Subtract <span class="math" data-say="4">4</span> from every payoff in which the person attacks. An attacker who finds the other at peace now gets <span class="math" data-say="1">1</span>, and two attackers each get <span class="math" data-say="negative 3">−3</span>. The victim's payoffs do not change.</p><div class="mathblock" data-say="other, peace, other, attack. a table, shown on the page. attack, 1, 0, negative 3, negative 3" tabindex="0" role="region" aria-label="Mathematical notation">                 other: peace    other: attack
+     peace           3, 3             0, 1
+     attack          1, 0            −3, −3</div><p>Against peace, peace pays <span class="math" data-say="3">3</span> and attack pays <span class="math" data-say="1">1</span>. Against attack, peace pays <span class="math" data-say="0">0</span> and attack pays <span class="math" data-say="negative 3">−3</span>. Peace now dominates, the only equilibrium is peace with peace, and each collects <span class="math" data-say="3">3</span>. Nobody is fined there, so the penalty is never collected: a threat that works costs nothing to carry out. Hobbes's remark that covenants without the sword are but words is, in the table, the observation that a promise changes no payoff: only the sword does, and it has to change them by enough. A penalty of <span class="math" data-say="2">2</span> or less does not make peace dominate, since at <span class="math" data-say="1">1</span> attacking a peaceful neighbour still pays <span class="math" data-say="4">4</span> against <span class="math" data-say="3">3</span>, and at <span class="math" data-say="2">2</span> the two tie. The lab's dominance tile reports strict dominance only, so it turns at a penalty of <span class="math" data-say="3">3</span>.</p><h3>Fear without greed</h3><p>The third table has no gain from attacking at all. Peace with peace pays <span class="math" data-say="4">4</span> each. Attacking pays <span class="math" data-say="3">3</span> whatever the other does, because the attacker gets only the safety of not being caught unprepared, and a peaceful victim gets <span class="math" data-say="0">0</span>. This is the stag hunt of “Coordination, Conventions and the Stag Hunt”, and it has two equilibria: peace with peace and attack with attack.</p><p>Hobbes's point about diffidence is that the second equilibrium can be reached by people who want nothing the other has. Peace is worth keeping only if the neighbour keeps it with probability at least <span class="math" data-say="3 over 4">3/4</span>; short of that, attacking first is the better bet. What the sovereign supplies in this version is assurance. The remedy is a common power that makes each person's expectation of the other safe.</p><p>The lab does not say who watches the sovereign, who pays him, or why he would fine anyone: the penalty is an assumption of the model, and Hobbes's own argument for an authority that can be trusted to apply it is the part the table leaves out.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Writing the state of nature as a game</h2></div><p>The same steps for each of Hobbes's causes.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List what each person can do</h3><p>Peace or attack. Hobbes's conclusions follow from this much, so a third option has to be argued for.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Order the four outcomes by what each would rather have</h3><p>Ask what an attacker gains from a peaceful victim. If the gain is more than peace, the cause is competition; if it is only safety, the cause is diffidence.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the equilibria</h3><p>Check dominance first, then the cells where both are best-responding. Anarchy by competition has one, and anarchy by diffidence has two.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Subtract the sovereign&#x27;s penalty</h3><p>Take it from every payoff in which the person attacks, and leave the victim's payoff alone.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find the equilibria again</h3><p>If peace now dominates, the sovereign's penalty is large enough. If attack still pays against peace, it is not.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Writing the state of nature as a game</h2>
+      <p class="lead-in">The same steps for each of Hobbes's causes.</p>
+      <ol class="key-ideas method"><li><strong>List what each person can do.</strong> Peace or attack. Hobbes's conclusions follow from this much, so a third option has to be argued for.</li><li><strong>Order the four outcomes by what each would rather have.</strong> Ask what an attacker gains from a peaceful victim. If the gain is more than peace, the cause is competition; if it is only safety, the cause is diffidence.</li><li><strong>Find the equilibria.</strong> Check dominance first, then the cells where both are best-responding. Anarchy by competition has one, and anarchy by diffidence has two.</li><li><strong>Subtract the sovereign&#x27;s penalty.</strong> Take it from every payoff in which the person attacks, and leave the victim's payoff alone.</li><li><strong>Find the equilibria again.</strong> If peace now dominates, the sovereign's penalty is large enough. If attack still pays against peace, it is not.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1509,16 @@ Penalty 4 off every attack payoff:
 Only equilibrium:  (peace, peace), 3 each, no fine paid</div><p>Nothing in either table says the people have changed. The sovereign has changed what an attack costs, and with it what each does in reply to the other.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Hobbes took people to be wicked</strong><span>The diffidence table has no gain from attacking a peaceful neighbour: attack pays <span class="math" data-say="3">3</span> whether the other attacks or not, and peace with peace pays <span class="math" data-say="4">4</span>. Yet attack with attack is still an equilibrium, because anyone who doubts the neighbour's peace does better to strike first. The model needs only that people are rational and unsure of each other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the sovereign to be the cause of peace</strong><span>The sovereign changes payoffs, and peace follows from the new table. In the penalty table the fine is never paid. If it is too small, as <span class="math" data-say="1">1</span> is, attacking still pays and the war continues under a ruler.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the model as a history of how states began</strong><span>The tables say what follows from a given set of payoffs and say nothing about whether any people were ever in that condition. Hobbes himself treats the state of nature as what would follow without a common power, and the model makes that claim checkable.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show how a penalty moves an equilibrium.</strong><p>Write the state of nature as a two-by-two table, find its equilibria, subtract a stated penalty from the attack payoffs, and say whether peace now dominates and, if it does not, how large the penalty must be.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Hobbes's glory, which makes men fight for reputation, has no payoff to attach to it here, and the lab leaves it out rather than invent one. The two people stand for any pair; the next lessons ask what changes when ten take part.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Hobbes took people to be wicked</strong><span>The diffidence table has no gain from attacking a peaceful neighbour: attack pays <span class="math" data-say="3">3</span> whether the other attacks or not, and peace with peace pays <span class="math" data-say="4">4</span>. Yet attack with attack is still an equilibrium, because anyone who doubts the neighbour's peace does better to strike first. The model needs only that people are rational and unsure of each other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the sovereign to be the cause of peace</strong><span>The sovereign changes payoffs, and peace follows from the new table. In the penalty table the fine is never paid. If it is too small, as <span class="math" data-say="1">1</span> is, attacking still pays and the war continues under a ruler.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the model as a history of how states began</strong><span>The tables say what follows from a given set of payoffs and say nothing about whether any people were ever in that condition. Hobbes himself treats the state of nature as what would follow without a common power, and the model makes that claim checkable.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show how a penalty moves an equilibrium.</strong><p>Write the state of nature as a two-by-two table, find its equilibria, subtract a stated penalty from the attack payoffs, and say whether peace now dominates and, if it does not, how large the penalty must be.</p></div></div><div class="note"><strong>Note:</strong> Hobbes's glory, which makes men fight for reputation, has no payoff to attach to it here, and the lab leaves it out rather than invent one. The two people stand for any pair; the next lessons ask what changes when ten take part.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The state of nature is a game without enforcement</summary><p>Two people each choose peace or attack, with no one to punish an attack. Whatever the numbers are, they are the payoffs of an interaction in which only the players' own interests apply.</p></details><details class="recall"><summary>Attack can pay from greed or from fear</summary><p>If attacking a peaceful neighbour pays most, attack dominates and the game is the prisoner's dilemma. If it pays no more than defending against an attacker, the game is the stag hunt and the trouble is only that each fears the other.</p></details><details class="recall"><summary>A sovereign changes the payoffs</summary><p>A penalty on attacking is subtracted from every payoff in which someone attacks. It is a change to the table, and a large enough change moves the equilibrium without changing what anyone wants.</p></details></div>
+      <h3>Summary</h3>
       <p>Hobbes's state of nature can be written as a game between two people who each choose peace or attack. Where attacking pays whatever the other does, war is the only equilibrium; where attacking is only protection against an attacker, war and peace are both equilibria. A sovereign who punishes attack changes the payoffs, and with a large enough penalty peace is the only equilibrium.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The state of nature is a game without enforcement.</strong> Two people each choose peace or attack, with no one to punish an attack. Whatever the numbers are, they are the payoffs of an interaction in which only the players' own interests apply.</li><li><strong>Attack can pay from greed or from fear.</strong> If attacking a peaceful neighbour pays most, attack dominates and the game is the prisoner's dilemma. If it pays no more than defending against an attacker, the game is the stag hunt and the trouble is only that each fears the other.</li><li><strong>A sovereign changes the payoffs.</strong> A penalty on attacking is subtracted from every payoff in which someone attacks. It is a change to the table, and a large enough change moves the equilibrium without changing what anyone wants.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="anarchy, attack pays against either move. so both attack, and each does worse. fear alone gives two equilibria. a sovereign changes payoffs, not people" tabindex="0" role="region" aria-label="Mathematical notation">anarchy: attack pays against either move
 so both attack, and each does worse
 fear alone gives two equilibria
@@ -2254,11 +2299,40 @@ a sovereign changes payoffs, not people</div><figcaption>A game whose payoffs a 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2326,7 +2400,7 @@ a sovereign changes payoffs, not people</div><figcaption>A game whose payoffs a 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

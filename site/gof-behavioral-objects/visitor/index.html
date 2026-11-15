@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Visitor</h1>
       <p class="lesson-lede">An operation over a structure of objects packed into one class of its own, so new operations can be added without changing the objects&#x27; classes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Visitor</li><li>Double dispatch</li><li>The two kinds of addition</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Visitor lets you define a new operation without changing the classes of the elements on which it operates.&rdquo; That is the second sentence of Visitor's intent, the last pattern in the catalog. The first says what a visitor is: an operation to be carried out on the elements of a structure, made into an object of its own.</p><p>The book's Motivation, summarised, is a compiler holding programs as syntax trees and needing many operations over them, type checking, code generation, optimization, pretty-printing and more, each treating assignments, variables and expressions differently. Put every operation in every node class and the classes become a mixture that is hard to follow and must all be recompiled for one new operation. So each operation goes into a visitor, which is passed to the nodes; a node accepts it by calling the visitor's operation for its own class, passing itself. There are then two hierarchies, the elements and the visitors, and a new operation is a new visitor subclass. The Applicability's cases share one shape: a stable set of element classes, each with its own interface, and a growing list of jobs over them that you would rather not spread through every class.</p><p>The participants: the Visitor declares one visit operation per concrete element class, and the operation's name tells the visitor which class it has; a ConcreteVisitor implements them all, and its fields often accumulate the result as it goes; the Element declares accept; each ConcreteElement implements it; and the ObjectStructure can enumerate its elements, perhaps as a Composite or a plain collection. The client makes a concrete visitor and has the structure visited; each element calls the visit operation for its class and passes itself.</p><p>The Consequences weigh both sides. Adding an operation is easy, a new visitor, where spreading operations over the classes would mean editing each. Related behaviour sits together in one visitor and unrelated behaviour apart. But adding a ConcreteElement class is hard: every visitor gains an operation, and a default in the abstract visitor helps only sometimes. So the key question, the book says, is which you expect to change more often, the operations or the element classes; if the classes, keep the operations in them. Visitors can also visit objects with no common parent class, which an iterator cannot, and can accumulate state that would otherwise travel as arguments or globals. The last liability is encapsulation: visitors need public access to what elements hold.</p><pre class="codeblock" data-say="line 1, interface playlist visitor. line 2, void visit folder of folder f. line 3, void visit track of track t. line 4, void visit episode of episode e. line 6, interface entry void accept of playlist visitor v. line 8, final class folder implements entry. line 9, final list of entry entries is set to new array list. line 10, public void accept of playlist visitor v. line 11, for entry e in entries e dot accept of v, comment, the structure traverses. line 12, v dot visit folder of this. line 15, final class track implements entry. line 16, final double minutes. line 17, track of double minutes this dot minutes is set to minutes. line 18, public void accept of playlist visitor v v dot visit track of this. line 20, comment, Episode is written like Track each visitor implements all three visits." tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface PlaylistVisitor {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Visitor lets you define a new operation without changing the classes of the elements on which it operates.&rdquo; That is the second sentence of Visitor's intent, the last pattern in the catalog. The first says what a visitor is: an operation to be carried out on the elements of a structure, made into an object of its own.</p><p>The book's Motivation, summarised, is a compiler holding programs as syntax trees and needing many operations over them, type checking, code generation, optimization, pretty-printing and more, each treating assignments, variables and expressions differently. Put every operation in every node class and the classes become a mixture that is hard to follow and must all be recompiled for one new operation. So each operation goes into a visitor, which is passed to the nodes; a node accepts it by calling the visitor's operation for its own class, passing itself. There are then two hierarchies, the elements and the visitors, and a new operation is a new visitor subclass. The Applicability's cases share one shape: a stable set of element classes, each with its own interface, and a growing list of jobs over them that you would rather not spread through every class.</p><p>The participants: the Visitor declares one visit operation per concrete element class, and the operation's name tells the visitor which class it has; a ConcreteVisitor implements them all, and its fields often accumulate the result as it goes; the Element declares accept; each ConcreteElement implements it; and the ObjectStructure can enumerate its elements, perhaps as a Composite or a plain collection. The client makes a concrete visitor and has the structure visited; each element calls the visit operation for its class and passes itself.</p><p>The Consequences weigh both sides. Adding an operation is easy, a new visitor, where spreading operations over the classes would mean editing each. Related behaviour sits together in one visitor and unrelated behaviour apart. But adding a ConcreteElement class is hard: every visitor gains an operation, and a default in the abstract visitor helps only sometimes. So the key question, the book says, is which you expect to change more often, the operations or the element classes; if the classes, keep the operations in them. Visitors can also visit objects with no common parent class, which an iterator cannot, and can accumulate state that would otherwise travel as arguments or globals. The last liability is encapsulation: visitors need public access to what elements hold.</p><pre class="codeblock" data-say="line 1, interface playlist visitor. line 2, void visit folder of folder f. line 3, void visit track of track t. line 4, void visit episode of episode e. line 6, interface entry void accept of playlist visitor v. line 8, final class folder implements entry. line 9, final list of entry entries is set to new array list. line 10, public void accept of playlist visitor v. line 11, for entry e in entries e dot accept of v, comment, the structure traverses. line 12, v dot visit folder of this. line 15, final class track implements entry. line 16, final double minutes. line 17, track of double minutes this dot minutes is set to minutes. line 18, public void accept of playlist visitor v v dot visit track of this. line 20, comment, Episode is written like Track each visitor implements all three visits." tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface PlaylistVisitor {</span>
 <span class="cl">    void visitFolder(Folder f);</span>
 <span class="cl">    void visitTrack(Track t);</span>
 <span class="cl">    void visitEpisode(Episode e);</span>
@@ -1464,16 +1508,11 @@
 <span class="cl">    Track(double minutes) { this.minutes = minutes; }</span>
 <span class="cl">    public void accept(PlaylistVisitor v) { v.visitTrack(this); }</span>
 <span class="cl">}</span>
-<span class="cl">// Episode is written like Track; each visitor implements all three visits.</span></code></pre><p>The sketch is the lesson's own, a music playlist in Java. A folder passes the visitor to its entries and then visits itself, so here the structure does the traversing. That is the Implementation's second issue: traversal can belong to the structure, to an iterator or to the visitor, the last mainly for an irregular traversal that depends on the results, at the cost of repeating it in each visitor. The first issue is the name of the trick, double dispatch: the method that runs depends on both classes involved, the element's and the visitor's, where C++ and Smalltalk choose by the receiver alone. Languages with multiple dispatch, CLOS among them, need the pattern less.</p><p>The Sample Code returns to Composite's equipment, adding pricing and inventory visitors in C++, and then redoes Interpreter's matcher in Smalltalk with a visitor that traverses for itself. Known Uses names Smalltalk-80's compiler and IRIS Inventor, whose actions are visitors dispatched through a table of visitors by node classes; the name itself was Mark Linton's, from the Fresco toolkit. Related Patterns: Composite, whose structures visitors traverse, and Interpreter, which a visitor can carry out.</p><p>Now the lab, on a playlist of the lesson's own: a library folder holding a morning folder, a running folder and a talk; eight entries of three kinds, folders, tracks and episodes; and two visitors, one totalling the minutes and one exporting the list. On the preset <code>playlist-operation</code> the lab counts 16 accept calls, one per entry per visitor, and as many visit calls, shown by kind in the table. There are 4 element classes, the abstract element and three kinds, and 3 visitor classes. With Visitor 9 methods are written, a visit per kind per visitor and an accept per kind; with each operation a method of the element classes, 6. A third operation is 1 new visitor and changes nothing, against edits to the abstract element and all three element classes.</p><p>The preset <code>playlist-kind</code> makes the other addition, a new kind of entry, say an audiobook chapter. With Visitor it is 1 new element class and 3 changed classes, the abstract visitor and both visitors; with operations on the elements it is 1 new class and nothing changed. The two presets are the book's key consideration as counts. Which addition your playlist will see more often is not in the counts.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, nodes, museum, minus, wing, minus, east, museum, wing, minus. line 2, vase, east, exhibit, 1, mask, east, exhibit, 1. line 3, film, museum, screen, 1. line 4, visitors, audio map count. line 5, adding, A new kind of element, shop" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">nodes:     museum, -, Wing, -; east, museum, Wing, -;</span>
-<span class="cl">           vase, east, Exhibit, 1; mask, east, Exhibit, 1;</span>
-<span class="cl">           film, museum, Screen, 1</span>
-<span class="cl">visitors:  audio map count</span>
-<span class="cl">adding:    a new kind of element, Shop</span></code></pre><p>A museum's floor plan, with three visitors. By hand, count the accept calls, the methods written with Visitor against operations on the elements, and the classes a new Shop kind changes under each. Then enter it into the lab to check.</p><p>That ends the catalog. The next lesson, Discussion of Behavioral Patterns, reads the chapter's closing comparison of the eleven.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A tree of parts</h2></div><p>operations as visitors, or as methods of the elements</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">// Episode is written like Track; each visitor implements all three visits.</span></code></pre><p>The sketch is the lesson's own, a music playlist in Java. A folder passes the visitor to its entries and then visits itself, so here the structure does the traversing. That is the Implementation's second issue: traversal can belong to the structure, to an iterator or to the visitor, the last mainly for an irregular traversal that depends on the results, at the cost of repeating it in each visitor. The first issue is the name of the trick, double dispatch: the method that runs depends on both classes involved, the element's and the visitor's, where C++ and Smalltalk choose by the receiver alone. Languages with multiple dispatch, CLOS among them, need the pattern less.</p><p>The Sample Code returns to Composite's equipment, adding pricing and inventory visitors in C++, and then redoes Interpreter's matcher in Smalltalk with a visitor that traverses for itself. Known Uses names Smalltalk-80's compiler and IRIS Inventor, whose actions are visitors dispatched through a table of visitors by node classes; the name itself was Mark Linton's, from the Fresco toolkit. Related Patterns: Composite, whose structures visitors traverse, and Interpreter, which a visitor can carry out.</p><p>Now the lab, on a playlist of the lesson's own: a library folder holding a morning folder, a running folder and a talk; eight entries of three kinds, folders, tracks and episodes; and two visitors, one totalling the minutes and one exporting the list. On the preset <code>playlist-operation</code> the lab counts 16 accept calls, one per entry per visitor, and as many visit calls, shown by kind in the table. There are 4 element classes, the abstract element and three kinds, and 3 visitor classes. With Visitor 9 methods are written, a visit per kind per visitor and an accept per kind; with each operation a method of the element classes, 6. A third operation is 1 new visitor and changes nothing, against edits to the abstract element and all three element classes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A tree of parts</h2></div><p>operations as visitors, or as methods of the elements</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A tree of parts</strong><span>operations as visitors, or as methods of the elements</span></div>
       </div>
@@ -1481,10 +1520,10 @@
       <div class="table-wrap" id="gtrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gtrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one node: its name, its parent (- for the root; exactly one root), its kind (a class name) and its value, a decimal for a leaf and - for a composite. A leaf has no children; a composite may have none. Children are taken in record order. A kind is either a leaf class or a composite class, never both. Depth counts the edges on the longest path down from the root (a root alone is at depth 0). The structure asks every node to accept each visitor once, and each accept makes one visit call on the visitor's method for that node's kind: nodes × visitors of each. Element classes are 1 abstract element + 1 per kind; visitor classes are 1 abstract visitor + 1 per visitor. Methods written, counting implementations only: with Visitor, kinds × visitors visit methods + 1 accept per kind; with each operation a method of the element classes, kinds × visitors. A new operation is 1 new visitor and changes nothing, against a change to the abstract element and every element class; a new kind is 1 new element class that changes the abstract visitor and every visitor, against nothing changed.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Calls, classes and the two additions</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Calls, classes and the two additions</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gtrPreset">Worked example</label>
           <select id="gtrPreset"><option value="playlist-operation" selected>A playlist with two visitors, adding an operation</option><option value="playlist-kind">The same playlist, adding a kind of entry</option></select>
@@ -1512,12 +1551,19 @@
           <div class="kpi"><span>The addition, operations on the elements</span><strong id="gtrAddPlain">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>playlist-kind</code> makes the other addition, a new kind of entry, say an audiobook chapter. With Visitor it is 1 new element class and 3 changed classes, the abstract visitor and both visitors; with operations on the elements it is 1 new class and nothing changed. The two presets are the book's key consideration as counts. Which addition your playlist will see more often is not in the counts.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, nodes, museum, minus, wing, minus, east, museum, wing, minus. line 2, vase, east, exhibit, 1, mask, east, exhibit, 1. line 3, film, museum, screen, 1. line 4, visitors, audio map count. line 5, adding, A new kind of element, shop" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">nodes:     museum, -, Wing, -; east, museum, Wing, -;</span>
+<span class="cl">           vase, east, Exhibit, 1; mask, east, Exhibit, 1;</span>
+<span class="cl">           film, museum, Screen, 1</span>
+<span class="cl">visitors:  audio map count</span>
+<span class="cl">adding:    a new kind of element, Shop</span></code></pre><p>A museum's floor plan, with three visitors. By hand, count the accept calls, the methods written with Visitor against operations on the elements, and the classes a new Shop kind changes under each. Then enter it into the lab to check.</p><p>That ends the catalog. The next lesson, Discussion of Behavioral Patterns, reads the chapter's closing comparison of the eleven.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting what a visitor costs and saves</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the structure and the operations</h3><p>Write each element with its parent and kind, and name the operations you would make visitors.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the calls</h3><p>One accept call per element per visitor, and each accept makes one visit call.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the classes each addition changes</h3><p>A new operation: one new visitor, nothing changed, against every element class and their parent edited. A new kind: one new class, and the abstract visitor and every visitor edited, against nothing changed.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on code of your own</h3><p>Find a tree or a set of related classes in code you know with several operations over it. Count both additions, and say from its history which it has seen more of.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting what a visitor costs and saves</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the structure and the operations.</strong> Write each element with its parent and kind, and name the operations you would make visitors.</li><li><strong>Count the calls.</strong> One accept call per element per visitor, and each accept makes one visit call.</li><li><strong>Count the classes each addition changes.</strong> A new operation: one new visitor, nothing changed, against every element class and their parent edited. A new kind: one new class, and the abstract visitor and every visitor edited, against nothing changed.</li><li><strong>Do it on code of your own.</strong> Find a tree or a set of related classes in code you know with several operations over it. Count both additions, and say from its history which it has seen more of.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1537,17 +1583,16 @@ on the elements: 3 × 2 = 6 methods
 new operation: 1 added, 0 changed</div><p>The three extra methods are the accepts, the price of double dispatch; in return the six visit methods sit in two visitors instead of across three element classes.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Choosing Visitor where new kinds of element keep arriving</strong><span>Every new element class adds an operation to the abstract visitor and to every concrete one. On the lesson's illustration a new kind changes 3 classes with Visitor and none without; the book's test is which you expect to change more often, operations or element classes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the elements to stay fully encapsulated</strong><span>A visitor does its work from outside the element, so the element's interface must be rich enough for it, which often means public operations exposing state the element would otherwise keep to itself. The book lists this among the liabilities.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking Visitor for an iterator</strong><span>An iterator visits elements one after another and calls their operations, and its elements must share a parent type. A visitor carries an operation to the elements, chooses its code by their class, and can visit classes with no common parent; who traverses is a separate choice.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a visitor makes easy and what it makes hard.</strong><p>Given a structure and its operations, count the accept and visit calls and the methods written, and the classes each kind of addition changes with and without Visitor.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts calls and classes. It cannot say which kind of addition your structure will see, which is the book's whole test, or how much of an element's state a visitor will need opened up.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Choosing Visitor where new kinds of element keep arriving</strong><span>Every new element class adds an operation to the abstract visitor and to every concrete one. On the lesson's illustration a new kind changes 3 classes with Visitor and none without; the book's test is which you expect to change more often, operations or element classes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the elements to stay fully encapsulated</strong><span>A visitor does its work from outside the element, so the element's interface must be rich enough for it, which often means public operations exposing state the element would otherwise keep to itself. The book lists this among the liabilities.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking Visitor for an iterator</strong><span>An iterator visits elements one after another and calls their operations, and its elements must share a parent type. A visitor carries an operation to the elements, chooses its code by their class, and can visit classes with no common parent; who traverses is a separate choice.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a visitor makes easy and what it makes hard.</strong><p>Given a structure and its operations, count the accept and visit calls and the methods written, and the classes each kind of addition changes with and without Visitor.</p></div></div><div class="note"><strong>Note:</strong> The lab counts calls and classes. It cannot say which kind of addition your structure will see, which is the book's whole test, or how much of an element's state a visitor will need opened up.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Visitor</summary><p>An object holding one operation over a structure, with a visit method for each class of element. The elements call it; the operation's code lives in the visitor instead of being spread over the element classes.</p></details><details class="recall"><summary>Double dispatch</summary><p>Choosing the code to run by the classes of two objects instead of one. An element's accept calls the visit method for its own class, on whichever visitor it was given, so the method run depends on both.</p></details><details class="recall"><summary>The two kinds of addition</summary><p>A new operation is one new visitor class and no edits. A new kind of element is one new element class, and a new visit method in the abstract visitor and in every visitor.</p></details></div>
+      <h3>Summary</h3>
       <p>Visitor moves an operation out of the classes of a structure's elements into a visitor object the elements accept. Read the pattern, then count the accept and visit calls two visitors make over a playlist, and the classes a new operation and a new kind of element each change.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Visitor.</strong> An object holding one operation over a structure, with a visit method for each class of element. The elements call it; the operation's code lives in the visitor instead of being spread over the element classes.</li><li><strong>Double dispatch.</strong> Choosing the code to run by the classes of two objects instead of one. An element's accept calls the visit method for its own class, on whichever visitor it was given, so the method run depends on both.</li><li><strong>The two kinds of addition.</strong> A new operation is one new visitor class and no edits. A new kind of element is one new element class, and a new visit method in the abstract visitor and in every visitor.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one visitor per operation. accept calls the visit for its class. two classes choose the method. new operations are cheap. new element classes are dear. visitors may need what elements hide" tabindex="0" role="region" aria-label="Mathematical notation">one visitor per operation
 accept calls the visit for its class
 two classes choose the method
@@ -2354,11 +2399,40 @@ visitors may need what elements hide</div><figcaption>Visitor in six lines</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2426,7 +2500,7 @@ visitors may need what elements hide</div><figcaption>Visitor in six lines</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

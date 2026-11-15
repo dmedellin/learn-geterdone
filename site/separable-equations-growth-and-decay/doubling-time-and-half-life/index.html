@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,39 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Separable Equations, Growth and Decay</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Exponential change</p>
       <h1>Doubling Time and Half-Life</h1>
       <p class="lesson-lede">T = ln 2/k comes from <span data-say="e to the power k T equals 2">e^(kT) = 2</span>, it does not depend on the amount you start with, and the exact Euler sequence passes double at a step the lab names.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>T comes from one equation</li><li>The start drops out</li><li>Euler crosses on the grid</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The time to double, and the step that first gets there</h2>
-      <article class="prose reading"><p>Take <span class="math" data-say="y prime equals the quantity 1 over 2, times y">y′ = (1/2)·y</span>, so <span class="math" data-say="k equals 1 over 2">k = 1/2</span>. The solution is <span class="math" data-say="y sub 0 times e to the power the quantity t over 2">y₀·e^(t/2)</span>, and it doubles when <span class="math" data-say="e to the power the quantity T over 2, equals 2">e^(T/2) = 2</span>, which is <span class="math" data-say="T over 2 equals the natural log of 2">T/2 = ln 2</span> and <span class="math" data-say="T equals 2 times the natural log of 2">T = 2·ln 2</span>. The lab prints this as <span class="math" data-say="the natural log of 2 over the quantity 1 over 2">ln 2/(1/2)</span> and then <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, rounded; the irrational factor is <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span>.</p><div class="mathblock" data-say="y equals y sub 0 times e to the power k t. doubled when, y equals 2 times y sub 0. e to the power k T equals 2. k T equals the natural log of 2. T equals the natural log of 2 over k. k equals 1 over 2, T equals 2 times the natural log of 2, is approximately 1.38629. k equals 1 over 10, T equals 10 times the natural log of 2, is approximately 6.93147. k equals negative 1 over 2, half-life 2 times the natural log of 2, is approximately 1.38629" tabindex="0" role="region" aria-label="Mathematical notation">y = y₀·e^(kt)
-
-  doubled when   y = 2·y₀
-  e^(kT) = 2
-  kT = ln 2
-  T = ln 2/k
-
-k = 1/2:    T = 2·ln 2     ≈ 1.38629
-k = 1/10:   T = 10·ln 2    ≈ 6.93147
-k = −1/2:   half-life 2·ln 2    ≈ 1.38629</div><p>A bigger rate constant gives a shorter doubling time, and the product <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span> is the same for every equation of this kind. A useful consequence: <span class="math" data-say="T is approximately 0.693 over k">T ≈ 0.693/k</span>, so a rate of <span class="math" data-say="k equals 0.07">k = 0.07</span> per year, about seven percent, doubles in about ten years. That is rounded, and the lab prints it as rounded whenever it appears.</p><h3>The start drops out</h3><p>Begin with <span class="math" data-say="y sub 0 equals 1">y₀ = 1</span> and the target <span class="math" data-say="2">2</span>, and again with <span class="math" data-say="y sub 0 equals 8">y₀ = 8</span> and the target <span class="math" data-say="4">4</span> and <span class="math" data-say="k equals negative 1 over 2">k = −1/2</span>: the lab prints the same time, <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, because <span class="math" data-say="k">k</span> is the only thing the formula uses. Change the start to <span class="math" data-say="5">5</span> and the target to <span class="math" data-say="10">10</span> on the first preset to see the same step and the same time again. The amount scales the whole curve and moves nowhere along the time axis.</p><h3>Where the exact sequence crosses</h3><p>With <span class="math" data-say="k equals 1 over 2">k = 1/2</span> and <span class="math" data-say="h equals 1 over 4">h = 1/4</span> the factor is <span class="math" data-say="9 over 8">9/8</span>. The terms <span class="math" data-say="the quantity 9 over 8, to the power 5 equals 59049 over 32768 is approximately 1.80203">(9/8)⁵ = 59049/32768 ≈ 1.80203</span> and <span class="math" data-say="the quantity 9 over 8, to the power 6 equals 531441 over 262144 is approximately 2.02729">(9/8)⁶ = 531441/262144 ≈ 2.02729</span> straddle <span class="math" data-say="2">2</span>, so the exact sequence first reaches double at step 6, which is <span class="math" data-say="t equals 6 times the quantity 1 over 4, equals 3 over 2">t = 6·(1/4) = 3/2</span>. The lab prints <span class="math" data-say="step 6, at t equals 3 over 2">step 6 (t = 3/2)</span>.</p><div class="mathblock" data-say="k equals 1 over 2, h equals 1 over 4, factor 9 over 8, y sub 0 equals 1, target 2. step 5, the quantity 9 over 8, to the power 5 equals 59049 over 32768, is approximately 1.80203, below 2. step 6, the quantity 9 over 8, to the power 6 equals 531441 over 262144 is approximately 2.02729, at or above 2. first step past the target, step 6, t equals 3 over 2. true doubling time, T is approximately 1.38629" tabindex="0" role="region" aria-label="Mathematical notation">k = 1/2, h = 1/4, factor 9/8, y₀ = 1, target 2
-
-  step 5   (9/8)⁵ = 59049/32768   ≈ 1.80203   below 2
-  step 6   (9/8)⁶ = 531441/262144 ≈ 2.02729   at or above 2
-
-  first step past the target:  step 6, t = 3/2
-  true doubling time:          T ≈ 1.38629</div><p>The true curve passes <span class="math" data-say="2">2</span> at <span class="math" data-say="T is approximately 1.38629">T ≈ 1.38629</span>, between steps 5 and 6. For growth the exact Euler sequence lies below the curve, so it cannot cross earlier than the curve does: the crossing step is at or after the first grid point past <span class="math" data-say="T">T</span>, and here it is that grid point. It need not be. A coarser step leaves the sequence further below the curve, and in the third preset the crossing comes a whole step after the grid point that follows <span class="math" data-say="T">T</span>.</p><div class="example"><span class="label">Example &middot; A coarse step, a late crossing</span><p>For <span class="math" data-say="k equals 1 over 10">k = 1/10</span> and <span class="math" data-say="h equals 1">h = 1</span> the factor is <span class="math" data-say="11 over 10">11/10</span>. The terms <span class="math" data-say="the quantity 11 over 10, to the power 7 equals 19487171 over 10000000 is approximately 1.94872">(11/10)⁷ = 19487171/10000000 ≈ 1.94872</span> and <span class="math" data-say="the quantity 11 over 10, to the power 8 is approximately 2.14359">(11/10)⁸ ≈ 2.14359</span> straddle 2, so the lab prints <span class="math" data-say="step 8, at t equals 8">step 8 (t = 8)</span>. The true doubling time is <span class="math" data-say="T is approximately 6.93147">T ≈ 6.93147</span>, so at <span class="math" data-say="t equals 7">t = 7</span> the closed form column already reads <span class="math" data-say="is approximately 2.01375">≈ 2.01375</span>, while the exact sequence at step 7 is still below 2: it is late by a whole step.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Growth and decay</h2></div><p>A geometric sequence beside an exponential</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The time to double, and the step that first gets there</h2><div class="prose reading"><p>Take <span class="math" data-say="y prime equals the quantity 1 over 2, times y">y′ = (1/2)·y</span>, so <span class="math" data-say="k equals 1 over 2">k = 1/2</span>. The solution is <span class="math" data-say="y sub 0 times e to the power the quantity t over 2">y₀·e^(t/2)</span>, and it doubles when <span class="math" data-say="e to the power the quantity T over 2, equals 2">e^(T/2) = 2</span>, which is <span class="math" data-say="T over 2 equals the natural log of 2">T/2 = ln 2</span> and <span class="math" data-say="T equals 2 times the natural log of 2">T = 2·ln 2</span>. The lab prints this as <span class="math" data-say="the natural log of 2 over the quantity 1 over 2">ln 2/(1/2)</span> and then <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, rounded; the irrational factor is <span class="math" data-say="the natural log of 2 is approximately 0.693147">ln 2 ≈ 0.693147</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Growth and decay</h2></div><p>A geometric sequence beside an exponential</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Growth and decay</strong><span>y′ = k·(y − A)</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>Euler steps (exact)</span><span class="tone-cyan"><i class="legend-swatch"></i>closed form, rounded</span></div>
@@ -1420,10 +1448,10 @@ k = −1/2:   half-life 2·ln 2    ≈ 1.38629</div><p>A bigger rate constant gi
       <div class="table-wrap" style="margin-top:12px;" id="grTable" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="grStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The doubling time, and the first step past the target</h3>
-          <p>The doubling-or-halving tile is ln 2 over the size of k, rounded. The step tile is the first exact Euler value at or past the target in the direction of travel, with its time. Change the start and the target together on the first preset and see that only the table's numbers move.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The doubling time, and the first step past the target</h3>
+            <p>The doubling-or-halving tile is ln 2 over the size of k, rounded. The step tile is the first exact Euler value at or past the target in the direction of travel, with its time. Change the start and the target together on the first preset and see that only the table's numbers move.</p>
         <div class="field">
           <label for="grPreset">Situation</label>
           <select id="grPreset"><option value="double" selected>k = 1/2, y(0) = 1, h = 1/4, target 2</option><option value="halve">k = −1/2, y(0) = 8, h = 1/4, target 4</option><option value="slow">k = 1/10, y(0) = 1, h = 1, target 2</option></select>
@@ -1462,12 +1490,30 @@ k = −1/2:   half-life 2·ln 2    ≈ 1.38629</div><p>A bigger rate constant gi
           <div class="kpi"><span>Steady state A</span><strong id="grSteady">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="y equals y sub 0 times e to the power k t. doubled when, y equals 2 times y sub 0. e to the power k T equals 2. k T equals the natural log of 2. T equals the natural log of 2 over k. k equals 1 over 2, T equals 2 times the natural log of 2, is approximately 1.38629. k equals 1 over 10, T equals 10 times the natural log of 2, is approximately 6.93147. k equals negative 1 over 2, half-life 2 times the natural log of 2, is approximately 1.38629" tabindex="0" role="region" aria-label="Mathematical notation">y = y₀·e^(kt)
+
+  doubled when   y = 2·y₀
+  e^(kT) = 2
+  kT = ln 2
+  T = ln 2/k
+
+k = 1/2:    T = 2·ln 2     ≈ 1.38629
+k = 1/10:   T = 10·ln 2    ≈ 6.93147
+k = −1/2:   half-life 2·ln 2    ≈ 1.38629</div><p>A bigger rate constant gives a shorter doubling time, and the product <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span> is the same for every equation of this kind. A useful consequence: <span class="math" data-say="T is approximately 0.693 over k">T ≈ 0.693/k</span>, so a rate of <span class="math" data-say="k equals 0.07">k = 0.07</span> per year, about seven percent, doubles in about ten years. That is rounded, and the lab prints it as rounded whenever it appears.</p><h3>The start drops out</h3><p>Begin with <span class="math" data-say="y sub 0 equals 1">y₀ = 1</span> and the target <span class="math" data-say="2">2</span>, and again with <span class="math" data-say="y sub 0 equals 8">y₀ = 8</span> and the target <span class="math" data-say="4">4</span> and <span class="math" data-say="k equals negative 1 over 2">k = −1/2</span>: the lab prints the same time, <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, because <span class="math" data-say="k">k</span> is the only thing the formula uses. Change the start to <span class="math" data-say="5">5</span> and the target to <span class="math" data-say="10">10</span> on the first preset to see the same step and the same time again. The amount scales the whole curve and moves nowhere along the time axis.</p><h3>Where the exact sequence crosses</h3><p>With <span class="math" data-say="k equals 1 over 2">k = 1/2</span> and <span class="math" data-say="h equals 1 over 4">h = 1/4</span> the factor is <span class="math" data-say="9 over 8">9/8</span>. The terms <span class="math" data-say="the quantity 9 over 8, to the power 5 equals 59049 over 32768 is approximately 1.80203">(9/8)⁵ = 59049/32768 ≈ 1.80203</span> and <span class="math" data-say="the quantity 9 over 8, to the power 6 equals 531441 over 262144 is approximately 2.02729">(9/8)⁶ = 531441/262144 ≈ 2.02729</span> straddle <span class="math" data-say="2">2</span>, so the exact sequence first reaches double at step 6, which is <span class="math" data-say="t equals 6 times the quantity 1 over 4, equals 3 over 2">t = 6·(1/4) = 3/2</span>. The lab prints <span class="math" data-say="step 6, at t equals 3 over 2">step 6 (t = 3/2)</span>.</p><div class="mathblock" data-say="k equals 1 over 2, h equals 1 over 4, factor 9 over 8, y sub 0 equals 1, target 2. step 5, the quantity 9 over 8, to the power 5 equals 59049 over 32768, is approximately 1.80203, below 2. step 6, the quantity 9 over 8, to the power 6 equals 531441 over 262144 is approximately 2.02729, at or above 2. first step past the target, step 6, t equals 3 over 2. true doubling time, T is approximately 1.38629" tabindex="0" role="region" aria-label="Mathematical notation">k = 1/2, h = 1/4, factor 9/8, y₀ = 1, target 2
+
+  step 5   (9/8)⁵ = 59049/32768   ≈ 1.80203   below 2
+  step 6   (9/8)⁶ = 531441/262144 ≈ 2.02729   at or above 2
+
+  first step past the target:  step 6, t = 3/2
+  true doubling time:          T ≈ 1.38629</div><p>The true curve passes <span class="math" data-say="2">2</span> at <span class="math" data-say="T is approximately 1.38629">T ≈ 1.38629</span>, between steps 5 and 6. For growth the exact Euler sequence lies below the curve, so it cannot cross earlier than the curve does: the crossing step is at or after the first grid point past <span class="math" data-say="T">T</span>, and here it is that grid point. It need not be. A coarser step leaves the sequence further below the curve, and in the third preset the crossing comes a whole step after the grid point that follows <span class="math" data-say="T">T</span>.</p><div class="example"><span class="label">Example &middot; A coarse step, a late crossing</span><p>For <span class="math" data-say="k equals 1 over 10">k = 1/10</span> and <span class="math" data-say="h equals 1">h = 1</span> the factor is <span class="math" data-say="11 over 10">11/10</span>. The terms <span class="math" data-say="the quantity 11 over 10, to the power 7 equals 19487171 over 10000000 is approximately 1.94872">(11/10)⁷ = 19487171/10000000 ≈ 1.94872</span> and <span class="math" data-say="the quantity 11 over 10, to the power 8 is approximately 2.14359">(11/10)⁸ ≈ 2.14359</span> straddle 2, so the lab prints <span class="math" data-say="step 8, at t equals 8">step 8 (t = 8)</span>. The true doubling time is <span class="math" data-say="T is approximately 6.93147">T ≈ 6.93147</span>, so at <span class="math" data-say="t equals 7">t = 7</span> the closed form column already reads <span class="math" data-say="is approximately 2.01375">≈ 2.01375</span>, while the exact sequence at step 7 is still below 2: it is late by a whole step.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding a doubling time or a half-life</h2></div><p>Five moves, and the last one is the one that stops a coarse step being mistaken for the answer.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Identify k and its sign</h3><p>Positive means doubling, negative means halving. The time uses <span class="math" data-say="the absolute value of k">|k|</span> only.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set the quantity equal to its target</h3><p><span class="math" data-say="y sub 0 times e to the power k T equals 2 times y sub 0">y₀·e^(kT) = 2·y₀</span> for doubling, <span class="math" data-say="y sub 0 times e to the power k T equals y sub 0 over 2">y₀·e^(kT) = y₀/2</span> for halving. The <span class="math" data-say="y sub 0">y₀</span> cancels, and that is why the answer does not depend on it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the logarithm</h3><p><span class="math" data-say="k T equals the natural log of 2">kT = ln 2</span>, so <span class="math" data-say="T equals the natural log of 2 over the absolute value of k">T = ln 2/|k|</span>. Quote it rounded and marked <span class="math" data-say="is approximately">≈</span>, since <span class="math" data-say="the natural log of 2">ln 2</span> is irrational.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Find the crossing step of the exact sequence</h3><p>Compute <span class="math" data-say="the quantity 1 plus k h, to the power n">(1 + kh)ⁿ</span> for increasing <span class="math" data-say="n">n</span> until it passes 2 (or falls to 1/2). The first such <span class="math" data-say="n">n</span> and the time <span class="math" data-say="n times h">n·h</span> are exact.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare the two times</h3><p>The grid time is at least <span class="math" data-say="T">T</span> for growth, with the gap set by <span class="math" data-say="h">h</span>. Report the step size alongside it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding a doubling time or a half-life</h2>
+      <p class="lead-in">Five moves, and the last one is the one that stops a coarse step being mistaken for the answer.</p>
+      <ol class="key-ideas method"><li><strong>Identify k and its sign.</strong> Positive means doubling, negative means halving. The time uses <span class="math" data-say="the absolute value of k">|k|</span> only.</li><li><strong>Set the quantity equal to its target.</strong> <span class="math" data-say="y sub 0 times e to the power k T equals 2 times y sub 0">y₀·e^(kT) = 2·y₀</span> for doubling, <span class="math" data-say="y sub 0 times e to the power k T equals y sub 0 over 2">y₀·e^(kT) = y₀/2</span> for halving. The <span class="math" data-say="y sub 0">y₀</span> cancels, and that is why the answer does not depend on it.</li><li><strong>Take the logarithm.</strong> <span class="math" data-say="k T equals the natural log of 2">kT = ln 2</span>, so <span class="math" data-say="T equals the natural log of 2 over the absolute value of k">T = ln 2/|k|</span>. Quote it rounded and marked <span class="math" data-say="is approximately">≈</span>, since <span class="math" data-say="the natural log of 2">ln 2</span> is irrational.</li><li><strong>Find the crossing step of the exact sequence.</strong> Compute <span class="math" data-say="the quantity 1 plus k h, to the power n">(1 + kh)ⁿ</span> for increasing <span class="math" data-say="n">n</span> until it passes 2 (or falls to 1/2). The first such <span class="math" data-say="n">n</span> and the time <span class="math" data-say="n times h">n·h</span> are exact.</li><li><strong>Compare the two times.</strong> The grid time is at least <span class="math" data-say="T">T</span> for growth, with the gap set by <span class="math" data-say="h">h</span>. Report the step size alongside it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1488,17 +1534,16 @@ first step past 2:  step 6,  t = 6/4 = 3/2
 gap to the true T:  3/2 − T ≈ 0.113706</div><p>Euler underestimates growth, so it is late by the part of a step it needs to make up. Here that is part of a quarter-step, and with the step equal to 1 in the third preset it is more than a whole one. Neither is wrong arithmetic; the first is the exact sequence and the second is the true curve, and they are different objects.</p><p>The decay preset runs the same arithmetic downward: the factor is <span class="math" data-say="7 over 8">7/8</span> and the exact sequence from 8 first reaches 4 or below at step 6, the same step, though not for the same reason. For decay the factor <span class="math" data-say="7 over 8">7/8</span> is below <span class="math" data-say="e to the power the quantity negative 1 over 8">e^(−1/8)</span>, so the sequence falls faster than the curve and could cross early; here both cross between steps 5 and 6. Its time is the half-life, which equals the doubling time for the opposite rate.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the doubling time depends on the starting amount</strong><span>The mistaken model is that a larger amount takes longer to double, because there is more to double, or shorter, because it is growing faster in absolute terms. Neither is right. At <span class="math" data-say="t plus T">t + T</span> the amount is <span class="math" data-say="y sub 0 times e to the power k t times e to the power k T equals 2 times y of t">y₀·e^(kt)·e^(kT) = 2·y(t)</span>, so every amount doubles in <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>. The lab's first two presets start from 1 and from 8 and print the same <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, and the formula has no place to put the start.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Getting T upside down</strong><span>Writing <span class="math" data-say="T equals k over the natural log of 2">T = k/ln 2</span>, or <span class="math" data-say="T equals the natural log of 2 times k">T = ln 2·k</span>, reverses the sensible direction: a faster rate must shorten the time. The check is that <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span> for every equation of this kind, a constant, so doubling <span class="math" data-say="k">k</span> halves <span class="math" data-say="T">T</span>. With <span class="math" data-say="k equals 1 over 10">k = 1/10</span> the lab prints <span class="math" data-say="is approximately 6.93147">≈ 6.93147</span>; with <span class="math" data-say="k equals 1 over 2">k = 1/2</span>, <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, about five times shorter.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the crossing step as the doubling time</strong><span>The tile <span class="math" data-say="step 6, at t equals 3 over 2">step 6 (t = 3/2)</span> is exact, and it is a statement about the Euler sequence on its grid. The doubling time of the equation is <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>. They agree to within one step, and the lab prints both so that the gap is visible rather than assumed away.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can derive the doubling time, quote it rounded, and find the crossing step of the exact sequence.</strong><p>You should be able to turn a rate constant into a doubling time or a half-life, explain why the starting amount does not enter, compute powers of the Euler factor until one passes the target, and say how the grid time and the true time differ.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Decay is the same equation with a negative rate, and it brings the first honest application: how old is a sample that has lost three quarters of its carbon? &ldquo;Radioactive Decay and Dating&rdquo; converts a half-life to a rate and back.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the doubling time depends on the starting amount</strong><span>The mistaken model is that a larger amount takes longer to double, because there is more to double, or shorter, because it is growing faster in absolute terms. Neither is right. At <span class="math" data-say="t plus T">t + T</span> the amount is <span class="math" data-say="y sub 0 times e to the power k t times e to the power k T equals 2 times y of t">y₀·e^(kt)·e^(kT) = 2·y(t)</span>, so every amount doubles in <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>. The lab's first two presets start from 1 and from 8 and print the same <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, and the formula has no place to put the start.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Getting T upside down</strong><span>Writing <span class="math" data-say="T equals k over the natural log of 2">T = k/ln 2</span>, or <span class="math" data-say="T equals the natural log of 2 times k">T = ln 2·k</span>, reverses the sensible direction: a faster rate must shorten the time. The check is that <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span> for every equation of this kind, a constant, so doubling <span class="math" data-say="k">k</span> halves <span class="math" data-say="T">T</span>. With <span class="math" data-say="k equals 1 over 10">k = 1/10</span> the lab prints <span class="math" data-say="is approximately 6.93147">≈ 6.93147</span>; with <span class="math" data-say="k equals 1 over 2">k = 1/2</span>, <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>, about five times shorter.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the crossing step as the doubling time</strong><span>The tile <span class="math" data-say="step 6, at t equals 3 over 2">step 6 (t = 3/2)</span> is exact, and it is a statement about the Euler sequence on its grid. The doubling time of the equation is <span class="math" data-say="is approximately 1.38629">≈ 1.38629</span>. They agree to within one step, and the lab prints both so that the gap is visible rather than assumed away.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can derive the doubling time, quote it rounded, and find the crossing step of the exact sequence.</strong><p>You should be able to turn a rate constant into a doubling time or a half-life, explain why the starting amount does not enter, compute powers of the Euler factor until one passes the target, and say how the grid time and the true time differ.</p></div></div><div class="note"><strong>Note:</strong> Decay is the same equation with a negative rate, and it brings the first honest application: how old is a sample that has lost three quarters of its carbon? &ldquo;Radioactive Decay and Dating&rdquo; converts a half-life to a rate and back.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>T comes from one equation</summary><p>The solution <span class="math" data-say="y sub 0 times e to the power k t">y₀·e^(kt)</span> has doubled when <span class="math" data-say="e to the power k T equals 2">e^(kT) = 2</span>. Taking the natural logarithm of both sides gives <span class="math" data-say="k T equals the natural log of 2">kT = ln 2</span>, so <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>. For <span class="math" data-say="k is less than 0">k < 0</span> the quantity halves when <span class="math" data-say="e to the power k T equals 1 over 2">e^(kT) = 1/2</span>, and <span class="math" data-say="T equals the natural log of 2 over the absolute value of k">T = ln 2/|k|</span>. The number <span class="math" data-say="the natural log of 2">ln 2</span> is irrational: <span class="math" data-say="is approximately 0.693147">≈ 0.693147</span> to six figures.</p></details><details class="recall"><summary>The start drops out</summary><p>The amount at time <span class="math" data-say="t plus T">t + T</span> is <span class="math" data-say="y sub 0 times e to the power the quantity k times the quantity t plus T, equals y sub 0 times e to the power k t times e to the power k T equals 2 times y of t">y₀·e^(k·(t + T)) = y₀·e^(kt)·e^(kT) = 2·y(t)</span>. Whatever <span class="math" data-say="y of t">y(t)</span> is, doubling it takes <span class="math" data-say="T">T</span>. A culture of a thousand and a culture of a million, with the same <span class="math" data-say="k">k</span>, have the same doubling time.</p></details><details class="recall"><summary>Euler crosses on the grid</summary><p>The exact sequence <span class="math" data-say="y sub 0 times the quantity 1 plus k h, to the power n">y₀·(1 + kh)ⁿ</span> exists only at multiples of <span class="math" data-say="h">h</span>. The first step <span class="math" data-say="n">n</span> with <span class="math" data-say="y sub n">yₙ</span> at least double the start is an exact statement about the sequence, and the lab prints it with its time. For growth it is never earlier than <span class="math" data-say="T">T</span>, and how much later it falls depends on the step: within a step for a fine one, more than a step for a coarse one.</p></details></div>
+      <h3>Summary</h3>
       <p>Every solution of <span class="math" data-say="y prime equals k times y">y′ = k·y</span> doubles in the same time, <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>, whatever its starting amount, and a decaying one halves in <span class="math" data-say="the natural log of 2 over the absolute value of k">ln 2/|k|</span>. The time is irrational, so the lab prints it rounded. The exact Euler sequence passes the target at a particular step, and the lab prints that step and its time as exact values: they sit on the grid of steps, not at the true time.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>T comes from one equation.</strong> The solution <span class="math" data-say="y sub 0 times e to the power k t">y₀·e^(kt)</span> has doubled when <span class="math" data-say="e to the power k T equals 2">e^(kT) = 2</span>. Taking the natural logarithm of both sides gives <span class="math" data-say="k T equals the natural log of 2">kT = ln 2</span>, so <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>. For <span class="math" data-say="k is less than 0">k < 0</span> the quantity halves when <span class="math" data-say="e to the power k T equals 1 over 2">e^(kT) = 1/2</span>, and <span class="math" data-say="T equals the natural log of 2 over the absolute value of k">T = ln 2/|k|</span>. The number <span class="math" data-say="the natural log of 2">ln 2</span> is irrational: <span class="math" data-say="is approximately 0.693147">≈ 0.693147</span> to six figures.</li><li><strong>The start drops out.</strong> The amount at time <span class="math" data-say="t plus T">t + T</span> is <span class="math" data-say="y sub 0 times e to the power the quantity k times the quantity t plus T, equals y sub 0 times e to the power k t times e to the power k T equals 2 times y of t">y₀·e^(k·(t + T)) = y₀·e^(kt)·e^(kT) = 2·y(t)</span>. Whatever <span class="math" data-say="y of t">y(t)</span> is, doubling it takes <span class="math" data-say="T">T</span>. A culture of a thousand and a culture of a million, with the same <span class="math" data-say="k">k</span>, have the same doubling time.</li><li><strong>Euler crosses on the grid.</strong> The exact sequence <span class="math" data-say="y sub 0 times the quantity 1 plus k h, to the power n">y₀·(1 + kh)ⁿ</span> exists only at multiples of <span class="math" data-say="h">h</span>. The first step <span class="math" data-say="n">n</span> with <span class="math" data-say="y sub n">yₙ</span> at least double the start is an exact statement about the sequence, and the lab prints it with its time. For growth it is never earlier than <span class="math" data-say="T">T</span>, and how much later it falls depends on the step: within a step for a fine one, more than a step for a coarse one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="e to the power k T equals 2, implies, T equals the natural log of 2 over k. the natural log of 2 is approximately 0.693147, rounded. T does not depend on y sub 0. k equals 1 over 2, T is approximately 1.38629, k equals 1 over 10, T is approximately 6.93147. Euler passes 2 at a grid step, not at T" tabindex="0" role="region" aria-label="Mathematical notation">e^(kT) = 2  ⟹  T = ln 2/k
 ln 2 ≈ 0.693147   (rounded)
 T does not depend on y₀
@@ -2946,11 +2991,40 @@ Euler passes 2 at a grid step, not at T</div><figcaption>The doubling time, deri
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3018,7 +3092,7 @@ Euler passes 2 at a grid step, not at T</div><figcaption>The doubling time, deri
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

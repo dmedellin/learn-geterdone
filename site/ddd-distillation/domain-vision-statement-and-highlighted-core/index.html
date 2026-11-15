@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Distillation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 15 · Distillation</p>
       <h1>Domain Vision Statement and Highlighted Core</h1>
       <p class="lesson-lede">A page that says what the core is for, and a mark on the model that shows which elements are in it, both cheap and neither changing the code.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Domain Vision Statement</li><li>Highlighted Core</li><li>The newcomer&#x27;s share</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two light patterns, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The mental labor of constantly filtering the model to identify the key parts absorbs concentration better spent on design thinking&rdquo;, Evans writes in Highlighted Core, and it requires knowing the whole model. Most of Chapter 15's techniques change the model and the code; this lesson reads the two that change only a document, Domain Vision Statement and Highlighted Core, with The Distillation Document, The Flagged Core and The Distillation Document as Process Tool. Read them in your own copy first.</p><p>Domain Vision Statement answers two needs that arrive before any deep model does. At the start of a project there is no model yet, but its development already needs a direction; later, people need the value of the system explained without studying the model; and the critical concepts may span several Bounded Contexts, which no single model can show together. Many teams write a vision document for management, Evans notes, and it is usually forgotten once the funding arrives. His version keeps that form but is about the domain model and the value it brings, and it is meant to be used throughout by managers and developers alike.</p><p>So the pattern: about a page on the core and its worth to the business, leaving out whatever any similar model would also say, showing how competing interests are weighed, narrow in scope, drafted at the start and rewritten as understanding grows. The book sets two sample statements beside lists of things that are important but do not belong in one. For a bike-share, a sentence that does belong would say that the model forecasts each station's demand by hour and plans the fewest van moves that keep bikes where riders will want them. One that does not, however true, would say that the app must load in under two seconds, or that riders sign in with a phone number. Those are requirements, not the model's value.</p><p>A vision statement names the core in broad terms and leaves each reader to decide which elements it means, and different people, or one person on different days, will not pick the same ones. Highlighted Core is the remedy. Restructuring the code is the ideal way to show the core, Evans says, but it is not always possible in the short term, and it is hard to do without exactly the shared view the team lacks. Marking the core says something about the model without having to belong to it, and any technique that lets everyone see it will do.</p><p>The first technique is the distillation document: a short document, a handful of pages (Evans says three to seven, sparse), on the core and how its elements work together. It can be a list of the essential objects, diagrams of them, a walk through their interactions, or prose, and it is an entry point that sends the reader to the code, not a complete design document. It carries the usual risks of a separate document: it may go stale, go unread, or add one more source of information to a complex picture. Being minimalist limits all three, because the central abstractions change more slowly than the detail. Write it for the nontechnical members of the team too.</p><p>The second is the flagged core. Evans's story: given a two-hundred-page industry model on his first day with an insurer, and with management unwilling to see it cut, he worked through it with a business analyst, marked the few sections that held the essential concepts, and gave the team a way through the model that showed the core and what supported it. A new prototype built from that view soon showed some of what was required. The technique does not depend on paper: a stereotype on a diagram, a structured comment in the code or a tool in the development environment will do, provided a developer can tell at a glance whether an element is core.</p><p>The Distillation Document as Process Tool turns the document into a rule for coordination. On a team where any pair may change any code, some changes still need consultation, and in the domain layer it is not always obvious which. If a change would force the distillation document to change, it alters the core's elements, their relationships or the core's boundary: consult first, then tell the whole team and send round the new document. A change outside the core, or below the document's level of detail, can be made without either.</p><p>Now the count, on the bike-share model's twelve classes, each with the weeks spent on it so far. The preset <code>flagged-narrowly</code> flags the three classes the vision statement's sentence is about: <span class="math" data-say="demand forecast">DemandForecast</span>, <span class="math" data-say="rebalancing plan">RebalancingPlan</span> and <span class="math" data-say="move">Move</span>. A newcomer reads 3 of the 12 classes first, a quarter of the model; they carry 14 of the 40 weeks spent, and two of the three strongest developers work on them. The lab prints the weeks; the classes you count from its table.</p><p>The preset <code>flagged-broadly</code> is the same model with every class to do with stations and vans flagged too: <span class="math" data-say="station">Station</span>, <span class="math" data-say="dock">Dock</span>, <span class="math" data-say="bike">Bike</span> and <span class="math" data-say="van run">VanRun</span>. Now the core is 7 of the 12 classes and 27 of the 40 weeks, more than half the model, and the flag tells a newcomer little that the class list did not. On the lesson's illustration, a broad flag costs the reading it was meant to save. Whether a station belongs in the core is the team's call; Evans's advice in the chapter is to keep the core small.</p><h3>Exercise</h3><ul><li>The clinic's model, with the core flagged in its distillation document: <span class="math" data-say="urgency score">UrgencyScore</span>, <span class="math" data-say="triage rule">TriageRule</span> and <span class="math" data-say="booking">Booking</span>. Its other classes are <span class="math" data-say="patient">Patient</span>, <span class="math" data-say="clinician">Clinician</span>, <span class="math" data-say="slot">Slot</span>, <span class="math" data-say="room">Room</span>, <span class="math" data-say="invoice">Invoice</span> and <span class="math" data-say="reminder">Reminder</span>.</li><li>Five proposed changes and the classes each touches: (a) reminders by text message, <span class="math" data-say="reminder">Reminder</span>; (b) a new triage rule for chest pain, <span class="math" data-say="triage rule">TriageRule</span>; (c) invoices in two currencies, <span class="math" data-say="invoice">Invoice</span>; (d) a booking may now hold two clinicians, <span class="math" data-say="booking">Booking</span> and <span class="math" data-say="clinician">Clinician</span>; (e) rooms get a cleaning flag, <span class="math" data-say="room">Room</span>. Changes (b) and (d) each alter what the distillation document says about the core's elements or their relationships; the others do not.</li></ul><p>By hand, find the share of the model's classes a newcomer reads first, and which of the five changes call for consultation under the process rule. Then type the classes into the lab with the core flagged and 1 week each, so that the share on the core counts classes.</p><p>Both patterns guide the team without changing the code. The next lesson, Cohesive Mechanisms, begins the techniques that change the code itself, with a computation that has swamped the model around it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Distillation: where the effort goes</h2></div><p>the share of effort and of the strongest developers on the core domain</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two light patterns, then the count</h2><div class="prose reading"><p>&ldquo;The mental labor of constantly filtering the model to identify the key parts absorbs concentration better spent on design thinking&rdquo;, Evans writes in Highlighted Core, and it requires knowing the whole model. Most of Chapter 15's techniques change the model and the code; this lesson reads the two that change only a document, Domain Vision Statement and Highlighted Core, with The Distillation Document, The Flagged Core and The Distillation Document as Process Tool. Read them in your own copy first.</p><p>Domain Vision Statement answers two needs that arrive before any deep model does. At the start of a project there is no model yet, but its development already needs a direction; later, people need the value of the system explained without studying the model; and the critical concepts may span several Bounded Contexts, which no single model can show together. Many teams write a vision document for management, Evans notes, and it is usually forgotten once the funding arrives. His version keeps that form but is about the domain model and the value it brings, and it is meant to be used throughout by managers and developers alike.</p><p>So the pattern: about a page on the core and its worth to the business, leaving out whatever any similar model would also say, showing how competing interests are weighed, narrow in scope, drafted at the start and rewritten as understanding grows. The book sets two sample statements beside lists of things that are important but do not belong in one. For a bike-share, a sentence that does belong would say that the model forecasts each station's demand by hour and plans the fewest van moves that keep bikes where riders will want them. One that does not, however true, would say that the app must load in under two seconds, or that riders sign in with a phone number. Those are requirements, not the model's value.</p><p>A vision statement names the core in broad terms and leaves each reader to decide which elements it means, and different people, or one person on different days, will not pick the same ones. Highlighted Core is the remedy. Restructuring the code is the ideal way to show the core, Evans says, but it is not always possible in the short term, and it is hard to do without exactly the shared view the team lacks. Marking the core says something about the model without having to belong to it, and any technique that lets everyone see it will do.</p><p>The first technique is the distillation document: a short document, a handful of pages (Evans says three to seven, sparse), on the core and how its elements work together. It can be a list of the essential objects, diagrams of them, a walk through their interactions, or prose, and it is an entry point that sends the reader to the code, not a complete design document. It carries the usual risks of a separate document: it may go stale, go unread, or add one more source of information to a complex picture. Being minimalist limits all three, because the central abstractions change more slowly than the detail. Write it for the nontechnical members of the team too.</p><p>The second is the flagged core. Evans's story: given a two-hundred-page industry model on his first day with an insurer, and with management unwilling to see it cut, he worked through it with a business analyst, marked the few sections that held the essential concepts, and gave the team a way through the model that showed the core and what supported it. A new prototype built from that view soon showed some of what was required. The technique does not depend on paper: a stereotype on a diagram, a structured comment in the code or a tool in the development environment will do, provided a developer can tell at a glance whether an element is core.</p><p>The Distillation Document as Process Tool turns the document into a rule for coordination. On a team where any pair may change any code, some changes still need consultation, and in the domain layer it is not always obvious which. If a change would force the distillation document to change, it alters the core's elements, their relationships or the core's boundary: consult first, then tell the whole team and send round the new document. A change outside the core, or below the document's level of detail, can be made without either.</p><p>Now the count, on the bike-share model's twelve classes, each with the weeks spent on it so far. The preset <code>flagged-narrowly</code> flags the three classes the vision statement's sentence is about: <span class="math" data-say="demand forecast">DemandForecast</span>, <span class="math" data-say="rebalancing plan">RebalancingPlan</span> and <span class="math" data-say="move">Move</span>. A newcomer reads 3 of the 12 classes first, a quarter of the model; they carry 14 of the 40 weeks spent, and two of the three strongest developers work on them. The lab prints the weeks; the classes you count from its table.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Distillation: where the effort goes</h2></div><p>the share of effort and of the strongest developers on the core domain</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Distillation: where the effort goes</strong><span>the share of effort and of the strongest developers on the core domain</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="ddsTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ddsTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each part is core, supporting or generic, with its developer-weeks and the number of the team's strongest developers on it. A part may end with an option: build (the same as none), buy, published (a published model adopted) or outsource; only a generic part may take one other than build, and a part not built has no strongest developers on it. Only built parts count their weeks. The shares are each kind's built weeks over all built weeks, exact. The strongest on the core are counted against the strongest on every built part. The weeks buying or publishing would free are those of the generic parts still built in house.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The share of a model flagged core</h3>
-          <p>A count over the small model the lesson states. Each record is one class of the model, flagged core, supporting or generic, with the developer-weeks spent on it and the strongest developers who work on it. The lab adds them by flag; which classes deserve the core flag is the team's judgement, which the book weighs. The last two tiles count generic classes and mean nothing here.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The share of a model flagged core</h3>
+            <p>A count over the small model the lesson states. Each record is one class of the model, flagged core, supporting or generic, with the developer-weeks spent on it and the strongest developers who work on it. The lab adds them by flag; which classes deserve the core flag is the team's judgement, which the book weighs. The last two tiles count generic classes and mean nothing here.</p>
         <div class="field">
           <label for="ddsPreset">Worked example</label>
           <select id="ddsPreset"><option value="flagged-narrowly" selected>The bike-share's classes, three flagged core</option><option value="flagged-broadly">The same classes, seven flagged core</option></select>
@@ -1426,12 +1469,15 @@
           <div class="kpi"><span>Weeks buying or publishing would free</span><strong id="ddsFree">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>flagged-broadly</code> is the same model with every class to do with stations and vans flagged too: <span class="math" data-say="station">Station</span>, <span class="math" data-say="dock">Dock</span>, <span class="math" data-say="bike">Bike</span> and <span class="math" data-say="van run">VanRun</span>. Now the core is 7 of the 12 classes and 27 of the 40 weeks, more than half the model, and the flag tells a newcomer little that the class list did not. On the lesson's illustration, a broad flag costs the reading it was meant to save. Whether a station belongs in the core is the team's call; Evans's advice in the chapter is to keep the core small.</p><h3>Exercise</h3><ul><li>The clinic's model, with the core flagged in its distillation document: <span class="math" data-say="urgency score">UrgencyScore</span>, <span class="math" data-say="triage rule">TriageRule</span> and <span class="math" data-say="booking">Booking</span>. Its other classes are <span class="math" data-say="patient">Patient</span>, <span class="math" data-say="clinician">Clinician</span>, <span class="math" data-say="slot">Slot</span>, <span class="math" data-say="room">Room</span>, <span class="math" data-say="invoice">Invoice</span> and <span class="math" data-say="reminder">Reminder</span>.</li><li>Five proposed changes and the classes each touches: (a) reminders by text message, <span class="math" data-say="reminder">Reminder</span>; (b) a new triage rule for chest pain, <span class="math" data-say="triage rule">TriageRule</span>; (c) invoices in two currencies, <span class="math" data-say="invoice">Invoice</span>; (d) a booking may now hold two clinicians, <span class="math" data-say="booking">Booking</span> and <span class="math" data-say="clinician">Clinician</span>; (e) rooms get a cleaning flag, <span class="math" data-say="room">Room</span>. Changes (b) and (d) each alter what the distillation document says about the core's elements or their relationships; the others do not.</li></ul><p>By hand, find the share of the model's classes a newcomer reads first, and which of the five changes call for consultation under the process rule. Then type the classes into the lab with the core flagged and 1 week each, so that the share on the core counts classes.</p><p>Both patterns guide the team without changing the code. The next lesson, Cohesive Mechanisms, begins the techniques that change the code itself, with a computation that has swamped the model around it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Making the core visible</h2></div><p>Four steps, the last of them on a model of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the vision statement</h3><p>Write a few sentences on what the model does that others do not, and strike any sentence about screens, servers, response times or sign-in.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Flag the elements it names</h3><p>Mark as core only the classes the statement's sentences are about, and count them against all the classes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the rule for consulting</h3><p>List the core's elements and their main interactions on one page, and agree that a change which would alter that page is discussed first.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own model</h3><p>Flag the core classes of a system you know, type them into the lab, and write down the share of classes and of weeks a newcomer would read first.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Making the core visible</h2>
+      <p class="lead-in">Four steps, the last of them on a model of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the vision statement.</strong> Write a few sentences on what the model does that others do not, and strike any sentence about screens, servers, response times or sign-in.</li><li><strong>Flag the elements it names.</strong> Mark as core only the classes the statement's sentences are about, and count them against all the classes.</li><li><strong>Write the rule for consulting.</strong> List the core's elements and their main interactions on one page, and agree that a change which would alter that page is discussed first.</li><li><strong>Do it on your own model.</strong> Flag the core classes of a system you know, type them into the lab, and write down the share of classes and of weeks a newcomer would read first.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1450,17 +1496,16 @@ core share of weeks: 14 of 40
 strongest on core: 2 of 3</div><p>The supporting classes take 4 + 3 + 2 + 4 + 4 + 2 + 2 = 21 weeks and the two generic ones 5. The three flagged classes are the ones the vision statement's sentence names; the flag only makes that reading the same for everyone.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing the vision statement as a list of features and technology</strong><span>A vision document for management often lists screens, platforms and response times. Evans's Domain Vision Statement is modelled on such documents but is about the domain model and the value it brings to the business, and it leaves out whatever does not distinguish this model from others. The book's samples set requirements like those beside the statements as important but not part of them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a distillation document to describe the whole design</strong><span>It is a minimalist entry point of three to seven sparse pages on the core's elements and their main interactions, which sends the reader to the code for detail. Evans names the usual risks of separate documents, going stale, going unread and adding to the complexity, and says the way to limit all three is to stay away from detail.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the core can only be shown by restructuring the code</strong><span>Restructuring is the ideal, Evans says, but not always practical at first, and hard without the shared view it is meant to provide. Highlighting is a reflection on the model, and any technique will do: his flagged core was a highlighter and page tabs on a purchased model. On the lesson's illustration a narrow flag puts a newcomer's first reading at 3 of 12 classes without one line of code moving.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can make a model&#x27;s core visible without changing its code.</strong><p>Given a project, write the sentences of its vision statement and strike those that do not belong, flag its core classes and state their share, and say which of a list of changes call for consultation.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab adds classes and weeks by the flags you set. It cannot read a vision statement, so it cannot tell whether the flags match it, and it cannot tell whether a document is being read; Evans's risks for separate documents are about people, not counts.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing the vision statement as a list of features and technology</strong><span>A vision document for management often lists screens, platforms and response times. Evans's Domain Vision Statement is modelled on such documents but is about the domain model and the value it brings to the business, and it leaves out whatever does not distinguish this model from others. The book's samples set requirements like those beside the statements as important but not part of them.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a distillation document to describe the whole design</strong><span>It is a minimalist entry point of three to seven sparse pages on the core's elements and their main interactions, which sends the reader to the code for detail. Evans names the usual risks of separate documents, going stale, going unread and adding to the complexity, and says the way to limit all three is to stay away from detail.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the core can only be shown by restructuring the code</strong><span>Restructuring is the ideal, Evans says, but not always practical at first, and hard without the shared view it is meant to provide. Highlighting is a reflection on the model, and any technique will do: his flagged core was a highlighter and page tabs on a purchased model. On the lesson's illustration a narrow flag puts a newcomer's first reading at 3 of 12 classes without one line of code moving.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can make a model&#x27;s core visible without changing its code.</strong><p>Given a project, write the sentences of its vision statement and strike those that do not belong, flag its core classes and state their share, and say which of a list of changes call for consultation.</p></div></div><div class="note"><strong>Note:</strong> The lab adds classes and weeks by the flags you set. It cannot read a vision statement, so it cannot tell whether the flags match it, and it cannot tell whether a document is being read; Evans's risks for separate documents are about people, not counts.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Domain Vision Statement</summary><p>About a page describing the Core Domain and what it is worth to the business. It leaves out whatever does not distinguish this model from others, shows how the model balances the interests it serves, and is revised as the team learns.</p></details><details class="recall"><summary>Highlighted Core</summary><p>Any means of making it effortless to see which model elements are in the core. Evans gives two: a distillation document of a few sparse pages on the core's elements and their main interactions, and a flagged core, marks on the elements themselves wherever the model is kept.</p></details><details class="recall"><summary>The newcomer&#x27;s share</summary><p>In the lab, the classes flagged core against all the classes of the model, and the weeks spent on them against all the weeks: how much of the model a new member must read to know what the system is for.</p></details></div>
+      <h3>Summary</h3>
       <p>Two distillations that change only documents: a short Domain Vision Statement of the core's value, and a Highlighted Core, as a distillation document or as flags in the model itself. Read why Evans thinks both are worth their small cost, what each must leave out, and how the distillation document tells a team which changes need consulting on; then count the share of a model a newcomer must read.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Domain Vision Statement.</strong> About a page describing the Core Domain and what it is worth to the business. It leaves out whatever does not distinguish this model from others, shows how the model balances the interests it serves, and is revised as the team learns.</li><li><strong>Highlighted Core.</strong> Any means of making it effortless to see which model elements are in the core. Evans gives two: a distillation document of a few sparse pages on the core's elements and their main interactions, and a flagged core, marks on the elements themselves wherever the model is kept.</li><li><strong>The newcomer&#x27;s share.</strong> In the lab, the classes flagged core against all the classes of the model, and the weeks spent on them against all the weeks: how much of the model a new member must read to know what the system is for.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one narrow page on what the core is worth. about the model, not the screens or servers. show everyone which elements are core. a distillation document, a few sparse pages. or flag the core where the model lives. a change to the document means, consult" tabindex="0" role="region" aria-label="Mathematical notation">one narrow page on what the core is worth
 about the model, not the screens or servers
 show everyone which elements are core
@@ -2212,11 +2257,40 @@ a change to the document means: consult</div><figcaption>The two patterns in six
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2284,7 +2358,7 @@ a change to the document means: consult</div><figcaption>The two patterns in six
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

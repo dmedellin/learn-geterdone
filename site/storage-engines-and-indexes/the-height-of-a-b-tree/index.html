@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Storage Engines and Indexes</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The cost model</p>
       <h1>The Height of a B-tree</h1>
       <p class="lesson-lede">Find a tree&#x27;s height by exact integer search, and turn it into the I/Os a lookup costs once the page cache is counted.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Height is defined by a power, not by a logarithm</li><li>Fanout is enormous because a page is</li><li>A lookup costs the levels the cache does not hold</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The smallest h with Bʰ <span data-say="is at least N">≥ N</span>, and what the cache takes off it</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; B-tree height</span><p>For a tree in which every internal node holds up to <span class="math" data-say="B">B</span> children, the <strong>height</strong> <span class="math" data-say="h">h</span> is the smallest integer with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>, where <span class="math" data-say="N">N</span> is the number of keys stored. Equivalently, <span class="math" data-say="h equals the ceiling of log base B N">h = ⌈log_B N⌉</span>.</p><p>A lookup descends one node per level and reads one page per node, so an uncached lookup costs <span class="math" data-say="h">h</span> page reads.</p></div><div class="mathblock" data-say="N equals 1000000000, B equals 500. h equals 1, 500, is less than, N. h equals 2, 250000, is less than, N. h equals 3, 125000000, is less than, N. h equals 4, 62500000000, is at least, N, stop. height equals 4, level sizes at 4 kB a page. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">N = 1 000 000 000      B = 500
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The smallest h with Bʰ <span data-say="is at least N">≥ N</span>, and what the cache takes off it</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; B-tree height</span><p>For a tree in which every internal node holds up to <span class="math" data-say="B">B</span> children, the <strong>height</strong> <span class="math" data-say="h">h</span> is the smallest integer with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>, where <span class="math" data-say="N">N</span> is the number of keys stored. Equivalently, <span class="math" data-say="h equals the ceiling of log base B N">h = ⌈log_B N⌉</span>.</p><p>A lookup descends one node per level and reads one page per node, so an uncached lookup costs <span class="math" data-say="h">h</span> page reads.</p></div><div class="mathblock" data-say="N equals 1000000000, B equals 500. h equals 1, 500, is less than, N. h equals 2, 250000, is less than, N. h equals 3, 125000000, is less than, N. h equals 4, 62500000000, is at least, N, stop. height equals 4, level sizes at 4 kB a page. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">N = 1 000 000 000      B = 500
 
 h = 1        500                 &lt;  N
 h = 2        250 000             &lt;  N
@@ -1399,12 +1443,11 @@ h = 3        125 000 000         &lt;  N
 h = 4        62 500 000 000      ≥  N      stop
 
 height = 4      level sizes at 4 kB a page
-                L1  4.00 kB    L2  2.00 MB    L3  1.00 GB    L4  500.00 GB</div><p>That table is not an illustration of the answer; it <em>is</em> the computation. Four multiplications and four comparisons, in exact integer arithmetic, and the height is the number of multiplications the accumulator needed. The lab draws the same four rows.</p><h3>Why the lab multiplies instead of taking a logarithm</h3><p>Because at every exact power of the fanout a quotient of two logarithms can land a few units in the last place above the integer, and the ceiling then adds a level that does not exist. At <span class="math" data-say="B equals 3">B = 3</span> and <span class="math" data-say="N equals 9">N = 9</span>, <span class="math" data-say="log of 9 over log of 3">log(9)/log(3)</span> evaluates to <span class="math" data-say="2.0000000000000004">2.0000000000000004</span> and its ceiling is <span class="math" data-say="3">3</span> — a two-level tree reported as three, which on a page about counting I/Os is a whole extra I/O. It is not a rare corner: <span class="math" data-say="B equals 5">B = 5</span> at <span class="math" data-say="N equals 125">N = 125</span>, <span class="math" data-say="B equals 8">B = 8</span> at <span class="math" data-say="N equals 2097152">N = 2 097 152</span> and <span class="math" data-say="B equals 19">B = 19</span> at <span class="math" data-say="N equals 2476099">N = 2 476 099</span> all do the same thing. The lab prints what a logarithm would have said beside the exact answer and tells you when the two disagree.</p><div class="example"><span class="label">Example &middot; Where the height actually moves</span><p>Hold <span class="math" data-say="B equals 500">B = 500</span> and raise <span class="math" data-say="N">N</span>. At <span class="math" data-say="10 to the power 6">10⁶</span> the height is <span class="math" data-say="3">3</span>; at <span class="math" data-say="10 to the power 9">10⁹</span> it is <span class="math" data-say="4">4</span>; at <span class="math" data-say="10 to the power 12">10¹²</span> it is <span class="math" data-say="5">5</span>. Three orders of magnitude buy one level. The height changes only when <span class="math" data-say="N">N</span> crosses a whole power of <span class="math" data-say="B">B</span>, so every tree holding between <span class="math" data-say="125000001">125 000 001</span> and <span class="math" data-say="62500000000">62 500 000 000</span> keys — a range of five hundred to one — is exactly four levels deep.</p></div><h3>The page cache takes the top off</h3><p>Look at the level sizes rather than the level count. The top two levels together are <span class="math" data-say="4.00 kB plus 2.00 megabytes">4.00 kB + 2.00 MB</span>; the third is <span class="math" data-say="1.00 gigabytes">1.00 GB</span> and the fourth is <span class="math" data-say="500.00 gigabytes">500.00 GB</span>. So the levels that are cheap to keep in memory are exactly the ones every descent passes through, and keeping them is what an engine does without being asked. Two megabytes removes half the I/Os of every lookup in the system.</p><p>The number that multiplies into a workload is the cached one. Ten thousand lookups a second against this tree with two levels resident is <span class="math" data-say="20000">20 000</span> disk reads a second; against the same tree with nothing resident it is <span class="math" data-say="40000">40 000</span>. The height did not change and the device's day did.</p><p>Two things the model assumes. Nodes are taken to be full, and a real B-tree's nodes sit somewhere between half full and full, so the effective fanout is below the page's capacity and the true height is occasionally one more than this calculation says. And a lookup is taken to be one page read per level, which ignores the leaf splitting across pages. Both errors point the same way — the real cost is at or just above the computed one — which is what makes the computed one usable.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The height of a B-tree, counted rather than logged</h2></div><p>A billion keys at B = 500 is four levels, and the cache holds two of them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                L1  4.00 kB    L2  2.00 MB    L3  1.00 GB    L4  500.00 GB</div><p>That table is not an illustration of the answer; it <em>is</em> the computation. Four multiplications and four comparisons, in exact integer arithmetic, and the height is the number of multiplications the accumulator needed. The lab draws the same four rows.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The height of a B-tree, counted rather than logged</h2></div><p>A billion keys at B = 500 is four levels, and the cache holds two of them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Height is the smallest h with B<sup>h</sup> &ge; N</strong><span>Found by multiplying, not by a logarithm &mdash; and then minus the cached levels</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>cached level</span><span class="tone-purple"><i class="legend-swatch"></i>level read from disk</span><span class="tone-amber"><i class="legend-swatch"></i>the level that reaches N</span><span class="tone-red"><i class="legend-swatch"></i>what a logarithm would say</span></div>
@@ -1412,10 +1455,10 @@ height = 4      level sizes at 4 kB a page
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="btTree" viewBox="0 0 520 240" role="img" aria-label="The levels of a B-tree drawn as rows of nodes, cached levels tinted, with the running capacity beside each."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="btTable"></table></div>
       <div class="status-banner" id="btStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set N, the fanout and what memory holds</h3>
-          <p>The height is the smallest <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>, found by multiplying in BigInt, and the table is the search itself — one row per multiplication. Drag the power-of-ten slider across three decades and watch the height sit still, then set <span class="math" data-say="B equals 3">B = 3</span> and <span class="math" data-say="N equals 9">N = 9</span> and read what a logarithm would have said.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set N, the fanout and what memory holds</h3>
+            <p>The height is the smallest <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>, found by multiplying in BigInt, and the table is the search itself — one row per multiplication. Drag the power-of-ten slider across three decades and watch the height sit still, then set <span class="math" data-say="B equals 3">B = 3</span> and <span class="math" data-say="N equals 9">N = 9</span> and read what a logarithm would have said.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="btMant">Keys N &mdash; leading digit</label><span class="range-value" id="btMantOut">1</span></div>
           <input id="btMant" type="range" min="1" max="9" step="1" value="1" />
@@ -1439,12 +1482,15 @@ height = 4      level sizes at 4 kB a page
           <div class="kpi"><span>A logarithm would say</span><strong id="btLog">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="btHint" style="margin:0;">&quot;log N is slow for big N&quot; is the misconception. Multiply the fanout out and look: the height only moves when N crosses a whole power of B, so a thousandfold more data costs one more level, and the page cache is holding the first two of them anyway.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Why the lab multiplies instead of taking a logarithm</h3><p>Because at every exact power of the fanout a quotient of two logarithms can land a few units in the last place above the integer, and the ceiling then adds a level that does not exist. At <span class="math" data-say="B equals 3">B = 3</span> and <span class="math" data-say="N equals 9">N = 9</span>, <span class="math" data-say="log of 9 over log of 3">log(9)/log(3)</span> evaluates to <span class="math" data-say="2.0000000000000004">2.0000000000000004</span> and its ceiling is <span class="math" data-say="3">3</span> — a two-level tree reported as three, which on a page about counting I/Os is a whole extra I/O. It is not a rare corner: <span class="math" data-say="B equals 5">B = 5</span> at <span class="math" data-say="N equals 125">N = 125</span>, <span class="math" data-say="B equals 8">B = 8</span> at <span class="math" data-say="N equals 2097152">N = 2 097 152</span> and <span class="math" data-say="B equals 19">B = 19</span> at <span class="math" data-say="N equals 2476099">N = 2 476 099</span> all do the same thing. The lab prints what a logarithm would have said beside the exact answer and tells you when the two disagree.</p><div class="example"><span class="label">Example &middot; Where the height actually moves</span><p>Hold <span class="math" data-say="B equals 500">B = 500</span> and raise <span class="math" data-say="N">N</span>. At <span class="math" data-say="10 to the power 6">10⁶</span> the height is <span class="math" data-say="3">3</span>; at <span class="math" data-say="10 to the power 9">10⁹</span> it is <span class="math" data-say="4">4</span>; at <span class="math" data-say="10 to the power 12">10¹²</span> it is <span class="math" data-say="5">5</span>. Three orders of magnitude buy one level. The height changes only when <span class="math" data-say="N">N</span> crosses a whole power of <span class="math" data-say="B">B</span>, so every tree holding between <span class="math" data-say="125000001">125 000 001</span> and <span class="math" data-say="62500000000">62 500 000 000</span> keys — a range of five hundred to one — is exactly four levels deep.</p></div><h3>The page cache takes the top off</h3><p>Look at the level sizes rather than the level count. The top two levels together are <span class="math" data-say="4.00 kB plus 2.00 megabytes">4.00 kB + 2.00 MB</span>; the third is <span class="math" data-say="1.00 gigabytes">1.00 GB</span> and the fourth is <span class="math" data-say="500.00 gigabytes">500.00 GB</span>. So the levels that are cheap to keep in memory are exactly the ones every descent passes through, and keeping them is what an engine does without being asked. Two megabytes removes half the I/Os of every lookup in the system.</p><p>The number that multiplies into a workload is the cached one. Ten thousand lookups a second against this tree with two levels resident is <span class="math" data-say="20000">20 000</span> disk reads a second; against the same tree with nothing resident it is <span class="math" data-say="40000">40 000</span>. The height did not change and the device's day did.</p><p>Two things the model assumes. Nodes are taken to be full, and a real B-tree's nodes sit somewhere between half full and full, so the effective fanout is below the page's capacity and the true height is occasionally one more than this calculation says. And a lookup is taken to be one page read per level, which ignores the leaf splitting across pages. Both errors point the same way — the real cost is at or just above the computed one — which is what makes the computed one usable.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Getting a height and then an I/O count</h2></div><p>The first step is the one people skip, and it is the one that decides every number after it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Get the fanout from the page, not from a guess</h3><p><span class="math" data-say="B">B</span> is the page size divided by the size of one index entry: a <span class="math" data-say="4 kB">4 kB</span> page with an <span class="math" data-say="8 B">8 B</span> key and an <span class="math" data-say="8 B">8 B</span> pointer is about <span class="math" data-say="250">250</span>, and the same page with a shorter key is more. Every figure downstream depends on this one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply the fanout out until it reaches <span class="math" data-say="N">N</span></h3><p><span class="math" data-say="B">B</span>, <span class="math" data-say="B squared">B²</span>, <span class="math" data-say="B cubed">B³</span>, …, stopping at the first value that is at least <span class="math" data-say="N">N</span>, and count the multiplications. Four of them at <span class="math" data-say="B equals 500">B = 500</span> passes a billion. Do not take a logarithm; at an exact power it can round the wrong way.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Subtract the levels memory holds</h3><p>Add the level sizes from the top — <span class="math" data-say="4 kB">4 kB</span>, <span class="math" data-say="2 megabytes">2 MB</span>, <span class="math" data-say="1 gigabytes">1 GB</span> — and see how far down your memory reaches. The I/Os a lookup costs are the levels below that line, not the height.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Multiply by the lookup rate</h3><p>The height is a fact about the tree; the I/Os a second are the fact about the device. <span class="math" data-say="10000">10 000</span> lookups a second against a two-I/O tree is <span class="math" data-say="20000">20 000</span> reads a second, and that is the number to hold against what the disk can do.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Getting a height and then an I/O count</h2>
+      <p class="lead-in">The first step is the one people skip, and it is the one that decides every number after it.</p>
+      <ol class="key-ideas method"><li><strong>Get the fanout from the page, not from a guess.</strong> <span class="math" data-say="B">B</span> is the page size divided by the size of one index entry: a <span class="math" data-say="4 kB">4 kB</span> page with an <span class="math" data-say="8 B">8 B</span> key and an <span class="math" data-say="8 B">8 B</span> pointer is about <span class="math" data-say="250">250</span>, and the same page with a shorter key is more. Every figure downstream depends on this one.</li><li><strong>Multiply the fanout out until it reaches <span class="math" data-say="N">N</span>.</strong> <span class="math" data-say="B">B</span>, <span class="math" data-say="B squared">B²</span>, <span class="math" data-say="B cubed">B³</span>, …, stopping at the first value that is at least <span class="math" data-say="N">N</span>, and count the multiplications. Four of them at <span class="math" data-say="B equals 500">B = 500</span> passes a billion. Do not take a logarithm; at an exact power it can round the wrong way.</li><li><strong>Subtract the levels memory holds.</strong> Add the level sizes from the top — <span class="math" data-say="4 kB">4 kB</span>, <span class="math" data-say="2 megabytes">2 MB</span>, <span class="math" data-say="1 gigabytes">1 GB</span> — and see how far down your memory reaches. The I/Os a lookup costs are the levels below that line, not the height.</li><li><strong>Multiply by the lookup rate.</strong> The height is a fact about the tree; the I/Os a second are the fact about the device. <span class="math" data-say="10000">10 000</span> lookups a second against a two-I/O tree is <span class="math" data-say="20000">20 000</span> reads a second, and that is the number to hold against what the disk can do.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ a logarithm here     log(10⁹)/log(500) = 3.33…  →  ceiling 4      ✓ agre
 the corner it misses log(9)/log(3) = 2.0000000000000004  →  3, but 3² = 9</div><p>Read the fourth column. Two megabytes of memory removes half the I/Os of every lookup in the system, and it is the cheapest two megabytes anyone will ever spend. The third level is a gigabyte, which is a real decision; the fourth is five hundred, which is not.</p><p>The misconception this page is aimed at is that <span class="math" data-say="log N">log N</span> gets uncomfortable for large <span class="math" data-say="N">N</span>. Multiply the fanout out and see what it would take: five levels cover <span class="math" data-say="31.25">31.25</span> trillion keys and six cover about fifteen quadrillion. The base is five hundred, and a base of five hundred has no large logarithm anywhere you will ever put data.</p><p>For a faded rehearsal, take <span class="math" data-say="N equals 10 to the power 9">N = 10⁹</span> with a fanout of <span class="math" data-say="100">100</span> — a longer key, so fewer entries a page. The supplied first move is that <span class="math" data-say="100 cubed equals 10 to the power 6">100³ = 10⁶</span> is far short of <span class="math" data-say="N">N</span>. Finish the search, state the height, and then say how many levels have to be resident to keep a lookup at two I/Os. Check both on the sliders before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking <span class="math" data-say="the ceiling of log base B N">⌈log_B N⌉</span> from a floating-point logarithm</strong><span>At every exact power of the fanout the quotient can land a few units in the last place above the integer, and the ceiling adds a level that is not there. <span class="math" data-say="B equals 3">B = 3</span> at <span class="math" data-say="N equals 9">N = 9</span>, <span class="math" data-say="B equals 5">B = 5</span> at <span class="math" data-say="N equals 125">N = 125</span> and <span class="math" data-say="B equals 8">B = 8</span> at <span class="math" data-say="N equals 2097152">N = 2 097 152</span> all do it. Multiply the fanout out instead: it is four or five multiplications and it is exact.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the height as the cost of a lookup</strong><span>The height is how many levels exist; the cost is how many of them are not in memory. A four-level tree with its top two resident costs two reads, and the difference between two and four is the difference between a device that keeps up and one that does not.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reasoning about the height as though the base were two</strong><span><span class="math" data-say="log base 2 of 10 to the power 9">log₂(10⁹)</span> is about <span class="math" data-say="30">30</span> and <span class="math" data-say="log base 500 of 10 to the power 9">log₅₀₀(10⁹)</span> is about <span class="math" data-say="3.33">3.33</span>. A B-tree exists precisely to make the base the number of entries that fit on a page, and an intuition carried over from binary search trees — where the depth really does reach thirty — is an intuition about a different structure.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “a billion keys” stops sounding like a lot of levels.</strong><p>You should be able to find a height by multiplying a fanout out, state the level sizes and therefore which of them memory will hold, and convert a lookup rate into a disk read rate without going anywhere near a logarithm.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A tree costs its height for a point lookup and a hash index costs one, which sounds settled until a query asks for a range. “Hash vs Tree for Ranges” counts both engines on the same workload, and the ordering reverses by a factor of nearly a hundred and seventy.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking <span class="math" data-say="the ceiling of log base B N">⌈log_B N⌉</span> from a floating-point logarithm</strong><span>At every exact power of the fanout the quotient can land a few units in the last place above the integer, and the ceiling adds a level that is not there. <span class="math" data-say="B equals 3">B = 3</span> at <span class="math" data-say="N equals 9">N = 9</span>, <span class="math" data-say="B equals 5">B = 5</span> at <span class="math" data-say="N equals 125">N = 125</span> and <span class="math" data-say="B equals 8">B = 8</span> at <span class="math" data-say="N equals 2097152">N = 2 097 152</span> all do it. Multiply the fanout out instead: it is four or five multiplications and it is exact.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the height as the cost of a lookup</strong><span>The height is how many levels exist; the cost is how many of them are not in memory. A four-level tree with its top two resident costs two reads, and the difference between two and four is the difference between a device that keeps up and one that does not.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reasoning about the height as though the base were two</strong><span><span class="math" data-say="log base 2 of 10 to the power 9">log₂(10⁹)</span> is about <span class="math" data-say="30">30</span> and <span class="math" data-say="log base 500 of 10 to the power 9">log₅₀₀(10⁹)</span> is about <span class="math" data-say="3.33">3.33</span>. A B-tree exists precisely to make the base the number of entries that fit on a page, and an intuition carried over from binary search trees — where the depth really does reach thirty — is an intuition about a different structure.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “a billion keys” stops sounding like a lot of levels.</strong><p>You should be able to find a height by multiplying a fanout out, state the level sizes and therefore which of them memory will hold, and convert a lookup rate into a disk read rate without going anywhere near a logarithm.</p></div></div><div class="note"><strong>Note:</strong> A tree costs its height for a point lookup and a hash index costs one, which sounds settled until a query asks for a range. “Hash vs Tree for Ranges” counts both engines on the same workload, and the ordering reverses by a factor of nearly a hundred and seventy.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Height is defined by a power, not by a logarithm</summary><p>The question is how many levels of fanout <span class="math" data-say="B">B</span> it takes to cover <span class="math" data-say="N">N</span> keys, and the answer is the smallest <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>. That is a search over integers: multiply <span class="math" data-say="B">B</span> into an accumulator and count the multiplications. <span class="math" data-say="the ceiling of log base B N">⌈log_B N⌉</span> names the same number in exact arithmetic, and the lab computes the power because a floating-point logarithm does not always agree.</p></details><details class="recall"><summary>Fanout is enormous because a page is</summary><p>A <span class="math" data-say="4 kB">4 kB</span> page holding <span class="math" data-say="500">500</span> index entries gives <span class="math" data-say="B equals 500">B = 500</span>, so every level multiplies the reach by five hundred. Four levels reach <span class="math" data-say="62500000000">62 500 000 000</span> keys. This is why the height of a real index is a single digit, and why “<span class="math" data-say="log N">log N</span> is slow for big <span class="math" data-say="N">N</span>” has nothing to hold onto here: the base is five hundred and it is set by the page, not by the data.</p></details><details class="recall"><summary>A lookup costs the levels the cache does not hold</summary><p>The descent reads one page per level, so <span class="math" data-say="h">h</span> page reads — except that the root and the level below it are <span class="math" data-say="4.00 kB">4.00 kB</span> and <span class="math" data-say="2.00 megabytes">2.00 MB</span> and live in memory permanently. At <span class="math" data-say="N equals 10 to the power 9">N = 10⁹</span> and <span class="math" data-say="B equals 500">B = 500</span> that turns a four-I/O lookup into a two-I/O one, and no change to the tree was involved.</p></details></div>
+      <h3>Summary</h3>
       <p>A B-tree's height is the smallest <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span> — which is <span class="math" data-say="the ceiling of log base B N">⌈log_B N⌉</span> written so that a computer gets it right. A billion keys at a fanout of five hundred is four levels, the page cache holds the top two of them for a couple of megabytes, and a lookup is therefore two disk reads. Nothing about a billion is slow here.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Height is defined by a power, not by a logarithm.</strong> The question is how many levels of fanout <span class="math" data-say="B">B</span> it takes to cover <span class="math" data-say="N">N</span> keys, and the answer is the smallest <span class="math" data-say="h">h</span> with <span class="math" data-say="B to the power h is at least N">Bʰ ≥ N</span>. That is a search over integers: multiply <span class="math" data-say="B">B</span> into an accumulator and count the multiplications. <span class="math" data-say="the ceiling of log base B N">⌈log_B N⌉</span> names the same number in exact arithmetic, and the lab computes the power because a floating-point logarithm does not always agree.</li><li><strong>Fanout is enormous because a page is.</strong> A <span class="math" data-say="4 kB">4 kB</span> page holding <span class="math" data-say="500">500</span> index entries gives <span class="math" data-say="B equals 500">B = 500</span>, so every level multiplies the reach by five hundred. Four levels reach <span class="math" data-say="62500000000">62 500 000 000</span> keys. This is why the height of a real index is a single digit, and why “<span class="math" data-say="log N">log N</span> is slow for big <span class="math" data-say="N">N</span>” has nothing to hold onto here: the base is five hundred and it is set by the page, not by the data.</li><li><strong>A lookup costs the levels the cache does not hold.</strong> The descent reads one page per level, so <span class="math" data-say="h">h</span> page reads — except that the root and the level below it are <span class="math" data-say="4.00 kB">4.00 kB</span> and <span class="math" data-say="2.00 megabytes">2.00 MB</span> and live in memory permanently. At <span class="math" data-say="N equals 10 to the power 9">N = 10⁹</span> and <span class="math" data-say="B equals 500">B = 500</span> that turns a four-I/O lookup into a two-I/O one, and no change to the tree was involved.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="height equals the ceiling of log base B N, equals the smallest h with B to the power h is at least N. a table, shown on the page. h equals 1, h equals 2, h equals 3, h equals 4, is at least 10 to the power 9, stop. N equals 10 to the power 9, B equals 500, goes to, 4 levels, top 2 cached, goes to, 2 disk reads a lookup" tabindex="0" role="region" aria-label="Mathematical notation">height = ⌈log_B N⌉ = the smallest h with Bʰ ≥ N
 
 B = 500     500        250 000       125 000 000      62 500 000 000
@@ -2630,11 +2675,40 @@ N = 10⁹, B = 500  →  4 levels,  top 2 cached  →  2 disk reads a lookup</di
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2702,7 +2776,7 @@ N = 10⁹, B = 500  →  4 levels,  top 2 cached  →  2 disk reads a lookup</di
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Laying the Foundation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Key Construction Decisions</p>
       <h1>Key Construction Decisions</h1>
       <p class="lesson-lede">Before construction starts, choose the language, the conventions and the practices, and where the language lacks something you need, supply it by convention: program into the language, not in it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A statement ratio</li><li>A convention</li><li>Programming into a language</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The key point first, then the chapter&#x27;s four decisions</h2>
-      <article class="prose reading"><p><strong>Chapter 4, p. 70.</strong> &ldquo;Ask yourself whether the programming practices you’re using are a response to the programming language you’re using or controlled by it. Remember to program into the language, rather than programming in it.&rdquo; It is the fourth of the chapter's five key points, and the idea the chapter calls critical to understanding the whole book. Chapter 4 is short, pages 61 to 70; read it in your own copy first.</p><p>Chapter 3 was about preparations a programmer may have had no say in. Chapter 4 asks which preparations are yours: the decisions individual programmers and technical leads take, directly or indirectly, before construction starts, or in the book's image, which tools go on your belt and how you load the truck before you drive to the site. It names four: the language, the programming conventions, where you stand on the technology wave, and which of the many good construction practices you will use.</p><p>Section 4.1 (p. 61) begins with the language, since you will be immersed in it from the start of construction to the end, and reports two findings about productivity. Programmers are more productive in a language they know: the Cocomo II estimation model's data, as the book gives it after Boehm and others (2000), puts programmers with three or more years in a language about 30 percent ahead of equally experienced programmers new to it. And higher-level languages say more per line. Table 4-1 (p. 62) gives typical ratios, which the book adapts from Jones 1998, Boehm 2000 and Prechelt 2000: the number of statements of C that one statement of a language does the work of, 2.5 for Java, 4.5 for Visual Basic and 6 for Python among them, and the others in your copy. They are typical ratios, not constants of the languages.</p><p>The section's second argument is about thought rather than output. It borrows the Sapir-Whorf hypothesis, that the words a language offers shape the thoughts its speakers can form, and suggests that programmers may be shaped the same way by theirs. Its evidence is a story the industry has told for years: a team of Fortran programmers moves to C++ and writes code that compiles as C++ but is really &ldquo;disguised Fortran&rdquo;, with Fortran's gotos and global data and none of C++'s classes. The section ends with a paragraph or two on each of the languages in wide use in 2004, from Ada to Visual Basic, which this lesson leaves to your copy.</p><p>Section 4.2 (p. 66) is about programming conventions: for names, layout, comments and the like. A program's low-level detail should bear out its architecture, McConnell argues, as the parts of a painting bear out its design; a painting that is partly classical, partly impressionist and partly cubist is a collage, however faithfully it follows the plan. Arbitrary variations of style make the reader work for nothing, and conventions remove them, leaving attention for the variations that matter. The decision belongs before construction because conventions work at a level of detail that is nearly impossible to retrofit into code already written.</p><p>Section 4.3 (p. 66) asks where you stand on the technology wave. Late in a wave, as Web programming was in the mid-2000s, the languages are mature, the tools integrated and documented and the compilers nearly free of bugs, so a programmer's day goes on new function. Early in a wave, as Web programming was in the mid-1990s, the languages are buggy and poorly documented, debuggers may not exist, and much of the day goes on finding out how the tools behave. McConnell does not advise avoiding the early part of a wave, where some of the most innovative programs were written; he says the book's practices help even more there.</p><p>Here the chapter turns to David Gries, and to a distinction from his <em>The Science of Programming</em> (1981), as the book cites it, on which the key point rests. Programmers who program <em>in</em> a language limit their thoughts to the constructs it directly supports. Programmers who program <em>into</em> a language first decide what they want to express, and then work out how to express it with the tools they have. McConnell's example is his own. In early Visual Basic he wanted business logic, user interface and database code kept apart, and the language offered no way to do it, so he adopted a convention: a form could only read its data from the database and write it back, it exposed one public routine, which said whether the form had saved its data, and everything else, validity checks included, lived in an associated module. The language encouraged the opposite. The convention, he says, kept the project intellectually manageable.</p><p>Section 4.4 (p. 69) closes the chapter with the practices themselves. There are more good ones than any project can use, and the book's point is to choose them consciously: some projects pair-program and write tests first, others work alone and hold formal inspections, and either combination can work. Its checklist of major construction practices asks, among other things, how much design will be done up front and how much at the keyboard, whether programmers will write test cases before the code, and whether they will review each other's code.</p><p>Programming into a language is easiest to see in a small case. Java has no default values for parameters: in C++ or Python a declaration can say that a missing argument means 3, and in Java it cannot. The convention below supplies the facility. The full version of <span class="math" data-say="send">send</span> holds the logic, the shorter version does nothing but forward to it, and the default is written once, as a named constant. <span class="math" data-say="transmit">transmit</span> stands for some routine that sends the message once and reports whether it arrived.</p><pre class="codeblock" data-say="line 1, comment, Java has no default arguments.. line 2, comment, Each shorter send forwards to the full one.. line 3, static final int default retries is set to 3. line 5, boolean send of message message. line 6, return send of message, default retries. line 9, boolean send of message message, int retries. line 10, for int attempt is set to 1, attempt is at most retries, attempt is incremented. line 11, if transmit of message. line 12, return true. line 15, return false" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Java has no default arguments.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The key point first, then the chapter&#x27;s four decisions</h2><div class="prose reading"><p><strong>Chapter 4, p. 70.</strong> &ldquo;Ask yourself whether the programming practices you’re using are a response to the programming language you’re using or controlled by it. Remember to program into the language, rather than programming in it.&rdquo; It is the fourth of the chapter's five key points, and the idea the chapter calls critical to understanding the whole book. Chapter 4 is short, pages 61 to 70; read it in your own copy first.</p><p>Chapter 3 was about preparations a programmer may have had no say in. Chapter 4 asks which preparations are yours: the decisions individual programmers and technical leads take, directly or indirectly, before construction starts, or in the book's image, which tools go on your belt and how you load the truck before you drive to the site. It names four: the language, the programming conventions, where you stand on the technology wave, and which of the many good construction practices you will use.</p><p>Section 4.1 (p. 61) begins with the language, since you will be immersed in it from the start of construction to the end, and reports two findings about productivity. Programmers are more productive in a language they know: the Cocomo II estimation model's data, as the book gives it after Boehm and others (2000), puts programmers with three or more years in a language about 30 percent ahead of equally experienced programmers new to it. And higher-level languages say more per line. Table 4-1 (p. 62) gives typical ratios, which the book adapts from Jones 1998, Boehm 2000 and Prechelt 2000: the number of statements of C that one statement of a language does the work of, 2.5 for Java, 4.5 for Visual Basic and 6 for Python among them, and the others in your copy. They are typical ratios, not constants of the languages.</p><p>The section's second argument is about thought rather than output. It borrows the Sapir-Whorf hypothesis, that the words a language offers shape the thoughts its speakers can form, and suggests that programmers may be shaped the same way by theirs. Its evidence is a story the industry has told for years: a team of Fortran programmers moves to C++ and writes code that compiles as C++ but is really &ldquo;disguised Fortran&rdquo;, with Fortran's gotos and global data and none of C++'s classes. The section ends with a paragraph or two on each of the languages in wide use in 2004, from Ada to Visual Basic, which this lesson leaves to your copy.</p><p>Section 4.2 (p. 66) is about programming conventions: for names, layout, comments and the like. A program's low-level detail should bear out its architecture, McConnell argues, as the parts of a painting bear out its design; a painting that is partly classical, partly impressionist and partly cubist is a collage, however faithfully it follows the plan. Arbitrary variations of style make the reader work for nothing, and conventions remove them, leaving attention for the variations that matter. The decision belongs before construction because conventions work at a level of detail that is nearly impossible to retrofit into code already written.</p><p>Section 4.3 (p. 66) asks where you stand on the technology wave. Late in a wave, as Web programming was in the mid-2000s, the languages are mature, the tools integrated and documented and the compilers nearly free of bugs, so a programmer's day goes on new function. Early in a wave, as Web programming was in the mid-1990s, the languages are buggy and poorly documented, debuggers may not exist, and much of the day goes on finding out how the tools behave. McConnell does not advise avoiding the early part of a wave, where some of the most innovative programs were written; he says the book's practices help even more there.</p><p>Here the chapter turns to David Gries, and to a distinction from his <em>The Science of Programming</em> (1981), as the book cites it, on which the key point rests. Programmers who program <em>in</em> a language limit their thoughts to the constructs it directly supports. Programmers who program <em>into</em> a language first decide what they want to express, and then work out how to express it with the tools they have. McConnell's example is his own. In early Visual Basic he wanted business logic, user interface and database code kept apart, and the language offered no way to do it, so he adopted a convention: a form could only read its data from the database and write it back, it exposed one public routine, which said whether the form had saved its data, and everything else, validity checks included, lived in an associated module. The language encouraged the opposite. The convention, he says, kept the project intellectually manageable.</p><p>Section 4.4 (p. 69) closes the chapter with the practices themselves. There are more good ones than any project can use, and the book's point is to choose them consciously: some projects pair-program and write tests first, others work alone and hold formal inspections, and either combination can work. Its checklist of major construction practices asks, among other things, how much design will be done up front and how much at the keyboard, whether programmers will write test cases before the code, and whether they will review each other's code.</p><p>Programming into a language is easiest to see in a small case. Java has no default values for parameters: in C++ or Python a declaration can say that a missing argument means 3, and in Java it cannot. The convention below supplies the facility. The full version of <span class="math" data-say="send">send</span> holds the logic, the shorter version does nothing but forward to it, and the default is written once, as a named constant. <span class="math" data-say="transmit">transmit</span> stands for some routine that sends the message once and reports whether it arrived.</p><pre class="codeblock" data-say="line 1, comment, Java has no default arguments.. line 2, comment, Each shorter send forwards to the full one.. line 3, static final int default retries is set to 3. line 5, boolean send of message message. line 6, return send of message, default retries. line 9, boolean send of message message, int retries. line 10, for int attempt is set to 1, attempt is at most retries, attempt is incremented. line 11, if transmit of message. line 12, return true. line 15, return false" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Java has no default arguments.</span>
 <span class="cl">// Each shorter send forwards to the full one.</span>
 <span class="cl">static final int DEFAULT_RETRIES = 3;</span>
 <span class="cl"></span>
@@ -1460,22 +1504,21 @@
 <span class="cl">        }</span>
 <span class="cl">    }</span>
 <span class="cl">    return false;</span>
-<span class="cl">}</span></code></pre><p>Line 6 is the whole convention: <span class="math" data-say="send of message">send(message)</span> passes <span class="math" data-say="default retries">DEFAULT_RETRIES</span> from line 3 to the two-argument version on lines 9 to 16, which tries up to <span class="math" data-say="retries">retries</span> times and returns <span class="math" data-say="true">true</span> on the first attempt that arrives. Nothing in Java requires this shape. A teammate could give the one-argument version a loop of its own, or write a bare 3 into it, and the compiler would accept either; the convention holds because the team keeps it and reviews for it, which is what it has in common with McConnell's Visual Basic forms.</p><p>The lab does Table 4-1's one sum. Give it a size in statements of C and a ratio from the table, and it divides, giving the statements of the other language that would do the same work. On the <code>java</code> preset, 10,000 statements of C at Java's 2.5 come to 4,000 statements of Java. On <code>python</code>, at 6, they come to <span data-say="5000 over 3 is approximately 1666.67">5000/3 ≈ 1,666.67</span>, and on <code>visual-basic</code>, at 4.5, to <span data-say="20000 over 9 is approximately 2222.22">20000/9 ≈ 2,222.22</span>; a fraction of a statement is the typical ratio showing through, not a statement anyone writes. The book never turns the ratio into a schedule, and neither does the lab: it measures statements, not the time the work takes, not the defects in it, and not the gain the book reports from years of experience in a language.</p><h3>Exercise</h3><ul><li>A language with no assertion statement, as Java was before version 1.4.</li><li>A language with no enumerated types, as Java was before version 5.</li><li>A language with no access control, in which every member of a class is public.</li></ul><p>For each language, write the convention that supplies the missing facility: a few lines of Java and a sentence on how they are used for the first two, and a sentence for the third. Each answer should be something a team can agree on and a reviewer can check. The lab has nothing to say about this exercise; write your three conventions down before you reach the quiz, whose first item checks the first of them.</p><p>That ends the book's first Part. The next course, Creating High-Quality Code, opens Part II with “Design Challenges and Complexity”, and with the idea the rest of the book is organised around: that managing complexity is software's primary technical imperative.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Project arithmetic</h2></div><p>statements of C, and of another language</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Line 6 is the whole convention: <span class="math" data-say="send of message">send(message)</span> passes <span class="math" data-say="default retries">DEFAULT_RETRIES</span> from line 3 to the two-argument version on lines 9 to 16, which tries up to <span class="math" data-say="retries">retries</span> times and returns <span class="math" data-say="true">true</span> on the first attempt that arrives. Nothing in Java requires this shape. A teammate could give the one-argument version a loop of its own, or write a bare 3 into it, and the compiler would accept either; the convention holds because the team keeps it and reviews for it, which is what it has in common with McConnell's Visual Basic forms.</p><p>The lab does Table 4-1's one sum. Give it a size in statements of C and a ratio from the table, and it divides, giving the statements of the other language that would do the same work. On the <code>java</code> preset, 10,000 statements of C at Java's 2.5 come to 4,000 statements of Java. On <code>python</code>, at 6, they come to <span data-say="5000 over 3 is approximately 1666.67">5000/3 ≈ 1,666.67</span>, and on <code>visual-basic</code>, at 4.5, to <span data-say="20000 over 9 is approximately 2222.22">20000/9 ≈ 2,222.22</span>; a fraction of a statement is the typical ratio showing through, not a statement anyone writes. The book never turns the ratio into a schedule, and neither does the lab: it measures statements, not the time the work takes, not the defects in it, and not the gain the book reports from years of experience in a language.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Project arithmetic</h2></div><p>statements of C, and of another language</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Project arithmetic</strong><span>statements of C, and of another language</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="pjTable"></table></div>
       <div class="status-banner" id="pjStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The same work in another language, by the book&#x27;s ratio</h3>
-          <p>The arithmetic of figures the lesson quotes (marked with their source). Give a size in statements of C and a ratio from Table 4-1: the lab divides, giving the statements of the other language that do the same work. Figures: Table 4-1's typical ratios, which the book adapts from Jones 1998, Boehm 2000 and Prechelt 2000; the size is the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The same work in another language, by the book&#x27;s ratio</h3>
+            <p>The arithmetic of figures the lesson quotes (marked with their source). Give a size in statements of C and a ratio from Table 4-1: the lab divides, giving the statements of the other language that do the same work. Figures: Table 4-1's typical ratios, which the book adapts from Jones 1998, Boehm 2000 and Prechelt 2000; the size is the lesson's.</p>
         <div class="field">
           <label for="pjPreset">Worked example</label>
           <select id="pjPreset"><option value="java" selected>10,000 statements of C, in Java (ratio 2.5)</option><option value="python">10,000 statements of C, in Python (ratio 6)</option><option value="visual-basic">10,000 statements of C, in Visual Basic (ratio 4.5)</option></select>
@@ -1492,12 +1535,15 @@
           <div class="kpi"><span>Statements of the language</span><strong id="pjEquivalent">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Exercise</h3><ul><li>A language with no assertion statement, as Java was before version 1.4.</li><li>A language with no enumerated types, as Java was before version 5.</li><li>A language with no access control, in which every member of a class is public.</li></ul><p>For each language, write the convention that supplies the missing facility: a few lines of Java and a sentence on how they are used for the first two, and a sentence for the third. Each answer should be something a team can agree on and a reviewer can check. The lab has nothing to say about this exercise; write your three conventions down before you reach the quiz, whose first item checks the first of them.</p><p>That ends the book's first Part. The next course, Creating High-Quality Code, opens Part II with “Design Challenges and Complexity”, and with the idea the rest of the book is organised around: that managing complexity is software's primary technical imperative.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Converting a size, and supplying what a language lacks</h2></div><p>Five steps: three for the table, two for the convention.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the ratio</h3><p>Look up the language in Table 4-1: the number of statements of C one of its statements does the work of.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide</h3><p>Divide the size in statements of C by the ratio. A fraction in the result is the typical ratio showing through; keep it, and do not round it into a promise.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Say what the figure leaves out</h3><p>State that the result counts statements: not hours, not defects, and not the team's experience in the language, which Section 4.1 treats as a separate effect.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Name the facility and its convention</h3><p>When the language lacks something you want, say what you want to express, then write the smallest convention that expresses it with what the language has, and say how a reviewer would see it kept or broken.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it for your own language</h3><p>Name one facility your own language or framework lacks, write in two or three sentences, or a few lines of code, the convention your team uses or should use to supply it, and name one place in your own code where the convention is kept, broken or missing.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Converting a size, and supplying what a language lacks</h2>
+      <p class="lead-in">Five steps: three for the table, two for the convention.</p>
+      <ol class="key-ideas method"><li><strong>Find the ratio.</strong> Look up the language in Table 4-1: the number of statements of C one of its statements does the work of.</li><li><strong>Divide.</strong> Divide the size in statements of C by the ratio. A fraction in the result is the typical ratio showing through; keep it, and do not round it into a promise.</li><li><strong>Say what the figure leaves out.</strong> State that the result counts statements: not hours, not defects, and not the team's experience in the language, which Section 4.1 treats as a separate effect.</li><li><strong>Name the facility and its convention.</strong> When the language lacks something you want, say what you want to express, then write the smallest convention that expresses it with what the language has, and say how a reviewer would see it kept or broken.</li><li><strong>Do it for your own language.</strong> Name one facility your own language or framework lacks, write in two or three sentences, or a few lines of code, the convention your team uses or should use to supply it, and name one place in your own code where the convention is kept, broken or missing.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1513,17 +1559,16 @@ Python: 10000 / 6 is 5000/3, about 1666.67
 Visual Basic: 10000 / 4.5 is 20000/9, about 2222.22</div><p>The same work takes fewer statements the higher the ratio, and that is all the figures say. None of them is a number of hours, and a team that has used Python for a month is not, by this table, a team that will finish in a sixth of the time.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a missing keyword means a missing practice</strong><span>The view that a practice your language has no keyword for is unavailable to you. Section 4.3 is the refutation: programmers who program into a language decide what they want to express and supply what the language lacks by convention, as McConnell kept Visual Basic forms free of business logic when the language offered no way to separate it. The lesson's <span class="math" data-say="send">send</span> does the same for default arguments, which Java does not have.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the ratio as a schedule</strong><span>Table 4-1 says one statement of Python does the work of about six of C, and it is tempting to read that as six times faster. The table counts statements. It says nothing about the hours a statement takes, the defects in it or the team's experience, and the book never turns it into a schedule. On the lesson's illustration, 10,000 statements of C become <span data-say="5000 over 3 is approximately 1666.67">5000/3 ≈ 1,666.67</span> statements of Python, and no number of days.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving conventions for later</strong><span>Agreeing conventions once the code shows what is needed sounds pragmatic. Section 4.2 says they work at a level of detail that is nearly impossible to retrofit into code already written, and so belong among the decisions taken before construction; the chapter's checklist of construction practices asks about them among its first questions.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert a size by the table&#x27;s ratio and supply a missing facility by convention.</strong><p>Given a size in statements of C and a ratio from Table 4-1, state the equivalent statements and what the ratio does not measure; given a facility a language lacks, write the convention that supplies it, without the lab.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab divides one number by another. The ratios are the typical ratios the book adapts from Jones 1998, Boehm 2000 and Prechelt 2000, not constants of the languages, and the size in the presets is the lesson's. Nothing in the lab can tell whether a convention is kept; that is done by people reading code, which is why the chapter puts conventions among the decisions taken before construction rather than among the things a tool enforces.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a missing keyword means a missing practice</strong><span>The view that a practice your language has no keyword for is unavailable to you. Section 4.3 is the refutation: programmers who program into a language decide what they want to express and supply what the language lacks by convention, as McConnell kept Visual Basic forms free of business logic when the language offered no way to separate it. The lesson's <span class="math" data-say="send">send</span> does the same for default arguments, which Java does not have.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the ratio as a schedule</strong><span>Table 4-1 says one statement of Python does the work of about six of C, and it is tempting to read that as six times faster. The table counts statements. It says nothing about the hours a statement takes, the defects in it or the team's experience, and the book never turns it into a schedule. On the lesson's illustration, 10,000 statements of C become <span data-say="5000 over 3 is approximately 1666.67">5000/3 ≈ 1,666.67</span> statements of Python, and no number of days.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving conventions for later</strong><span>Agreeing conventions once the code shows what is needed sounds pragmatic. Section 4.2 says they work at a level of detail that is nearly impossible to retrofit into code already written, and so belong among the decisions taken before construction; the chapter's checklist of construction practices asks about them among its first questions.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert a size by the table&#x27;s ratio and supply a missing facility by convention.</strong><p>Given a size in statements of C and a ratio from Table 4-1, state the equivalent statements and what the ratio does not measure; given a facility a language lacks, write the convention that supplies it, without the lab.</p></div></div><div class="note"><strong>Note:</strong> The lab divides one number by another. The ratios are the typical ratios the book adapts from Jones 1998, Boehm 2000 and Prechelt 2000, not constants of the languages, and the size in the presets is the lesson's. Nothing in the lab can tell whether a convention is kept; that is done by people reading code, which is why the chapter puts conventions among the decisions taken before construction rather than among the things a tool enforces.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A statement ratio</summary><p>The book's Table 4-1 gives, for each of several languages, how many statements of C one statement of that language is typically worth: 2.5 for Java, 6 for Python. A size in C divided by the ratio is the size of the same work in that language. It counts statements and nothing else.</p></details><details class="recall"><summary>A convention</summary><p>An agreement among programmers about how code is written, which the compiler does not enforce: names, layout, comments, or a shape every routine of a kind takes. Section 4.2 says conventions belong before construction, because they are nearly impossible to retrofit.</p></details><details class="recall"><summary>Programming into a language</summary><p>David Gries's distinction, which the book adopts: programming in a language limits your thinking to what it directly supports, while programming into it means deciding what you want to express first and then supplying, by convention if need be, what the language lacks.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 4 is about the decisions programmers and technical leads take themselves before construction: the language, the conventions, where the project stands on the technology wave, and which construction practices to use. Convert a size in statements of C by the book's ratio and say what the ratio does not measure, and supply in Java, by convention, a facility the language lacks.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A statement ratio.</strong> The book's Table 4-1 gives, for each of several languages, how many statements of C one statement of that language is typically worth: 2.5 for Java, 6 for Python. A size in C divided by the ratio is the size of the same work in that language. It counts statements and nothing else.</li><li><strong>A convention.</strong> An agreement among programmers about how code is written, which the compiler does not enforce: names, layout, comments, or a shape every routine of a kind takes. Section 4.2 says conventions belong before construction, because they are nearly impossible to retrofit.</li><li><strong>Programming into a language.</strong> David Gries's distinction, which the book adopts: programming in a language limits your thinking to what it directly supports, while programming into it means deciding what you want to express first and then supplying, by convention if need be, what the language lacks.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="program into the language, not in it. ratio, C statements per statement. statements, C size divided by ratio. ratios count statements, not hours. set conventions before the code. know where you are on the wave" tabindex="0" role="region" aria-label="Mathematical notation">program into the language, not in it
 ratio: C statements per statement
 statements: C size / ratio
@@ -2208,11 +2253,40 @@ know where you are on the wave</div><figcaption>Chapter 4 in six lines</figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2280,7 +2354,7 @@ know where you are on the wave</div><figcaption>Chapter 4 in six lines</figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

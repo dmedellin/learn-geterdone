@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,27 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Combinatorics and Counting</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Arrangements</p>
       <h1>Permutations</h1>
       <p class="lesson-lede">Ordered selections without repetition.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Each choice removes one option</li><li><span class="math" data-say="0 factorial equals 1">0! = 1</span> is a convention that works</li><li>Factorial growth is genuinely enormous</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Arrangements</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Permutation</span><p>A <strong>permutation</strong> of a set is an ordered arrangement of its elements. An <strong><span class="math" data-say="r">r</span>-permutation</strong> is an ordered arrangement of <span class="math" data-say="r">r</span> of them.</p></div><div class="thm"><span class="label">Theorem &middot; Counting <span class="math" data-say="r">r</span>-permutations</span><p>For <span class="math" data-say="0 is at most r is at most n">0 ≤ r ≤ n</span>, <span class="math" data-say="P of n and r equals n times the quantity n minus 1, times the quantity n minus 2, and so on n minus r plus 1 equals n factorial over the quantity n minus r, factorial">P(n, r) = n(n−1)(n−2)⋯(n−r+1) = n!/(n−r)!</span>.</p></div><div class="proof"><p>Fill the <span class="math" data-say="r">r</span> positions in order. The first has <span class="math" data-say="n">n</span> candidates. Whatever was chosen, the second has <span class="math" data-say="n minus 1">n−1</span> remaining, the third <span class="math" data-say="n minus 2">n−2</span>, and the <span class="math" data-say="r">r</span>th has <span class="math" data-say="n minus r plus 1">n−r+1</span>. The number of options at each stage does not depend on which particular objects were chosen earlier, so the product rule applies.</p><p><span class="qed">&#9633;</span></p></div><p>Note the count of factors: <span class="math" data-say="r">r</span> of them, running from <span class="math" data-say="n">n</span> down to <span class="math" data-say="n minus r plus 1">n−r+1</span>. Writing <span class="math" data-say="n">n</span> down to <span class="math" data-say="n minus r">n−r</span> is the standard off-by-one, and it gives <span class="math" data-say="P of n and r plus 1">P(n, r+1)</span>.</p><div class="example"><span class="label">Example &middot; Podium finishes</span><p>Ten runners, how many ways to fill gold, silver and bronze? <span class="math" data-say="P of 10 and 3 equals 10 times 9 times 8 equals 720">P(10,3) = 10 · 9 · 8 = 720</span>. Order matters here &mdash; the same three runners in a different order is a different outcome &mdash; which is exactly what makes it a permutation rather than a combination.</p></div><h3>Circular arrangements</h3><div class="thm"><span class="label">Theorem &middot; Arrangements around a circle</span><p><span class="math" data-say="n">n</span> distinct objects can be arranged in a circle in <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> ways, when rotations are considered identical.</p></div><div class="proof"><p>There are <span class="math" data-say="n factorial">n!</span> linear arrangements. Each circular arrangement corresponds to exactly <span class="math" data-say="n">n</span> of them, one for each choice of which object is written first. So the circular count is <span class="math" data-say="n factorial over n equals the quantity n minus 1, factorial">n!/n = (n−1)!</span>.</p><p>Equivalently: fix one object's position to break the rotational symmetry, and arrange the remaining <span class="math" data-say="n minus 1">n−1</span> freely.</p><p><span class="qed">&#9633;</span></p></div><p>The division is legitimate only because rotations were declared identical. If the chairs are numbered, rotating everyone one seat along produces a different seating, nothing is identified, and the count is <span class="math" data-say="n factorial">n!</span>. Say which situation you are in before dividing; the question decides it, not the shape of the table.</p><p>The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is Sets, Relations, and Functions's equivalence relation doing combinatorial work, and “Permutations with Repetition” uses it again.</p><h3>The size of factorials</h3><div class="mathblock" data-say="5 factorial equals, 120. 10 factorial equals, 3628800. 20 factorial equals, 2432902008176640000. 52 factorial is approximately 8.07 times 10 to the power 67" tabindex="0" role="region" aria-label="Mathematical notation">  5! =                        120
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Arrangements</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Permutation</span><p>A <strong>permutation</strong> of a set is an ordered arrangement of its elements. An <strong><span class="math" data-say="r">r</span>-permutation</strong> is an ordered arrangement of <span class="math" data-say="r">r</span> of them.</p></div><div class="thm"><span class="label">Theorem &middot; Counting <span class="math" data-say="r">r</span>-permutations</span><p>For <span class="math" data-say="0 is at most r is at most n">0 ≤ r ≤ n</span>, <span class="math" data-say="P of n and r equals n times the quantity n minus 1, times the quantity n minus 2, and so on n minus r plus 1 equals n factorial over the quantity n minus r, factorial">P(n, r) = n(n−1)(n−2)⋯(n−r+1) = n!/(n−r)!</span>.</p></div><div class="proof"><p>Fill the <span class="math" data-say="r">r</span> positions in order. The first has <span class="math" data-say="n">n</span> candidates. Whatever was chosen, the second has <span class="math" data-say="n minus 1">n−1</span> remaining, the third <span class="math" data-say="n minus 2">n−2</span>, and the <span class="math" data-say="r">r</span>th has <span class="math" data-say="n minus r plus 1">n−r+1</span>. The number of options at each stage does not depend on which particular objects were chosen earlier, so the product rule applies.</p><p><span class="qed">&#9633;</span></p></div><p>Note the count of factors: <span class="math" data-say="r">r</span> of them, running from <span class="math" data-say="n">n</span> down to <span class="math" data-say="n minus r plus 1">n−r+1</span>. Writing <span class="math" data-say="n">n</span> down to <span class="math" data-say="n minus r">n−r</span> is the standard off-by-one, and it gives <span class="math" data-say="P of n and r plus 1">P(n, r+1)</span>.</p><div class="example"><span class="label">Example &middot; Podium finishes</span><p>Ten runners, how many ways to fill gold, silver and bronze? <span class="math" data-say="P of 10 and 3 equals 10 times 9 times 8 equals 720">P(10,3) = 10 · 9 · 8 = 720</span>. Order matters here &mdash; the same three runners in a different order is a different outcome &mdash; which is exactly what makes it a permutation rather than a combination.</p></div><h3>Circular arrangements</h3><div class="thm"><span class="label">Theorem &middot; Arrangements around a circle</span><p><span class="math" data-say="n">n</span> distinct objects can be arranged in a circle in <span class="math" data-say="the quantity n minus 1, factorial">(n−1)!</span> ways, when rotations are considered identical.</p></div><div class="proof"><p>There are <span class="math" data-say="n factorial">n!</span> linear arrangements. Each circular arrangement corresponds to exactly <span class="math" data-say="n">n</span> of them, one for each choice of which object is written first. So the circular count is <span class="math" data-say="n factorial over n equals the quantity n minus 1, factorial">n!/n = (n−1)!</span>.</p><p>Equivalently: fix one object's position to break the rotational symmetry, and arrange the remaining <span class="math" data-say="n minus 1">n−1</span> freely.</p><p><span class="qed">&#9633;</span></p></div><p>The division is legitimate only because rotations were declared identical. If the chairs are numbered, rotating everyone one seat along produces a different seating, nothing is identified, and the count is <span class="math" data-say="n factorial">n!</span>. Say which situation you are in before dividing; the question decides it, not the shape of the table.</p><p>The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is Sets, Relations, and Functions's equivalence relation doing combinatorial work, and “Permutations with Repetition” uses it again.</p><h3>The size of factorials</h3><div class="mathblock" data-say="5 factorial equals, 120. 10 factorial equals, 3628800. 20 factorial equals, 2432902008176640000. 52 factorial is approximately 8.07 times 10 to the power 67" tabindex="0" role="region" aria-label="Mathematical notation">  5! =                        120
  10! =                  3 628 800
  20! =  2 432 902 008 176 640 000
- 52! ≈ 8.07 × 10⁶⁷</div><p><span class="math" data-say="52 factorial">52!</span> is about <span class="math" data-say="10 to the power 18">10¹⁸</span> times the number of atoms in the Earth, which is roughly <span class="math" data-say="10 to the power 50">10⁵⁰</span>. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and “P, NP and NP-Completeness” in Algorithms and Complexity gives that observation a name.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+ 52! ≈ 8.07 × 10⁶⁷</div><p><span class="math" data-say="52 factorial">52!</span> is about <span class="math" data-say="10 to the power 18">10¹⁸</span> times the number of atoms in the Earth, which is roughly <span class="math" data-say="10 to the power 50">10⁵⁰</span>. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and “P, NP and NP-Completeness” in Algorithms and Complexity gives that observation a name.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Choosing r from n</strong><span>Order matters or not; repetition allowed or not</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected rule</span></div>
@@ -1408,10 +1451,10 @@
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cntTable"></table></div>
         <div id="cntList" class="small-copy" style="margin-top:10px;"></div>
       </div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Permutations, listed</h3>
-          <p>The P row is highlighted and its 60 arrangements are listed. Raise <span class="math" data-say="n">n</span> to 9 and the list stops &mdash; <span class="math" data-say="P of 9 and 3 equals 504">P(9, 3) = 504</span> is past the 400 the lab will print &mdash; while the count stays exact. At <span class="math" data-say="n equals 24">n = 24</span>, <span class="math" data-say="r equals 12">r = 12</span> the P row reads <span class="math" data-say="24 factorial over 12 factorial equals 1295295050649600">24!/12! = 1 295 295 050 649 600</span>, computed in big integers rather than as a floating-point approximation.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Permutations, listed</h3>
+            <p>The P row is highlighted and its 60 arrangements are listed. Raise <span class="math" data-say="n">n</span> to 9 and the list stops &mdash; <span class="math" data-say="P of 9 and 3 equals 504">P(9, 3) = 504</span> is past the 400 the lab will print &mdash; while the count stays exact. At <span class="math" data-say="n equals 24">n = 24</span>, <span class="math" data-say="r equals 12">r = 12</span> the P row reads <span class="math" data-say="24 factorial over 12 factorial equals 1295295050649600">24!/12! = 1 295 295 050 649 600</span>, computed in big integers rather than as a floating-point approximation.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="cntN">n (things to choose from)</label><span class="range-value" id="cntNOut">5</span></div>
           <input id="cntN" type="range" min="1" max="24" value="5" />
@@ -1430,12 +1473,14 @@
           </select>
         </div>
         <div class="status-banner" id="cntStatus">Every total is computed in exact integer arithmetic.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting arrangements</h2></div><p>Confirm order matters before reaching for the formula.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that order matters</h3><p>If rearranging the same objects gives a different outcome, it is a permutation. If not, “Combinations” has the right formula.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check that repetition is forbidden</h3><p>Objects are drawn without replacement. If they may repeat, “Permutations with Repetition” applies and the answer is <span class="math" data-say="n to the power r">nʳ</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the factors</h3><p><span class="math" data-say="P of n and r">P(n, r)</span> has exactly <span class="math" data-say="r">r</span> factors, ending at <span class="math" data-say="n minus r plus 1">n−r+1</span>. Miscounting them is the standard error.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Divide out any symmetry</h3><p>Circular seating divides by <span class="math" data-say="n">n</span>; a necklace that may be flipped divides by <span class="math" data-say="2 n">2n</span>. Name the symmetry before dividing.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting arrangements</h2>
+      <p class="lead-in">Confirm order matters before reaching for the formula.</p>
+      <ol class="key-ideas method"><li><strong>Check that order matters.</strong> If rearranging the same objects gives a different outcome, it is a permutation. If not, “Combinations” has the right formula.</li><li><strong>Check that repetition is forbidden.</strong> Objects are drawn without replacement. If they may repeat, “Permutations with Repetition” applies and the answer is <span class="math" data-say="n to the power r">nʳ</span>.</li><li><strong>Count the factors.</strong> <span class="math" data-say="P of n and r">P(n, r)</span> has exactly <span class="math" data-say="r">r</span> factors, ending at <span class="math" data-say="n minus r plus 1">n−r+1</span>. Miscounting them is the standard error.</li><li><strong>Divide out any symmetry.</strong> Circular seating divides by <span class="math" data-say="n">n</span>; a necklace that may be flipped divides by <span class="math" data-say="2 n">2n</span>. Name the symmetry before dividing.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1504,16 @@ Check: 1440 / 5040 = 2/7.  Fix one of the pair; the other has
 7 seats to choose from, and exactly 2 of them are beside the first.</div><p>The block trick &mdash; glue constrained objects together, count, then multiply by their internal arrangements &mdash; is the standard device for "must be adjacent" constraints. The final ratio check is cheap and catches an error in the block count immediately.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using <span class="math" data-say="P">P</span> when order does not matter</strong><span>A committee of three is not an ordered triple. <span class="math" data-say="P of n and r">P(n,r)</span> counts each committee <span class="math" data-say="r factorial">r!</span> times, which is exactly the relationship “Combinations” exploits.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Miscounting the factors</strong><span><span class="math" data-say="P of n and r">P(n, r)</span> runs from <span class="math" data-say="n">n</span> down to <span class="math" data-say="n minus r plus 1">n − r + 1</span>, which is <span class="math" data-say="r">r</span> factors. Ending at <span class="math" data-say="n minus r">n − r</span> gives one too many.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting to divide out a symmetry</strong><span>Circular arrangements, necklaces and identical items all require dividing by the size of the symmetry class. Naming the symmetry first prevents dividing by the wrong number.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can justify the divisor in a symmetry argument.</strong><p>Count the ways to seat 6 people around a round table with two specific people not adjacent. Do it by complement, and state exactly why the circular count is <span class="math" data-say="5 factorial">5!</span> rather than <span class="math" data-say="6 factorial">6!</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A permutation is also a bijection from a set to itself, which is the remark of “Composition and Inverse Functions”, in Sets, Relations, and Functions. There are <span class="math" data-say="n factorial">n!</span> of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using <span class="math" data-say="P">P</span> when order does not matter</strong><span>A committee of three is not an ordered triple. <span class="math" data-say="P of n and r">P(n,r)</span> counts each committee <span class="math" data-say="r factorial">r!</span> times, which is exactly the relationship “Combinations” exploits.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Miscounting the factors</strong><span><span class="math" data-say="P of n and r">P(n, r)</span> runs from <span class="math" data-say="n">n</span> down to <span class="math" data-say="n minus r plus 1">n − r + 1</span>, which is <span class="math" data-say="r">r</span> factors. Ending at <span class="math" data-say="n minus r">n − r</span> gives one too many.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting to divide out a symmetry</strong><span>Circular arrangements, necklaces and identical items all require dividing by the size of the symmetry class. Naming the symmetry first prevents dividing by the wrong number.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can justify the divisor in a symmetry argument.</strong><p>Count the ways to seat 6 people around a round table with two specific people not adjacent. Do it by complement, and state exactly why the circular count is <span class="math" data-say="5 factorial">5!</span> rather than <span class="math" data-say="6 factorial">6!</span>.</p></div></div><div class="note"><strong>Note:</strong> A permutation is also a bijection from a set to itself, which is the remark of “Composition and Inverse Functions”, in Sets, Relations, and Functions. There are <span class="math" data-say="n factorial">n!</span> of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Each choice removes one option</summary><p><span class="math" data-say="n">n</span> ways for the first position, <span class="math" data-say="n minus 1">n−1</span> for the second, and so on for <span class="math" data-say="r">r</span> positions. That product is <span class="math" data-say="P of n and r">P(n, r)</span>.</p></details><details class="recall"><summary><span class="math" data-say="0 factorial equals 1">0! = 1</span> is a convention that works</summary><p>It makes <span class="math" data-say="P of n and n equals n factorial over 0 factorial equals n factorial">P(n, n) = n!/0! = n!</span> come out right and keeps every formula in this course free of special cases.</p></details><details class="recall"><summary>Factorial growth is genuinely enormous</summary><p><span class="math" data-say="52 factorial">52!</span> is about <span class="math" data-say="8 times 10 to the power 67">8 × 10⁶⁷</span>. Every shuffle of a deck that has ever been performed was almost certainly unique.</p></details></div>
+      <h3>Summary</h3>
       <p><span class="math" data-say="P of n and r equals n factorial over the quantity n minus r, factorial">P(n, r) = n!/(n−r)!</span> counts the ways to arrange <span class="math" data-say="r">r</span> of <span class="math" data-say="n">n</span> distinct objects in order. Factorials grow explosively, and that growth is a fact about the problem rather than about the notation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Each choice removes one option.</strong> <span class="math" data-say="n">n</span> ways for the first position, <span class="math" data-say="n minus 1">n−1</span> for the second, and so on for <span class="math" data-say="r">r</span> positions. That product is <span class="math" data-say="P of n and r">P(n, r)</span>.</li><li><strong><span class="math" data-say="0 factorial equals 1">0! = 1</span> is a convention that works.</strong> It makes <span class="math" data-say="P of n and n equals n factorial over 0 factorial equals n factorial">P(n, n) = n!/0! = n!</span> come out right and keeps every formula in this course free of special cases.</li><li><strong>Factorial growth is genuinely enormous.</strong> <span class="math" data-say="52 factorial">52!</span> is about <span class="math" data-say="8 times 10 to the power 67">8 × 10⁶⁷</span>. Every shuffle of a deck that has ever been performed was almost certainly unique.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of n and r equals n times the quantity n minus 1, and so on n minus r plus 1 equals n factorial over the quantity n minus r, factorial. P of n and n equals n factorial, all n objects arranged. 0 factorial equals 1, the empty arrangement. circular arrangements of n, the quantity n minus 1, factorial" tabindex="0" role="region" aria-label="Mathematical notation">P(n, r) = n(n−1)⋯(n−r+1) = n!/(n−r)!
 P(n, n) = n!                  all n objects arranged
 0! = 1                        the empty arrangement
@@ -1923,11 +1967,40 @@ circular arrangements of n:   (n−1)!</div><figcaption>Ordered, no repetition</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -1995,7 +2068,7 @@ circular arrangements of n:   (n−1)!</div><figcaption>Ordered, no repetition</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,42 +1424,34 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Science, Induction and Causation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Induction</p>
       <h1>Enumerative Induction and Hume&#x27;s Problem</h1>
       <p class="lesson-lede">A run of sunrises is not a deduction of the next one, and what must be added is a prior.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Enumerative induction is not deduction</li><li>A prior is the missing premise written down</li><li>Hume&#x27;s problem is about justification, not reliability</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From the past to the next case</h2>
-      <article class="prose reading"><p>Take the plainest inductive argument there is: the sun has risen on each of the last ten days, so it will rise on the eleventh. Write <span class="math" data-say="R sub 1">R₁</span> for &ldquo;the sun rises on day 1&rdquo;, and so on. The argument has ten premises and one conclusion, and “Validity by Truth Table” gives the test: look for a row on which every premise is true and the conclusion false.</p><div class="mathblock" data-say="day 1, day 2, day 10, day 11. T, T, T, F, gets every premise true, conclusion false" tabindex="0" role="region" aria-label="Mathematical notation">day 1   day 2   ...   day 10   |   day 11
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From the past to the next case</h2><div class="prose reading"><p>Take the plainest inductive argument there is: the sun has risen on each of the last ten days, so it will rise on the eleventh. Write <span class="math" data-say="R sub 1">R₁</span> for &ldquo;the sun rises on day 1&rdquo;, and so on. The argument has ten premises and one conclusion, and “Validity by Truth Table” gives the test: look for a row on which every premise is true and the conclusion false.</p><div class="mathblock" data-say="day 1, day 2, day 10, day 11. T, T, T, F, gets every premise true, conclusion false" tabindex="0" role="region" aria-label="Mathematical notation">day 1   day 2   ...   day 10   |   day 11
 -----------------------------------------
-  T       T     ...     T      |     F      &lt;- every premise true, conclusion false</div><p>The row exists. Nothing in the ten premises mentions day 11, so the sentence about day 11 is free to be false, and the argument is invalid. Replace ten by ten thousand and the row is still there: the premises grow, the conclusion does not move into them.</p><div class="defbox"><span class="label">Definition &middot; Enumerative induction</span><p><strong>Enumerative induction</strong> is the inference from &ldquo;all observed cases of F have been G&rdquo; to &ldquo;the next case of F will be G&rdquo;. As a form it is invalid, so whatever force it has comes from a premise it does not state.</p></div><p>The missing premise can be written as a probability. Suppose the sun rises each day with some fixed chance, and consider five hypotheses about that chance: <span class="math" data-say="1">1</span>, <span class="math" data-say="3 over 4">3/4</span>, <span class="math" data-say="1 over 2">1/2</span>, <span class="math" data-say="1 over 4">1/4</span> and <span class="math" data-say="0">0</span>. Put an equal prior of <span class="math" data-say="1 over 5">1/5</span> on each. This is the rule of succession reduced to five points, which keeps every number an exact fraction; it is a discretisation and it says nothing about hypotheses in between.</p><p>Ten sunrises in a row have probability <span class="math" data-say="chance to the power 10">chance¹⁰</span> under each hypothesis, so they favour the high chances heavily. After the data, the hypothesis that the sun always rises carries the posterior the lab prints in its first tile, and the probability of an eleventh sunrise is each hypothesis's chance weighted by its posterior.</p><div class="mathblock" data-say="chance, prior, weight after ten sunrises units of 1 over 1048576. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">chance   prior   weight after ten sunrises (units of 1/1048576)
----------------------------------------------------------------
-  1       1/5        1048576
-  3/4     1/5          59049
-  1/2     1/5           1024
-  1/4     1/5              1
-  0       1/5              0</div><div class="thm"><span class="label">Theorem &middot; The predictive probability</span><p>The probability that the next case is a success is the sum, over the hypotheses, of the posterior of each times its chance of a success: <span class="math" data-say="P of next given data equals the sum of P of h given data times chance of h">P(next | data) = Σ P(h | data)·chance(h)</span>. It is below 1 whenever some hypothesis with a chance under 1 keeps any posterior.</p></div><div class="example"><span class="label">Example &middot; Same data, other prior</span><p>Give a skeptic a prior of <span class="math" data-say="1 over 1000">1/1000</span> on a chance of 1, <span class="math" data-say="1 over 10">1/10</span> on each of <span class="math" data-say="3 over 4">3/4</span>, <span class="math" data-say="1 over 2">1/2</span> and <span class="math" data-say="1 over 4">1/4</span>, and <span class="math" data-say="699 over 1000">699/1000</span> on a chance of 0. The ten sunrises are the same, the likelihoods are the same, and the predictive probability falls from just under 1 to about <span class="math" data-say="0.78">0.78</span>. The data did not change; the prior did.</p></div><p>That is the force of Hume's point. His argument can be set out as a valid argument, and its premises are worth stating at full strength:</p><ol><li>An argument from observed cases to an unobserved one is either deductive or rests on the assumption that the unobserved resembles the observed.</li><li>It is not deductive: the row above shows that.</li><li>The assumption of resemblance is not a necessary truth, since a world in which the sun stops is describable without contradiction. So if anything supports it, experience does; Hume allowed no third source.</li><li>Any argument from experience for it is itself an argument from observed cases to unobserved ones, and so already assumes it.</li><li>So nothing non-circular supports the assumption, and nothing non-circular supports enumerative induction.</li></ol><p>The lab does not answer this. It shows exactly where the answer would have to go. Reject the third premise and you owe an account of a third source of support, or of why resemblance is necessary after all; reject the fourth and you owe an account of why a circular defence is not vicious; accept the conclusion and you owe an account of why anyone should expect the sun at all. Either way the reader decides, and the arithmetic is the same.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  T       T     ...     T      |     F      &lt;- every premise true, conclusion false</div><p>The row exists. Nothing in the ten premises mentions day 11, so the sentence about day 11 is free to be false, and the argument is invalid. Replace ten by ten thousand and the row is still there: the premises grow, the conclusion does not move into them.</p><div class="defbox"><span class="label">Definition &middot; Enumerative induction</span><p><strong>Enumerative induction</strong> is the inference from &ldquo;all observed cases of F have been G&rdquo; to &ldquo;the next case of F will be G&rdquo;. As a form it is invalid, so whatever force it has comes from a premise it does not state.</p></div><p>The missing premise can be written as a probability. Suppose the sun rises each day with some fixed chance, and consider five hypotheses about that chance: <span class="math" data-say="1">1</span>, <span class="math" data-say="3 over 4">3/4</span>, <span class="math" data-say="1 over 2">1/2</span>, <span class="math" data-say="1 over 4">1/4</span> and <span class="math" data-say="0">0</span>. Put an equal prior of <span class="math" data-say="1 over 5">1/5</span> on each. This is the rule of succession reduced to five points, which keeps every number an exact fraction; it is a discretisation and it says nothing about hypotheses in between.</p><p>Ten sunrises in a row have probability <span class="math" data-say="chance to the power 10">chance¹⁰</span> under each hypothesis, so they favour the high chances heavily. After the data, the hypothesis that the sun always rises carries the posterior the lab prints in its first tile, and the probability of an eleventh sunrise is each hypothesis's chance weighted by its posterior.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Exact Bayesian updating</h2></div><p>prior times likelihood, normalised; the Bayes factor is the weight of the data</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Hypotheses, data, posterior</strong><span>every figure is an exact fraction</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="upTable"></table></div>
       <div class="status-banner" id="upStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change the prior, the likelihoods or the data</h3>
-          <p>A prior or a likelihood row that does not sum to 1 is refused, not rescaled.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change the prior, the likelihoods or the data</h3>
+            <p>A prior or a likelihood row that does not sum to 1 is refused, not rescaled.</p>
         <div class="field">
           <label for="upPreset">Worked example</label>
           <select id="upPreset"><option value="succession" selected>Uniform prior over five chances, ten sunrises</option><option value="skeptic">Skeptic's prior, ten sunrises</option></select>
@@ -1447,12 +1484,21 @@
           <div class="kpi"><span>Best act now</span><strong id="upBest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="chance, prior, weight after ten sunrises units of 1 over 1048576. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">chance   prior   weight after ten sunrises (units of 1/1048576)
+---------------------------------------------------------------
+  1       1/5        1048576
+  3/4     1/5          59049
+  1/2     1/5           1024
+  1/4     1/5              1
+  0       1/5              0</div><div class="thm"><span class="label">Theorem &middot; The predictive probability</span><p>The probability that the next case is a success is the sum, over the hypotheses, of the posterior of each times its chance of a success: <span class="math" data-say="P of next given data equals the sum of P of h given data times chance of h">P(next | data) = Σ P(h | data)·chance(h)</span>. It is below 1 whenever some hypothesis with a chance under 1 keeps any posterior.</p></div><div class="example"><span class="label">Example &middot; Same data, other prior</span><p>Give a skeptic a prior of <span class="math" data-say="1 over 1000">1/1000</span> on a chance of 1, <span class="math" data-say="1 over 10">1/10</span> on each of <span class="math" data-say="3 over 4">3/4</span>, <span class="math" data-say="1 over 2">1/2</span> and <span class="math" data-say="1 over 4">1/4</span>, and <span class="math" data-say="699 over 1000">699/1000</span> on a chance of 0. The ten sunrises are the same, the likelihoods are the same, and the predictive probability falls from just under 1 to about <span class="math" data-say="0.78">0.78</span>. The data did not change; the prior did.</p></div><p>That is the force of Hume's point. His argument can be set out as a valid argument, and its premises are worth stating at full strength:</p><ol><li>An argument from observed cases to an unobserved one is either deductive or rests on the assumption that the unobserved resembles the observed.</li><li>It is not deductive: the row above shows that.</li><li>The assumption of resemblance is not a necessary truth, since a world in which the sun stops is describable without contradiction. So if anything supports it, experience does; Hume allowed no third source.</li><li>Any argument from experience for it is itself an argument from observed cases to unobserved ones, and so already assumes it.</li><li>So nothing non-circular supports the assumption, and nothing non-circular supports enumerative induction.</li></ol><p>The lab does not answer this. It shows exactly where the answer would have to go. Reject the third premise and you owe an account of a third source of support, or of why resemblance is necessary after all; reject the fourth and you owe an account of why a circular defence is not vicious; accept the conclusion and you owe an account of why anyone should expect the sun at all. Either way the reader decides, and the arithmetic is the same.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading an inductive argument</h2></div><p>Four moves, in this order, for any argument from past cases to a new one.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the row</h3><p>Write the observed cases as premises and the new case as the conclusion, and set every premise true and the conclusion false. If nothing forbids that, the argument is invalid.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Name the missing premise</h3><p>Say what would have to be true of the unobserved for the past to bear on it. For the sun it is that the chance of rising is stable from one day to the next.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write it as a prior</h3><p>List the hypotheses about that stability, with a probability on each before any data. The choice is yours, and it is the part the data cannot check.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute, then vary the prior</h3><p>Read the posterior and the predictive probability from the lab, then change the prior and read them again. The gap between the two answers is how much the conclusion owes to the premise rather than to the data.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading an inductive argument</h2>
+      <p class="lead-in">Four moves, in this order, for any argument from past cases to a new one.</p>
+      <ol class="key-ideas method"><li><strong>Find the row.</strong> Write the observed cases as premises and the new case as the conclusion, and set every premise true and the conclusion false. If nothing forbids that, the argument is invalid.</li><li><strong>Name the missing premise.</strong> Say what would have to be true of the unobserved for the past to bear on it. For the sun it is that the chance of rising is stable from one day to the next.</li><li><strong>Write it as a prior.</strong> List the hypotheses about that stability, with a probability on each before any data. The choice is yours, and it is the part the data cannot check.</li><li><strong>Compute, then vary the prior.</strong> Read the posterior and the predictive probability from the lab, then change the prior and read them again. The gap between the two answers is how much the conclusion owes to the premise rather than to the data.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ P(next sunrise | data) = 43735/44346, just under 1
 skeptic&#x27;s prior: P(next sunrise | data) = 1382119/1763994</div><p>The first predictive probability is <span class="math" data-say="1 minus 611 over 44346">1 − 611/44346</span>, so the uniform prior is certain enough to bet on and never certain. The second is about <span class="math" data-say="0.78">0.78</span>. The ten sunrises were identical; the skeptic's prior started with almost nothing on the hypotheses that ten sunrises favour, and ten sunrises were not enough to undo that.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a large sample makes induction valid</strong><span>Ten sunrises and ten million have the same defect: a row on which the premises are true and the next case is not. A large sample raises the probability of the conclusion under a prior; it never turns the argument into a deduction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the posterior as if the data had produced it alone</strong><span>The posterior is the prior reweighted. The skeptic and the optimist start from different priors, see the same ten sunrises, and end with predictions that are about <span class="math" data-say="0.78">0.78</span> and <span class="math" data-say="0.99">0.99</span>. Where the prior came from is exactly Hume's question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the problem is that induction fails</strong><span>Induction has worked in every case we have checked. Hume's point is about justification: using that record to defend induction is itself an inductive argument, and the lab shows what any version of it has to assume.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can construct the row and compute the prediction.</strong><p>Given an inductive argument, you should be able to write the row that makes it invalid, state the premise a prior would supply, and compute the predictive probability under two priors from the lab, saying which part of the difference is the prior's.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The five chances are a discretisation chosen so every figure is an exact fraction. A finer set of hypotheses changes the numbers and not the lesson. “Grue and the New Riddle” asks why the hypotheses were these five and not some others.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a large sample makes induction valid</strong><span>Ten sunrises and ten million have the same defect: a row on which the premises are true and the next case is not. A large sample raises the probability of the conclusion under a prior; it never turns the argument into a deduction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the posterior as if the data had produced it alone</strong><span>The posterior is the prior reweighted. The skeptic and the optimist start from different priors, see the same ten sunrises, and end with predictions that are about <span class="math" data-say="0.78">0.78</span> and <span class="math" data-say="0.99">0.99</span>. Where the prior came from is exactly Hume's question.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the problem is that induction fails</strong><span>Induction has worked in every case we have checked. Hume's point is about justification: using that record to defend induction is itself an inductive argument, and the lab shows what any version of it has to assume.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can construct the row and compute the prediction.</strong><p>Given an inductive argument, you should be able to write the row that makes it invalid, state the premise a prior would supply, and compute the predictive probability under two priors from the lab, saying which part of the difference is the prior's.</p></div></div><div class="note"><strong>Note:</strong> The five chances are a discretisation chosen so every figure is an exact fraction. A finer set of hypotheses changes the numbers and not the lesson. “Grue and the New Riddle” asks why the hypotheses were these five and not some others.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Enumerative induction is not deduction</summary><p>From &ldquo;every observed case was F&rdquo; to &ldquo;the next case will be F&rdquo; there is always a row of the truth table on which the premises hold and the conclusion fails. Adding more premises of the same kind adds more cases to the premises and leaves that row in place.</p></details><details class="recall"><summary>A prior is the missing premise written down</summary><p>To let the past bear on the future you must say, before looking, how likely the various regularities are. That is a prior over hypotheses, and the data then reweight it.</p></details><details class="recall"><summary>Hume&#x27;s problem is about justification, not reliability</summary><p>The question is not whether induction has worked. It is whether anything non-circular shows that it will go on working, and the answer Hume gave is that nothing does.</p></details></div>
+      <h3>Summary</h3>
       <p>&ldquo;The sun has risen ten times, so it will rise again&rdquo; has a counterexample row, however large the number. It gains force only under a prior over hypotheses about how reliable the sun is, and the same ten sunrises give a different prediction under a different prior.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Enumerative induction is not deduction.</strong> From &ldquo;every observed case was F&rdquo; to &ldquo;the next case will be F&rdquo; there is always a row of the truth table on which the premises hold and the conclusion fails. Adding more premises of the same kind adds more cases to the premises and leaves that row in place.</li><li><strong>A prior is the missing premise written down.</strong> To let the past bear on the future you must say, before looking, how likely the various regularities are. That is a prior over hypotheses, and the data then reweight it.</li><li><strong>Hume&#x27;s problem is about justification, not reliability.</strong> The question is not whether induction has worked. It is whether anything non-circular shows that it will go on working, and the answer Hume gave is that nothing does.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="10 sunrises, so an 11 t h, has a bad row. no row implies valid, one row implies invalid. P of next equals the sum of P of chance given data times chance. the prior supplies what the data cannot" tabindex="0" role="region" aria-label="Mathematical notation">10 sunrises, so an 11th: has a bad row
 no row ⟹ valid; one row ⟹ invalid
 P(next) = Σ P(chance | data)·chance
@@ -2205,11 +2250,40 @@ the prior supplies what the data cannot</div><figcaption>What the past licenses<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2277,7 +2351,7 @@ the prior supplies what the data cannot</div><figcaption>What the past licenses<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Elementary Data Structures</p>
       <h1>Stacks, Queues and Linked Lists</h1>
       <p class="lesson-lede">A stack, a queue and a linked list are three ways to hold a changing set, and each makes some operations constant-time by giving up others; the cost of an operation belongs to a representation, not to the set.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Dynamic set</li><li>Stack and queue</li><li>Sentinel</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;A sentinel is a dummy object that allows us to simplify boundary conditions.&rdquo; The authors say it in Section 10.2, and the sentence is a fair summary of the chapter's method: each structure here is a small device that makes some operation cheap or some code short, and each has a price somewhere else. This lesson reads the introduction to Part III and the four sections of Chapter 10.</p><p>Part III opens with vocabulary rather than algorithms. A dynamic set changes while an algorithm runs; its elements are objects with a key and perhaps satellite data; and the operations on it fall into queries, which only look, and modifying operations, which change it. The authors list seven of them, SEARCH, INSERT, DELETE, MINIMUM, MAXIMUM, SUCCESSOR and PREDECESSOR, and say that the time an operation takes is usually measured against the size of the set. Every structure in this course is judged by which of those seven it does quickly.</p><p>Section 10.1 puts a stack in an array <span class="math" data-say="S at 1, n">S[1..n]</span> with one index, <span class="math" data-say="S, top">S.top</span>. PUSH increments it and stores; POP decrements it and returns the element above. Each costs <span class="math" data-say="big O of 1">O(1)</span>. Popping an empty stack is <em>underflow</em>, pushing past n is <em>overflow</em>, and the book's code checks only the first. A queue needs two indices: <span class="math" data-say="Q, head">Q.head</span>, the element to leave next, and <span class="math" data-say="Q, tail">Q.tail</span>, the slot the next arrival takes. Both move rightward and wrap from n back to 1, so the array is used as a ring. Empty and full must look different, which is why one slot is always left unused: the queue is empty when head equals tail and full when the tail is one step behind the head, so <span class="math" data-say="Q at 1, n">Q[1..n]</span> holds at most n − 1 elements.</p><p>Section 10.2 replaces index order with pointer order. In a doubly linked list every element points to its successor and its predecessor, and <span class="math" data-say="L, head">L.head</span> points to the first. A list can also be singly linked, sorted, or circular. LIST-SEARCH walks from the head and costs <span class="math" data-say="theta of n">Θ(n)</span> in the worst case. LIST-INSERT splices a new element in at the front and costs <span class="math" data-say="big O of 1">O(1)</span>. LIST-DELETE splices an element out in <span class="math" data-say="big O of 1">O(1)</span>, but only when it is handed a pointer to the element; deleting by key means searching first, and then the cost is <span class="math" data-say="theta of n">Θ(n)</span>. The distinction between an operation given a key and the same operation given a pointer runs through the rest of the course.</p><div class="defbox"><span class="label">Definition &middot; Sentinel, as Section 10.2 uses it</span><p>An object <span class="math" data-say="L, nil">L.nil</span> with the same fields as a list element and no real key. Every pointer that would be NIL points to it instead, so the list becomes circular with <span class="math" data-say="L, nil">L.nil</span> between tail and head, and the empty list is the sentinel pointing to itself. Insert and delete then lose their tests for the first and last element.</p></div><p>The authors are careful about what the sentinel buys. It rarely changes an asymptotic bound; in the list procedures it saves a constant number of tests, and the gain is mostly clearer code. In a tight loop it can lower the coefficient of the running time, which is the use Chapter 2's merge made of it. It also costs one extra object per list, which matters when a program keeps many short lists, so the book uses sentinels only where they make the code simpler. Chapter 13's red-black trees are one such place.</p><p>Section 10.3 asks what to do in a language without pointers, and answers with arrays. In the multiple-array form, three arrays <em>next</em>, <em>key</em> and <em>prev</em> hold one field each, and an object is an index into all three. In the single-array form an object is a run of consecutive cells and a pointer is the index of its first cell, with each field at a fixed offset. Unused objects are kept on a singly linked <em>free list</em>, which is worked as a stack: ALLOCATE-OBJECT pops an object off it and FREE-OBJECT pushes one back, both in <span class="math" data-say="big O of 1">O(1)</span>.</p><p>Section 10.4 represents rooted trees. A binary tree node carries pointers to its parent and its left and right children. A tree whose nodes may have any number of children cannot reserve a field per child, so each node keeps just two: its leftmost child and its next sibling to the right. That <em>left-child, right-sibling</em> form stores any n-node rooted tree in <span class="math" data-say="big O of n">O(n)</span> space. Chapters 12 to 14 build on the binary form.</p><p>Now the lab, the one from the Algorithms Subject's lesson Arrays, Linked Lists, and the Cost Model, where the comparison is practised further. It runs one operation sequence on a dynamic array and on a doubly linked list with a tail pointer and adds up a cost per operation in a stated model: reaching index i of the array costs 1, reaching the i-th list node costs i + 1 hops, inserting at the front of the array shifts every element, and deleting at a position shifts the elements after it in the array but walks to it in the list. That last rule prices LIST-DELETE as the book does when it is given a position rather than a pointer: the splice is cheap, the walk is not.</p><p>The tiles are the number of operations run, each representation's total, which one was cheaper, the ratio of the two totals, and the kind of operation whose two columns differ most, labelled decided by. The worked example <code>four-operations</code> repeats index, insert at the front, insert at the end and delete from the middle four times from 16 elements: 122 on the array, 92 on the list, decided by the front insertions. <code>front-insertions</code> is three front insertions and one index from 24 elements: 370 against 78, the ratio 185/39. <code>random-access</code>, three indexes and one insertion at the end, reverses it: 16 against 250, decided by index. <code>scan-bound</code>, search and delete mixed in, gives 212 against 216, the ratio 53/54: when both must walk, the representation hardly matters.</p><p>Move the position slider in <code>random-access</code> to the front and the list's total drops from 250 to 16, a tie: the same operations, reaching the front instead of four fifths of the way along. A count is a fact about one sequence at one position. The bounds in the chapter, <span class="math" data-say="big O of 1">O(1)</span> for a splice and <span class="math" data-say="theta of n">Θ(n)</span> for a search, hold for every list of n elements; the totals say what one sequence cost.</p><h3>Exercise</h3><p>In the lab choose <code>front-insertions</code>, set the starting size to 8, one round, and the position to halfway. Before reading the tiles, price each of the four operations on both representations by hand, carrying the size down as it grows, and add the columns. Then move the position to the back and say which total changes, by how much, and why the other does not.</p><p>A list finds a key by walking the whole of it. The next lesson, Direct Addressing and Hashing with Chaining, uses the key to compute where to look, and keeps short lists only for the keys that land in the same place.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Arrays against linked lists</h2></div><p>One operation sequence, two representations, two counts</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;A sentinel is a dummy object that allows us to simplify boundary conditions.&rdquo; The authors say it in Section 10.2, and the sentence is a fair summary of the chapter's method: each structure here is a small device that makes some operation cheap or some code short, and each has a price somewhere else. This lesson reads the introduction to Part III and the four sections of Chapter 10.</p><p>Part III opens with vocabulary rather than algorithms. A dynamic set changes while an algorithm runs; its elements are objects with a key and perhaps satellite data; and the operations on it fall into queries, which only look, and modifying operations, which change it. The authors list seven of them, SEARCH, INSERT, DELETE, MINIMUM, MAXIMUM, SUCCESSOR and PREDECESSOR, and say that the time an operation takes is usually measured against the size of the set. Every structure in this course is judged by which of those seven it does quickly.</p><p>Section 10.1 puts a stack in an array <span class="math" data-say="S at 1, n">S[1..n]</span> with one index, <span class="math" data-say="S, top">S.top</span>. PUSH increments it and stores; POP decrements it and returns the element above. Each costs <span class="math" data-say="big O of 1">O(1)</span>. Popping an empty stack is <em>underflow</em>, pushing past n is <em>overflow</em>, and the book's code checks only the first. A queue needs two indices: <span class="math" data-say="Q, head">Q.head</span>, the element to leave next, and <span class="math" data-say="Q, tail">Q.tail</span>, the slot the next arrival takes. Both move rightward and wrap from n back to 1, so the array is used as a ring. Empty and full must look different, which is why one slot is always left unused: the queue is empty when head equals tail and full when the tail is one step behind the head, so <span class="math" data-say="Q at 1, n">Q[1..n]</span> holds at most n − 1 elements.</p><p>Section 10.2 replaces index order with pointer order. In a doubly linked list every element points to its successor and its predecessor, and <span class="math" data-say="L, head">L.head</span> points to the first. A list can also be singly linked, sorted, or circular. LIST-SEARCH walks from the head and costs <span class="math" data-say="theta of n">Θ(n)</span> in the worst case. LIST-INSERT splices a new element in at the front and costs <span class="math" data-say="big O of 1">O(1)</span>. LIST-DELETE splices an element out in <span class="math" data-say="big O of 1">O(1)</span>, but only when it is handed a pointer to the element; deleting by key means searching first, and then the cost is <span class="math" data-say="theta of n">Θ(n)</span>. The distinction between an operation given a key and the same operation given a pointer runs through the rest of the course.</p><div class="defbox"><span class="label">Definition &middot; Sentinel, as Section 10.2 uses it</span><p>An object <span class="math" data-say="L, nil">L.nil</span> with the same fields as a list element and no real key. Every pointer that would be NIL points to it instead, so the list becomes circular with <span class="math" data-say="L, nil">L.nil</span> between tail and head, and the empty list is the sentinel pointing to itself. Insert and delete then lose their tests for the first and last element.</p></div><p>The authors are careful about what the sentinel buys. It rarely changes an asymptotic bound; in the list procedures it saves a constant number of tests, and the gain is mostly clearer code. In a tight loop it can lower the coefficient of the running time, which is the use Chapter 2's merge made of it. It also costs one extra object per list, which matters when a program keeps many short lists, so the book uses sentinels only where they make the code simpler. Chapter 13's red-black trees are one such place.</p><p>Section 10.3 asks what to do in a language without pointers, and answers with arrays. In the multiple-array form, three arrays <em>next</em>, <em>key</em> and <em>prev</em> hold one field each, and an object is an index into all three. In the single-array form an object is a run of consecutive cells and a pointer is the index of its first cell, with each field at a fixed offset. Unused objects are kept on a singly linked <em>free list</em>, which is worked as a stack: ALLOCATE-OBJECT pops an object off it and FREE-OBJECT pushes one back, both in <span class="math" data-say="big O of 1">O(1)</span>.</p><p>Section 10.4 represents rooted trees. A binary tree node carries pointers to its parent and its left and right children. A tree whose nodes may have any number of children cannot reserve a field per child, so each node keeps just two: its leftmost child and its next sibling to the right. That <em>left-child, right-sibling</em> form stores any n-node rooted tree in <span class="math" data-say="big O of n">O(n)</span> space. Chapters 12 to 14 build on the binary form.</p><p>Now the lab, the one from the Algorithms Subject's lesson Arrays, Linked Lists, and the Cost Model, where the comparison is practised further. It runs one operation sequence on a dynamic array and on a doubly linked list with a tail pointer and adds up a cost per operation in a stated model: reaching index i of the array costs 1, reaching the i-th list node costs i + 1 hops, inserting at the front of the array shifts every element, and deleting at a position shifts the elements after it in the array but walks to it in the list. That last rule prices LIST-DELETE as the book does when it is given a position rather than a pointer: the splice is cheap, the walk is not.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Arrays against linked lists</h2></div><p>One operation sequence, two representations, two counts</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two representations, one sequence</strong><span>cost counted in the word RAM, not quoted from a class</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>dynamic array</span><span class="tone-amber"><i class="legend-swatch"></i>doubly-linked list</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" id="alStage" tabindex="0" role="region" aria-label="Cumulative cost of the operation sequence on a dynamic array and on a doubly-linked list."><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 220" role="img" aria-label="Cumulative cost of the operation sequence on a dynamic array and on a doubly-linked list."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Price one sequence on an array and on a linked list</h3>
-          <p>Choose an operation sequence, a starting size, how many times it repeats and how far along the indexed operations reach. Each operation is costed on both representations in the lab's model, an array index at 1 and the i-th list node at i + 1, and the totals are counts of that one sequence, not bounds.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Price one sequence on an array and on a linked list</h3>
+            <p>Choose an operation sequence, a starting size, how many times it repeats and how far along the indexed operations reach. Each operation is costed on both representations in the lab's model, an array index at 1 and the i-th list node at i + 1, and the totals are counts of that one sequence, not bounds.</p>
         <div class="field" id="alPresetField">
           <label for="alPreset">Operation sequence</label>
           <select id="alPreset"><option value="four-operations" selected>index, insert at the front, insert at the end, delete from the middle</option><option value="front-insertions">three insertions at the front, then one index</option><option value="random-access">three indexes, then one insertion at the end</option><option value="scan-bound">search, insert at the end, search, delete at a position</option></select>
@@ -1433,12 +1476,15 @@
           <div class="kpi"><span>Decided by</span><strong id="alDecider">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The tiles are the number of operations run, each representation's total, which one was cheaper, the ratio of the two totals, and the kind of operation whose two columns differ most, labelled decided by. The worked example <code>four-operations</code> repeats index, insert at the front, insert at the end and delete from the middle four times from 16 elements: 122 on the array, 92 on the list, decided by the front insertions. <code>front-insertions</code> is three front insertions and one index from 24 elements: 370 against 78, the ratio 185/39. <code>random-access</code>, three indexes and one insertion at the end, reverses it: 16 against 250, decided by index. <code>scan-bound</code>, search and delete mixed in, gives 212 against 216, the ratio 53/54: when both must walk, the representation hardly matters.</p><p>Move the position slider in <code>random-access</code> to the front and the list's total drops from 250 to 16, a tie: the same operations, reaching the front instead of four fifths of the way along. A count is a fact about one sequence at one position. The bounds in the chapter, <span class="math" data-say="big O of 1">O(1)</span> for a splice and <span class="math" data-say="theta of n">Θ(n)</span> for a search, hold for every list of n elements; the totals say what one sequence cost.</p><h3>Exercise</h3><p>In the lab choose <code>front-insertions</code>, set the starting size to 8, one round, and the position to halfway. Before reading the tiles, price each of the four operations on both representations by hand, carrying the size down as it grows, and add the columns. Then move the position to the back and say which total changes, by how much, and why the other does not.</p><p>A list finds a key by walking the whole of it. The next lesson, Direct Addressing and Hashing with Chaining, uses the key to compute where to look, and keeps short lists only for the keys that land in the same place.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>A queue round its array by hand</h2></div><p>Four steps on a small array, then one on the lab.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the array and both indices</h3><p>Write the slots 1 to n in a row, mark the head and the tail, and start both at slot 1. The queue is empty while they are equal.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Enqueue at the tail</h3><p>Store the arrival in the tail's slot and move the tail one to the right, from n back to 1. Refuse the arrival if the tail would land on the head: the queue is full.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Dequeue at the head</h3><p>Take the element in the head's slot and move the head one to the right, wrapping the same way. Refuse if head equals tail: the queue is empty.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the queue off the ring</h3><p>The queue is the slots from the head up to the one before the tail, read with wrap-around. Check that their number never exceeds n − 1.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Price a sequence in the lab</h3><p>Choose <code>front-insertions</code> at 8 elements, one round, halfway: work the four costs by hand on both representations, then compare your two totals with the tiles.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>A queue round its array by hand</h2>
+      <p class="lead-in">Four steps on a small array, then one on the lab.</p>
+      <ol class="key-ideas method"><li><strong>Draw the array and both indices.</strong> Write the slots 1 to n in a row, mark the head and the tail, and start both at slot 1. The queue is empty while they are equal.</li><li><strong>Enqueue at the tail.</strong> Store the arrival in the tail's slot and move the tail one to the right, from n back to 1. Refuse the arrival if the tail would land on the head: the queue is full.</li><li><strong>Dequeue at the head.</strong> Take the element in the head's slot and move the head one to the right, wrapping the same way. Refuse if head equals tail: the queue is empty.</li><li><strong>Read the queue off the ring.</strong> The queue is the slots from the head up to the one before the tail, read with wrap-around. Check that their number never exceeds n − 1.</li><li><strong>Price a sequence in the lab.</strong> Choose <code>front-insertions</code> at 8 elements, one round, halfway: work the four costs by hand on both representations, then compare your two totals with the tiles.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1505,16 @@ head 3, tail 2: full again
 queue, head first: 15 16 23 42 7</div><p>The queue was full twice, both times holding five elements in six slots, and never with the tail on the head: had a sixth arrival been allowed, head and tail would have coincided and the full queue would have looked empty. That is why one slot is given up. Every operation moved one index by one slot, so each cost <span class="math" data-say="big O of 1">O(1)</span> whatever the queue held.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying a linked list inserts in constant time, without saying where</strong><span>LIST-INSERT splices at the head in <span class="math" data-say="big O of 1">O(1)</span>, and LIST-DELETE splices out in <span class="math" data-say="big O of 1">O(1)</span> given a pointer. Neither covers inserting or deleting at a position or by key, which first needs a walk that costs <span class="math" data-say="theta of n">Θ(n)</span> in the worst case. In the lab, <code>scan-bound</code> mixes searches and deletes at a position, and the list's total, 216, is no better than the array's, 212. The cheap part of a list operation is the splice; reaching the place is the part that costs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Filling every slot of a circular queue</strong><span>With head and tail alone, an empty queue and a full queue would both have the tail on the head. Section 10.1's queue therefore holds at most n − 1 elements in <span class="math" data-say="Q at 1, n">Q[1..n]</span>. Keeping a separate count of elements is another way out, but it is a different structure from the book's, with one more field to keep right on every operation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a sentinel to improve the bound</strong><span>The sentinel removes boundary tests. The authors say it rarely changes an asymptotic bound and mostly makes code clearer, and that it costs one extra object per list, which adds up when a program keeps many small lists. LIST-SEARCH with a sentinel still walks up to n elements.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run and price the chapter&#x27;s structures by hand.</strong><p>Given a short sequence of operations, run it on a stack, an array queue or a doubly linked list, say the cost of each operation, and say which costs depend on being handed a pointer rather than a key.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares a dynamic array with a doubly linked list in one fixed cost model on four sequences it supplies; you choose the size, the repetitions and the position, not the operations. It does not run the array stack or queue, the objects built from arrays, or the tree representations; those are worked by hand here. Its totals describe one sequence, and the chapter's bounds hold for all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying a linked list inserts in constant time, without saying where</strong><span>LIST-INSERT splices at the head in <span class="math" data-say="big O of 1">O(1)</span>, and LIST-DELETE splices out in <span class="math" data-say="big O of 1">O(1)</span> given a pointer. Neither covers inserting or deleting at a position or by key, which first needs a walk that costs <span class="math" data-say="theta of n">Θ(n)</span> in the worst case. In the lab, <code>scan-bound</code> mixes searches and deletes at a position, and the list's total, 216, is no better than the array's, 212. The cheap part of a list operation is the splice; reaching the place is the part that costs.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Filling every slot of a circular queue</strong><span>With head and tail alone, an empty queue and a full queue would both have the tail on the head. Section 10.1's queue therefore holds at most n − 1 elements in <span class="math" data-say="Q at 1, n">Q[1..n]</span>. Keeping a separate count of elements is another way out, but it is a different structure from the book's, with one more field to keep right on every operation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a sentinel to improve the bound</strong><span>The sentinel removes boundary tests. The authors say it rarely changes an asymptotic bound and mostly makes code clearer, and that it costs one extra object per list, which adds up when a program keeps many small lists. LIST-SEARCH with a sentinel still walks up to n elements.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run and price the chapter&#x27;s structures by hand.</strong><p>Given a short sequence of operations, run it on a stack, an array queue or a doubly linked list, say the cost of each operation, and say which costs depend on being handed a pointer rather than a key.</p></div></div><div class="note"><strong>Note:</strong> The lab compares a dynamic array with a doubly linked list in one fixed cost model on four sequences it supplies; you choose the size, the repetitions and the position, not the operations. It does not run the array stack or queue, the objects built from arrays, or the tree representations; those are worked by hand here. Its totals describe one sequence, and the chapter's bounds hold for all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Dynamic set</summary><p>A set that algorithms grow, shrink and query while they run. Each element has a key, which identifies it, and may carry satellite data, which travels with it. The operations split into queries, such as SEARCH, MINIMUM and SUCCESSOR, and modifying operations, INSERT and DELETE. A set that needs only insert, delete and search is a dictionary.</p></details><details class="recall"><summary>Stack and queue</summary><p>Two dynamic sets whose DELETE takes no argument because the element removed is fixed in advance: the most recently inserted for a stack (last in, first out), the longest present for a queue (first in, first out). Insert and delete are called PUSH and POP on a stack, ENQUEUE and DEQUEUE on a queue.</p></details><details class="recall"><summary>Sentinel</summary><p>A dummy object that stands where the list would otherwise point to nothing. A doubly linked list with one sentinel becomes a ring: the sentinel's next is the head, its previous is the tail, and no operation has to test whether it is at an end.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 10 builds the simplest dynamic sets: a stack and a queue in an array, the doubly linked list with and without a sentinel, objects and pointers made out of plain arrays, and rooted trees with any number of children. Run a queue round its array by hand, then let the lab price one operation sequence on an array and on a linked list and show which operation decides between them.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Dynamic set.</strong> A set that algorithms grow, shrink and query while they run. Each element has a key, which identifies it, and may carry satellite data, which travels with it. The operations split into queries, such as SEARCH, MINIMUM and SUCCESSOR, and modifying operations, INSERT and DELETE. A set that needs only insert, delete and search is a dictionary.</li><li><strong>Stack and queue.</strong> Two dynamic sets whose DELETE takes no argument because the element removed is fixed in advance: the most recently inserted for a stack (last in, first out), the longest present for a queue (first in, first out). Insert and delete are called PUSH and POP on a stack, ENQUEUE and DEQUEUE on a queue.</li><li><strong>Sentinel.</strong> A dummy object that stands where the list would otherwise point to nothing. A doubly linked list with one sentinel becomes a ring: the sentinel's next is the head, its previous is the tail, and no operation has to test whether it is at an end.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a stack removes the newest element. a queue removes the oldest element. a queue in Q at 1, n holds n minus 1 at most. list search theta of n, splice in or out big O of 1. a sentinel removes the boundary tests. a free list hands out unused objects. any tree fits two pointers per node" tabindex="0" role="region" aria-label="Mathematical notation">a stack removes the newest element
 a queue removes the oldest element
 a queue in Q[1..n] holds n − 1 at most
@@ -2989,11 +3034,40 @@ any tree fits two pointers per node</div><figcaption>Chapter 10 in seven lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3061,7 +3135,7 @@ any tree fits two pointers per node</div><figcaption>Chapter 10 in seven lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

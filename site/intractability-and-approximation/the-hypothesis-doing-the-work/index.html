@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,27 +1424,25 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Intractability and Approximation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Guarantees, and the lower bound they rest on</p>
       <h1>The Hypothesis Doing the Work</h1>
       <p class="lesson-lede">Double a spanning tree of weight 5, shortcut it to a tour of 10 against an optimum of 7, then raise one distance and watch the promise fail.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The lower bound is a spanning tree, and the argument is one deletion</li><li>The shortcut step is where the hypothesis is spent</li><li>A sweep bounds the ratio below the guarantee, and that is not evidence against it</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The tree, the doubling, the shortcut, and the assumption it needs</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The metric travelling salesman</span><p>Distances are given for every pair of cities, are symmetric, and satisfy the <strong>triangle inequality</strong>: <span class="math" data-say="D of A and b is at most D of A and c plus D of c and b">D(a,b) ≤ D(a,c) + D(c,b)</span> for all <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, <span class="math" data-say="c">c</span>. The problem is to find a shortest tour visiting every city once and returning. Distances that come from positions in space always satisfy the inequality, which is why the hypothesis is usually free.</p></div><h3>The algorithm</h3><ol><li>Build a minimum spanning tree of the cities.</li><li>Walk it, using every edge exactly twice, returning to the start. The walk has weight exactly twice the tree.</li><li>Traverse the walk and skip every city already visited, hopping directly to the next new one. What is left visits each city once: a tour.</li></ol><div class="thm"><span class="label">Theorem &middot; The doubled tree gives a tour within twice the optimum</span><p>For distances satisfying the triangle inequality, the tour produced has length at most <span class="math" data-say="2 times MST is at most 2 times OPT">2 · MST ≤ 2 · OPT</span>.</p></div><div class="proof"><p>Deleting one step from an optimal tour leaves a connected acyclic spanning subgraph, that is, a spanning tree, of weight at most the tour's. So <span class="math" data-say="MST is at most OPT">MST ≤ OPT</span>.</p><p>The doubled walk has weight exactly <span class="math" data-say="2 times MST">2 · MST</span> and visits every city. Shortcutting replaces a sub-path from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> through already-visited cities by the direct hop <span class="math" data-say="D of A and b">D(a,b)</span>; by the triangle inequality applied along that sub-path, the hop is no longer than the sub-path it replaces. So the tour is at most <span class="math" data-say="2 times MST">2 · MST</span>, and combining gives <span class="math" data-say="2 times OPT">2 · OPT</span>.</p><p><span class="qed">&#9633;</span></p></div><h3>The chain, as four numbers</h3><div class="mathblock" data-say="the tree, 5, a lower bound the algorithm computes. the optimum, 7, by exhaustive search over the tours. the tour built, 10, the doubled tree, shortcut. twice the tree, 10, the promise" tabindex="0" role="region" aria-label="Mathematical notation">the tree           5      a lower bound the algorithm computes
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The tree, the doubling, the shortcut, and the assumption it needs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The metric travelling salesman</span><p>Distances are given for every pair of cities, are symmetric, and satisfy the <strong>triangle inequality</strong>: <span class="math" data-say="D of A and b is at most D of A and c plus D of c and b">D(a,b) ≤ D(a,c) + D(c,b)</span> for all <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span>, <span class="math" data-say="c">c</span>. The problem is to find a shortest tour visiting every city once and returning. Distances that come from positions in space always satisfy the inequality, which is why the hypothesis is usually free.</p></div><h3>The algorithm</h3><ol><li>Build a minimum spanning tree of the cities.</li><li>Walk it, using every edge exactly twice, returning to the start. The walk has weight exactly twice the tree.</li><li>Traverse the walk and skip every city already visited, hopping directly to the next new one. What is left visits each city once: a tour.</li></ol><div class="thm"><span class="label">Theorem &middot; The doubled tree gives a tour within twice the optimum</span><p>For distances satisfying the triangle inequality, the tour produced has length at most <span class="math" data-say="2 times MST is at most 2 times OPT">2 · MST ≤ 2 · OPT</span>.</p></div><div class="proof"><p>Deleting one step from an optimal tour leaves a connected acyclic spanning subgraph, that is, a spanning tree, of weight at most the tour's. So <span class="math" data-say="MST is at most OPT">MST ≤ OPT</span>.</p><p>The doubled walk has weight exactly <span class="math" data-say="2 times MST">2 · MST</span> and visits every city. Shortcutting replaces a sub-path from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> through already-visited cities by the direct hop <span class="math" data-say="D of A and b">D(a,b)</span>; by the triangle inequality applied along that sub-path, the hop is no longer than the sub-path it replaces. So the tour is at most <span class="math" data-say="2 times MST">2 · MST</span>, and combining gives <span class="math" data-say="2 times OPT">2 · OPT</span>.</p><p><span class="qed">&#9633;</span></p></div><h3>The chain, as four numbers</h3><div class="mathblock" data-say="the tree, 5, a lower bound the algorithm computes. the optimum, 7, by exhaustive search over the tours. the tour built, 10, the doubled tree, shortcut. twice the tree, 10, the promise" tabindex="0" role="region" aria-label="Mathematical notation">the tree           5      a lower bound the algorithm computes
 the optimum        7      by exhaustive search over the tours
 the tour built    10      the doubled tree, shortcut
-twice the tree    10      the promise</div><p>The loaded instance is four cities with the distances <span class="math" data-say="1 minus 2 2, 1 minus 3 1, 1 minus 4 3, 2 minus 3 3, 2 minus 4 2, 3 minus 4 2">1-2 2, 1-3 1, 1-4 3, 2-3 3, 2-4 2, 3-4 2</span>, which satisfies the triangle inequality. The tree takes the edges of weight 1, 2 and 2 for a total of 5; the shortcut tour is <span class="math" data-say="1, 2, 3, 4">1, 2, 3, 4</span> at length 10; the optimum is 7, attained by <span class="math" data-say="1, 2, 4, 3">1, 2, 4, 3</span>; and the realised ratio is 10/7. Notice that the tour equals <span class="math" data-say="2 times MST">2 · MST</span> exactly here, so the last link of the chain is an equality and all the slack in the promise lives in the gap between 5 and 7.</p><p>This instance was not chosen by hand. The panel enumerates every symmetric instance on four cities with distances from 1 to 3 &mdash; 729 of them &mdash; keeps the 482 that are metric, solves each exactly, and reports the worst ratio any produced. It is 10/7, and this is the instance attaining it. On three cities the same sweep reports a worst ratio of 1: the heuristic is exact there, because every tour on three cities is the same tour.</p><div class="example"><span class="label">Example &middot; Switching the hypothesis off</span><p>Load the instance with one distance raised: <span class="math" data-say="1 minus 2 50">1-2 50</span> with every other distance 1. The direct hop from 1 to 2 costs 50 while going round through 3 costs 2, so the triangle inequality fails by a factor of 25. The panel reports metric: no, a tree of 3, a promise of 6, an optimum of 4 &mdash; and a tour of 53, against a promise of 6. The answer is more than eight times the promise the algorithm made, because the shortcut step replaced a cheap path by an enormous hop and the proof's last line is simply false.</p></div><p>That is the most important thing on this page. A guarantee is a conditional, and when the condition fails there is no residual weaker guarantee: the algorithm can be arbitrarily bad, and the slider can make the ratio as large as you like. Raising the distance further raises the tour without limit while the optimum stays at 4.</p><p>And the general problem really is that bad, which was proved earlier on this course by putting <span class="math" data-say="rho times n plus 1">ρ · n + 1</span> on the non-edges: no constant-factor approximation exists for the travelling salesman without a hypothesis, unless <span class="math" data-say="P equals NP">P = NP</span>. So the triangle inequality is not a convenience that simplifies the analysis. It is the difference between a problem with a factor-2 algorithm and a problem with no constant-factor algorithm at all.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The metric tour in two: an MST, doubled, shortcut</h2></div><p>The tree is below the optimum and the walk is twice the tree — and the shortcut step, the only one that needs the triangle inequality, is the one the slider breaks</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+twice the tree    10      the promise</div><p>The loaded instance is four cities with the distances <span class="math" data-say="1 minus 2 2, 1 minus 3 1, 1 minus 4 3, 2 minus 3 3, 2 minus 4 2, 3 minus 4 2">1-2 2, 1-3 1, 1-4 3, 2-3 3, 2-4 2, 3-4 2</span>, which satisfies the triangle inequality. The tree takes the edges of weight 1, 2 and 2 for a total of 5; the shortcut tour is <span class="math" data-say="1, 2, 3, 4">1, 2, 3, 4</span> at length 10; the optimum is 7, attained by <span class="math" data-say="1, 2, 4, 3">1, 2, 4, 3</span>; and the realised ratio is 10/7. Notice that the tour equals <span class="math" data-say="2 times MST">2 · MST</span> exactly here, so the last link of the chain is an equality and all the slack in the promise lives in the gap between 5 and 7.</p><p>This instance was not chosen by hand. The panel enumerates every symmetric instance on four cities with distances from 1 to 3 &mdash; 729 of them &mdash; keeps the 482 that are metric, solves each exactly, and reports the worst ratio any produced. It is 10/7, and this is the instance attaining it. On three cities the same sweep reports a worst ratio of 1: the heuristic is exact there, because every tour on three cities is the same tour.</p><div class="example"><span class="label">Example &middot; Switching the hypothesis off</span><p>Load the instance with one distance raised: <span class="math" data-say="1 minus 2 50">1-2 50</span> with every other distance 1. The direct hop from 1 to 2 costs 50 while going round through 3 costs 2, so the triangle inequality fails by a factor of 25. The panel reports metric: no, a tree of 3, a promise of 6, an optimum of 4 &mdash; and a tour of 53, against a promise of 6. The answer is more than eight times the promise the algorithm made, because the shortcut step replaced a cheap path by an enormous hop and the proof's last line is simply false.</p></div><p>That is the most important thing on this page. A guarantee is a conditional, and when the condition fails there is no residual weaker guarantee: the algorithm can be arbitrarily bad, and the slider can make the ratio as large as you like. Raising the distance further raises the tour without limit while the optimum stays at 4.</p><p>And the general problem really is that bad, which was proved earlier on this course by putting <span class="math" data-say="rho times n plus 1">ρ · n + 1</span> on the non-edges: no constant-factor approximation exists for the travelling salesman without a hypothesis, unless <span class="math" data-say="P equals NP">P = NP</span>. So the triangle inequality is not a convenience that simplifies the analysis. It is the difference between a problem with a factor-2 algorithm and a problem with no constant-factor algorithm at all.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The metric tour in two: an MST, doubled, shortcut</h2></div><p>The tree is below the optimum and the walk is twice the tree — and the shortcut step, the only one that needs the triangle inequality, is the one the slider breaks</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The metric tour in two: an MST, doubled, shortcut</strong><span>the shortcut step is where the triangle inequality is used, and the mode lets you take it away</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>an edge of the minimum spanning tree</span><span class="tone-purple"><i class="legend-swatch"></i>the tour after shortcutting</span><span class="tone-green"><i class="legend-swatch"></i>the optimum</span><span class="tone-red"><i class="legend-swatch"></i>the promise, twice the tree</span></div>
@@ -1408,10 +1451,10 @@ twice the tree    10      the promise</div><p>The loaded instance is four cities
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tsChain"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tsWorst"></table></div>
       <div class="status-banner" id="tsStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Raise one distance until the instance stops being metric</h3>
-          <p>Each link of the chain is a separate row, with what it needs written beside it, because only one of the three uses the triangle inequality. The optimum is an exhaustive search over the tours, and a second search covers every metric instance of a size so the worst case is a number rather than an adjective.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Raise one distance until the instance stops being metric</h3>
+            <p>Each link of the chain is a separate row, with what it needs written beside it, because only one of the three uses the triangle inequality. The optimum is an exhaustive search over the tours, and a second search covers every metric instance of a size so the worst case is a number rather than an adjective.</p>
         <div class="field">
           <label for="tsPreset">Worked example</label>
           <select id="tsPreset"><option value="worst4" selected>the worst metric instance on four cities</option><option value="worst5">a five-city metric instance</option><option value="easy">four cities, distances 3 to 5</option><option value="broken">one distance raised until the triangle inequality breaks</option><option value="grid">five cities on a line</option></select>
@@ -1439,12 +1482,14 @@ twice the tree    10      the promise</div><p>The loaded instance is four cities
           <div class="kpi"><span>An instance that attains it</span><strong id="tsWorstCase">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="tsHint" style="margin:0;">A distance is <span class="tt">1-2 7</span>, and every pair must be given. Build a minimum spanning tree, walk it so every edge is used twice, then shortcut past any city already visited. The walk costs exactly twice the tree, the tree is below the optimum because deleting one edge of an optimal tour leaves a spanning path, and shortcutting does not make the walk longer &mdash; <em>provided</em> a direct hop is no longer than going round. That proviso is the triangle inequality, and the slider removes it.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Using a guarantee that has a hypothesis attached</h2></div><p>Four steps, and the first one is the only defence against a guarantee that does not apply.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check the hypothesis on your data before quoting the ratio</h3><p>Test the triangle inequality on every triple, which is what the panel's metric verdict is. Distances derived from coordinates always pass; distances that are prices, travel times with one-way roads, or measurements with noise may not, and a single violating triple is enough to void the guarantee.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the lower bound, and keep it</h3><p>The minimum spanning tree is not a by-product, it is the evidence. Report it beside the tour: the pair <span class="math" data-say="MST">MST</span> and <span class="math" data-say="2 times MST">2 · MST</span> brackets the answer, and it is the only bracket available when the optimum is out of reach.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Print the realised ratio with the optimum beside it, or not at all</h3><p>On an instance small enough to enumerate, compute the optimum and divide. On a real instance you cannot, and then the honest report is the tour and the tree &mdash; a ratio against an unknown denominator is not a number.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read a small sweep for what it is</h3><p>482 metric instances on four cities with distances up to 3 give a worst ratio of 10/7. That is a fact about a small family, and it neither confirms nor threatens a bound of 2 over all families. The panel reports the family size precisely so the claim can be read at the right scope.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Using a guarantee that has a hypothesis attached</h2>
+      <p class="lead-in">Four steps, and the first one is the only defence against a guarantee that does not apply.</p>
+      <ol class="key-ideas method"><li><strong>Check the hypothesis on your data before quoting the ratio.</strong> Test the triangle inequality on every triple, which is what the panel's metric verdict is. Distances derived from coordinates always pass; distances that are prices, travel times with one-way roads, or measurements with noise may not, and a single violating triple is enough to void the guarantee.</li><li><strong>Compute the lower bound, and keep it.</strong> The minimum spanning tree is not a by-product, it is the evidence. Report it beside the tour: the pair <span class="math" data-say="MST">MST</span> and <span class="math" data-say="2 times MST">2 · MST</span> brackets the answer, and it is the only bracket available when the optimum is out of reach.</li><li><strong>Print the realised ratio with the optimum beside it, or not at all.</strong> On an instance small enough to enumerate, compute the optimum and divide. On a real instance you cannot, and then the honest report is the tour and the tree &mdash; a ratio against an unknown denominator is not a number.</li><li><strong>Read a small sweep for what it is.</strong> 482 metric instances on four cities with distances up to 3 give a worst ratio of 10/7. That is a fact about a small family, and it neither confirms nor threatens a bound of 2 over all families. The panel reports the family size precisely so the claim can be read at the right scope.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1521,16 @@ twice the tree    10      the promise</div><p>The loaded instance is four cities
      metric no,  tree 3,  promise 6,  optimum 4,  tour 53</div><p>The shortcut here saves nothing: the walk weighs 10 and the tour is 10. That happens when the walk's repeated visits are all immediate backtracks, so the shortcut hops are the same edges the walk used. It is why this instance is the worst of the 482 &mdash; the algorithm pays the full <span class="math" data-say="2 times MST">2 · MST</span> while the optimum gets away with 7.</p><p>The optimum is <span class="math" data-say="1 minus 2 minus 4 minus 3">1-2-4-3</span>, which uses the two edges of weight 2 and the edge of weight 1, avoiding the 3s. The tree also used the edge of weight 1, so the two solutions overlap; the tree is not a bad guess, it is simply a different object, and the factor of 2 is the price of turning one into the other.</p><p>For a faded rehearsal, load the instance the heuristic gets exactly right and predict the ratio before running it. The supplied first move: its distances are 3, 4, 5 on one side and 3, 4, 3 on the other, so the tree weighs 9 and twice the tree is 18. Say what the tour and the optimum have to be for the ratio to come out at 1, then check &mdash; and note that an instance where the ratio is 1 is as uninformative about the worst case as one where it is 10/7.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting the factor of 2 without checking the input is metric</strong><span>The hypothesis is a property of the data, not of the algorithm, and it is cheap to test. Travel times on a road network with one-way streets are not even symmetric; prices with volume discounts break the inequality. The panel prints a metric verdict on every redraw for this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a weaker guarantee when the hypothesis fails</strong><span>There is none. The measured ratio on the broken instance is 53/4, and multiplying that distance again moves it further with nothing to stop it. A conditional result with a false condition says nothing, and that is different from saying something weak.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a small sweep as evidence about the bound</strong><span>10/7 over 482 instances is a fact about instances with four cities and distances of 1, 2 or 3. It is worth having, and it is not a comment on a bound quantified over every instance. Report the family with the number, always.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run the three steps by hand and say which of them needs the hypothesis.</strong><p>You should be able to build the tree, write the doubled walk, shortcut it, prove <span class="math" data-say="MST is at most OPT">MST ≤ OPT</span> by deleting an edge, identify the shortcut as the step needing the triangle inequality, test that inequality on given data, and state what survives when it fails.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both guarantees so far have been constants. &ldquo;Charging Every Element&rdquo; has a guarantee that grows with the instance &mdash; the harmonic number of the universe &mdash; and an argument that prices each element separately and then adds the prices up.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting the factor of 2 without checking the input is metric</strong><span>The hypothesis is a property of the data, not of the algorithm, and it is cheap to test. Travel times on a road network with one-way streets are not even symmetric; prices with volume discounts break the inequality. The panel prints a metric verdict on every redraw for this reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a weaker guarantee when the hypothesis fails</strong><span>There is none. The measured ratio on the broken instance is 53/4, and multiplying that distance again moves it further with nothing to stop it. A conditional result with a false condition says nothing, and that is different from saying something weak.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a small sweep as evidence about the bound</strong><span>10/7 over 482 instances is a fact about instances with four cities and distances of 1, 2 or 3. It is worth having, and it is not a comment on a bound quantified over every instance. Report the family with the number, always.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run the three steps by hand and say which of them needs the hypothesis.</strong><p>You should be able to build the tree, write the doubled walk, shortcut it, prove <span class="math" data-say="MST is at most OPT">MST ≤ OPT</span> by deleting an edge, identify the shortcut as the step needing the triangle inequality, test that inequality on given data, and state what survives when it fails.</p></div></div><div class="note"><strong>Note:</strong> Both guarantees so far have been constants. &ldquo;Charging Every Element&rdquo; has a guarantee that grows with the instance &mdash; the harmonic number of the universe &mdash; and an argument that prices each element separately and then adds the prices up.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The lower bound is a spanning tree, and the argument is one deletion</summary><p>Take an optimal tour and delete any one of its steps. What remains visits every city and has no cycle, so it is a spanning tree, and its weight is less than the tour's. A minimum spanning tree is therefore no heavier than the optimal tour &mdash; a lower bound the algorithm computes with Prim's algorithm from the graph course, and the only thing the guarantee is proved against.</p></details><details class="recall"><summary>The shortcut step is where the hypothesis is spent</summary><p>Walking every tree edge twice gives a closed walk of weight exactly <span class="math" data-say="2 times MST">2 · MST</span> visiting every city, but repeating cities. Shortcutting means skipping a city already visited and going straight to the next new one. That can only shorten the walk provided a direct hop is no longer than the path it replaces &mdash; which is exactly the triangle inequality. Without it the shortcut can cost more than the walk it replaces, and the panel's slider makes that happen.</p></details><details class="recall"><summary>A sweep bounds the ratio below the guarantee, and that is not evidence against it</summary><p>The panel enumerates every symmetric instance on four cities with distances from 1 to 3, keeps the 482 satisfying the triangle inequality, solves each exactly, and reports the worst ratio: 10/7, which is about 1.43 against a promise of 2. The guarantee is not thereby shown to be loose. It quantifies over every size and every distance range, and the family swept here is tiny &mdash; four cities and three possible distances. A bound over all instances is not refuted by the worst of a finite few.</p></details></div>
+      <h3>Summary</h3>
       <p>A minimum spanning tree is below the optimal tour, doubling it gives a walk, and shortcutting the walk gives a tour &mdash; but only if a direct hop is never longer than going round. That proviso is the triangle inequality and the panel has a slider that removes it. On the loaded instance the tree is 5, the tour is 10, the optimum is 7 and the ratio is 10/7, which is the worst ratio over all 482 metric instances on four cities with distances up to 3.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The lower bound is a spanning tree, and the argument is one deletion.</strong> Take an optimal tour and delete any one of its steps. What remains visits every city and has no cycle, so it is a spanning tree, and its weight is less than the tour's. A minimum spanning tree is therefore no heavier than the optimal tour &mdash; a lower bound the algorithm computes with Prim's algorithm from the graph course, and the only thing the guarantee is proved against.</li><li><strong>The shortcut step is where the hypothesis is spent.</strong> Walking every tree edge twice gives a closed walk of weight exactly <span class="math" data-say="2 times MST">2 · MST</span> visiting every city, but repeating cities. Shortcutting means skipping a city already visited and going straight to the next new one. That can only shorten the walk provided a direct hop is no longer than the path it replaces &mdash; which is exactly the triangle inequality. Without it the shortcut can cost more than the walk it replaces, and the panel's slider makes that happen.</li><li><strong>A sweep bounds the ratio below the guarantee, and that is not evidence against it.</strong> The panel enumerates every symmetric instance on four cities with distances from 1 to 3, keeps the 482 satisfying the triangle inequality, solves each exactly, and reports the worst ratio: 10/7, which is about 1.43 against a promise of 2. The guarantee is not thereby shown to be loose. It quantifies over every size and every distance range, and the family swept here is tiny &mdash; four cities and three possible distances. A bound over all instances is not refuted by the worst of a finite few.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="delete an edge of an optimal tour and a spanning tree is left, MST is at most OPT. walk the tree twice, 2 times MST, shortcut it, no longer, IF the triangle inequality holds. four cities, MST 5, optimum 7, tour 10, 2 times MST 10, ratio 10 over 7. worst over all 482 metric instances on four cities, distances is at most 3, 10 over 7. raise one distance to 50 and the tour is 53 against an optimum of 4" tabindex="0" role="region" aria-label="Mathematical notation">delete an edge of an optimal tour and a spanning tree is left:   MST ≤ OPT
 walk the tree twice:  2 × MST.   shortcut it:  no longer, IF the triangle inequality holds
 
@@ -4236,11 +4280,40 @@ raise one distance to 50 and the tour is 53 against an optimum of 4</div><figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4308,7 +4381,7 @@ raise one distance to 50 and the tour is 53 against an optimum of 4</div><figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

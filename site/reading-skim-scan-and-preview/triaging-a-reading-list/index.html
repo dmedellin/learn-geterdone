@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,26 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Skimming, Scanning and Previewing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Reading strategically</p>
       <h1>Triaging a Reading List</h1>
       <p class="lesson-lede">Plan a session through eight documents under a 45-minute budget by choosing to read, skim or skip each one, and compute the time and the value the plan covers.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Value for a purpose</li><li>Three choices and their price</li><li>Fit, then coverage</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Eight documents and 45 minutes</h2>
-      <article class="prose reading"><p>Start with the warm-up at the top of the lab: a timed reading with six questions, logged as practice, so that this lesson, which has no drill of its own, still has a reading in it. Then turn to the pile.</p><p>The pile is for a stated purpose: tomorrow you help decide whether your team moves to a new building. Eight documents arrived, in the order the lab lists them, 15,000 words in all. Each has a value for that decision, from 1 for the neighbourhood newsletter to 10 for the landlord's lease proposal, 36 in all. The read, skim and skip buttons beside each document rewrite the plan, and the tiles recompute.</p><p>The model is plain. A document read costs its words over a reading rate of 250 words a minute. One skimmed costs its words over a skimming rate of 750 and is credited with half its value. One skipped costs nothing. The half is an assumption in the spirit of What Skimming Costs, where a skim kept the gist better than the detail, and you can change it in its box.</p><div class="mathblock" data-say="read everything, 15000 over 250 equals 60 minutes, budget 45. in arrival order, 10800 over 250 equals 43.2 minutes, 23 over 36 of the value. triaged, 7500 over 250 plus 7500 over 750 equals 40 minutes, 32 over 36" tabindex="0" role="region" aria-label="Mathematical notation">read everything   15,000 / 250 = 60 min        budget 45
-in arrival order  10,800 / 250 = 43.2 min      23/36 of the value
-triaged           7,500 / 250 + 7,500 / 750 = 40 min   32/36</div><p>The <strong>read-everything</strong> preset is the plan most piles get: 60 minutes, 15 over the budget, so in practice the last documents are never reached. The <strong>skip-wrong</strong> preset is what that looks like: read in the order they came until the time runs out, which gets through the staff survey and stops, 43.2 minutes with 1.8 to spare, and covers 23 of the 36, about 63.9%, without ever opening the facilities manager's summary, the second most valuable document in the pile. The <strong>skim-the-rest</strong> preset reads the four documents worth 4 or more, skims the other four, and takes 40 minutes with 5 to spare, covering 32/36 = 8/9, about 88.9%.</p><p>Now compare that with reading faster. To read the whole pile in 45 minutes you would need <span data-say="15000 over 45 is approximately 333.3">15,000 / 45 ≈ 333.3</span> words a minute, a third faster than 250, with the same understanding, and no lesson in this Subject promises that. The triaged plan came in under the budget with nearly nine-tenths of the value at the rate you already have. Skip the four low documents instead of skimming them and it takes 30 minutes and covers 28/36 = 7/9, about 77.8%.</p><p>Duggan and Payne (2009) studied readers with more text than time, enough for half of each text: those who skimmed all of it remembered more of its important ideas than those who read half of it, because they chose where to look, and the advantage depended on how easily they could move around the text. A reading list asks for the same choice one level up, between documents instead of within one.</p><p>The plan is only as good as its values. If the parking study matters more to your team than it does here, change its value and the plan; the lab recomputes. In this pile the time was saved by the documents not read in full, not by the speed at which the others were read.</p><p>Triage decides how much of each text to read. Shifting Gears, the last lesson of the course, asks whether you change speed within a text when its difficulty changes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Triaging a reading list</h2></div><p>what to read, what to skim, what to skip</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Eight documents and 45 minutes</h2><div class="prose reading"><p>Start with the warm-up at the top of the lab: a timed reading with six questions, logged as practice, so that this lesson, which has no drill of its own, still has a reading in it. Then turn to the pile.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Triaging a reading list</h2></div><p>what to read, what to skim, what to skip</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Triaging a reading list</strong><span>what to read, what to skim, what to skip</span></div>
       </div>
@@ -1415,10 +1456,10 @@ triaged           7,500 / 250 + 7,500 / 750 = 40 min   32/36</div><p>The <strong
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="trTable"></table></div>
       <div class="status-banner" id="trStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The plan, in numbers</h3>
-          <p>A stated model: a document read costs its words over your reading rate, one skimmed its words over your skimming rate, one skipped nothing; a skim is credited with a stated share of the document's value. Choose read, skim or skip for each document.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The plan, in numbers</h3>
+            <p>A stated model: a document read costs its words over your reading rate, one skimmed its words over your skimming rate, one skipped nothing; a skim is credited with a stated share of the document's value. Choose read, skim or skip for each document.</p>
         <div class="field">
           <label for="trPreset">Worked example</label>
           <select id="trPreset"><option value="read-everything">Read all eight</option><option value="skip-wrong">Read in the order they came until time runs out</option><option value="skim-the-rest" selected>Read the four worth most, skim the rest</option></select>
@@ -1449,12 +1490,17 @@ triaged           7,500 / 250 + 7,500 / 750 = 40 min   32/36</div><p>The <strong
           <div class="kpi"><span>Against the budget</span><strong id="trFits">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The pile is for a stated purpose: tomorrow you help decide whether your team moves to a new building. Eight documents arrived, in the order the lab lists them, 15,000 words in all. Each has a value for that decision, from 1 for the neighbourhood newsletter to 10 for the landlord's lease proposal, 36 in all. The read, skim and skip buttons beside each document rewrite the plan, and the tiles recompute.</p><p>The model is plain. A document read costs its words over a reading rate of 250 words a minute. One skimmed costs its words over a skimming rate of 750 and is credited with half its value. One skipped costs nothing. The half is an assumption in the spirit of What Skimming Costs, where a skim kept the gist better than the detail, and you can change it in its box.</p><div class="mathblock" data-say="read everything, 15000 over 250 equals 60 minutes, budget 45. in arrival order, 10800 over 250 equals 43.2 minutes, 23 over 36 of the value. triaged, 7500 over 250 plus 7500 over 750 equals 40 minutes, 32 over 36" tabindex="0" role="region" aria-label="Mathematical notation">read everything   15,000 / 250 = 60 min        budget 45
+in arrival order  10,800 / 250 = 43.2 min      23/36 of the value
+triaged           7,500 / 250 + 7,500 / 750 = 40 min   32/36</div><p>The <strong>read-everything</strong> preset is the plan most piles get: 60 minutes, 15 over the budget, so in practice the last documents are never reached. The <strong>skip-wrong</strong> preset is what that looks like: read in the order they came until the time runs out, which gets through the staff survey and stops, 43.2 minutes with 1.8 to spare, and covers 23 of the 36, about 63.9%, without ever opening the facilities manager's summary, the second most valuable document in the pile. The <strong>skim-the-rest</strong> preset reads the four documents worth 4 or more, skims the other four, and takes 40 minutes with 5 to spare, covering 32/36 = 8/9, about 88.9%.</p><p>Now compare that with reading faster. To read the whole pile in 45 minutes you would need <span data-say="15000 over 45 is approximately 333.3">15,000 / 45 ≈ 333.3</span> words a minute, a third faster than 250, with the same understanding, and no lesson in this Subject promises that. The triaged plan came in under the budget with nearly nine-tenths of the value at the rate you already have. Skip the four low documents instead of skimming them and it takes 30 minutes and covers 28/36 = 7/9, about 77.8%.</p><p>Duggan and Payne (2009) studied readers with more text than time, enough for half of each text: those who skimmed all of it remembered more of its important ideas than those who read half of it, because they chose where to look, and the advantage depended on how easily they could move around the text. A reading list asks for the same choice one level up, between documents instead of within one.</p><p>The plan is only as good as its values. If the parking study matters more to your team than it does here, change its value and the plan; the lab recomputes. In this pile the time was saved by the documents not read in full, not by the speed at which the others were read.</p><p>Triage decides how much of each text to read. Shifting Gears, the last lesson of the course, asks whether you change speed within a text when its difficulty changes.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Triaging your own pile</h2></div><p>Five steps, and the reading starts only at the fourth.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the purpose</h3><p>One sentence: what the reading is for, and when it is needed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List and value the pile</h3><p>Each document with its rough length and a value from 1 to 10 for that purpose. Do this before you read any of them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read, skim or skip</h3><p>Read the highest values, skim the middle and skip the lowest, and add up the time at your own rates until the plan fits the budget with a little to spare.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read in order of value</h3><p>Work through the plan from the most valuable down, so that if the time runs out, it is the least valuable that goes.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Finish with today's reading from The Daily Drill.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Triaging your own pile</h2>
+      <p class="lead-in">Five steps, and the reading starts only at the fourth.</p>
+      <ol class="key-ideas method"><li><strong>Write the purpose.</strong> One sentence: what the reading is for, and when it is needed.</li><li><strong>List and value the pile.</strong> Each document with its rough length and a value from 1 to 10 for that purpose. Do this before you read any of them.</li><li><strong>Read, skim or skip.</strong> Read the highest values, skim the middle and skip the lowest, and add up the time at your own rates until the plan fits the budget with a little to spare.</li><li><strong>Read in order of value.</strong> Work through the plan from the most valuable down, so that if the time runs out, it is the least valuable that goes.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Finish with today's reading from The Daily Drill.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1473,17 +1519,16 @@ value  10 + 6 + 8 + 4 + (1 + 3 + 3 + 1) / 2 = 32
        32 / 36 = 8/9 ≈ 88.9%, in 40 of 45 min</div><p>Half the words were read and half skimmed, and the skimmed half carried only 8 of the 36 points of value. That asymmetry, not a faster rate, is what got the pile under the budget.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the fastest way through a pile is to read faster</strong><span>Reading the whole pile in 45 minutes would need about 333.3 words a minute, a third faster than 250. Reading four documents and skimming four fits at 250 with 5 minutes to spare and 8/9 of the value. Choosing what not to read saved more time here than a rate gain you could count on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Working through a pile in the order it arrived</strong><span>The order of arrival is nobody's judgement of value. In the skip-wrong preset it put the newsletter first and left the facilities manager's summary, worth 8, unread.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the values are yours</strong><span>The lab computes the plan from the values you state, and a wrong value produces a confident wrong plan. Value the pile for the purpose before you open any of it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can plan a pile to fit a budget and beat reading it in order.</strong><p>Given a stack with word counts and values, a budget, and reading and skimming rates, produce a plan that fits the budget, compute its time and the share of the value it covers, and show that it covers more than reading the stack in the order given.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The model is stated, not measured: a skim's share of the value is set at one half, the values are judgements, and a real document's value is not spread evenly through it. The warm-up is a practice reading and fills none of the plan's boxes.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the fastest way through a pile is to read faster</strong><span>Reading the whole pile in 45 minutes would need about 333.3 words a minute, a third faster than 250. Reading four documents and skimming four fits at 250 with 5 minutes to spare and 8/9 of the value. Choosing what not to read saved more time here than a rate gain you could count on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Working through a pile in the order it arrived</strong><span>The order of arrival is nobody's judgement of value. In the skip-wrong preset it put the newsletter first and left the facilities manager's summary, worth 8, unread.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the values are yours</strong><span>The lab computes the plan from the values you state, and a wrong value produces a confident wrong plan. Value the pile for the purpose before you open any of it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can plan a pile to fit a budget and beat reading it in order.</strong><p>Given a stack with word counts and values, a budget, and reading and skimming rates, produce a plan that fits the budget, compute its time and the share of the value it covers, and show that it covers more than reading the stack in the order given.</p></div></div><div class="note"><strong>Note:</strong> The model is stated, not measured: a skim's share of the value is set at one half, the values are judgements, and a real document's value is not spread evenly through it. The warm-up is a practice reading and fills none of the plan's boxes.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Value for a purpose</summary><p>Each document carries a value, a judgement of how much it bears on what you are reading for. The values are stated, not computed, and choosing them is half of triage.</p></details><details class="recall"><summary>Three choices and their price</summary><p>A document read costs its words over your reading rate and yields its whole value. One skimmed costs its words over a skimming rate and yields a stated share of its value. One skipped costs and yields nothing.</p></details><details class="recall"><summary>Fit, then coverage</summary><p>A plan first has to fit the budget. Among the plans that fit, the better one covers more of the value, and reading in the order the pile arrived is a plan too, usually a poor one.</p></details></div>
+      <h3>Summary</h3>
       <p>Reading a whole pile of eight documents at 250 words a minute takes an hour, and the budget is 45 minutes. Choose read, skim or skip for each document, and the lab computes the time the plan takes and the share of the pile's value it covers, under a stated model of what a skim keeps.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Value for a purpose.</strong> Each document carries a value, a judgement of how much it bears on what you are reading for. The values are stated, not computed, and choosing them is half of triage.</li><li><strong>Three choices and their price.</strong> A document read costs its words over your reading rate and yields its whole value. One skimmed costs its words over a skimming rate and yields a stated share of its value. One skipped costs and yields nothing.</li><li><strong>Fit, then coverage.</strong> A plan first has to fit the budget. Among the plans that fit, the better one covers more of the value, and reading in the order the pile arrived is a plan too, usually a poor one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="read, words over reading rate. skim, words over skimming rate. a skim covers 1 over 2 of the value. skip, no time, no value. decide what not to read first" tabindex="0" role="region" aria-label="Mathematical notation">read: words / reading rate
 skim: words / skimming rate
 a skim covers 1/2 of the value
@@ -2504,11 +2549,40 @@ decide what not to read first</div><figcaption>The triage model</figcaption></fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2576,7 +2650,7 @@ decide what not to read first</div><figcaption>The triage model</figcaption></fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

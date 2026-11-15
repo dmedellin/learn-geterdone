@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,56 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Markov Chains, Decisions and Queues</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chains that stop, chains you steer</p>
       <h1>Markov Decision Processes and Policy Iteration</h1>
       <p class="lesson-lede">Evaluate a policy by solving <span data-say="v equals r plus gamma P to the power d v">v = r + γPᵈv</span> exactly, improve it greedily, and stop for a reason better than nothing moved.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A policy turns a decision problem back into a chain</li><li>Evaluating a policy is the linear solve, again</li><li>The loop stops for a reason, not because the numbers stopped moving</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Choosing an action in every state, and knowing when to stop choosing</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A discounted Markov decision process</span><p>States <span class="math" data-say="1, and so on, n">1, …, n</span>, a finite set of <strong>actions</strong>, a transition matrix <span class="math" data-say="P of times given s and A">P(· | s, a)</span> for each action, a reward <span class="math" data-say="r of s and A">r(s, a)</span>, and a <strong>discount</strong> <span class="math" data-say="gamma">γ</span> with <span class="math" data-say="0 is at most gamma is less than 1">0 ≤ γ < 1</span>.</p><p>A <strong>policy</strong> <span class="math" data-say="d">d</span> assigns one action to each state. Its <strong>value</strong> <span class="math" data-say="v sub d">v_d</span> is the unique solution of <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γ P_d v</span>, where <span class="math" data-say="P sub d">P_d</span> and <span class="math" data-say="r sub d">r_d</span> are the matrix and the reward vector the policy selects. The unique solution exists because <span class="math" data-say="I minus gamma P sub d">I − γP_d</span> is invertible for <span class="math" data-say="gamma is less than 1">γ < 1</span>.</p></div><p>The lab takes two transition matrices and two reward vectors, one pair per action, and validates each matrix as a chain before anything else. The discount is set in twentieths so that it stays a fraction: at <span class="math" data-say="gamma equals 18 over 20">γ = 18/20</span> every value on the page is a rational with a small denominator, which is what makes the comparison between two policies decidable rather than approximate. The page heads its two action columns simply &ldquo;action 1&rdquo; and &ldquo;action 2&rdquo;; which real-world choice each stands for is in the matrices and the rewards you typed.</p><h3>Evaluation, improvement, and the round structure</h3><p>A round does two things. It <em>evaluates</em> the current policy by solving <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γP_d v</span> exactly &mdash; the lab reports how many elimination operations that took &mdash; and then it <em>improves</em>: for each state it computes <span class="math" data-say="q of s and A equals r of s and A plus gamma times the sum of P of s prime given s and A, times v of s prime">q(s, a) = r(s, a) + γ Σ P(s′|s, a) v(s′)</span> for every action, using the <span class="math" data-say="v">v</span> it just solved for, and switches to the best. If no state switched, the policy is optimal and the loop stops.</p><div class="mathblock" data-say="two states, two actions, gamma equals 9 over 10. action 1, P equals, 1 over 2, 1 over 2, r equals 1, 3. 1 over 4, 3 over 4. action 2, P equals, 3 over 4, 1 over 4, r equals 2, 1. 1 over 2, 1 over 2. round 1, policy, action 1 over action 1. solve v equals r plus gamma Pv, v equals 670 over 31, 750 over 31. q at state 1, 670 over 31, against, 683 over 31, to switch. q at state 2, 750 over 31, against, 670 over 31, to keep. 1 state improved. round 2, policy, action 2 over action 1. solve, v equals 265 over 11, 285 over 11. q at state 1, 47 over 2, against, 265 over 11, to keep. q at state 2, 285 over 11 against, 47 over 2, to keep. nothing changed, stop. 4 policies in total, 2 rounds, and 47 over 2 equals 23.5 against 265 over 11 equals 24.09 and so on" tabindex="0" role="region" aria-label="Mathematical notation">two states, two actions, γ = 9/10
-
-   action 1    P =  1/2  1/2      r = (1, 3)
-                    1/4  3/4
-   action 2    P =  3/4  1/4      r = (2, 1)
-                    1/2  1/2
-
-  round 1   policy  action 1 / action 1
-            solve v = r + γPv     v = (670/31, 750/31)
-            q at state 1:  670/31  against  683/31   → switch
-            q at state 2:  750/31  against  670/31   → keep
-            1 state improved
-
-  round 2   policy  action 2 / action 1
-            solve                 v = (265/11, 285/11)
-            q at state 1:  47/2   against  265/11    → keep
-            q at state 2:  285/11 against  47/2      → keep
-            nothing changed — stop
-
-  4 policies in total, 2 rounds, and 47/2 = 23.5 against 265/11 = 24.09…</div><p>Look at the last comparison. <span class="math" data-say="265 over 11">265/11</span> and <span class="math" data-say="47 over 2">47/2</span> differ by <span class="math" data-say="13 over 22">13/22</span>, which is about <span class="math" data-say="0.591">0.591</span>. Both routes to it are exact, so the decision is decided; a floating-point evaluation would also have got it right here, and on a problem with a near-tie it would be choosing between two roundings and reporting a policy. That is the case exactness is insurance against, and it is not a rare one at discounts close to 1, where the values of neighbouring policies crowd together.</p><div class="thm"><span class="label">Theorem &middot; Policy iteration terminates</span><p>Greedy improvement produces a policy whose value is at least as large as the current one in every state. Since there are finitely many policies and the loop only stops when no state changes, the loop cannot run for ever, and the policy it stops at satisfies the optimality condition for every state.</p></div><div class="proof"><p>Let <span class="math" data-say="d">d</span> be the current policy with value <span class="math" data-say="v">v</span>, and <span class="math" data-say="d prime">d′</span> the greedy policy. By construction <span class="math" data-say="r sub d prime plus gamma P sub d prime v is at least v">r_{d′} + γP_{d′}v ≥ v</span> entrywise, since the greedy choice is at least as good as the current action, whose value is exactly <span class="math" data-say="v">v</span>.</p><p>Applying <span class="math" data-say="r sub d prime plus gamma P sub d prime times">r_{d′} + γP_{d′}(·)</span> repeatedly preserves that inequality, because <span class="math" data-say="P sub d prime">P_{d′}</span> has non-negative entries and <span class="math" data-say="gamma is greater than 0">γ > 0</span>; the iterates converge to <span class="math" data-say="v sub d prime">v_{d′}</span>, so <span class="math" data-say="v sub d prime is at least v">v_{d′} ≥ v</span>. If the values are equal in every state, no state changed and the loop has stopped. Otherwise the value has strictly increased somewhere, so the policy is new. With finitely many policies the loop can only strictly increase finitely often.</p><p><span class="qed">&#9633;</span></p></div><p>That is worth contrasting with the other way of solving the same problem. Value iteration starts at zero and applies the improvement operator over and over; it converges, and there is no step at which anything tells you it has arrived. What people do instead is stop when the change between steps falls below a number they chose, which is a statement about the increments and not about the distance to the answer.</p><h3>Value iteration, measured against the answer the solve already has</h3><p>Because the exact value is on the same page, the lab can print what value iteration is actually short by rather than how much it moved last step. On the two-state example at <span class="math" data-say="gamma equals 9 over 10">γ = 9/10</span> the iterates start at <span class="math" data-say="0, 0">(0, 0)</span> and climb &mdash; <span class="math" data-say="2.00000">2.00000</span>, <span class="math" data-say="4.02500">4.02500</span>, <span class="math" data-say="5.94875">5.94875</span>, <span class="math" data-say="7.72569">7.72569</span> &mdash; reaching <span class="math" data-say="17.03023">17.03023</span> at step twelve against an exact <span class="math" data-say="265 over 11 equals 24.09 and so on">265/11 = 24.09…</span>. It is short by <span class="math" data-say="7.06068">7.06068</span> and <span class="math" data-say="7.06080">7.06080</span>, and it approaches from underneath and never arrives.</p><div class="mathblock" data-say="value iteration on the best policy, state 1, gamma equals 9 over 10, exact value 265 over 11. step, v sub 1, denominator of v sub 1. a table, shown on the page. 20, 21.05149. 40, 23.72139. the exact solve, 265 over 11 equals 24.090909 and so on, 2 digits, at round 2. still short by, at 12 steps, 7.06068, at 40 steps, 0.36952" tabindex="0" role="region" aria-label="Mathematical notation">value iteration on the best policy, state 1, γ = 9/10, exact value 265/11
-
-     step      v₁          denominator of v₁
-        0     0.00000            1 digit
-        1     2.00000            1
-        4     7.72569            5
-        8    13.33076           10
-       12    17.03023           15
-       20    21.05149
-       40    23.72139
-
-     the exact solve    265/11 = 24.090909…       2 digits, at round 2
-
-     still short by:   at 12 steps  7.06068      at 40 steps  0.36952</div><p>Two things in that table are worth naming. The shortfall shrinks by a factor of about <span class="math" data-say="gamma">γ</span> per step, which is why raising the discount towards 1 slows it down sharply while policy iteration takes the same two or three rounds. And the denominators grow by one power of the discount's denominator every step, from one digit to fifteen by step twelve, while the exact answer has a two-digit denominator &mdash; the iteration is accumulating complexity as it approaches a number that was simple all along.</p><div class="example"><span class="label">Example &middot; Raising the discount</span><p>At <span class="math" data-say="gamma equals 9 over 20">γ = 9/20</span> the two-state problem still stops in 2 rounds, with value <span class="math" data-say="1330 over 341, 1770 over 341">(1330/341, 1770/341)</span>, and value iteration is within <span class="math" data-say="0.0003">0.0003</span> after twelve steps. At <span class="math" data-say="gamma equals 19 over 20">γ = 19/20</span> it still stops in 2 rounds, with value <span class="math" data-say="1030 over 21, 1070 over 21">(1030/21, 1070/21)</span>, and value iteration is <span class="math" data-say="27.02">27.02</span> short after twelve.</p><p>The number of rounds is a property of how many policies there are and how quickly the greedy step finds the best one; the iteration's progress is a property of <span class="math" data-say="gamma">γ</span>. Those are different mechanisms, and the slider makes the difference visible in a few seconds.</p></div><div class="example"><span class="label">Example &middot; Three states and a penalty for being empty</span><p>The stock-control example has three states and rewards <span class="math" data-say="4, 1, negative 3">(4, 1, −3)</span> under one action and <span class="math" data-say="1, 0, negative 1">(1, 0, −1)</span> under the other. At <span class="math" data-say="gamma equals 9 over 10">γ = 9/10</span> policy iteration takes 3 rounds over 8 policies and settles on <span class="math" data-say="1640 over 59, 1440 over 59, 1345 over 59">(1640/59, 1440/59, 1345/59)</span>.</p><p>The middle round is the instructive one: the greedy step swings the policy from all-hold to all-restock, values it at <span class="math" data-say="10, 360 over 41, 310 over 41">(10, 360/41, 310/41)</span>, and then swings the first state back. A method that stopped at the first improvement would have taken that middle policy and been wrong by between fifteen and eighteen in every state.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Choosing an action in every state, and knowing when to stop choosing</h2></div><p>each round is an exact linear solve, and the stopping argument is finiteness</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Choosing an action in every state, and knowing when to stop choosing</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A discounted Markov decision process</span><p>States <span class="math" data-say="1, and so on, n">1, …, n</span>, a finite set of <strong>actions</strong>, a transition matrix <span class="math" data-say="P of times given s and A">P(· | s, a)</span> for each action, a reward <span class="math" data-say="r of s and A">r(s, a)</span>, and a <strong>discount</strong> <span class="math" data-say="gamma">γ</span> with <span class="math" data-say="0 is at most gamma is less than 1">0 ≤ γ < 1</span>.</p><p>A <strong>policy</strong> <span class="math" data-say="d">d</span> assigns one action to each state. Its <strong>value</strong> <span class="math" data-say="v sub d">v_d</span> is the unique solution of <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γ P_d v</span>, where <span class="math" data-say="P sub d">P_d</span> and <span class="math" data-say="r sub d">r_d</span> are the matrix and the reward vector the policy selects. The unique solution exists because <span class="math" data-say="I minus gamma P sub d">I − γP_d</span> is invertible for <span class="math" data-say="gamma is less than 1">γ < 1</span>.</p></div><p>The lab takes two transition matrices and two reward vectors, one pair per action, and validates each matrix as a chain before anything else. The discount is set in twentieths so that it stays a fraction: at <span class="math" data-say="gamma equals 18 over 20">γ = 18/20</span> every value on the page is a rational with a small denominator, which is what makes the comparison between two policies decidable rather than approximate. The page heads its two action columns simply &ldquo;action 1&rdquo; and &ldquo;action 2&rdquo;; which real-world choice each stands for is in the matrices and the rewards you typed.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Choosing an action in every state, and knowing when to stop choosing</h2></div><p>each round is an exact linear solve, and the stopping argument is finiteness</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Evaluate exactly, improve greedily, repeat</strong><span>each round is one linear solve, and it stops for a reason better than &ldquo;nothing moved&rdquo;</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>the action the round chooses</span><span class="tone-purple"><i class="legend-swatch"></i>the action it rejects</span><span class="tone-amber"><i class="legend-swatch"></i>a state whose action changed this round</span><span class="tone-cyan"><i class="legend-swatch"></i>value iteration, converging to the same numbers</span></div>
@@ -1438,10 +1449,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mdIter"></table></div>
       <div class="status-banner" id="mdStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two actions, two matrices, two reward vectors</h3>
-          <p>Every policy is evaluated by solving <span data-say="v equals r plus gamma Pv">v = r + γPv</span> exactly rather than by iterating it, which is what lets the page show value iteration converging TO something instead of stopping when it gets bored. Raise the discount towards 1 and watch the iteration slow down while the number of rounds does not move.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two actions, two matrices, two reward vectors</h3>
+            <p>Every policy is evaluated by solving <span data-say="v equals r plus gamma Pv">v = r + γPv</span> exactly rather than by iterating it, which is what lets the page show value iteration converging TO something instead of stopping when it gets bored. Raise the discount towards 1 and watch the iteration slow down while the number of rounds does not move.</p>
         <div class="field">
           <label for="mdPreset">Worked example</label>
           <select id="mdPreset"><option value="machine" selected>Run it or service it: two states, two actions</option><option value="stock">Hold or restock, with a penalty for being empty</option></select>
@@ -1484,12 +1495,47 @@
         </div>
         <p class="small-copy" id="mdHint" style="margin:0;">Policy iteration stops because there are finitely many policies and the value never decreases, so it cannot revisit one &mdash; a reason, not a tolerance. Value iteration below it stops when you stop looking. Raise the discount towards 1 and watch the second one slow down while the first takes the same two or three rounds.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Evaluation, improvement, and the round structure</h3><p>A round does two things. It <em>evaluates</em> the current policy by solving <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γP_d v</span> exactly &mdash; the lab reports how many elimination operations that took &mdash; and then it <em>improves</em>: for each state it computes <span class="math" data-say="q of s and A equals r of s and A plus gamma times the sum of P of s prime given s and A, times v of s prime">q(s, a) = r(s, a) + γ Σ P(s′|s, a) v(s′)</span> for every action, using the <span class="math" data-say="v">v</span> it just solved for, and switches to the best. If no state switched, the policy is optimal and the loop stops.</p><div class="mathblock" data-say="two states, two actions, gamma equals 9 over 10. action 1, P equals, 1 over 2, 1 over 2, r equals 1, 3. 1 over 4, 3 over 4. action 2, P equals, 3 over 4, 1 over 4, r equals 2, 1. 1 over 2, 1 over 2. round 1, policy, action 1 over action 1. solve v equals r plus gamma Pv, v equals 670 over 31, 750 over 31. q at state 1, 670 over 31, against, 683 over 31, to switch. q at state 2, 750 over 31, against, 670 over 31, to keep. 1 state improved. round 2, policy, action 2 over action 1. solve, v equals 265 over 11, 285 over 11. q at state 1, 47 over 2, against, 265 over 11, to keep. q at state 2, 285 over 11 against, 47 over 2, to keep. nothing changed, stop. 4 policies in total, 2 rounds, and 47 over 2 equals 23.5 against 265 over 11 equals 24.09 and so on" tabindex="0" role="region" aria-label="Mathematical notation">two states, two actions, γ = 9/10
+
+   action 1    P =  1/2  1/2      r = (1, 3)
+                    1/4  3/4
+   action 2    P =  3/4  1/4      r = (2, 1)
+                    1/2  1/2
+
+  round 1   policy  action 1 / action 1
+            solve v = r + γPv     v = (670/31, 750/31)
+            q at state 1:  670/31  against  683/31   → switch
+            q at state 2:  750/31  against  670/31   → keep
+            1 state improved
+
+  round 2   policy  action 2 / action 1
+            solve                 v = (265/11, 285/11)
+            q at state 1:  47/2   against  265/11    → keep
+            q at state 2:  285/11 against  47/2      → keep
+            nothing changed — stop
+
+  4 policies in total, 2 rounds, and 47/2 = 23.5 against 265/11 = 24.09…</div><p>Look at the last comparison. <span class="math" data-say="265 over 11">265/11</span> and <span class="math" data-say="47 over 2">47/2</span> differ by <span class="math" data-say="13 over 22">13/22</span>, which is about <span class="math" data-say="0.591">0.591</span>. Both routes to it are exact, so the decision is decided; a floating-point evaluation would also have got it right here, and on a problem with a near-tie it would be choosing between two roundings and reporting a policy. That is the case exactness is insurance against, and it is not a rare one at discounts close to 1, where the values of neighbouring policies crowd together.</p><div class="thm"><span class="label">Theorem &middot; Policy iteration terminates</span><p>Greedy improvement produces a policy whose value is at least as large as the current one in every state. Since there are finitely many policies and the loop only stops when no state changes, the loop cannot run for ever, and the policy it stops at satisfies the optimality condition for every state.</p></div><div class="proof"><p>Let <span class="math" data-say="d">d</span> be the current policy with value <span class="math" data-say="v">v</span>, and <span class="math" data-say="d prime">d′</span> the greedy policy. By construction <span class="math" data-say="r sub d prime plus gamma P sub d prime v is at least v">r_{d′} + γP_{d′}v ≥ v</span> entrywise, since the greedy choice is at least as good as the current action, whose value is exactly <span class="math" data-say="v">v</span>.</p><p>Applying <span class="math" data-say="r sub d prime plus gamma P sub d prime times">r_{d′} + γP_{d′}(·)</span> repeatedly preserves that inequality, because <span class="math" data-say="P sub d prime">P_{d′}</span> has non-negative entries and <span class="math" data-say="gamma is greater than 0">γ > 0</span>; the iterates converge to <span class="math" data-say="v sub d prime">v_{d′}</span>, so <span class="math" data-say="v sub d prime is at least v">v_{d′} ≥ v</span>. If the values are equal in every state, no state changed and the loop has stopped. Otherwise the value has strictly increased somewhere, so the policy is new. With finitely many policies the loop can only strictly increase finitely often.</p><p><span class="qed">&#9633;</span></p></div><p>That is worth contrasting with the other way of solving the same problem. Value iteration starts at zero and applies the improvement operator over and over; it converges, and there is no step at which anything tells you it has arrived. What people do instead is stop when the change between steps falls below a number they chose, which is a statement about the increments and not about the distance to the answer.</p><h3>Value iteration, measured against the answer the solve already has</h3><p>Because the exact value is on the same page, the lab can print what value iteration is actually short by rather than how much it moved last step. On the two-state example at <span class="math" data-say="gamma equals 9 over 10">γ = 9/10</span> the iterates start at <span class="math" data-say="0, 0">(0, 0)</span> and climb &mdash; <span class="math" data-say="2.00000">2.00000</span>, <span class="math" data-say="4.02500">4.02500</span>, <span class="math" data-say="5.94875">5.94875</span>, <span class="math" data-say="7.72569">7.72569</span> &mdash; reaching <span class="math" data-say="17.03023">17.03023</span> at step twelve against an exact <span class="math" data-say="265 over 11 equals 24.09 and so on">265/11 = 24.09…</span>. It is short by <span class="math" data-say="7.06068">7.06068</span> and <span class="math" data-say="7.06080">7.06080</span>, and it approaches from underneath and never arrives.</p><div class="mathblock" data-say="value iteration on the best policy, state 1, gamma equals 9 over 10, exact value 265 over 11. step, v sub 1, denominator of v sub 1. a table, shown on the page. 20, 21.05149. 40, 23.72139. the exact solve, 265 over 11 equals 24.090909 and so on, 2 digits, at round 2. still short by, at 12 steps, 7.06068, at 40 steps, 0.36952" tabindex="0" role="region" aria-label="Mathematical notation">value iteration on the best policy, state 1, γ = 9/10, exact value 265/11
+
+     step      v₁          denominator of v₁
+        0     0.00000            1 digit
+        1     2.00000            1
+        4     7.72569            5
+        8    13.33076           10
+       12    17.03023           15
+       20    21.05149
+       40    23.72139
+
+     the exact solve    265/11 = 24.090909…       2 digits, at round 2
+
+     still short by:   at 12 steps  7.06068      at 40 steps  0.36952</div><p>Two things in that table are worth naming. The shortfall shrinks by a factor of about <span class="math" data-say="gamma">γ</span> per step, which is why raising the discount towards 1 slows it down sharply while policy iteration takes the same two or three rounds. And the denominators grow by one power of the discount's denominator every step, from one digit to fifteen by step twelve, while the exact answer has a two-digit denominator &mdash; the iteration is accumulating complexity as it approaches a number that was simple all along.</p><div class="example"><span class="label">Example &middot; Raising the discount</span><p>At <span class="math" data-say="gamma equals 9 over 20">γ = 9/20</span> the two-state problem still stops in 2 rounds, with value <span class="math" data-say="1330 over 341, 1770 over 341">(1330/341, 1770/341)</span>, and value iteration is within <span class="math" data-say="0.0003">0.0003</span> after twelve steps. At <span class="math" data-say="gamma equals 19 over 20">γ = 19/20</span> it still stops in 2 rounds, with value <span class="math" data-say="1030 over 21, 1070 over 21">(1030/21, 1070/21)</span>, and value iteration is <span class="math" data-say="27.02">27.02</span> short after twelve.</p><p>The number of rounds is a property of how many policies there are and how quickly the greedy step finds the best one; the iteration's progress is a property of <span class="math" data-say="gamma">γ</span>. Those are different mechanisms, and the slider makes the difference visible in a few seconds.</p></div><div class="example"><span class="label">Example &middot; Three states and a penalty for being empty</span><p>The stock-control example has three states and rewards <span class="math" data-say="4, 1, negative 3">(4, 1, −3)</span> under one action and <span class="math" data-say="1, 0, negative 1">(1, 0, −1)</span> under the other. At <span class="math" data-say="gamma equals 9 over 10">γ = 9/10</span> policy iteration takes 3 rounds over 8 policies and settles on <span class="math" data-say="1640 over 59, 1440 over 59, 1345 over 59">(1640/59, 1440/59, 1345/59)</span>.</p><p>The middle round is the instructive one: the greedy step swings the policy from all-hold to all-restock, values it at <span class="math" data-say="10, 360 over 41, 310 over 41">(10, 360/41, 310/41)</span>, and then swings the first state back. A method that stopped at the first improvement would have taken that middle policy and been wrong by between fifteen and eighteen in every state.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running policy iteration by hand</h2></div><p>Four steps and a loop. The first is the one people skip, and it is what makes the comparison in the third meaningful.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check each action&#x27;s matrix separately</h3><p>Each action needs its own transition matrix and each of those has to be a chain in its own right: every row summing to 1. A single bad row anywhere means one of the policies being compared is not a chain, and the comparison will still produce a winner.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Pick any starting policy and evaluate it exactly</h3><p>Solve <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γP_d v</span>. Any starting policy will do &mdash; the loop is not sensitive to it &mdash; so take the obvious one. Solve rather than iterate: this is n equations in n unknowns and the elimination is short.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Improve greedily, one state at a time, using the value you just solved for</h3><p>For each state compute <span class="math" data-say="q of s and A">q(s, a)</span> for every action and take the best. Use the same <span class="math" data-say="v">v</span> throughout the sweep; recomputing it mid-sweep is a different algorithm with different guarantees.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Stop when no state changed, and say that that is a proof</h3><p>No change means the policy is greedy with respect to its own value, which is the optimality condition. Combined with finiteness and monotonicity, the loop terminates. This is a reason to stop; &ldquo;the numbers stopped moving&rdquo; is not, and on value iteration it is never even true.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running policy iteration by hand</h2>
+      <p class="lead-in">Four steps and a loop. The first is the one people skip, and it is what makes the comparison in the third meaningful.</p>
+      <ol class="key-ideas method"><li><strong>Check each action&#x27;s matrix separately.</strong> Each action needs its own transition matrix and each of those has to be a chain in its own right: every row summing to 1. A single bad row anywhere means one of the policies being compared is not a chain, and the comparison will still produce a winner.</li><li><strong>Pick any starting policy and evaluate it exactly.</strong> Solve <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γP_d v</span>. Any starting policy will do &mdash; the loop is not sensitive to it &mdash; so take the obvious one. Solve rather than iterate: this is n equations in n unknowns and the elimination is short.</li><li><strong>Improve greedily, one state at a time, using the value you just solved for.</strong> For each state compute <span class="math" data-say="q of s and A">q(s, a)</span> for every action and take the best. Use the same <span class="math" data-say="v">v</span> throughout the sweep; recomputing it mid-sweep is a different algorithm with different guarantees.</li><li><strong>Stop when no state changed, and say that that is a proof.</strong> No change means the policy is greedy with respect to its own value, which is the optimality condition. Combined with finiteness and monotonicity, the loop terminates. This is a reason to stop; &ldquo;the numbers stopped moving&rdquo; is not, and on value iteration it is never even true.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1532,17 +1578,16 @@ value iteration on the same policy, from (0, 0):
      exact      265/11          short by 0, at round 2</div><p>Round 1 is where the method earns its name. The policy being evaluated is not optimal, and the <span class="math" data-say="q">q</span> values computed from its own value function still point at the better action: <span class="math" data-say="683 over 31">683/31</span> beats <span class="math" data-say="670 over 31">670/31</span> at the first state. That is the improvement theorem in one comparison &mdash; you do not need the optimal value function to find a better policy, only the current one's.</p><p>Round 2 stops, and it stops for a reason you can state: both states are already choosing the action their own value function prefers, so the policy is greedy with respect to itself. No tolerance was involved and no number had to be compared against a threshold.</p><p>The value-iteration block underneath is the comparison the whole page exists for. It is converging to <span class="math" data-say="265 over 11">265/11</span>, it is monotone from below, and after forty steps it is still <span class="math" data-say="0.36952">0.36952</span> short of a number the solve produced in four elimination operations. Its denominators have gone from one digit to fifteen on the way to a number whose denominator is <span class="math" data-say="11">11</span>.</p><p>For a rehearsal, set the discount to its lowest setting and predict what happens to both methods before looking. The supplied first move is that at a small <span class="math" data-say="gamma">γ</span> the future barely counts, so the greedy one-step reward nearly decides the policy. Say what you expect of the round count and of the iteration's shortfall, then check: the rounds stay at 2 and the shortfall at twelve steps collapses to about <span class="math" data-say="0.0003">0.0003</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Improving a state using a value that has already been updated in the same sweep</strong><span>Policy iteration evaluates the policy once and then improves every state against that single value vector. Updating as you go is a different algorithm with different behaviour, and the finiteness argument above does not apply to it as written.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Stopping value iteration on the change between steps and reporting it as the answer</strong><span>The gap between consecutive iterates is not the gap to the limit; with a discount close to 1 it understates it badly. This page can print the true shortfall only because the exact value is sitting beside it, which is the situation you will not be in when it matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing two policies on floating-point values</strong><span>Two policies can differ by <span class="math" data-say="13 over 22">13/22</span> in value, as the two actions at the first state do here, and at a discount near 1 they can differ by far less. A comparison of two roundings returns a policy either way and says nothing about which is better. Evaluate exactly and the comparison is decided.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run a round of policy iteration on paper and state why the loop must end.</strong><p>You should be able to build <span class="math" data-say="P sub d">P_d</span> and <span class="math" data-say="r sub d">r_d</span> from a policy, solve <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γP_d v</span> as a linear system, compute <span class="math" data-say="q of s and A">q(s, a)</span> for each action from that <span class="math" data-say="v">v</span> and improve greedily, give the finiteness-and-monotonicity argument for termination, and say what value iteration's shortfall depends on and why its stopping rule measures the wrong thing.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything so far has been one matrix with n named states. The material that follows keeps the chain and throws the matrix away: on a queue the states are 0, 1, 2, … and the only transitions are up one and down one, so the whole distribution comes out of one equation applied between each pair of neighbours. &ldquo;The Cut Equation, and Every Queue From It&rdquo; derives it and then checks it against the full balance system solved by elimination.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Improving a state using a value that has already been updated in the same sweep</strong><span>Policy iteration evaluates the policy once and then improves every state against that single value vector. Updating as you go is a different algorithm with different behaviour, and the finiteness argument above does not apply to it as written.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Stopping value iteration on the change between steps and reporting it as the answer</strong><span>The gap between consecutive iterates is not the gap to the limit; with a discount close to 1 it understates it badly. This page can print the true shortfall only because the exact value is sitting beside it, which is the situation you will not be in when it matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing two policies on floating-point values</strong><span>Two policies can differ by <span class="math" data-say="13 over 22">13/22</span> in value, as the two actions at the first state do here, and at a discount near 1 they can differ by far less. A comparison of two roundings returns a policy either way and says nothing about which is better. Evaluate exactly and the comparison is decided.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run a round of policy iteration on paper and state why the loop must end.</strong><p>You should be able to build <span class="math" data-say="P sub d">P_d</span> and <span class="math" data-say="r sub d">r_d</span> from a policy, solve <span class="math" data-say="v equals r sub d plus gamma P sub d v">v = r_d + γP_d v</span> as a linear system, compute <span class="math" data-say="q of s and A">q(s, a)</span> for each action from that <span class="math" data-say="v">v</span> and improve greedily, give the finiteness-and-monotonicity argument for termination, and say what value iteration's shortfall depends on and why its stopping rule measures the wrong thing.</p></div></div><div class="note"><strong>Note:</strong> Everything so far has been one matrix with n named states. The material that follows keeps the chain and throws the matrix away: on a queue the states are 0, 1, 2, … and the only transitions are up one and down one, so the whole distribution comes out of one equation applied between each pair of neighbours. &ldquo;The Cut Equation, and Every Queue From It&rdquo; derives it and then checks it against the full balance system solved by elimination.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A policy turns a decision problem back into a chain</summary><p>Fix one action per state and the transition matrix is determined: row <span class="math" data-say="s">s</span> is the row that action gives. So a policy is an ordinary Markov chain with a reward attached, and everything already built applies to it. The decision problem is the question of which of the finitely many chains to be.</p></details><details class="recall"><summary>Evaluating a policy is the linear solve, again</summary><p><span class="math" data-say="v of s equals r of s plus gamma times the sum of P of s prime given s, times v of s prime">v(s) = r(s) + γ Σ P(s′|s) v(s′)</span> is n equations in n unknowns, and it is solved by the same exact elimination that produced the steady state. So the value of a policy is <span class="math" data-say="265 over 11">265/11</span> and <span class="math" data-say="285 over 11">285/11</span> rather than a decimal near them, and a comparison between two policies is a comparison of fractions. Iterating that equation would also work and would never finish.</p></details><details class="recall"><summary>The loop stops for a reason, not because the numbers stopped moving</summary><p>Greedy improvement never decreases the value of any state, and there are finitely many policies &mdash; <span class="math" data-say="2 to the power n">2ⁿ</span> with two actions &mdash; so a policy cannot recur without the value having stayed put, which is the stopping condition. That is a proof of termination. Value iteration below it stops when you stop looking, and the page prints how far short it is when you do.</p></details></div>
+      <h3>Summary</h3>
       <p>Put an action in every state and a reward on every state-action pair, and the chain becomes a decision problem. A <strong>policy</strong> picks one action per state, and it induces an ordinary Markov chain whose discounted value solves <span class="math" data-say="v equals r plus gamma P to the power d v">v = r + γPᵈv</span> &mdash; n linear equations in n unknowns, solved exactly. <strong>Policy iteration</strong> alternates that solve with a greedy improvement and stops because there are finitely many policies and the value never decreases: a termination proof rather than a tolerance. Beside it the page runs value iteration, which approaches the same numbers from below and is still <span class="math" data-say="7.06">7.06</span> short after twelve steps.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A policy turns a decision problem back into a chain.</strong> Fix one action per state and the transition matrix is determined: row <span class="math" data-say="s">s</span> is the row that action gives. So a policy is an ordinary Markov chain with a reward attached, and everything already built applies to it. The decision problem is the question of which of the finitely many chains to be.</li><li><strong>Evaluating a policy is the linear solve, again.</strong> <span class="math" data-say="v of s equals r of s plus gamma times the sum of P of s prime given s, times v of s prime">v(s) = r(s) + γ Σ P(s′|s) v(s′)</span> is n equations in n unknowns, and it is solved by the same exact elimination that produced the steady state. So the value of a policy is <span class="math" data-say="265 over 11">265/11</span> and <span class="math" data-say="285 over 11">285/11</span> rather than a decimal near them, and a comparison between two policies is a comparison of fractions. Iterating that equation would also work and would never finish.</li><li><strong>The loop stops for a reason, not because the numbers stopped moving.</strong> Greedy improvement never decreases the value of any state, and there are finitely many policies &mdash; <span class="math" data-say="2 to the power n">2ⁿ</span> with two actions &mdash; so a policy cannot recur without the value having stayed put, which is the stopping condition. That is a proof of termination. Value iteration below it stops when you stop looking, and the page prints how far short it is when you do.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a policy d picks one action per state, and induces an ordinary chain P to the power d with reward r to the power d. v equals r to the power d plus gamma P to the power d v, n equations, n unknowns, solved exactly, the evaluation step. improve greedily, q of s and A equals r of s and A plus gamma times the sum of P of s prime given s and A, times v of s prime, take the best A. finitely many policies and a value that never decreases implies the loop must stop. two states, two actions, 4 policies, 2 rounds, v equals 265 over 11, 285 over 11 at gamma equals 9 over 10. value iteration after 12 steps, still 7.06068 and 7.06080 BELOW that value" tabindex="0" role="region" aria-label="Mathematical notation">a policy d picks one action per state, and induces an ordinary chain Pᵈ with reward rᵈ
 v = rᵈ + γPᵈv       n equations, n unknowns, solved exactly — the evaluation step
 improve greedily:  q(s, a) = r(s, a) + γΣ P(s′|s, a) v(s′),  take the best a
@@ -3134,11 +3179,40 @@ value iteration after 12 steps: still 7.06068 and 7.06080 BELOW that value</div>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3206,7 +3280,7 @@ value iteration after 12 steps: still 7.06068 and 7.06080 BELOW that value</div>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

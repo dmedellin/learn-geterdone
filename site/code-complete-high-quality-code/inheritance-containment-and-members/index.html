@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,51 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creating High-Quality Code</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 6 · Working Classes</p>
       <h1>Inheritance, Containment and Members</h1>
       <p class="lesson-lede">Contain before you inherit; inherit only for a true “is a” that a caller cannot tell apart, and keep the hierarchy shallow.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Containment</li><li>Inheritance</li><li>Substitution</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s rules first, then a hierarchy measured</h2>
-      <article class="prose reading"><p>&ldquo;Containment is usually preferable to inheritance unless you’re modeling an &lsquo;is a&rsquo; relationship.&rdquo; That is one of Chapter 6's key points (p. 160). This lesson reads sections 6.3 to 6.6, pages 143 to 160: how a class is built inside, and when a class is worth creating at all. Read them in your own copy first.</p><p>Once a class has an interface, the chapter asks how to build what is behind it, and it starts with the plainest answer. Containment, a class holding another as a field, is the workhorse; more is written about inheritance, it says, because inheritance is trickier and more error-prone, not because it is better. Private inheritance to get at a contained class's protected members is a last resort, a C++ device; Java has no private inheritance, so the question does not arise there.</p><p>Inheritance means &ldquo;is a&rdquo;: the new class is a more specialised version of the old, and must keep the contract the old one sets. The book quotes Joshua Bloch: &ldquo;Design and document for inheritance, or prohibit it.&rdquo; In Java the prohibition is <span class="math" data-say="final">final</span>. Then comes the principle with a person behind it. In a 1988 paper Barbara Liskov argued that one class should inherit from another only if it truly is a more specific version of it, and the book gives Hunt and Thomas's summary: a subclass must be usable through its parent's interface without the caller knowing the difference. Its example is an account whose interest routine returns a rate with the opposite sign from its parent's; every caller would have to know which kind it held.</p><p>More rules follow. Move common interface, data and behaviour as high as abstraction allows; be suspicious of a base class with one derived class, and of an override that does nothing; and keep hierarchies shallow. Riel, the book reports, suggests a limit of six levels; McConnell calls that &ldquo;grossly optimistic&rdquo; and says most people have trouble juggling more than two or three, and that deep trees have been significantly associated with higher fault rates (Basili, Briand and Melo 1996). If inheritance is a chain saw, he adds, multiple inheritance is a 1950s chain saw with no blade guard. The section's summary is a heavy bias against inheritance: contain when classes share only data; inherit when they share behaviour, or when the base class should control the interface.</p><p>The section ends with members and constructors: keep the number of routines in a class small; minimise the routines a class calls and the classes it uses; follow the Law of Demeter (Lieberherr and Holland), under which an object may call routines on the objects it holds but not on the objects those return; initialise all member data in every constructor; and prefer deep copies to shallow ones until shown otherwise.</p><p>Section 6.4 asks why to create a class at all. Modelling real-world and abstract objects are reasons, but the single most important one, it says, is to reduce complexity; others are to isolate complexity, hide implementation details, limit the effects of change and make central points of control. It warns against god classes that know and do everything, classes with data and no behaviour, and classes named after verbs. Section 6.5 is on language-specific issues, which these lessons leave to the book, and 6.6 on packages, which Java has as a feature.</p><p>Now the count. The lab reads a hierarchy as <span class="math" data-say="child, parent">child, parent</span> records and prints its depth, with a root at level 1, the deepest class (the alphabetically first, when several tie, with the banner naming every one), the number of classes and the number of leaves, classes nothing extends. The preset <code>shallow</code> has <span class="math" data-say="circle">Circle</span>, <span class="math" data-say="square">Square</span> and <span class="math" data-say="triangle">Triangle</span> under <span class="math" data-say="shape">Shape</span>: depth 2, deepest Circle (tied with the other two), 4 classes and 3 leaves.</p><p>The preset <code>deep</code> is a chain of accounts: <span class="math" data-say="record">Record</span>, <span class="math" data-say="account">Account</span>, <span class="math" data-say="deposit account">DepositAccount</span>, <span class="math" data-say="savings account">SavingsAccount</span>, <span class="math" data-say="bonus savings">BonusSavings</span>, <span class="math" data-say="holiday bonus savings">HolidayBonusSavings</span> and <span class="math" data-say="christmas holiday savings">ChristmasHolidaySavings</span>, with <span class="math" data-say="checking account">CheckingAccount</span> beside <span class="math" data-say="savings account">SavingsAccount</span>. The lab prints depth 7, deepest ChristmasHolidaySavings, 8 classes and 2 leaves. Read 7 against McConnell's two or three, not against Riel's six. What it measures is how many classes a reader must open to know what one call on a <span class="math" data-say="christmas holiday savings">ChristmasHolidaySavings</span> does, when any of the six above may have defined or overridden it.</p><p>The depth is the part of this section a count can reach. Substitution is not: the lab cannot tell whether a subclass keeps its parent's promises, because that depends on what a caller expects, not on the shape of the tree. To test a subclass, name a caller of the parent, write down what it expects, and run the subclass through it by hand.</p><h3>Exercise</h3><p>First, the hierarchy <span class="math" data-say="dog, mammal, cat, mammal, mammal, animal, animal, living thing, puppy, dog">Dog, Mammal; Cat, Mammal; Mammal, Animal; Animal, LivingThing; Puppy, Dog</span>. Second, this <span class="math" data-say="square">Square</span>, which extends <span class="math" data-say="rectangle">Rectangle</span> and overrides both setters so that each sets both sides:</p><pre class="codeblock" data-say="line 1, class rectangle. line 2, private int width. line 3, private int height. line 4, void set width of int w width is set to w. line 5, void set height of int h height is set to h. line 6, int area return width times height. line 9, class square extends rectangle. line 10, void set width of int w. line 11, super dot set width of w. line 12, super dot set height of w. line 14, void set height of int h. line 15, super dot set width of h. line 16, super dot set height of h" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">class Rectangle {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s rules first, then a hierarchy measured</h2><div class="prose reading"><p>&ldquo;Containment is usually preferable to inheritance unless you’re modeling an &lsquo;is a&rsquo; relationship.&rdquo; That is one of Chapter 6's key points (p. 160). This lesson reads sections 6.3 to 6.6, pages 143 to 160: how a class is built inside, and when a class is worth creating at all. Read them in your own copy first.</p><p>Once a class has an interface, the chapter asks how to build what is behind it, and it starts with the plainest answer. Containment, a class holding another as a field, is the workhorse; more is written about inheritance, it says, because inheritance is trickier and more error-prone, not because it is better. Private inheritance to get at a contained class's protected members is a last resort, a C++ device; Java has no private inheritance, so the question does not arise there.</p><p>Inheritance means &ldquo;is a&rdquo;: the new class is a more specialised version of the old, and must keep the contract the old one sets. The book quotes Joshua Bloch: &ldquo;Design and document for inheritance, or prohibit it.&rdquo; In Java the prohibition is <span class="math" data-say="final">final</span>. Then comes the principle with a person behind it. In a 1988 paper Barbara Liskov argued that one class should inherit from another only if it truly is a more specific version of it, and the book gives Hunt and Thomas's summary: a subclass must be usable through its parent's interface without the caller knowing the difference. Its example is an account whose interest routine returns a rate with the opposite sign from its parent's; every caller would have to know which kind it held.</p><p>More rules follow. Move common interface, data and behaviour as high as abstraction allows; be suspicious of a base class with one derived class, and of an override that does nothing; and keep hierarchies shallow. Riel, the book reports, suggests a limit of six levels; McConnell calls that &ldquo;grossly optimistic&rdquo; and says most people have trouble juggling more than two or three, and that deep trees have been significantly associated with higher fault rates (Basili, Briand and Melo 1996). If inheritance is a chain saw, he adds, multiple inheritance is a 1950s chain saw with no blade guard. The section's summary is a heavy bias against inheritance: contain when classes share only data; inherit when they share behaviour, or when the base class should control the interface.</p><p>The section ends with members and constructors: keep the number of routines in a class small; minimise the routines a class calls and the classes it uses; follow the Law of Demeter (Lieberherr and Holland), under which an object may call routines on the objects it holds but not on the objects those return; initialise all member data in every constructor; and prefer deep copies to shallow ones until shown otherwise.</p><p>Section 6.4 asks why to create a class at all. Modelling real-world and abstract objects are reasons, but the single most important one, it says, is to reduce complexity; others are to isolate complexity, hide implementation details, limit the effects of change and make central points of control. It warns against god classes that know and do everything, classes with data and no behaviour, and classes named after verbs. Section 6.5 is on language-specific issues, which these lessons leave to the book, and 6.6 on packages, which Java has as a feature.</p><p>Now the count. The lab reads a hierarchy as <span class="math" data-say="child, parent">child, parent</span> records and prints its depth, with a root at level 1, the deepest class (the alphabetically first, when several tie, with the banner naming every one), the number of classes and the number of leaves, classes nothing extends. The preset <code>shallow</code> has <span class="math" data-say="circle">Circle</span>, <span class="math" data-say="square">Square</span> and <span class="math" data-say="triangle">Triangle</span> under <span class="math" data-say="shape">Shape</span>: depth 2, deepest Circle (tied with the other two), 4 classes and 3 leaves.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>depth and breadth of an inheritance tree</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Counting dependencies</strong><span>depth and breadth of an inheritance tree</span></div>
+      </div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
+      <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Measure an inheritance hierarchy</h3>
+            <p>A count over the structure the lesson states. Each record is one class and the class it extends, written child, parent. The lab prints the depth with a root at level 1, the deepest class, the classes and the leaves. It cannot tell whether a subclass can stand in for its parent; that is a question about callers.</p>
+        <div class="field">
+          <label for="dgPreset">Worked example</label>
+          <select id="dgPreset"><option value="shallow" selected>Shallow: three shapes under Shape (illustrative)</option><option value="deep">Deep: a chain of account classes (illustrative)</option></select>
+        </div>
+        <div class="field">
+          <label for="dgInEdges">Classes (child, parent)</label>
+          <input id="dgInEdges" type="text" value="Circle, Shape; Square, Shape; Triangle, Shape" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Deepest level (a root is 1)</span><strong id="dgDepth">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest class</span><strong id="dgDeepest">&mdash;</strong></div>
+          <div class="kpi"><span>Classes</span><strong id="dgClasses">&mdash;</strong></div>
+          <div class="kpi"><span>Leaves</span><strong id="dgLeaves">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>deep</code> is a chain of accounts: <span class="math" data-say="record">Record</span>, <span class="math" data-say="account">Account</span>, <span class="math" data-say="deposit account">DepositAccount</span>, <span class="math" data-say="savings account">SavingsAccount</span>, <span class="math" data-say="bonus savings">BonusSavings</span>, <span class="math" data-say="holiday bonus savings">HolidayBonusSavings</span> and <span class="math" data-say="christmas holiday savings">ChristmasHolidaySavings</span>, with <span class="math" data-say="checking account">CheckingAccount</span> beside <span class="math" data-say="savings account">SavingsAccount</span>. The lab prints depth 7, deepest ChristmasHolidaySavings, 8 classes and 2 leaves. Read 7 against McConnell's two or three, not against Riel's six. What it measures is how many classes a reader must open to know what one call on a <span class="math" data-say="christmas holiday savings">ChristmasHolidaySavings</span> does, when any of the six above may have defined or overridden it.</p><p>The depth is the part of this section a count can reach. Substitution is not: the lab cannot tell whether a subclass keeps its parent's promises, because that depends on what a caller expects, not on the shape of the tree. To test a subclass, name a caller of the parent, write down what it expects, and run the subclass through it by hand.</p><h3>Exercise</h3><p>First, the hierarchy <span class="math" data-say="dog, mammal, cat, mammal, mammal, animal, animal, living thing, puppy, dog">Dog, Mammal; Cat, Mammal; Mammal, Animal; Animal, LivingThing; Puppy, Dog</span>. Second, this <span class="math" data-say="square">Square</span>, which extends <span class="math" data-say="rectangle">Rectangle</span> and overrides both setters so that each sets both sides:</p><pre class="codeblock" data-say="line 1, class rectangle. line 2, private int width. line 3, private int height. line 4, void set width of int w width is set to w. line 5, void set height of int h height is set to h. line 6, int area return width times height. line 9, class square extends rectangle. line 10, void set width of int w. line 11, super dot set width of w. line 12, super dot set height of w. line 14, void set height of int h. line 15, super dot set width of h. line 16, super dot set height of h" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">class Rectangle {</span>
 <span class="cl">    private int width;</span>
 <span class="cl">    private int height;</span>
 <span class="cl">    void setWidth(int w) { width = w; }</span>
@@ -1462,43 +1539,12 @@
 <span class="cl">        super.setWidth(h);</span>
 <span class="cl">        super.setHeight(h);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>For the hierarchy, give its depth and its deepest class. For <span class="math" data-say="square">Square</span>, say whether it can stand in for <span class="math" data-say="rectangle">Rectangle</span>, naming a caller of <span class="math" data-say="rectangle">Rectangle</span> it would break and what that caller gets. You can type the hierarchy into the lab afterwards to check the depth.</p><p>Classes are made of routines. The next lesson, Reasons to Create a Routine, begins Chapter 7, on what a good routine is for.</p></article>
+<span class="cl">}</span></code></pre><p>For the hierarchy, give its depth and its deepest class. For <span class="math" data-say="square">Square</span>, say whether it can stand in for <span class="math" data-say="rectangle">Rectangle</span>, naming a caller of <span class="math" data-say="rectangle">Rectangle</span> it would break and what that caller gets. You can type the hierarchy into the lab afterwards to check the depth.</p><p>Classes are made of routines. The next lesson, Reasons to Create a Routine, begins Chapter 7, on what a good routine is for.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>depth and breadth of an inheritance tree</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Counting dependencies</strong><span>depth and breadth of an inheritance tree</span></div>
-      </div>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
-      <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Measure an inheritance hierarchy</h3>
-          <p>A count over the structure the lesson states. Each record is one class and the class it extends, written child, parent. The lab prints the depth with a root at level 1, the deepest class, the classes and the leaves. It cannot tell whether a subclass can stand in for its parent; that is a question about callers.</p>
-        <div class="field">
-          <label for="dgPreset">Worked example</label>
-          <select id="dgPreset"><option value="shallow" selected>Shallow: three shapes under Shape (illustrative)</option><option value="deep">Deep: a chain of account classes (illustrative)</option></select>
-        </div>
-        <div class="field">
-          <label for="dgInEdges">Classes (child, parent)</label>
-          <input id="dgInEdges" type="text" value="Circle, Shape; Square, Shape; Triangle, Shape" inputmode="text" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Deepest level (a root is 1)</span><strong id="dgDepth">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest class</span><strong id="dgDeepest">&mdash;</strong></div>
-          <div class="kpi"><span>Classes</span><strong id="dgClasses">&mdash;</strong></div>
-          <div class="kpi"><span>Leaves</span><strong id="dgLeaves">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring a hierarchy and testing a subclass</h2></div><p>Five steps, the last of them on your own code.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the roots</h3><p>A root is a class that extends nothing in the list. It is at level 1.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Number the levels</h3><p>Each class is one level below its parent. The depth is the largest level, and the deepest class is the one at it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Name a caller of the parent</h3><p>Pick a piece of code that uses the parent through its interface, and write down exactly what it expects: a value, a state after a call, an exception or none.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Run the subclass through it</h3><p>Trace the caller with the subclass in the parent's place. If it gets anything other than what it expected, the subclass does not substitute.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Take one inheritance chain from your own code, type it into the lab as child, parent records and note the depth. For its deepest class, write down one caller of its parent it could break, and what that caller would get.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring a hierarchy and testing a subclass</h2>
+      <p class="lead-in">Five steps, the last of them on your own code.</p>
+      <ol class="key-ideas method"><li><strong>Find the roots.</strong> A root is a class that extends nothing in the list. It is at level 1.</li><li><strong>Number the levels.</strong> Each class is one level below its parent. The depth is the largest level, and the deepest class is the one at it.</li><li><strong>Name a caller of the parent.</strong> Pick a piece of code that uses the parent through its interface, and write down exactly what it expects: a value, a state after a call, an exception or none.</li><li><strong>Run the subclass through it.</strong> Trace the caller with the subclass in the parent's place. If it gets anything other than what it expected, the subclass does not substitute.</li><li><strong>Do it on your own code.</strong> Take one inheritance chain from your own code, type it into the lab as child, parent records and note the depth. For its deepest class, write down one caller of its parent it could break, and what that caller would get.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1516,17 +1562,16 @@ ChristmasHolidaySavings 7: the depth
 classes 8; leaves CheckingAccount and the last, 2</div><p>Seven levels is more than twice the two or three McConnell says most people can manage. The count does not say the design is wrong; it says that to know what a call on the deepest class does, a reader may have to look in seven places.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating inheritance as the main way to reuse code</strong><span>Inheritance does let a subclass reuse its parent's code, and that is why it is reached for. Section 6.3 says containment is the workhorse and inheritance the trickier tool, to be used for an &ldquo;is a&rdquo; relationship that keeps the parent's contract, with a heavy bias against it otherwise. Reuse without &ldquo;is a&rdquo; is what containment is for. The depth tile counts one of inheritance's costs: in <code>deep</code>, seven classes to read for one call.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a subclass that compiles can stand in for its parent</strong><span>The compiler checks that a subclass has the parent's routines, not that they mean the same thing. Substitution is about meaning: the book's account whose interest routine returns a rate with the opposite sign compiles, and still breaks every caller that relied on the parent's behaviour.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Allowing deep hierarchies because each level is small</strong><span>Each class in a chain may be simple, and the chain still hard to follow, because a call can be defined or overridden at any level above. The book reports Riel's six levels and calls them grossly optimistic, puts most people's limit at two or three, and cites a study associating deep trees with higher fault rates.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can measure a hierarchy and test a subclass.</strong><p>For a hierarchy given as child, parent pairs, state its depth and deepest class; for a stated subclass, say whether it can stand in for its parent, naming a caller it would break and what that caller gets.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab measures the shape of a hierarchy you type; it cannot read a subclass's code or tell whether it keeps its parent's promises, which is what substitution is about. The hierarchies are illustrative. The figures on depth are the book's guidance and its report of Riel and of one study, not limits the lab enforces.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating inheritance as the main way to reuse code</strong><span>Inheritance does let a subclass reuse its parent's code, and that is why it is reached for. Section 6.3 says containment is the workhorse and inheritance the trickier tool, to be used for an &ldquo;is a&rdquo; relationship that keeps the parent's contract, with a heavy bias against it otherwise. Reuse without &ldquo;is a&rdquo; is what containment is for. The depth tile counts one of inheritance's costs: in <code>deep</code>, seven classes to read for one call.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a subclass that compiles can stand in for its parent</strong><span>The compiler checks that a subclass has the parent's routines, not that they mean the same thing. Substitution is about meaning: the book's account whose interest routine returns a rate with the opposite sign compiles, and still breaks every caller that relied on the parent's behaviour.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Allowing deep hierarchies because each level is small</strong><span>Each class in a chain may be simple, and the chain still hard to follow, because a call can be defined or overridden at any level above. The book reports Riel's six levels and calls them grossly optimistic, puts most people's limit at two or three, and cites a study associating deep trees with higher fault rates.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can measure a hierarchy and test a subclass.</strong><p>For a hierarchy given as child, parent pairs, state its depth and deepest class; for a stated subclass, say whether it can stand in for its parent, naming a caller it would break and what that caller gets.</p></div></div><div class="note"><strong>Note:</strong> The lab measures the shape of a hierarchy you type; it cannot read a subclass's code or tell whether it keeps its parent's promises, which is what substitution is about. The hierarchies are illustrative. The figures on depth are the book's guidance and its report of Riel and of one study, not limits the lab enforces.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Containment</summary><p>A class that holds another as a field: an employee has a name, has an address. The book calls it the workhorse technique of object-oriented programming.</p></details><details class="recall"><summary>Inheritance</summary><p>A class that is a more specialised version of another: it inherits the parent's interface, and perhaps its implementation, and must keep the parent's promises.</p></details><details class="recall"><summary>Substitution</summary><p>The Liskov substitution principle (Liskov 1988): a subclass should be usable through its parent's interface without the caller knowing the difference.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 6.3 to 6.6 cover how a class is built inside: containment, inheritance and its rules, members, constructors, and the reasons to create a class at all. Compute the depth of an inheritance hierarchy, read it against the book's guidance, and say whether a subclass can stand in for its parent.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Containment.</strong> A class that holds another as a field: an employee has a name, has an address. The book calls it the workhorse technique of object-oriented programming.</li><li><strong>Inheritance.</strong> A class that is a more specialised version of another: it inherits the parent's interface, and perhaps its implementation, and must keep the parent's promises.</li><li><strong>Substitution.</strong> The Liskov substitution principle (Liskov 1988): a subclass should be usable through its parent's interface without the caller knowing the difference.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="has A, containment, the workhorse. is A, inheritance, with care. a subclass must stand in for its parent. depth, levels from the root, root is 1. most people manage two or three levels" tabindex="0" role="region" aria-label="Mathematical notation">has a: containment, the workhorse
 is a: inheritance, with care
 a subclass must stand in for its parent
@@ -2259,11 +2304,40 @@ most people manage two or three levels</div><figcaption>Sections 6.3 to 6.6 in f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2331,7 +2405,7 @@ most people manage two or three levels</div><figcaption>Sections 6.3 to 6.6 in f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Surveys, Data and Statistical Methods</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 14 · Why Use a Survey</p>
       <h1>You Can Trust Survey Data</h1>
       <p class="lesson-lede">Engineers who trust a log and doubt a survey have met bad data in both; the chapter argues that the survey is harder to move, and that some things only a survey measures.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Proxy</li><li>Reverse-coded item</li><li>Straight-lining</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three more reasons, then the count</h2>
-      <article class="prose reading"><p>&ldquo;In this case, the use of a survey actually protects us against bad actors.&rdquo; Forsgren, Humble and Kim write that in the section of Chapter 14 headed You Can Trust Survey Data. This lesson reads that section and the two around it: Measuring Completely with System Data Is Difficult, before it, and Some Things Can Only Be Measured Through Surveys, after.</p><p>The third reason continues the last lesson's. A system knows only what happens inside its boundaries, and people can see around it. The authors take version control. A team can say whether every production artifact is under it, because the team sees all of its work. A system can count the files that were checked in, but it cannot know how many files never were, so it cannot give the percentage that matters. People lack perfect knowledge too, the authors add, but ignoring what the professionals perceive loses an important view.</p><p>The fourth reason answers the question the authors say they are asked most. They use a thought exercise with audiences of technologists. Few trust survey data. More trust their system or log data, because it feels untampered with. Then almost everyone admits having seen bad data come out of a system, since people build systems and make mistakes, and a single malicious author of code could make a system report false figures. The authors suggest engineers trust logs because they understand how systems work and expect to spot the errors, while survey methods feel foreign. They point to Part II, where the safeguards are measures chosen with care, latent constructs, and statistical checks that the measures are valid and reliable.</p><p>Then the comparison on which the lesson turns. A log can be bent by a single person, whether on purpose or through a mistake that review did not catch, and because a business usually watches a handful of its numbers, the error can sit there for months or years. A survey's liars are diluted by everyone else who answered; how much they matter depends on how many answered. The authors report over 23,000 pooled respondents and estimate that a noticeable change would need several hundred people lying together, on every item of a construct, equally and in the same direction. That is their estimate and not a computation they show. They add that responses are anonymous, items avoid propaganda, constructs pass tests of validity and reliability, and the data come from around the world.</p><p>Now the count, on a team of six. The lab's score view takes a construct called <code>ownership</code> with four items on a seven-point scale, the fourth worded in reverse, and each respondent's answers. A respondent's score is the mean of their four item scores after the reverse-coded answer is turned round, as 8 minus the answer. On the preset <code>five-respondents</code> the scores are 5.75, 5.25, 4.25, 5.75 and 3.25, and the construct's mean is 4.85. The preset <code>six-respondents</code> adds <code>r6</code>, who answered 7 to all four items. Turned round, those are 7, 7, 7 and 1, a score of 5.5, and the mean over six is 119 / 24, about 4.96. One respondent moved the mean by 0.108. The lab's last tile gives the means if nothing were reversed, the error to avoid: 4.45 for the five and 4.875 for the six. Its line tile counts respondents above, at and below a line, here the scale's middle, 4: 4 above and 1 below for the five, 5 above and 1 below for the six.</p><p>That shift is a formula, and it is the whole of the authors' argument in miniature. Adding one respondent with score s to a group whose mean is m, for a group of n including the new one, moves the mean by (s − m) / n. Here that is (5.5 − 4.85) / 6, which is 0.108. The preset <code>eleven-respondents</code> repeats the five answer patterns twice, ten honest respondents, and adds <code>r6</code>: the mean is 54 / 11, about 4.91, and the shift is (5.5 − 4.85) / 11, about 0.059. The repeated patterns are invented to show dilution and say nothing about real surveys. A log with one number that the business reads has n equal to 1, and the one entry decides.</p><p>The lab also shows why a reverse-coded item raises the bar a little. A respondent who agrees with all three positive items should disagree with the fourth, and the five others do: their fourth answers are 2, 3, 4, 2 and 5 against high and low answers elsewhere. <code>r6</code> gives 7 to the reverse-worded item too, so the score tops out at 5.5, not 7. Read that as a prompt to look at the answers, not as proof of anything: a hurried respondent straight-lines honestly, and a deliberate liar who reads every item can answer 7, 7, 7 and 1. The authors do not rely on this device. They rely on numbers, anonymity and many items, and the pooled estimate does not reach a bias shared by many respondents. Appendix C's tests, read in Tests for Bias, look for two such patterns, early against late answering and common method bias; a survey that tells people to answer well is guarded against only by how it is run, as the chapter's footnote says.</p><p>The fifth reason is that some things can only be measured by asking. Culture is the authors' example. Teams want a faster measure than a survey, from HR systems, and turnover is the usual stand-in: low turnover for a good culture, high for a bad one. The authors give reasons it fails. A leaver may have taken a much better-paid offer; followed a partner who relocated; or left for a different career or for study. One of the authors knows a person who left a supportive team because that team's encouragement gave him the confidence to change career, so strong culture produced turnover. And the measure can be gamed: a manager who learns an employee is looking may lay them off to keep them out of the turnover figure, and a manager rewarded for retention may block transfers.</p><p>Turnover, the authors grant, can be useful if one is careful about what it measures. Other proxies exist, such as network traffic to see who talks to whom, or semantic analysis of email and chat. But to learn how people feel about taking risks, about sharing information and about working across boundaries, and why they behave as they do, you have to ask, and a survey is the way to ask systematically, reliably and comparably over time. The chapter closes by noting that it is worth asking: it cites research that organizational culture predicts technology and organizational performance, and credits Google's 2015 study with finding team dynamics and psychological safety to matter most for how a team performs.</p><h3>Exercise</h3><ul><li>Four items on a seven-point scale; the fourth is reverse-coded.</li><li>Five respondents' answers, <span class="math" data-say="respondent, a 1, a 2, a 3, a 4">respondent, a1, a2, a3, a4</span>: <span class="math" data-say="s 1, 6, 6, 5, 2, s 2, 5, 5, 5, 3, s 3, 7, 6, 6, 1, s 4, 4, 4, 5, 4, s 5, 1, 1, 1, 1">s1, 6, 6, 5, 2; s2, 5, 5, 5, 3; s3, 7, 6, 6, 1; s4, 4, 4, 5, 4; s5, 1, 1, 1, 1</span>.</li></ul><p>Score each respondent by hand, turning the fourth answer round, and take the construct's mean over all five. Then take it over <code>s1</code> to <code>s4</code> alone, and use (s − m) / n to check the difference. Type the records into the lab to confirm. Say what <code>s5</code>'s raw answers would have scored if the fourth item had not been reverse-coded.</p><p>The authors' case for asking is made. The next question is whom they asked, and the next lesson, The Data for the Project, reads Chapter 15 on how the sample was reached.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Likert-type items</h2></div><p>a construct&#x27;s score from Likert-type items, reverse-coded where stated</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three more reasons, then the count</h2><div class="prose reading"><p>&ldquo;In this case, the use of a survey actually protects us against bad actors.&rdquo; Forsgren, Humble and Kim write that in the section of Chapter 14 headed You Can Trust Survey Data. This lesson reads that section and the two around it: Measuring Completely with System Data Is Difficult, before it, and Some Things Can Only Be Measured Through Surveys, after.</p><p>The third reason continues the last lesson's. A system knows only what happens inside its boundaries, and people can see around it. The authors take version control. A team can say whether every production artifact is under it, because the team sees all of its work. A system can count the files that were checked in, but it cannot know how many files never were, so it cannot give the percentage that matters. People lack perfect knowledge too, the authors add, but ignoring what the professionals perceive loses an important view.</p><p>The fourth reason answers the question the authors say they are asked most. They use a thought exercise with audiences of technologists. Few trust survey data. More trust their system or log data, because it feels untampered with. Then almost everyone admits having seen bad data come out of a system, since people build systems and make mistakes, and a single malicious author of code could make a system report false figures. The authors suggest engineers trust logs because they understand how systems work and expect to spot the errors, while survey methods feel foreign. They point to Part II, where the safeguards are measures chosen with care, latent constructs, and statistical checks that the measures are valid and reliable.</p><p>Then the comparison on which the lesson turns. A log can be bent by a single person, whether on purpose or through a mistake that review did not catch, and because a business usually watches a handful of its numbers, the error can sit there for months or years. A survey's liars are diluted by everyone else who answered; how much they matter depends on how many answered. The authors report over 23,000 pooled respondents and estimate that a noticeable change would need several hundred people lying together, on every item of a construct, equally and in the same direction. That is their estimate and not a computation they show. They add that responses are anonymous, items avoid propaganda, constructs pass tests of validity and reliability, and the data come from around the world.</p><p>Now the count, on a team of six. The lab's score view takes a construct called <code>ownership</code> with four items on a seven-point scale, the fourth worded in reverse, and each respondent's answers. A respondent's score is the mean of their four item scores after the reverse-coded answer is turned round, as 8 minus the answer. On the preset <code>five-respondents</code> the scores are 5.75, 5.25, 4.25, 5.75 and 3.25, and the construct's mean is 4.85. The preset <code>six-respondents</code> adds <code>r6</code>, who answered 7 to all four items. Turned round, those are 7, 7, 7 and 1, a score of 5.5, and the mean over six is 119 / 24, about 4.96. One respondent moved the mean by 0.108. The lab's last tile gives the means if nothing were reversed, the error to avoid: 4.45 for the five and 4.875 for the six. Its line tile counts respondents above, at and below a line, here the scale's middle, 4: 4 above and 1 below for the five, 5 above and 1 below for the six.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Likert-type items</h2></div><p>a construct&#x27;s score from Likert-type items, reverse-coded where stated</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Likert-type items</strong><span>a construct's score from Likert-type items, reverse-coded where stated</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="alkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each answer is a whole number from 1 to the scale's points, one per item in the items' order. A reverse-coded item is scored points + 1 − the answer (on 7 points a 2 scores 6). A respondent's score on a construct is the mean of their scored answers on its items; a construct's mean is the mean of those scores over the respondents; an item's mean is over the respondents too, as scored. A respondent is above the line when their score is greater than it, at it when equal. The last tile scores every item as answered, the mistake of forgetting to reverse. Constructs and items go in the order given; means are exact, shown to 3 places when they do not end.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A construct&#x27;s mean with and without one suspect respondent</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A construct&#x27;s mean with and without one suspect respondent</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="alkPreset">Worked example</label>
           <select id="alkPreset"><option value="five-respondents" selected>Five consistent respondents on one four-item construct</option><option value="six-respondents">The same five and one respondent who answers 7 to every item</option><option value="eleven-respondents">The five patterns twice, and the same straight-lining respondent</option></select>
@@ -1437,12 +1480,15 @@
           <div class="kpi"><span>Construct means if nothing were reversed (the error)</span><strong id="alkUnreversed">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>That shift is a formula, and it is the whole of the authors' argument in miniature. Adding one respondent with score s to a group whose mean is m, for a group of n including the new one, moves the mean by (s − m) / n. Here that is (5.5 − 4.85) / 6, which is 0.108. The preset <code>eleven-respondents</code> repeats the five answer patterns twice, ten honest respondents, and adds <code>r6</code>: the mean is 54 / 11, about 4.91, and the shift is (5.5 − 4.85) / 11, about 0.059. The repeated patterns are invented to show dilution and say nothing about real surveys. A log with one number that the business reads has n equal to 1, and the one entry decides.</p><p>The lab also shows why a reverse-coded item raises the bar a little. A respondent who agrees with all three positive items should disagree with the fourth, and the five others do: their fourth answers are 2, 3, 4, 2 and 5 against high and low answers elsewhere. <code>r6</code> gives 7 to the reverse-worded item too, so the score tops out at 5.5, not 7. Read that as a prompt to look at the answers, not as proof of anything: a hurried respondent straight-lines honestly, and a deliberate liar who reads every item can answer 7, 7, 7 and 1. The authors do not rely on this device. They rely on numbers, anonymity and many items, and the pooled estimate does not reach a bias shared by many respondents. Appendix C's tests, read in Tests for Bias, look for two such patterns, early against late answering and common method bias; a survey that tells people to answer well is guarded against only by how it is run, as the chapter's footnote says.</p><p>The fifth reason is that some things can only be measured by asking. Culture is the authors' example. Teams want a faster measure than a survey, from HR systems, and turnover is the usual stand-in: low turnover for a good culture, high for a bad one. The authors give reasons it fails. A leaver may have taken a much better-paid offer; followed a partner who relocated; or left for a different career or for study. One of the authors knows a person who left a supportive team because that team's encouragement gave him the confidence to change career, so strong culture produced turnover. And the measure can be gamed: a manager who learns an employee is looking may lay them off to keep them out of the turnover figure, and a manager rewarded for retention may block transfers.</p><p>Turnover, the authors grant, can be useful if one is careful about what it measures. Other proxies exist, such as network traffic to see who talks to whom, or semantic analysis of email and chat. But to learn how people feel about taking risks, about sharing information and about working across boundaries, and why they behave as they do, you have to ask, and a survey is the way to ask systematically, reliably and comparably over time. The chapter closes by noting that it is worth asking: it cites research that organizational culture predicts technology and organizational performance, and credits Google's 2015 study with finding team dynamics and psychological safety to matter most for how a team performs.</p><h3>Exercise</h3><ul><li>Four items on a seven-point scale; the fourth is reverse-coded.</li><li>Five respondents' answers, <span class="math" data-say="respondent, a 1, a 2, a 3, a 4">respondent, a1, a2, a3, a4</span>: <span class="math" data-say="s 1, 6, 6, 5, 2, s 2, 5, 5, 5, 3, s 3, 7, 6, 6, 1, s 4, 4, 4, 5, 4, s 5, 1, 1, 1, 1">s1, 6, 6, 5, 2; s2, 5, 5, 5, 3; s3, 7, 6, 6, 1; s4, 4, 4, 5, 4; s5, 1, 1, 1, 1</span>.</li></ul><p>Score each respondent by hand, turning the fourth answer round, and take the construct's mean over all five. Then take it over <code>s1</code> to <code>s4</code> alone, and use (s − m) / n to check the difference. Type the records into the lab to confirm. Say what <code>s5</code>'s raw answers would have scored if the fourth item had not been reverse-coded.</p><p>The authors' case for asking is made. The next question is whom they asked, and the next lesson, The Data for the Project, reads Chapter 15 on how the sample was reached.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Weighing one respondent</h2></div><p>Five steps, the last of them on a survey of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Turn the reverse-coded items round</h3><p>For each reverse-worded item, replace the answer with the scale's top plus one, minus the answer: on a seven-point scale, 8 minus the answer.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Score each respondent</h3><p>Take the mean of a respondent's item scores. The construct's mean is the mean of the respondents' scores.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Recompute without the respondent you doubt</h3><p>Remove their row, rerun, and subtract: the difference is their weight in the mean.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the difference with (s − m) / n</h3><p>Their score minus the others' mean, over the group size n including them. The two answers should agree to the digits shown.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Look at your own responses</h3><p>Take a short survey your team ran. Count the respondents who gave one answer to every item, and recompute the mean without them. Write down the difference and the group size.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Weighing one respondent</h2>
+      <p class="lead-in">Five steps, the last of them on a survey of your own.</p>
+      <ol class="key-ideas method"><li><strong>Turn the reverse-coded items round.</strong> For each reverse-worded item, replace the answer with the scale's top plus one, minus the answer: on a seven-point scale, 8 minus the answer.</li><li><strong>Score each respondent.</strong> Take the mean of a respondent's item scores. The construct's mean is the mean of the respondents' scores.</li><li><strong>Recompute without the respondent you doubt.</strong> Remove their row, rerun, and subtract: the difference is their weight in the mean.</li><li><strong>Check the difference with (s − m) / n.</strong> Their score minus the others' mean, over the group size n including them. The two answers should agree to the digits shown.</li><li><strong>Look at your own responses.</strong> Take a short survey your team ran. Count the respondents who gave one answer to every item, and recompute the mean without them. Write down the difference and the group size.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1510,16 @@ six with r6: 29.75 / 6 = 4.958
 shift: (5.5 − 4.85) / 6 = 0.108</div><p>Every figure is a sum or a mean of numbers on the page. The lab's tiles agree with them; the small difference between 4.958 and the 4.96 in the prose is rounding.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking logs cannot lie and surveys can</strong><span>The authors ask which is more exposed. A log is shaped by people, so one bad actor or one uncaught mistake can distort the few numbers the business reads, for a long time. A survey's pooled answers are moved by a liar in proportion to one over n; the lab's 0.108 for six respondents and 0.059 for eleven fall as the group grows. Neither source is immune, and the claim is about how much each can be moved.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a large pool cancels every bias</strong><span>The pooled estimate is about coordinated lying by a few hundred. It does not address an error that many respondents share, such as being told to answer positively, which the chapter's footnote warns against. Appendix C does test for two shared patterns, early against late responders and common method bias, and the authors describe the survey as giving a reasonable assurance, not proof.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using turnover as an objective measure of culture</strong><span>Turnover is easy to collect and feels free of opinion, which makes it attractive. The chapter shows it can fall or rise for reasons that have nothing to do with culture, and for a reason that runs the other way, and that it is open to being gamed. What people feel about risk, information and the work environment has to be asked.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can weigh one respondent.</strong><p>Given a construct with a reverse-coded item and a set of answers, score each respondent, compute the construct's mean with and without a respondent you doubt, and check the difference with (s − m) / n.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab compares two means. It cannot tell whether a respondent lied, hurried or meant it; the pattern is a reason to look, not a finding. And the dilution it shows is for one respondent, not for a bias many respondents share.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking logs cannot lie and surveys can</strong><span>The authors ask which is more exposed. A log is shaped by people, so one bad actor or one uncaught mistake can distort the few numbers the business reads, for a long time. A survey's pooled answers are moved by a liar in proportion to one over n; the lab's 0.108 for six respondents and 0.059 for eleven fall as the group grows. Neither source is immune, and the claim is about how much each can be moved.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a large pool cancels every bias</strong><span>The pooled estimate is about coordinated lying by a few hundred. It does not address an error that many respondents share, such as being told to answer positively, which the chapter's footnote warns against. Appendix C does test for two shared patterns, early against late responders and common method bias, and the authors describe the survey as giving a reasonable assurance, not proof.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using turnover as an objective measure of culture</strong><span>Turnover is easy to collect and feels free of opinion, which makes it attractive. The chapter shows it can fall or rise for reasons that have nothing to do with culture, and for a reason that runs the other way, and that it is open to being gamed. What people feel about risk, information and the work environment has to be asked.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can weigh one respondent.</strong><p>Given a construct with a reverse-coded item and a set of answers, score each respondent, compute the construct's mean with and without a respondent you doubt, and check the difference with (s − m) / n.</p></div></div><div class="note"><strong>Note:</strong> The lab compares two means. It cannot tell whether a respondent lied, hurried or meant it; the pattern is a reason to look, not a finding. And the dilution it shows is for one respondent, not for a bias many respondents share.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Proxy</summary><p>A measure used in place of one that is hard to collect. Turnover from an HR system is the chapter's proxy for organizational culture. The authors argue that a proxy can move for reasons unrelated to the thing it stands for, and can be gamed.</p></details><details class="recall"><summary>Reverse-coded item</summary><p>An item worded so that agreeing with it means the opposite of the construct. On a seven-point scale its answer is turned round before scoring: the score is 8 minus the answer, so a 7 counts as a 1. The book's chapters do not discuss the device; the lesson uses it to show what a pattern of identical answers looks like.</p></details><details class="recall"><summary>Straight-lining</summary><p>Giving the same answer to every item. The lab uses it as a stand-in for a respondent whose answers a reader would doubt, without claiming that any such respondent is lying; the person may simply have hurried.</p></details></div>
+      <h3>Summary</h3>
       <p>The rest of Chapter 14 answers the doubt every survey meets: people may lie. Read the authors' comparison of one bad actor in a log with a few in a pool of thousands, and their case that culture cannot be read from turnover; then score a construct with one respondent who answers everything the same, and see how far that one respondent moves the mean.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Proxy.</strong> A measure used in place of one that is hard to collect. Turnover from an HR system is the chapter's proxy for organizational culture. The authors argue that a proxy can move for reasons unrelated to the thing it stands for, and can be gamed.</li><li><strong>Reverse-coded item.</strong> An item worded so that agreeing with it means the opposite of the construct. On a seven-point scale its answer is turned round before scoring: the score is 8 minus the answer, so a 7 counts as a 1. The book's chapters do not discuss the device; the lesson uses it to show what a pattern of identical answers looks like.</li><li><strong>Straight-lining.</strong> Giving the same answer to every item. The lab uses it as a stand-in for a respondent whose answers a reader would doubt, without claiming that any such respondent is lying; the person may simply have hurried.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a system sees only what is inside it. logs go wrong too, with few data points. pooled answers dilute one bad respondent. turnover is not a measure of culture. feelings and reasons need a question" tabindex="0" role="region" aria-label="Mathematical notation">a system sees only what is inside it
 logs go wrong too, with few data points
 pooled answers dilute one bad respondent
@@ -2353,11 +2398,40 @@ feelings and reasons need a question</div><figcaption>Trusting survey data in fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2425,7 +2499,7 @@ feelings and reasons need a question</div><figcaption>Trusting survey data in fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

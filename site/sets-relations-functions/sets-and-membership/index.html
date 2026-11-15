@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sets, Relations, and Functions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Sets</p>
       <h1>Sets and Membership</h1>
       <p class="lesson-lede">Collections, membership, and the two ways to describe a set.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A set is its members</li><li>Membership is the primitive relation</li><li>The empty set is a set</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What a set is</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Set and membership</span><p>A <strong>set</strong> is a collection of distinct objects, called its <strong>elements</strong> or <strong>members</strong>. We write <span class="math" data-say="x in A">x ∈ A</span> when <span class="math" data-say="x">x</span> is a member of <span class="math" data-say="A">A</span>, and <span class="math" data-say="x not in A">x ∉ A</span> when it is not.</p></div><p>Two notations describe sets. <strong>Roster</strong> notation lists the members: <span class="math" data-say="A equals the set 2, 3, 5, 7">A = {2, 3, 5, 7}</span>. <strong>Set-builder</strong> notation states the property that characterises them: <span class="math" data-say="A equals the set x in the integers such that x is prime and x is less than 10">A = {x ∈ ℤ : x is prime and x &lt; 10}</span>. The colon is read "such that", and a vertical bar is used equally often.</p><div class="defbox"><span class="label">Definition &middot; Extensionality</span><p><span class="math" data-say="A equals B">A = B</span> exactly when every member of <span class="math" data-say="A">A</span> is a member of <span class="math" data-say="B">B</span> and conversely &mdash; that is, <span class="math" data-say="for every x x in A if and only if x in B">∀x (x ∈ A ↔ x ∈ B)</span>. A set carries no information beyond its membership.</p></div><p>Two consequences follow immediately, and both surprise people once. Order carries no information: <span class="math" data-say="the set 1, 2, equals the set 2, 1">{1, 2} = {2, 1}</span>. Repetition carries none either: <span class="math" data-say="the set 1, 1, 2, equals the set 1, 2">{1, 1, 2} = {1, 2}</span>. If you need order, you need a sequence or a tuple, which “Cartesian Products and Tuples” supplies.</p><div class="defbox"><span class="label">Definition &middot; The empty set</span><p><span class="math" data-say="the empty set">∅</span> (also written <span class="math" data-say="the set">{}</span>) is the set with no members. There is exactly one: any two sets with no members satisfy extensionality vacuously.</p></div><p>The distinction between <span class="math" data-say="the empty set">∅</span> and <span class="math" data-say="the set the empty set">{∅}</span> is worth ten seconds. The first has zero members. The second has one member &mdash; the empty set. <span class="math" data-say="the size of the empty set, equals 0">|∅| = 0</span> and <span class="math" data-say="the size of the set the empty set, equals 1">|{∅}| = 1</span>, and a box containing an empty box is not an empty box.</p><h3>The standard sets</h3><div class="mathblock" data-say="the natural numbers, natural numbers, the set 0, 1, 2, 3, and so on, 0 included here. the integers, integers, the set and so on, negative 2, negative 1, 0, 1, 2, and so on. the rationals, rationals, the set A over b such that A, b in the integers, b is not equal to 0. the reals, real numbers. the complex numbers, complex numbers" tabindex="0" role="region" aria-label="Mathematical notation">ℕ    natural numbers      {0, 1, 2, 3, …}   (0 included here)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What a set is</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Set and membership</span><p>A <strong>set</strong> is a collection of distinct objects, called its <strong>elements</strong> or <strong>members</strong>. We write <span class="math" data-say="x in A">x ∈ A</span> when <span class="math" data-say="x">x</span> is a member of <span class="math" data-say="A">A</span>, and <span class="math" data-say="x not in A">x ∉ A</span> when it is not.</p></div><p>Two notations describe sets. <strong>Roster</strong> notation lists the members: <span class="math" data-say="A equals the set 2, 3, 5, 7">A = {2, 3, 5, 7}</span>. <strong>Set-builder</strong> notation states the property that characterises them: <span class="math" data-say="A equals the set x in the integers such that x is prime and x is less than 10">A = {x ∈ ℤ : x is prime and x &lt; 10}</span>. The colon is read "such that", and a vertical bar is used equally often.</p><div class="defbox"><span class="label">Definition &middot; Extensionality</span><p><span class="math" data-say="A equals B">A = B</span> exactly when every member of <span class="math" data-say="A">A</span> is a member of <span class="math" data-say="B">B</span> and conversely &mdash; that is, <span class="math" data-say="for every x x in A if and only if x in B">∀x (x ∈ A ↔ x ∈ B)</span>. A set carries no information beyond its membership.</p></div><p>Two consequences follow immediately, and both surprise people once. Order carries no information: <span class="math" data-say="the set 1, 2, equals the set 2, 1">{1, 2} = {2, 1}</span>. Repetition carries none either: <span class="math" data-say="the set 1, 1, 2, equals the set 1, 2">{1, 1, 2} = {1, 2}</span>. If you need order, you need a sequence or a tuple, which “Cartesian Products and Tuples” supplies.</p><div class="defbox"><span class="label">Definition &middot; The empty set</span><p><span class="math" data-say="the empty set">∅</span> (also written <span class="math" data-say="the set">{}</span>) is the set with no members. There is exactly one: any two sets with no members satisfy extensionality vacuously.</p></div><p>The distinction between <span class="math" data-say="the empty set">∅</span> and <span class="math" data-say="the set the empty set">{∅}</span> is worth ten seconds. The first has zero members. The second has one member &mdash; the empty set. <span class="math" data-say="the size of the empty set, equals 0">|∅| = 0</span> and <span class="math" data-say="the size of the set the empty set, equals 1">|{∅}| = 1</span>, and a box containing an empty box is not an empty box.</p><h3>The standard sets</h3><div class="mathblock" data-say="the natural numbers, natural numbers, the set 0, 1, 2, 3, and so on, 0 included here. the integers, integers, the set and so on, negative 2, negative 1, 0, 1, 2, and so on. the rationals, rationals, the set A over b such that A, b in the integers, b is not equal to 0. the reals, real numbers. the complex numbers, complex numbers" tabindex="0" role="region" aria-label="Mathematical notation">ℕ    natural numbers      {0, 1, 2, 3, …}   (0 included here)
 ℤ    integers             {…, −2, −1, 0, 1, 2, …}
 ℚ    rationals            {a/b : a, b ∈ ℤ,  b ≠ 0}
 ℝ    real numbers
-ℂ    complex numbers</div><p>Whether <span class="math" data-say="0 in the natural numbers">0 ∈ ℕ</span> is a convention, not a fact, and sources differ. This path includes it, and says so wherever it matters &mdash; a base case at <span class="math" data-say="n equals 0">n = 0</span> versus <span class="math" data-say="n equals 1">n = 1</span> is exactly the kind of detail Induction and Recursion cannot leave ambiguous.</p><div class="defbox"><span class="label">Definition &middot; Cardinality</span><p>For a finite set <span class="math" data-say="A">A</span>, <span class="math" data-say="the size of A">|A|</span> is the number of members. <span class="math" data-say="the size of the set 1, 2, 3, equals 3">|{1, 2, 3}| = 3</span> and <span class="math" data-say="the size of the empty set, equals 0">|∅| = 0</span>. “Cardinality and Countability” extends this to infinite sets, where it stops behaving the way the notation suggests.</p></div><div class="example"><span class="label">Example &middot; Set-builder can hide emptiness</span><p><span class="math" data-say="the set x in the reals such that x squared is less than 0">{x ∈ ℝ : x² &lt; 0}</span> is <span class="math" data-say="the empty set">∅</span>, written in a form that does not look empty. A set-builder description says which objects belong; it does not promise that any do.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Set algebra</h2></div><p>Two expressions, one membership</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+ℂ    complex numbers</div><p>Whether <span class="math" data-say="0 in the natural numbers">0 ∈ ℕ</span> is a convention, not a fact, and sources differ. This path includes it, and says so wherever it matters &mdash; a base case at <span class="math" data-say="n equals 0">n = 0</span> versus <span class="math" data-say="n equals 1">n = 1</span> is exactly the kind of detail Induction and Recursion cannot leave ambiguous.</p><div class="defbox"><span class="label">Definition &middot; Cardinality</span><p>For a finite set <span class="math" data-say="A">A</span>, <span class="math" data-say="the size of A">|A|</span> is the number of members. <span class="math" data-say="the size of the set 1, 2, 3, equals 3">|{1, 2, 3}| = 3</span> and <span class="math" data-say="the size of the empty set, equals 0">|∅| = 0</span>. “Cardinality and Countability” extends this to infinite sets, where it stops behaving the way the notation suggests.</p></div><div class="example"><span class="label">Example &middot; Set-builder can hide emptiness</span><p><span class="math" data-say="the set x in the reals such that x squared is less than 0">{x ∈ ℝ : x² &lt; 0}</span> is <span class="math" data-say="the empty set">∅</span>, written in a form that does not look empty. A set-builder description says which objects belong; it does not promise that any do.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Set algebra</h2></div><p>Two expressions, one membership</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Set expressions over U = {1, …, 12}</strong><span>Click an element to move it between the sets</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>selected by A</span><span class="tone-purple"><i class="legend-swatch"></i>selected by B</span></div>
@@ -1410,10 +1453,10 @@
         <div id="vennKey" class="small-copy" style="margin-top:8px;"></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="setRows"></table></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Twelve elements, three sets</h3>
-          <p>Click an element to cycle it through the eight possible memberships; the chips below the diagram show which elements are in each region. The figure marked Equal? is extensionality made visible: it reads yes exactly when <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> have the same members, and the difference row names what stops it. Cycle each of 1, 2, 3, 7, 8 and 9 until it is in both sets or in neither, and watch the row empty and the verdict flip.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Twelve elements, three sets</h3>
+            <p>Click an element to cycle it through the eight possible memberships; the chips below the diagram show which elements are in each region. The figure marked Equal? is extensionality made visible: it reads yes exactly when <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> have the same members, and the difference row names what stops it. Cycle each of 1, 2, 3, 7, 8 and 9 until it is in both sets or in neither, and watch the row empty and the verdict flip.</p>
         <div class="field">
           <label for="setExprA">Expression A</label>
           <select id="setExprA"></select>
@@ -1433,12 +1476,14 @@
           <div class="kpi"><span>Equal?</span><strong id="kEq">&mdash;</strong></div>
         </div>
         <div class="status-banner" id="setStatus">Pick two expressions and see whether anything separates them.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working with a set description</h2></div><p>Decide membership one element at a time.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the set-builder condition as a predicate</h3><p><span class="math" data-say="the set x in the integers such that P of x">{x ∈ ℤ : P(x)}</span> is exactly the elements of <span class="math" data-say="the integers">ℤ</span> satisfying <span class="math" data-say="P">P</span>. The domain before the colon matters as much as the condition after it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Test a few candidate elements</h3><p>Substituting three or four values tells you whether you have read the condition correctly. It does not tell you the set.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check whether the set is empty</h3><p>A condition no element satisfies describes <span class="math" data-say="the empty set">∅</span>. This is not an error, and it is easy to miss.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Convert between notations</h3><p>Roster for small sets, set-builder for large or infinite ones. Being able to move between them is what makes a proof of equality writable.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working with a set description</h2>
+      <p class="lead-in">Decide membership one element at a time.</p>
+      <ol class="key-ideas method"><li><strong>Read the set-builder condition as a predicate.</strong> <span class="math" data-say="the set x in the integers such that P of x">{x ∈ ℤ : P(x)}</span> is exactly the elements of <span class="math" data-say="the integers">ℤ</span> satisfying <span class="math" data-say="P">P</span>. The domain before the colon matters as much as the condition after it.</li><li><strong>Test a few candidate elements.</strong> Substituting three or four values tells you whether you have read the condition correctly. It does not tell you the set.</li><li><strong>Check whether the set is empty.</strong> A condition no element satisfies describes <span class="math" data-say="the empty set">∅</span>. This is not an error, and it is easy to miss.</li><li><strong>Convert between notations.</strong> Roster for small sets, set-builder for large or infinite ones. Being able to move between them is what makes a proof of equality writable.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1457,17 +1502,16 @@ So A = {…, −5, −2, 1, 4, 7, 10, …}   — the integers ≡ 1 (mod 3).
 Number Theory and Cryptography gives that description its own notation.</div><p>Note that <span class="math" data-say="negative 2">−2</span> required a negative <span class="math" data-say="k">k</span>. Set-builder conditions quantify over the domain stated, and forgetting that <span class="math" data-say="k">k</span> may be negative is how half a set goes missing.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing <span class="math" data-say="in">∈</span> with <span class="math" data-say="is a subset of">⊆</span></strong><span><span class="math" data-say="1 in the set 1, 2">1 ∈ {1, 2}</span> is true; <span class="math" data-say="1 is a subset of the set 1, 2">1 ⊆ {1, 2}</span> is not even well formed, because 1 is not a set. “Subsets and Power Sets” makes the distinction sharp.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading <span class="math" data-say="the set the empty set">{∅}</span> as empty</strong><span>It has one element. This matters immediately in “Subsets and Power Sets”, where the power set of <span class="math" data-say="the empty set">∅</span> is <span class="math" data-say="the set the empty set">{∅}</span> &mdash; a set with one member.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting the domain in set-builder notation</strong><span><span class="math" data-say="the set x such that x squared equals 2">{x : x² = 2}</span> is empty over <span class="math" data-say="the rationals">ℚ</span> and has two elements over <span class="math" data-say="the reals">ℝ</span>. The part before the colon is half the definition.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert between the two notations in both directions.</strong><p>Given <span class="math" data-say="the set 2, 4, 6, 8, 10">{2, 4, 6, 8, 10}</span>, write a set-builder description; given <span class="math" data-say="the set x in the integers such that x squared is less than 10">{x ∈ ℤ : x² &lt; 10}</span>, write the roster. If the second gives you seven elements you have remembered the negatives.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Naive set theory &mdash; "a set is any collection" &mdash; is inconsistent if pushed: the set of all sets that do not contain themselves cannot exist. Every set on this path is built from a stated domain, which is enough to stay clear of the problem.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing <span class="math" data-say="in">∈</span> with <span class="math" data-say="is a subset of">⊆</span></strong><span><span class="math" data-say="1 in the set 1, 2">1 ∈ {1, 2}</span> is true; <span class="math" data-say="1 is a subset of the set 1, 2">1 ⊆ {1, 2}</span> is not even well formed, because 1 is not a set. “Subsets and Power Sets” makes the distinction sharp.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading <span class="math" data-say="the set the empty set">{∅}</span> as empty</strong><span>It has one element. This matters immediately in “Subsets and Power Sets”, where the power set of <span class="math" data-say="the empty set">∅</span> is <span class="math" data-say="the set the empty set">{∅}</span> &mdash; a set with one member.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting the domain in set-builder notation</strong><span><span class="math" data-say="the set x such that x squared equals 2">{x : x² = 2}</span> is empty over <span class="math" data-say="the rationals">ℚ</span> and has two elements over <span class="math" data-say="the reals">ℝ</span>. The part before the colon is half the definition.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert between the two notations in both directions.</strong><p>Given <span class="math" data-say="the set 2, 4, 6, 8, 10">{2, 4, 6, 8, 10}</span>, write a set-builder description; given <span class="math" data-say="the set x in the integers such that x squared is less than 10">{x ∈ ℤ : x² &lt; 10}</span>, write the roster. If the second gives you seven elements you have remembered the negatives.</p></div></div><div class="note"><strong>Note:</strong> Naive set theory &mdash; "a set is any collection" &mdash; is inconsistent if pushed: the set of all sets that do not contain themselves cannot exist. Every set on this path is built from a stated domain, which is enough to stay clear of the problem.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A set is its members</summary><p><span class="math" data-say="the set 1, 2">{1, 2}</span> and <span class="math" data-say="the set 2, 1, 1">{2, 1, 1}</span> are the same set. Notation differs; the object does not. This is called <em>extensionality</em>.</p></details><details class="recall"><summary>Membership is the primitive relation</summary><p><span class="math" data-say="x in A">x ∈ A</span> is either true or false for every <span class="math" data-say="x">x</span>. A collection where membership is uncertain is not a set in this sense.</p></details><details class="recall"><summary>The empty set is a set</summary><p><span class="math" data-say="the empty set">∅</span> has no members, and there is only one such set. <span class="math" data-say="the empty set">∅</span> and <span class="math" data-say="the set the empty set">{∅}</span> are different: the second has one member, which happens to be empty.</p></details></div>
+      <h3>Summary</h3>
       <p>A set is determined entirely by what belongs to it. Roster and set-builder notation, the empty set, and why order and repetition carry no information.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A set is its members.</strong> <span class="math" data-say="the set 1, 2">{1, 2}</span> and <span class="math" data-say="the set 2, 1, 1">{2, 1, 1}</span> are the same set. Notation differs; the object does not. This is called <em>extensionality</em>.</li><li><strong>Membership is the primitive relation.</strong> <span class="math" data-say="x in A">x ∈ A</span> is either true or false for every <span class="math" data-say="x">x</span>. A collection where membership is uncertain is not a set in this sense.</li><li><strong>The empty set is a set.</strong> <span class="math" data-say="the empty set">∅</span> has no members, and there is only one such set. <span class="math" data-say="the empty set">∅</span> and <span class="math" data-say="the set the empty set">{∅}</span> are different: the second has one member, which happens to be empty.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A equals the set 1, 2, 3, roster notation. A equals the set x in the integers such that 0 is less than x is less than 4, s e t-builder notation. A equals B, if and only if, for every x x in A if and only if x in B, extensionality. the set 1, 2, equals the set 2, 1, equals the set 1, 1, 2, order and repetition mean nothing" tabindex="0" role="region" aria-label="Mathematical notation">A = {1, 2, 3}                    roster notation
 A = {x ∈ ℤ : 0 &lt; x &lt; 4}          set-builder notation
 A = B   ⟺   ∀x (x ∈ A ↔ x ∈ B)   extensionality
@@ -2001,11 +2045,40 @@ A = B   ⟺   ∀x (x ∈ A ↔ x ∈ B)   extensionality
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2073,7 +2146,7 @@ A = B   ⟺   ∀x (x ∈ A ↔ x ∈ B)   extensionality
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

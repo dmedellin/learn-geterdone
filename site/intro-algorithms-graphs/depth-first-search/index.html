@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 22 · Elementary Graph Algorithms</p>
       <h1>Depth-First Search</h1>
       <p class="lesson-lede">One walk that goes deeper whenever it can, a clock that ticks twice per vertex, and four classes of edge decided by the times alone.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Discovery and finish times</li><li>The parenthesis theorem</li><li>Tree, back, forward and cross edges</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument first, then the walk</h2>
-      <article class="prose reading"><p>&ldquo;The strategy followed by depth-first search is, as its name implies, to search &lsquo;deeper&rsquo; in the graph whenever possible.&rdquo; So Section 22.3 of CLRS opens. Breadth-first search, in the lesson before, spreads out from one source a layer at a time; depth-first search follows one edge after another from the vertex it reached last, and only when that vertex has nothing new to offer does it back up to the vertex it came from. When everything reachable from the first source is done, it starts again from any vertex still untouched, so its result is a forest rather than one tree.</p><p>The authors' procedure, DFS with its recursive helper DFS-VISIT, keeps three colours as breadth-first search does: white for undiscovered, grey for discovered but not finished, black for finished. What it adds is a clock. Each time a vertex turns grey the clock ticks and the vertex records the time as <span class="math" data-say="d">d</span>; each time one turns black the clock ticks again and it records <span class="math" data-say="f">f</span>. Every vertex is discovered once and finished once, so the times run from 1 to <span data-say="2 times the size of V">2|V|</span> and <span class="math" data-say="d is less than f">d < f</span> for every vertex. The section notes that the result depends on the order in which the outer loop tries vertices and the order of each adjacency list, and that any such order serves.</p><p>The running time is an aggregate count, as for breadth-first search. DFS-VISIT is called exactly once per vertex, because the first thing it does is turn its vertex grey and it is only ever called on a white one. Inside the call, the loop over the adjacency list runs once per entry, and the lists hold <span data-say="theta of E">Θ(E)</span> entries in all. Add the <span data-say="theta of V">Θ(V)</span> of the outer loops and the total is <span data-say="theta of the quantity V plus E">Θ(V + E)</span>. The count is exact, not just a bound: one call per vertex, one look per adjacency entry.</p><p>Then the properties. The predecessor subgraph is a forest whose shape mirrors the recursive calls, and a vertex is a descendant of <span class="math" data-say="u">u</span> exactly when it was discovered while <span class="math" data-say="u">u</span> was grey. From that comes the parenthesis theorem: two intervals either do not meet or one contains the other, and containment means descent. The proof is two cases on which vertex was discovered first and whether the second was discovered before the first finished. Corollary 22.8 restates it as a test: <span class="math" data-say="v">v</span> is a proper descendant of <span class="math" data-say="u">u</span> if and only if <span class="math" data-say="u, d is less than v, d is less than v, f is less than u, f">u.d < v.d < v.f < u.f</span>.</p><p>The white-path theorem, Theorem 22.9, says which vertices end up below <span class="math" data-say="u">u</span>: exactly those that, at the moment <span class="math" data-say="u">u</span> is discovered, can be reached from <span class="math" data-say="u">u</span> along a path of vertices that are all still white. Reachability alone is not enough. A path that runs through a grey or black vertex at that moment does not make its far end a descendant, and that is the misconception this lesson's graph is built to break.</p><p>Last, the classification. The four classes are defined from the forest, and the section shows the search can assign them as it goes: when an edge is first explored, a white head makes it a tree edge, a grey head a back edge (the grey vertices are always the chain of open calls, so a grey head is an ancestor), and a black head a forward edge if the tail was discovered first and a cross edge otherwise. For an undirected graph Theorem 22.10 shows that forward and cross edges never occur: every edge is a tree edge or a back edge.</p><p>Now the lab. It runs the walk in your browser, classifies every arc from the two times at its ends, and checks the parenthesis theorem on every pair of vertices. It opens on its own preset <code>dag</code>, five arcs on four vertices: 0 back arcs and 1 forward arc, and with no back arc the graph is acyclic, which the next lesson turns into an algorithm. The preset <code>nested</code>, a five-cycle with an extra arc back to 1, has 2 back arcs and all 10 pairs of intervals nested; <code>diamond</code> has 3 tree arcs, 0 forward and 1 cross, and switching the reading to undirected shows the cross arc become a tree arc.</p><p>This lesson's graph has six vertices and eight arcs. Paste it into the arcs box and start the walk at 1: <code>1>2, 1>4, 1>3, 2>4, 4>1, 3>4, 5>3, 5>6</code>. Adjacency lists follow the order you type, so vertex 1 tries 2, then 4, then 3. The lab prints 4 tree arcs, 1 back arc, 1 forward arc and 2 cross arcs; it finds 5 pairs of intervals nested, 10 disjoint, and 0 overlapping without nesting, as the theorem says. The intervals are 1 [1, 8], 2 [2, 5], 4 [3, 4], 3 [6, 7], 5 [9, 12] and 6 [10, 11]: two trees, rooted at 1 and at 5.</p><p>Read the classes off those intervals. <span class="math" data-say="4 goes to 1">4 → 1</span> is back, since 4 is inside 1's interval and 1 was still grey. <span class="math" data-say="1 goes to 4">1 → 4</span> is forward: 4 is a finished descendant of 1, reached first through 2. <span class="math" data-say="3 goes to 4">3 → 4</span> is cross, because [3, 4] and [6, 7] are disjoint, and so is <span class="math" data-say="5 goes to 3">5 → 3</span>, which crosses from the second tree into the first. Now look at 2 and 3. Vertex 3 is reachable from 2, along <span class="math" data-say="2 goes to 4">2 → 4</span>, <span class="math" data-say="4 goes to 1">4 → 1</span>, <span class="math" data-say="1 goes to 3">1 → 3</span>, and it was discovered later, at 6 against 2. Yet [6, 7] is not inside [2, 5]: 3 is not a descendant of 2, because when 2 was discovered the path ran through 1, which was grey. That is the white-path theorem at work.</p><p>Two more runs separate the graph from the walk. Move the start to 5 and the lab prints 5 tree arcs, 3 back arcs and no forward or cross arcs at all, with 11 nested pairs: the same eight arcs, classified differently, because the classes describe one walk. Put the start back at 1 and switch the reading to undirected: 5 tree edges, 3 back edges, 0 forward, 0 cross, which is Theorem 22.10 holding on this graph. (Read undirected, <span class="math" data-say="1 goes to 4">1 → 4</span> and <span class="math" data-say="4 goes to 1">4 → 1</span> become two parallel edges between 1 and 4, and the lab classifies both as back edges.) What does not change is whether there is a back arc at all; the next lesson proves that this one fact belongs to the graph.</p><p>The lab does not print the work count, so do it by hand: from root 1 the walk makes 6 calls, one per vertex, and examines 8 arcs, one per adjacency entry. That is the <span data-say="theta of the quantity V plus E">Θ(V + E)</span> count on this graph, exactly. The Algorithms Subject's lesson Depth-First Search and the Timestamps runs the same lab on other graphs if you want more practice.</p><h3>Exercise</h3><p>Take the digraph <code>1>2, 2>3, 3>1, 3>4, 4>2, 1>5</code> and run depth-first search by hand from 1, with each adjacency list in the order written. Write down every interval, classify all six arcs, and find a vertex reachable from another and discovered after it that is nevertheless not its descendant, if one exists. Then type the graph into the lab and compare.</p><p>A depth-first search with no back arcs is a promise about the graph. The next lesson, Topological Sort and Strongly Connected Components, uses that promise and the finish times to order a dag and to split any digraph into its components.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Discovery and finish times, and the four edge classes</h2></div><p>One depth-first walk; the intervals nest exactly when one vertex is inside the other</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument first, then the walk</h2><div class="prose reading"><p>&ldquo;The strategy followed by depth-first search is, as its name implies, to search &lsquo;deeper&rsquo; in the graph whenever possible.&rdquo; So Section 22.3 of CLRS opens. Breadth-first search, in the lesson before, spreads out from one source a layer at a time; depth-first search follows one edge after another from the vertex it reached last, and only when that vertex has nothing new to offer does it back up to the vertex it came from. When everything reachable from the first source is done, it starts again from any vertex still untouched, so its result is a forest rather than one tree.</p><p>The authors' procedure, DFS with its recursive helper DFS-VISIT, keeps three colours as breadth-first search does: white for undiscovered, grey for discovered but not finished, black for finished. What it adds is a clock. Each time a vertex turns grey the clock ticks and the vertex records the time as <span class="math" data-say="d">d</span>; each time one turns black the clock ticks again and it records <span class="math" data-say="f">f</span>. Every vertex is discovered once and finished once, so the times run from 1 to <span data-say="2 times the size of V">2|V|</span> and <span class="math" data-say="d is less than f">d < f</span> for every vertex. The section notes that the result depends on the order in which the outer loop tries vertices and the order of each adjacency list, and that any such order serves.</p><p>The running time is an aggregate count, as for breadth-first search. DFS-VISIT is called exactly once per vertex, because the first thing it does is turn its vertex grey and it is only ever called on a white one. Inside the call, the loop over the adjacency list runs once per entry, and the lists hold <span data-say="theta of E">Θ(E)</span> entries in all. Add the <span data-say="theta of V">Θ(V)</span> of the outer loops and the total is <span data-say="theta of the quantity V plus E">Θ(V + E)</span>. The count is exact, not just a bound: one call per vertex, one look per adjacency entry.</p><p>Then the properties. The predecessor subgraph is a forest whose shape mirrors the recursive calls, and a vertex is a descendant of <span class="math" data-say="u">u</span> exactly when it was discovered while <span class="math" data-say="u">u</span> was grey. From that comes the parenthesis theorem: two intervals either do not meet or one contains the other, and containment means descent. The proof is two cases on which vertex was discovered first and whether the second was discovered before the first finished. Corollary 22.8 restates it as a test: <span class="math" data-say="v">v</span> is a proper descendant of <span class="math" data-say="u">u</span> if and only if <span class="math" data-say="u, d is less than v, d is less than v, f is less than u, f">u.d < v.d < v.f < u.f</span>.</p><p>The white-path theorem, Theorem 22.9, says which vertices end up below <span class="math" data-say="u">u</span>: exactly those that, at the moment <span class="math" data-say="u">u</span> is discovered, can be reached from <span class="math" data-say="u">u</span> along a path of vertices that are all still white. Reachability alone is not enough. A path that runs through a grey or black vertex at that moment does not make its far end a descendant, and that is the misconception this lesson's graph is built to break.</p><p>Last, the classification. The four classes are defined from the forest, and the section shows the search can assign them as it goes: when an edge is first explored, a white head makes it a tree edge, a grey head a back edge (the grey vertices are always the chain of open calls, so a grey head is an ancestor), and a black head a forward edge if the tail was discovered first and a cross edge otherwise. For an undirected graph Theorem 22.10 shows that forward and cross edges never occur: every edge is a tree edge or a back edge.</p><p>Now the lab. It runs the walk in your browser, classifies every arc from the two times at its ends, and checks the parenthesis theorem on every pair of vertices. It opens on its own preset <code>dag</code>, five arcs on four vertices: 0 back arcs and 1 forward arc, and with no back arc the graph is acyclic, which the next lesson turns into an algorithm. The preset <code>nested</code>, a five-cycle with an extra arc back to 1, has 2 back arcs and all 10 pairs of intervals nested; <code>diamond</code> has 3 tree arcs, 0 forward and 1 cross, and switching the reading to undirected shows the cross arc become a tree arc.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Discovery and finish times, and the four edge classes</h2></div><p>One depth-first walk; the intervals nest exactly when one vertex is inside the other</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Timestamps, and the four classes they decide</strong><span>one walk, four different things read off it</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the class you asked to see</span><span class="tone-muted"><i class="legend-swatch"></i>every other arc</span><span class="tone-purple"><i class="legend-swatch"></i>discovery and finish, as an interval</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dtVerts"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dtEdges"></table></div>
       <div class="status-banner" id="dtStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Run the walk, then read the classes off the times</h3>
-          <p>Type arcs as <span data-say="tail is greater than head">tail&gt;head</span>, choose where the walk starts, and the lab stamps each vertex with its discovery and finish times and classifies every arc from the two times at its ends. The parenthesis theorem is checked on every pair. Paste the lesson's graph to reproduce its figures.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Run the walk, then read the classes off the times</h3>
+            <p>Type arcs as <span data-say="tail is greater than head">tail&gt;head</span>, choose where the walk starts, and the lab stamps each vertex with its discovery and finish times and classifies every arc from the two times at its ends. The parenthesis theorem is checked on every pair. Paste the lesson's graph to reproduce its figures.</p>
         <div class="field">
           <label for="dtPreset">Worked example</label>
           <select id="dtPreset"><option value="allfour">one graph with all four edge classes on it</option><option value="dag" selected>five arcs on four vertices, none of them closing a cycle</option><option value="nested">a five-cycle with one extra arc back to 1</option><option value="diamond">a diamond: four arcs on four vertices</option></select>
@@ -1438,12 +1481,15 @@
           <div class="kpi"><span>Pairs that overlap without nesting</span><strong id="dtOver">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="dtHint" style="margin:0;">An arc is <span class="tt">tail&gt;head</span> and labels start at 1. The class of an arc is decided by the times at its ends and nothing else: tree when the arc is the one that discovered its head, back when the head is still open, forward when the head is a finished descendant, cross otherwise. Switch the reading to undirected and watch two of the four counts go to zero.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This lesson's graph has six vertices and eight arcs. Paste it into the arcs box and start the walk at 1: <code>1>2, 1>4, 1>3, 2>4, 4>1, 3>4, 5>3, 5>6</code>. Adjacency lists follow the order you type, so vertex 1 tries 2, then 4, then 3. The lab prints 4 tree arcs, 1 back arc, 1 forward arc and 2 cross arcs; it finds 5 pairs of intervals nested, 10 disjoint, and 0 overlapping without nesting, as the theorem says. The intervals are 1 [1, 8], 2 [2, 5], 4 [3, 4], 3 [6, 7], 5 [9, 12] and 6 [10, 11]: two trees, rooted at 1 and at 5.</p><p>Read the classes off those intervals. <span class="math" data-say="4 goes to 1">4 → 1</span> is back, since 4 is inside 1's interval and 1 was still grey. <span class="math" data-say="1 goes to 4">1 → 4</span> is forward: 4 is a finished descendant of 1, reached first through 2. <span class="math" data-say="3 goes to 4">3 → 4</span> is cross, because [3, 4] and [6, 7] are disjoint, and so is <span class="math" data-say="5 goes to 3">5 → 3</span>, which crosses from the second tree into the first. Now look at 2 and 3. Vertex 3 is reachable from 2, along <span class="math" data-say="2 goes to 4">2 → 4</span>, <span class="math" data-say="4 goes to 1">4 → 1</span>, <span class="math" data-say="1 goes to 3">1 → 3</span>, and it was discovered later, at 6 against 2. Yet [6, 7] is not inside [2, 5]: 3 is not a descendant of 2, because when 2 was discovered the path ran through 1, which was grey. That is the white-path theorem at work.</p><p>Two more runs separate the graph from the walk. Move the start to 5 and the lab prints 5 tree arcs, 3 back arcs and no forward or cross arcs at all, with 11 nested pairs: the same eight arcs, classified differently, because the classes describe one walk. Put the start back at 1 and switch the reading to undirected: 5 tree edges, 3 back edges, 0 forward, 0 cross, which is Theorem 22.10 holding on this graph. (Read undirected, <span class="math" data-say="1 goes to 4">1 → 4</span> and <span class="math" data-say="4 goes to 1">4 → 1</span> become two parallel edges between 1 and 4, and the lab classifies both as back edges.) What does not change is whether there is a back arc at all; the next lesson proves that this one fact belongs to the graph.</p><p>The lab does not print the work count, so do it by hand: from root 1 the walk makes 6 calls, one per vertex, and examines 8 arcs, one per adjacency entry. That is the <span data-say="theta of the quantity V plus E">Θ(V + E)</span> count on this graph, exactly. The Algorithms Subject's lesson Depth-First Search and the Timestamps runs the same lab on other graphs if you want more practice.</p><h3>Exercise</h3><p>Take the digraph <code>1>2, 2>3, 3>1, 3>4, 4>2, 1>5</code> and run depth-first search by hand from 1, with each adjacency list in the order written. Write down every interval, classify all six arcs, and find a vertex reachable from another and discovered after it that is nevertheless not its descendant, if one exists. Then type the graph into the lab and compare.</p><p>A depth-first search with no back arcs is a promise about the graph. The next lesson, Topological Sort and Strongly Connected Components, uses that promise and the finish times to order a dag and to split any digraph into its components.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running depth-first search by hand</h2></div><p>Five steps, the last on a graph of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Keep a clock and a stack of open vertices</h3><p>Start the clock at 0. Each time you reach a white vertex, tick and write the time as its d; it is now grey and on top of the stack of open calls.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Explore edges in list order</h3><p>From the vertex on top, take the next untried edge. If its head is white, go there. If not, note the head's colour for the classification and try the next edge.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Finish and back up</h3><p>When a vertex has no untried edges, tick and write the time as its f, colour it black and return to the vertex below it. When the stack empties, start again from the next white vertex.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Classify every edge</h3><p>White head: tree. Grey head: back. Black head: forward if the tail's d is smaller, cross if it is larger. Check that no two intervals overlap without nesting.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a graph of your own</h3><p>Write the import or call graph of a few modules of your own as arcs, run the walk by hand, then type it into the lab. Note any back arc the lab finds: it closes a cycle among your modules.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running depth-first search by hand</h2>
+      <p class="lead-in">Five steps, the last on a graph of your own.</p>
+      <ol class="key-ideas method"><li><strong>Keep a clock and a stack of open vertices.</strong> Start the clock at 0. Each time you reach a white vertex, tick and write the time as its d; it is now grey and on top of the stack of open calls.</li><li><strong>Explore edges in list order.</strong> From the vertex on top, take the next untried edge. If its head is white, go there. If not, note the head's colour for the classification and try the next edge.</li><li><strong>Finish and back up.</strong> When a vertex has no untried edges, tick and write the time as its f, colour it black and return to the vertex below it. When the stack empties, start again from the next white vertex.</li><li><strong>Classify every edge.</strong> White head: tree. Grey head: back. Black head: forward if the tail's d is smaller, cross if it is larger. Check that no two intervals overlap without nesting.</li><li><strong>Do it on a graph of your own.</strong> Write the import or call graph of a few modules of your own as arcs, run the walk by hand, then type it into the lab. Note any back arc the lab finds: it closes a cycle among your modules.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1510,16 @@ root 5 at 9; 5 → 3 cross; 6 from 10 to 11
 6 calls, 8 arcs examined</div><p>Four tree arcs <span data-say="1 goes to 2, 2 goes to 4, 1 goes to 3, 5 goes to 6">(1 → 2, 2 → 4, 1 → 3, 5 → 6)</span>, one back, one forward, two cross, as the lab prints. The count of 6 calls and 8 examinations is the <span data-say="theta of the quantity V plus E">Θ(V + E)</span> bound met exactly on this graph; the proof is what says it is met on every graph.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking every vertex reachable from u and discovered after it is u&#x27;s descendant</strong><span>Reachability plus a later discovery time sounds like descent, and Exercise 22.3-8 asks for a counterexample. The white-path theorem gives the real condition: the path must be all white when u is discovered. On the lesson's graph, 3 is reachable from 2 and discovered later, at 6 against 2, but the path from 2 runs through 1, which was grey, and 3's interval [6, 7] is not inside 2's [2, 5].</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the edge classes as properties of the graph</strong><span>The classes describe one walk. Start the lesson's graph at 1 and the lab prints 4 tree, 1 back, 1 forward and 2 cross arcs; start it at 5 and the same arcs come out 5 tree, 3 back and nothing else. Whether some back arc exists does not depend on the walk, and the next lesson proves it; how many, and which, does.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting depth-first search to produce one tree</strong><span>Breadth-first search, as the book sets it up, explores from one source. Depth-first search restarts from every vertex still white, so its predecessor subgraph is a forest. On the lesson's graph, vertex 5 cannot be reached from 1 and becomes the root of a second tree, with interval [9, 12].</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run depth-first search by hand and classify every edge.</strong><p>For a digraph of six to eight vertices, write each vertex's interval, classify every arc by the colour rule, and check the parenthesis theorem on every pair.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab runs one walk with the adjacency order you type and the start you choose, and classifies its arcs; it shows the theorem holding on that walk. It does not print the call and examination counts, which you count by hand, and it cannot show that the theorem holds on every graph. The proofs in Section 22.3 do that.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking every vertex reachable from u and discovered after it is u&#x27;s descendant</strong><span>Reachability plus a later discovery time sounds like descent, and Exercise 22.3-8 asks for a counterexample. The white-path theorem gives the real condition: the path must be all white when u is discovered. On the lesson's graph, 3 is reachable from 2 and discovered later, at 6 against 2, but the path from 2 runs through 1, which was grey, and 3's interval [6, 7] is not inside 2's [2, 5].</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the edge classes as properties of the graph</strong><span>The classes describe one walk. Start the lesson's graph at 1 and the lab prints 4 tree, 1 back, 1 forward and 2 cross arcs; start it at 5 and the same arcs come out 5 tree, 3 back and nothing else. Whether some back arc exists does not depend on the walk, and the next lesson proves it; how many, and which, does.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting depth-first search to produce one tree</strong><span>Breadth-first search, as the book sets it up, explores from one source. Depth-first search restarts from every vertex still white, so its predecessor subgraph is a forest. On the lesson's graph, vertex 5 cannot be reached from 1 and becomes the root of a second tree, with interval [9, 12].</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run depth-first search by hand and classify every edge.</strong><p>For a digraph of six to eight vertices, write each vertex's interval, classify every arc by the colour rule, and check the parenthesis theorem on every pair.</p></div></div><div class="note"><strong>Note:</strong> The lab runs one walk with the adjacency order you type and the start you choose, and classifies its arcs; it shows the theorem holding on that walk. It does not print the call and examination counts, which you count by hand, and it cannot show that the theorem holds on every graph. The proofs in Section 22.3 do that.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Discovery and finish times</summary><p>A single clock ticks when a vertex is first reached, giving its discovery time <strong>d</strong>, and again when every edge out of it has been explored, giving its finish time <strong>f</strong>. With <span data-say="the size of V">|V|</span> vertices the clock stops at <span data-say="2 times the size of V">2|V|</span>. Between d and f the vertex is grey: open, with a call still running for it.</p></details><details class="recall"><summary>The parenthesis theorem</summary><p>Theorem 22.7: for any two vertices, their intervals [d, f] are either disjoint, with neither a descendant of the other, or one lies entirely inside the other, and the inner vertex is a descendant of the outer. Write each discovery as an opening bracket and each finish as a closing one, and the brackets balance.</p></details><details class="recall"><summary>Tree, back, forward and cross edges</summary><p>A tree edge discovered its head. A back edge runs to an ancestor, a forward edge to a descendant that is not its child in the tree, and a cross edge to a vertex that is neither. The colour of the head when the edge is first explored decides the class: white for tree, grey for back, black for forward or cross.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 22.3 runs a search that always leaves from the most recently discovered vertex, stamps each vertex with a discovery time and a finish time, and proves that the intervals between them nest or are disjoint. Run it on a six-vertex digraph, classify its eight arcs as tree, back, forward and cross, and see which of those facts belong to the graph and which to the walk.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Discovery and finish times.</strong> A single clock ticks when a vertex is first reached, giving its discovery time <strong>d</strong>, and again when every edge out of it has been explored, giving its finish time <strong>f</strong>. With <span data-say="the size of V">|V|</span> vertices the clock stops at <span data-say="2 times the size of V">2|V|</span>. Between d and f the vertex is grey: open, with a call still running for it.</li><li><strong>The parenthesis theorem.</strong> Theorem 22.7: for any two vertices, their intervals [d, f] are either disjoint, with neither a descendant of the other, or one lies entirely inside the other, and the inner vertex is a descendant of the outer. Write each discovery as an opening bracket and each finish as a closing one, and the brackets balance.</li><li><strong>Tree, back, forward and cross edges.</strong> A tree edge discovered its head. A back edge runs to an ancestor, a forward edge to a descendant that is not its child in the tree, and a cross edge to a vertex that is neither. The colour of the head when the edge is first explored decides the class: white for tree, grey for back, black for forward or cross.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="d when discovered, f when finished. time runs from 1 to twice the number of vertices. intervals nest or are disjoint. white head, tree, grey head, back. black head, forward or cross, by d. undirected, only tree and back. running time, theta of the quantity V plus E" tabindex="0" role="region" aria-label="Mathematical notation">d when discovered, f when finished
 time runs from 1 to 2|V|
 intervals nest or are disjoint
@@ -3242,11 +3287,40 @@ running time: Θ(V + E)</div><figcaption>Section 22.3 in seven lines</figcaption
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3314,7 +3388,7 @@ running time: Θ(V + E)</div><figcaption>Section 22.3 in seven lines</figcaption
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

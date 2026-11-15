@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,24 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings, Geometry and Hardness</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 34 · NP-Completeness</p>
       <h1>Polynomial Time and Verification</h1>
       <p class="lesson-lede">P is the class of problems a polynomial-time algorithm decides; NP is the class whose yes-instances have a short certificate that a polynomial-time algorithm can check.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A decision problem</li><li>An encoding and its length</li><li>A verification algorithm</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the check</h2>
-      <article class="prose reading"><p>&ldquo;If we were somehow given a “certificate” of a solution, then we could verify that the certificate is correct in time polynomial in the size of the input to the problem.&rdquo; That is how the opening of Chapter 34 first describes NP, informally, before sections 34.1 and 34.2 make each word in it exact. This lesson reads those pages and then plays both parts on a small formula of its own: the verifier, who checks a certificate, and the searcher, who has to find one.</p><p>The chapter opens with pairs of problems that look alike and are not: shortest and longest simple paths, Euler tours and hamiltonian cycles, 2-CNF and 3-CNF satisfiability. In each pair the first has a polynomial-time algorithm and the second is NP-complete. It then names the three classes the chapter studies, P, NP and NPC, and the three ideas its proofs need: decision problems in place of optimization problems, reductions, and a first NP-complete problem to reduce from. The authors are plain about the stakes: no one has found a polynomial-time algorithm for an NP-complete problem, and no one has proved that none exists.</p><p>Section 34.1 builds the definition of polynomial time with care. An abstract problem is a relation between instances and solutions; a decision problem has solutions yes and no. An algorithm sees an instance only through an encoding as a binary string, and the encoding matters. If an algorithm runs in time proportional to an integer k, it is linear in the input's length when k is written in unary and exponential when k is written in binary, since a binary k takes only about lg k bits. So the authors rule out unary and assume any reasonable concise encoding; encodings polynomially related to one another agree on which problems are polynomial-time solvable (Lemma 34.1).</p><p>With encodings fixed, a decision problem is a language: the set of binary strings whose answer is yes. An algorithm accepts a string if it outputs 1, and decides a language if it accepts every member and rejects every other string. P is the class of languages decided, equivalently (Theorem 34.2) accepted, in polynomial time. The section also defends polynomial time as the line between tractable and intractable: polynomials compose, are closed under addition and multiplication, and coincide across the usual models of computation.</p><p>Section 34.2 starts from the hamiltonian-cycle problem. Deciding it by trying every ordering of the vertices takes time exponential in the square root of the input's length. But if someone hands you an ordering and claims it is a hamiltonian cycle, checking takes polynomial time: is it a permutation of the vertices, and is every consecutive pair, including the last and the first, an edge? That check is a verification algorithm, and the ordering is its certificate. NP is the class of languages with a polynomial-time verifier and certificates of polynomial length.</p><p>Every language in P is in NP, because a decider can ignore the certificate. Whether the inclusion is strict is the open question, and the section adds two more: whether NP is closed under complement, that is whether NP equals co-NP, and whether P equals the intersection of NP and co-NP. The section's diagram draws the four ways the classes might relate, and the authors say which one most researchers expect without claiming that it has been shown.</p><p>Now the lab, which works on formulas in conjunctive normal form, written as clauses separated by semicolons, with <span class="math" data-say="negative 2">-2</span> for not x2. It plays a game the chapter leaves to Exercise 34.4-6: given only a yes-or-no oracle for satisfiability, build a satisfying assignment. Ask whether the formula is satisfiable; then fix x1 true and ask again, keeping true if the answer is yes and false otherwise; and so on for each variable. That is at most n + 1 questions where trying assignments could take <span data-say="2 to the power n">2^n</span>. The lab then checks the assignment clause by clause, which is the verifier's job, and re-asks every step of brute force.</p><p>Its presets: <code>three</code> has 3 variables and 4 clauses; the oracle is asked 4 times, a search would try 8 assignments, and the result x1=T x2=T x3=F is one of the formula's 4 models. <code>forced</code> has exactly 1 model of 8, found in 4 questions. <code>four</code> takes 5 questions against 16 assignments and has 7 models. <code>free</code> has a variable the formula allows either way; the oracle says yes to x1 true, so the lab keeps it, and finds x1=T x2=T in 3 questions. <code>unsat</code> is unsatisfiable: the first answer is no, after 1 question, and there is no certificate to check.</p><p>Then type the lesson's formula: <span class="math" data-say="negative 1 2 3, 1 negative 2, negative 2 negative 3, negative 1 negative 3">-1 2 3; 1 -2; -2 -3; -1 -3</span>, that is <span data-say="the quantity not x 1 or x 2 or x 3, and the quantity x 1 or not x 2, and the quantity not x 2 or not x 3, and the quantity not x 1 or not x 3">(¬x1 ∨ x2 ∨ x3) ∧ (x1 ∨ ¬x2) ∧ (¬x2 ∨ ¬x3) ∧ (¬x1 ∨ ¬x3)</span>. The lab asks 4 questions, builds x1=T x2=T x3=F, checks it against every clause, and reports that the formula has 3 models among its 8 assignments. The 4 questions are a count for this formula; that n + 1 suffice for every formula is the argument above, and that each question could itself take exponential time is why none of this shows satisfiability is easy.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 1 2, minus 1 3, minus 2 minus 3, minus 1 minus 2" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">1 2; -1 3; -2 -3; -1 -2</span></code></pre><p>Run the self-reduction by hand: for each question say which formula is asked about and what the answer is, and give the assignment it builds. Then check that assignment as a verifier would, clause by clause, and count the formula's models. Type the formula into the lab to compare.</p><p>A certificate shows a problem is in NP; it says nothing yet about how hard it is. The next lesson, NP-Completeness and Reducibility, adds the reductions that do.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Search from decision: n + 1 questions build the answer</h2></div><p>The oracle only says yes or no, and asking it once per variable produces a satisfying assignment it never returned</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the check</h2><div class="prose reading"><p>&ldquo;If we were somehow given a “certificate” of a solution, then we could verify that the certificate is correct in time polynomial in the size of the input to the problem.&rdquo; That is how the opening of Chapter 34 first describes NP, informally, before sections 34.1 and 34.2 make each word in it exact. This lesson reads those pages and then plays both parts on a small formula of its own: the verifier, who checks a certificate, and the searcher, who has to find one.</p><p>The chapter opens with pairs of problems that look alike and are not: shortest and longest simple paths, Euler tours and hamiltonian cycles, 2-CNF and 3-CNF satisfiability. In each pair the first has a polynomial-time algorithm and the second is NP-complete. It then names the three classes the chapter studies, P, NP and NPC, and the three ideas its proofs need: decision problems in place of optimization problems, reductions, and a first NP-complete problem to reduce from. The authors are plain about the stakes: no one has found a polynomial-time algorithm for an NP-complete problem, and no one has proved that none exists.</p><p>Section 34.1 builds the definition of polynomial time with care. An abstract problem is a relation between instances and solutions; a decision problem has solutions yes and no. An algorithm sees an instance only through an encoding as a binary string, and the encoding matters. If an algorithm runs in time proportional to an integer k, it is linear in the input's length when k is written in unary and exponential when k is written in binary, since a binary k takes only about lg k bits. So the authors rule out unary and assume any reasonable concise encoding; encodings polynomially related to one another agree on which problems are polynomial-time solvable (Lemma 34.1).</p><p>With encodings fixed, a decision problem is a language: the set of binary strings whose answer is yes. An algorithm accepts a string if it outputs 1, and decides a language if it accepts every member and rejects every other string. P is the class of languages decided, equivalently (Theorem 34.2) accepted, in polynomial time. The section also defends polynomial time as the line between tractable and intractable: polynomials compose, are closed under addition and multiplication, and coincide across the usual models of computation.</p><p>Section 34.2 starts from the hamiltonian-cycle problem. Deciding it by trying every ordering of the vertices takes time exponential in the square root of the input's length. But if someone hands you an ordering and claims it is a hamiltonian cycle, checking takes polynomial time: is it a permutation of the vertices, and is every consecutive pair, including the last and the first, an edge? That check is a verification algorithm, and the ordering is its certificate. NP is the class of languages with a polynomial-time verifier and certificates of polynomial length.</p><p>Every language in P is in NP, because a decider can ignore the certificate. Whether the inclusion is strict is the open question, and the section adds two more: whether NP is closed under complement, that is whether NP equals co-NP, and whether P equals the intersection of NP and co-NP. The section's diagram draws the four ways the classes might relate, and the authors say which one most researchers expect without claiming that it has been shown.</p><p>Now the lab, which works on formulas in conjunctive normal form, written as clauses separated by semicolons, with <span class="math" data-say="negative 2">-2</span> for not x2. It plays a game the chapter leaves to Exercise 34.4-6: given only a yes-or-no oracle for satisfiability, build a satisfying assignment. Ask whether the formula is satisfiable; then fix x1 true and ask again, keeping true if the answer is yes and false otherwise; and so on for each variable. That is at most n + 1 questions where trying assignments could take <span data-say="2 to the power n">2^n</span>. The lab then checks the assignment clause by clause, which is the verifier's job, and re-asks every step of brute force.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Search from decision: n + 1 questions build the answer</h2></div><p>The oracle only says yes or no, and asking it once per variable produces a satisfying assignment it never returned</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Search from decision: n + 1 questions build the answer</strong><span>a yes-or-no oracle, asked once per variable, produces a satisfying assignment</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the branch the reduction took</span><span class="tone-green"><i class="legend-swatch"></i>the oracle allowed it</span><span class="tone-red"><i class="legend-swatch"></i>the oracle refused it</span></div>
@@ -1459,10 +1502,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="srSteps"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="srCheck"></table></div>
       <div class="status-banner" id="srStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Build a certificate from yes-or-no answers, then check it</h3>
-          <p>Type clauses separated by semicolons, with a minus sign for negation. The lab asks a decision oracle at most n + 1 questions, builds an assignment one variable at a time, checks it clause by clause, and compares every answer with brute force. Type the lesson's formula, then the exercise's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Build a certificate from yes-or-no answers, then check it</h3>
+            <p>Type clauses separated by semicolons, with a minus sign for negation. The lab asks a decision oracle at most n + 1 questions, builds an assignment one variable at a time, checks it clause by clause, and compares every answer with brute force. Type the lesson's formula, then the exercise's.</p>
         <div class="field">
           <label for="srPreset">Worked example</label>
           <select id="srPreset"><option value="three" selected>three variables, four clauses — satisfiable</option><option value="forced">a formula with exactly one model</option><option value="unsat">two variables, four clauses — unsatisfiable</option><option value="four">four variables, five clauses</option><option value="free">a variable the oracle allows either way</option></select>
@@ -1486,12 +1529,15 @@
           <div class="kpi"><span>Models the formula has</span><strong id="srModels">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="srHint" style="margin:0;">The oracle answers one question: <em>is this formula satisfiable</em>. It never returns an assignment. Fix <span class="tt">x1</span> to true, ask again; if the answer is still yes, keep it, otherwise <span class="tt">x1</span> must be false. After <span class="tt">n</span> more questions every variable is fixed and what is left is the assignment. The oracle here is brute force, which is the joke: an exponential oracle is still an oracle, and what is being shown is the <em>reduction</em>, not an efficient algorithm.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Its presets: <code>three</code> has 3 variables and 4 clauses; the oracle is asked 4 times, a search would try 8 assignments, and the result x1=T x2=T x3=F is one of the formula's 4 models. <code>forced</code> has exactly 1 model of 8, found in 4 questions. <code>four</code> takes 5 questions against 16 assignments and has 7 models. <code>free</code> has a variable the formula allows either way; the oracle says yes to x1 true, so the lab keeps it, and finds x1=T x2=T in 3 questions. <code>unsat</code> is unsatisfiable: the first answer is no, after 1 question, and there is no certificate to check.</p><p>Then type the lesson's formula: <span class="math" data-say="negative 1 2 3, 1 negative 2, negative 2 negative 3, negative 1 negative 3">-1 2 3; 1 -2; -2 -3; -1 -3</span>, that is <span data-say="the quantity not x 1 or x 2 or x 3, and the quantity x 1 or not x 2, and the quantity not x 2 or not x 3, and the quantity not x 1 or not x 3">(¬x1 ∨ x2 ∨ x3) ∧ (x1 ∨ ¬x2) ∧ (¬x2 ∨ ¬x3) ∧ (¬x1 ∨ ¬x3)</span>. The lab asks 4 questions, builds x1=T x2=T x3=F, checks it against every clause, and reports that the formula has 3 models among its 8 assignments. The 4 questions are a count for this formula; that n + 1 suffice for every formula is the argument above, and that each question could itself take exponential time is why none of this shows satisfiability is easy.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 1 2, minus 1 3, minus 2 minus 3, minus 1 minus 2" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">1 2; -1 3; -2 -3; -1 -2</span></code></pre><p>Run the self-reduction by hand: for each question say which formula is asked about and what the answer is, and give the assignment it builds. Then check that assignment as a verifier would, clause by clause, and count the formula's models. Type the formula into the lab to compare.</p><p>A certificate shows a problem is in NP; it says nothing yet about how hard it is. The next lesson, NP-Completeness and Reducibility, adds the reductions that do.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Verifying and finding a certificate</h2></div><p>Four steps settle one formula; the fifth is a formula of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Say what the certificate is</h3><p>For satisfiability it is an assignment of true or false to each variable: n bits for n variables, polynomial in the formula's length.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Verify it clause by clause</h3><p>A clause is satisfied when at least one of its literals is true. The certificate is good exactly when every clause is satisfied, and checking takes one pass over the formula.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Search with the oracle</h3><p>Ask whether the formula is satisfiable. If yes, fix x1 true and ask again; keep true on yes, false on no. Repeat for each variable, at most n + 1 questions.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count what each side cost</h3><p>Write the n + 1 questions beside the <span data-say="2 to the power n">2^n</span> assignments a blind search could try, and remember that the oracle is the part no polynomial-time algorithm is known to supply.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Write a formula with one model</h3><p>Write a formula of your own on four variables that has exactly one satisfying assignment, type it into the lab, and check that the models tile reads 1 of 16 and that the lab still needs only 5 questions.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Verifying and finding a certificate</h2>
+      <p class="lead-in">Four steps settle one formula; the fifth is a formula of your own.</p>
+      <ol class="key-ideas method"><li><strong>Say what the certificate is.</strong> For satisfiability it is an assignment of true or false to each variable: n bits for n variables, polynomial in the formula's length.</li><li><strong>Verify it clause by clause.</strong> A clause is satisfied when at least one of its literals is true. The certificate is good exactly when every clause is satisfied, and checking takes one pass over the formula.</li><li><strong>Search with the oracle.</strong> Ask whether the formula is satisfiable. If yes, fix x1 true and ask again; keep true on yes, false on no. Repeat for each variable, at most n + 1 questions.</li><li><strong>Count what each side cost.</strong> Write the n + 1 questions beside the <span data-say="2 to the power n">2^n</span> assignments a blind search could try, and remember that the oracle is the part no polynomial-time algorithm is known to supply.</li><li><strong>Write a formula with one model.</strong> Write a formula of your own on four variables that has exactly one satisfying assignment, type it into the lab, and check that the models tile reads 1 of 16 and that the lab still needs only 5 questions.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1511,17 +1557,16 @@ certificate: x1 true, x2 true, x3 false
 check: x2, x1, ¬x3, ¬x3 satisfy the four clauses</div><p>Four questions built the certificate and one pass over the clauses verified it. The formula's other two models set x1 and x2 false, with x3 either way; three of eight, as the lab counts. The verifier's pass is polynomial on every formula. The questions are polynomial in number, but each asks an oracle for which no polynomial-time algorithm is known, so the search is fast only relative to that oracle.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading NP as not polynomial</strong><span>NP stands for nondeterministic polynomial time, and the book defines it by verification: a short certificate, checked in polynomial time. Every problem in P is in NP: whether a graph has a path of at most k edges between two vertices is in NP and in P. The formula in this lesson is checked in one pass over four clauses; what is not known is how to find a certificate that fast on every formula.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Measuring time against the value instead of the length</strong><span>An algorithm that loops k times on an input k looks linear. Against the length of k written in binary it is exponential. Section 34.1's insistence on encodings is what makes the definition of P mean something, and it returns in the next lesson, where subset sum's numbers are large exactly so that this matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the self-reduction for a fast algorithm</strong><span>The lab builds a certificate in n + 1 questions, but each question is a call to an oracle that decides satisfiability, and no polynomial-time algorithm for that is known. The reduction shows that finding a certificate is no harder than deciding whether one exists; it does not make either one easy.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say exactly what puts a problem in NP.</strong><p>For a decision problem such as satisfiability or hamiltonian cycle, name the certificate, describe the polynomial-time check, explain why the encoding of numbers matters, and say which of the relations among P, NP and co-NP are proved and which are open.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's oracle is brute force over every assignment, so it is exponential, and it caps the formula's size to stay usable; the n + 1 count is about questions asked, not time spent. No count on small formulas bears on whether P equals NP, which is a question about every input size at once.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading NP as not polynomial</strong><span>NP stands for nondeterministic polynomial time, and the book defines it by verification: a short certificate, checked in polynomial time. Every problem in P is in NP: whether a graph has a path of at most k edges between two vertices is in NP and in P. The formula in this lesson is checked in one pass over four clauses; what is not known is how to find a certificate that fast on every formula.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Measuring time against the value instead of the length</strong><span>An algorithm that loops k times on an input k looks linear. Against the length of k written in binary it is exponential. Section 34.1's insistence on encodings is what makes the definition of P mean something, and it returns in the next lesson, where subset sum's numbers are large exactly so that this matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the self-reduction for a fast algorithm</strong><span>The lab builds a certificate in n + 1 questions, but each question is a call to an oracle that decides satisfiability, and no polynomial-time algorithm for that is known. The reduction shows that finding a certificate is no harder than deciding whether one exists; it does not make either one easy.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say exactly what puts a problem in NP.</strong><p>For a decision problem such as satisfiability or hamiltonian cycle, name the certificate, describe the polynomial-time check, explain why the encoding of numbers matters, and say which of the relations among P, NP and co-NP are proved and which are open.</p></div></div><div class="note"><strong>Note:</strong> The lab's oracle is brute force over every assignment, so it is exponential, and it caps the formula's size to stay usable; the n + 1 count is about questions asked, not time spent. No count on small formulas bears on whether P equals NP, which is a question about every input size at once.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A decision problem</summary><p>A problem whose answer is yes or no. An optimization problem becomes one by adding a bound: not the shortest path, but whether there is a path of at most k edges. If the optimization problem is easy, so is the decision problem, which is why hardness is studied on decision problems.</p></details><details class="recall"><summary>An encoding and its length</summary><p>An instance is given to an algorithm as a binary string, and running time is measured against that string's length. The authors assume a concise encoding: integers in binary, or any base polynomially related to it, never in unary.</p></details><details class="recall"><summary>A verification algorithm</summary><p>A two-argument algorithm A(x, y) that takes an input x and a certificate y. A language is in NP when some polynomial-time A accepts exactly its members, each with some certificate of length polynomial in <span data-say="the absolute value of x">|x|</span>, and no certificate makes A accept a non-member.</p></details></div>
+      <h3>Summary</h3>
       <p>The opening of Chapter 34 and sections 34.1 and 34.2: decision and optimization problems, why the encoding of an input matters, the class P in the formal-language framework, verification algorithms and certificates, the class NP, and co-NP. Check a certificate for a formula written for the lesson clause by clause, and count the decision questions it takes to build one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A decision problem.</strong> A problem whose answer is yes or no. An optimization problem becomes one by adding a bound: not the shortest path, but whether there is a path of at most k edges. If the optimization problem is easy, so is the decision problem, which is why hardness is studied on decision problems.</li><li><strong>An encoding and its length.</strong> An instance is given to an algorithm as a binary string, and running time is measured against that string's length. The authors assume a concise encoding: integers in binary, or any base polynomially related to it, never in unary.</li><li><strong>A verification algorithm.</strong> A two-argument algorithm A(x, y) that takes an input x and a certificate y. A language is in NP when some polynomial-time A accepts exactly its members, each with some certificate of length polynomial in <span data-say="the absolute value of x">|x|</span>, and no certificate makes A accept a non-member.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="decision problem, answer yes or no. P, decided in big O of n to the power k time. input size, the length of the encoding. verifier A of x and y, y is the certificate. NP, a short certificate, checked fast. P is a subset of NP, whether P equals NP is open" tabindex="0" role="region" aria-label="Mathematical notation">decision problem: answer yes or no
 P: decided in O(n^k) time
 input size: the length of the encoding
@@ -3400,11 +3445,40 @@ P ⊆ NP; whether P = NP is open</div><figcaption>Sections 34.1 and 34.2 in six 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3472,7 +3546,7 @@ P ⊆ NP; whether P = NP is open</div><figcaption>Sections 34.1 and 34.2 in six 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

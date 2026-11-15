@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rates of Change and the Derivative</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The derivative as a function</p>
       <h1>Where the Rate Is Zero</h1>
       <p class="lesson-lede">Solve <span data-say="p prime equals 0">p′ = 0</span> exactly, then use the sign of <span data-say="p prime">p′</span> on each side to say whether each zero is a maximum, a minimum or neither.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A graph can turn only where the tangent is level</li><li>A level tangent is not always a turn</li><li>Maximum and minimum are local</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Zeros of the derivative, and what they do and do not say</h2>
-      <article class="prose reading"><p>&ldquo;The Derivative as a Function&rdquo; ended on a warning: a zero of <span class="math" data-say="p prime">p′</span> is a place where the tangent is level, and it does not say whether the graph rises or falls on either side. This lesson turns the warning into a method.</p><div class="defbox"><span class="label">Definition &middot; Critical point, maximum and minimum</span><p>A <strong>critical point</strong> of a polynomial <span class="math" data-say="p">p</span> is a place where <span class="math" data-say="p prime of t equals 0">p′(t) = 0</span>.</p><p>It is a <strong>local maximum</strong> if <span class="math" data-say="p prime">p′</span> changes from positive to negative there, and a <strong>local minimum</strong> if <span class="math" data-say="p prime">p′</span> changes from negative to positive. If <span class="math" data-say="p prime">p′</span> has the same sign on both sides, it is neither.</p></div><div class="example"><span class="label">Example &middot; A cubic with two turns</span><p>Let <span class="math" data-say="p of t equals 2 t cubed minus 3 t squared minus 12 t plus 1">p(t) = 2t³ − 3t² − 12t + 1</span>. Then <span class="math" data-say="p prime of t equals 6 t squared minus 6 t minus 12">p′(t) = 6t² − 6t − 12</span>, and taking out the common factor 6 gives <span class="math" data-say="6 times the quantity t squared minus t minus 2, equals 6 times the quantity t minus 2, times the quantity t plus 1">6(t² − t − 2) = 6(t − 2)(t + 1)</span>.</p><p>The critical points are <span class="math" data-say="t equals negative 1">t = −1</span> and <span class="math" data-say="t equals 2">t = 2</span>. Test one place in each region they cut the line into, and the whole shape of the graph follows.</p></div><div class="mathblock" data-say="p prime of t equals 6 times the quantity t minus 2, times the quantity t plus 1. t, 0, rising. negative 1 is less than t is less than 2, p prime is less than 0, falling. t is greater than 2, p prime is greater than 0, rising" tabindex="0" role="region" aria-label="Mathematical notation">p′(t) = 6(t − 2)(t + 1)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Zeros of the derivative, and what they do and do not say</h2><div class="prose reading"><p>&ldquo;The Derivative as a Function&rdquo; ended on a warning: a zero of <span class="math" data-say="p prime">p′</span> is a place where the tangent is level, and it does not say whether the graph rises or falls on either side. This lesson turns the warning into a method.</p><div class="defbox"><span class="label">Definition &middot; Critical point, maximum and minimum</span><p>A <strong>critical point</strong> of a polynomial <span class="math" data-say="p">p</span> is a place where <span class="math" data-say="p prime of t equals 0">p′(t) = 0</span>.</p><p>It is a <strong>local maximum</strong> if <span class="math" data-say="p prime">p′</span> changes from positive to negative there, and a <strong>local minimum</strong> if <span class="math" data-say="p prime">p′</span> changes from negative to positive. If <span class="math" data-say="p prime">p′</span> has the same sign on both sides, it is neither.</p></div><div class="example"><span class="label">Example &middot; A cubic with two turns</span><p>Let <span class="math" data-say="p of t equals 2 t cubed minus 3 t squared minus 12 t plus 1">p(t) = 2t³ − 3t² − 12t + 1</span>. Then <span class="math" data-say="p prime of t equals 6 t squared minus 6 t minus 12">p′(t) = 6t² − 6t − 12</span>, and taking out the common factor 6 gives <span class="math" data-say="6 times the quantity t squared minus t minus 2, equals 6 times the quantity t minus 2, times the quantity t plus 1">6(t² − t − 2) = 6(t − 2)(t + 1)</span>.</p><p>The critical points are <span class="math" data-say="t equals negative 1">t = −1</span> and <span class="math" data-say="t equals 2">t = 2</span>. Test one place in each region they cut the line into, and the whole shape of the graph follows.</p></div><div class="mathblock" data-say="p prime of t equals 6 times the quantity t minus 2, times the quantity t plus 1. t, 0, rising. negative 1 is less than t is less than 2, p prime is less than 0, falling. t is greater than 2, p prime is greater than 0, rising" tabindex="0" role="region" aria-label="Mathematical notation">p′(t) = 6(t − 2)(t + 1)
 
    t &lt; −1          p′ &gt; 0     rising
    −1 &lt; t &lt; 2      p′ &lt; 0     falling
-   t &gt; 2           p′ &gt; 0     rising</div><p>At <span class="math" data-say="t equals negative 1">t = −1</span> the graph stops rising and starts falling: a local maximum. At <span class="math" data-say="t equals 2">t = 2</span> it stops falling and starts rising: a local minimum. The height comes from <span class="math" data-say="p">p</span>, not from <span class="math" data-say="p prime">p′</span>, because <span class="math" data-say="p prime">p′</span> is zero at both: <span class="math" data-say="p of negative 1 equals negative 2 minus 3 plus 12 plus 1 equals 8">p(−1) = −2 − 3 + 12 + 1 = 8</span> and <span class="math" data-say="p of 2 equals 16 minus 12 minus 24 plus 1 equals negative 19">p(2) = 16 − 12 − 24 + 1 = −19</span>.</p><p>The word local matters. The maximum height is 8, but further right the graph rises without limit: <span class="math" data-say="p of 4 equals 128 minus 48 minus 48 plus 1 equals 33">p(4) = 128 − 48 − 48 + 1 = 33</span>. The height 8 is the highest point near <span class="math" data-say="t equals negative 1">t = −1</span> and nothing more.</p><h3>A zero where nothing turns</h3><p>Now <span class="math" data-say="p of t equals t cubed">p(t) = t³</span>. Its derivative is <span class="math" data-say="3 t squared">3t²</span>, which is zero at <span class="math" data-say="t equals 0">t = 0</span> and positive for every other <span class="math" data-say="t">t</span>, because a square is never negative. So <span class="math" data-say="p prime">p′</span> is positive on both sides of its zero, and the graph rises before <span class="math" data-say="t equals 0">t = 0</span> and rises after it, level for an instant and not turning. The lab marks such a zero as having no sign change, and its interval tile reads rising on both sides.</p><p>This is the case the necessary-but-not-sufficient wording is for. Solving <span class="math" data-say="p prime equals 0">p′ = 0</span> finds every place a turn could be, and the sign test sorts the real turns from the flat steps.</p><h3>A derivative that is never zero</h3><p>For <span class="math" data-say="p of t equals t cubed plus t">p(t) = t³ + t</span> the derivative is <span class="math" data-say="3 t squared plus 1">3t² + 1</span>. A square is at least 0, so <span class="math" data-say="3 t squared plus 1">3t² + 1</span> is at least 1 and never reaches zero. The graph has no level tangent and no turn: it rises everywhere. The zero tile of the lab says <span class="math" data-say="none rational">none rational</span>, which is how it reports a polynomial with no zero it can write as a fraction, and the interval tile gives the fuller answer, rising for every <span class="math" data-say="t">t</span>.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The derivative</h2></div><p>p′ and p″ term by term, and their signs</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   t &gt; 2           p′ &gt; 0     rising</div><p>At <span class="math" data-say="t equals negative 1">t = −1</span> the graph stops rising and starts falling: a local maximum. At <span class="math" data-say="t equals 2">t = 2</span> it stops falling and starts rising: a local minimum. The height comes from <span class="math" data-say="p">p</span>, not from <span class="math" data-say="p prime">p′</span>, because <span class="math" data-say="p prime">p′</span> is zero at both: <span class="math" data-say="p of negative 1 equals negative 2 minus 3 plus 12 plus 1 equals 8">p(−1) = −2 − 3 + 12 + 1 = 8</span> and <span class="math" data-say="p of 2 equals 16 minus 12 minus 24 plus 1 equals negative 19">p(2) = 16 − 12 − 24 + 1 = −19</span>.</p><p>The word local matters. The maximum height is 8, but further right the graph rises without limit: <span class="math" data-say="p of 4 equals 128 minus 48 minus 48 plus 1 equals 33">p(4) = 128 − 48 − 48 + 1 = 33</span>. The height 8 is the highest point near <span class="math" data-say="t equals negative 1">t = −1</span> and nothing more.</p><h3>A zero where nothing turns</h3><p>Now <span class="math" data-say="p of t equals t cubed">p(t) = t³</span>. Its derivative is <span class="math" data-say="3 t squared">3t²</span>, which is zero at <span class="math" data-say="t equals 0">t = 0</span> and positive for every other <span class="math" data-say="t">t</span>, because a square is never negative. So <span class="math" data-say="p prime">p′</span> is positive on both sides of its zero, and the graph rises before <span class="math" data-say="t equals 0">t = 0</span> and rises after it, level for an instant and not turning. The lab marks such a zero as having no sign change, and its interval tile reads rising on both sides.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The derivative</h2></div><p>p′ and p″ term by term, and their signs</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The derivative as a function</strong><span>the power rule, term by term, and the sign of p′</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>p</span><span class="tone-purple"><i class="legend-swatch"></i>p′</span><span class="tone-muted"><i class="legend-swatch"></i>p″ (second order)</span><span class="tone-green"><i class="legend-swatch"></i>zeros of p′</span></div>
@@ -1408,10 +1451,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="dvPlot" viewBox="0 0 660 420" role="img" aria-label="p and its derivative"></svg></div>
       <div class="status-banner" id="dvStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Find the zeros of <span data-say="p prime">p′</span> and sort them by the sign</h3>
-          <p>Type a polynomial in t. The lab differentiates it, lists the rational zeros of the derivative, and tests the sign of <span data-say="p prime">p′</span> between them. A zero marked no sign change is a flat step and not a turn. The green dots on the plot sit on the graph of p at each zero of <span data-say="p prime">p′</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Find the zeros of <span data-say="p prime">p′</span> and sort them by the sign</h3>
+            <p>Type a polynomial in t. The lab differentiates it, lists the rational zeros of the derivative, and tests the sign of <span data-say="p prime">p′</span> between them. A zero marked no sign change is a flat step and not a turn. The green dots on the plot sit on the graph of p at each zero of <span data-say="p prime">p′</span>.</p>
         <div class="field">
           <label for="dvPreset">Polynomial</label>
           <select id="dvPreset"><option value="two-turns" selected>2t³ − 3t² − 12t + 1, a maximum and a minimum</option><option value="flat-step">t³, level at 0 and still rising</option><option value="none">t³ + t, never level</option></select>
@@ -1433,12 +1476,15 @@
         </div>
         <p class="small-copy" style="margin:0;">A polynomial in t of degree 10 at most: t^3 - 6t^2 + 9t.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This is the case the necessary-but-not-sufficient wording is for. Solving <span class="math" data-say="p prime equals 0">p′ = 0</span> finds every place a turn could be, and the sign test sorts the real turns from the flat steps.</p><h3>A derivative that is never zero</h3><p>For <span class="math" data-say="p of t equals t cubed plus t">p(t) = t³ + t</span> the derivative is <span class="math" data-say="3 t squared plus 1">3t² + 1</span>. A square is at least 0, so <span class="math" data-say="3 t squared plus 1">3t² + 1</span> is at least 1 and never reaches zero. The graph has no level tangent and no turn: it rises everywhere. The zero tile of the lab says <span class="math" data-say="none rational">none rational</span>, which is how it reports a polynomial with no zero it can write as a fraction, and the interval tile gives the fuller answer, rising for every <span class="math" data-say="t">t</span>.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Locating and sorting the critical points</h2></div><p>Five moves. The fourth is the one that stops a flat step being called a turn.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Differentiate</h3><p>Apply the power rule to each term and collect the result in descending powers.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Solve <span data-say="p prime equals 0">p′ = 0</span></h3><p>Factor, or use the quadratic formula. The zeros are the only places a turn can be. A zero that appears twice in the factoring, such as <span class="math" data-say="3 t squared">3t²</span>, is a warning that the sign may not change.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Test the sign in every region</h3><p>Between and beyond the zeros, put in one value of <span class="math" data-say="t">t</span> and note whether <span class="math" data-say="p prime">p′</span> is positive or negative there. Use the factored form so the sign is easy to read.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Name each zero from its two neighbours</h3><p>Positive then negative is a maximum, negative then positive is a minimum, and the same sign on both sides is neither.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find the height from p</h3><p>Put the zero into <span class="math" data-say="p">p</span>, not <span class="math" data-say="p prime">p′</span>. The height of the turn is a value of the original polynomial.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Locating and sorting the critical points</h2>
+      <p class="lead-in">Five moves. The fourth is the one that stops a flat step being called a turn.</p>
+      <ol class="key-ideas method"><li><strong>Differentiate.</strong> Apply the power rule to each term and collect the result in descending powers.</li><li><strong>Solve <span data-say="p prime equals 0">p′ = 0</span>.</strong> Factor, or use the quadratic formula. The zeros are the only places a turn can be. A zero that appears twice in the factoring, such as <span class="math" data-say="3 t squared">3t²</span>, is a warning that the sign may not change.</li><li><strong>Test the sign in every region.</strong> Between and beyond the zeros, put in one value of <span class="math" data-say="t">t</span> and note whether <span class="math" data-say="p prime">p′</span> is positive or negative there. Use the factored form so the sign is easy to read.</li><li><strong>Name each zero from its two neighbours.</strong> Positive then negative is a maximum, negative then positive is a minimum, and the same sign on both sides is neither.</li><li><strong>Find the height from p.</strong> Put the zero into <span class="math" data-say="p">p</span>, not <span class="math" data-say="p prime">p′</span>. The height of the turn is a value of the original polynomial.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1506,16 @@ t = −1:   rising then falling   maximum   p = 8
 t = 2:    falling then rising   minimum   p = −19</div><p>The lab's interval tile for this polynomial gives the same three regions as the table, and its zero tile gives the same two places. Neither height was found by plotting a point.</p><p>For a rehearsal, take <span class="math" data-say="p of t equals t cubed minus 3 t">p(t) = t³ − 3t</span>. The derivative is <span class="math" data-say="3 t squared minus 3 equals 3 times the quantity t minus 1, times the quantity t plus 1">3t² − 3 = 3(t − 1)(t + 1)</span>; work out the signs, then which of <span class="math" data-say="t equals negative 1">t = −1</span> and <span class="math" data-say="t equals 1">t = 1</span> is the maximum.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling every zero of <span data-say="p prime">p′</span> a maximum or a minimum</strong><span>For <span class="math" data-say="p of t equals t cubed">p(t) = t³</span>, <span class="math" data-say="p prime equals 3 t squared">p′ = 3t²</span> is zero at <span class="math" data-say="t equals 0">t = 0</span>, and the graph is rising on both sides of it. If 0 were a maximum the graph would fall just after it; it does not. The zero says the tangent is level, and only the signs of <span class="math" data-say="p prime">p′</span> either side say whether the graph turned.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the height of a turn from <span data-say="p prime">p′</span></strong><span>At <span class="math" data-say="t equals negative 1">t = −1</span> the derivative <span class="math" data-say="6 times the quantity t minus 2, times the quantity t plus 1">6(t − 2)(t + 1)</span> is zero, and the height of the maximum is 8. The zero of <span class="math" data-say="p prime">p′</span> tells you where to look, and the value of <span class="math" data-say="p">p</span> there tells you how high. Writing 0 as the height of a turn is reading the wrong function.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a local maximum for the largest value</strong><span>A maximum is the highest point near it. The cubic above has a local maximum of 8 at <span class="math" data-say="t equals negative 1">t = −1</span> and a value of 33 at <span class="math" data-say="t equals 4">t = 4</span>. Say local, and where a question asks for the greatest value over an interval, compare the turns with the ends.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can solve <span data-say="p prime equals 0">p′ = 0</span> exactly for a polynomial and say, from the signs on either side, whether each zero is a maximum, a minimum or neither.</strong><p>You should be able to differentiate, factor the result, test the sign of <span class="math" data-say="p prime">p′</span> in every region, name each zero from its neighbours, and find the height of each turn from <span class="math" data-say="p">p</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab finds the zeros of <span class="math" data-say="p prime">p′</span> that are fractions, and for a quadratic derivative it places the others with square roots in the interval tile. The next two lessons build the two rules that let you differentiate something other than a sum of powers, starting with &ldquo;The Product Rule&rdquo;.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling every zero of <span data-say="p prime">p′</span> a maximum or a minimum</strong><span>For <span class="math" data-say="p of t equals t cubed">p(t) = t³</span>, <span class="math" data-say="p prime equals 3 t squared">p′ = 3t²</span> is zero at <span class="math" data-say="t equals 0">t = 0</span>, and the graph is rising on both sides of it. If 0 were a maximum the graph would fall just after it; it does not. The zero says the tangent is level, and only the signs of <span class="math" data-say="p prime">p′</span> either side say whether the graph turned.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the height of a turn from <span data-say="p prime">p′</span></strong><span>At <span class="math" data-say="t equals negative 1">t = −1</span> the derivative <span class="math" data-say="6 times the quantity t minus 2, times the quantity t plus 1">6(t − 2)(t + 1)</span> is zero, and the height of the maximum is 8. The zero of <span class="math" data-say="p prime">p′</span> tells you where to look, and the value of <span class="math" data-say="p">p</span> there tells you how high. Writing 0 as the height of a turn is reading the wrong function.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a local maximum for the largest value</strong><span>A maximum is the highest point near it. The cubic above has a local maximum of 8 at <span class="math" data-say="t equals negative 1">t = −1</span> and a value of 33 at <span class="math" data-say="t equals 4">t = 4</span>. Say local, and where a question asks for the greatest value over an interval, compare the turns with the ends.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can solve <span data-say="p prime equals 0">p′ = 0</span> exactly for a polynomial and say, from the signs on either side, whether each zero is a maximum, a minimum or neither.</strong><p>You should be able to differentiate, factor the result, test the sign of <span class="math" data-say="p prime">p′</span> in every region, name each zero from its neighbours, and find the height of each turn from <span class="math" data-say="p">p</span>.</p></div></div><div class="note"><strong>Note:</strong> The lab finds the zeros of <span class="math" data-say="p prime">p′</span> that are fractions, and for a quadratic derivative it places the others with square roots in the interval tile. The next two lessons build the two rules that let you differentiate something other than a sum of powers, starting with &ldquo;The Product Rule&rdquo;.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A graph can turn only where the tangent is level</summary><p>Just before a turn the graph is rising, so <span class="math" data-say="p prime">p′</span> is positive; just after, it is falling, so <span class="math" data-say="p prime">p′</span> is negative. A polynomial's derivative is a polynomial, and a polynomial does not jump from positive to negative without passing through zero. So every turn sits at a zero of <span class="math" data-say="p prime">p′</span>.</p></details><details class="recall"><summary>A level tangent is not always a turn</summary><p>The converse is false. For <span class="math" data-say="p of t equals t cubed">p(t) = t³</span> the derivative <span class="math" data-say="3 t squared">3t²</span> is zero at <span class="math" data-say="t equals 0">t = 0</span>, and positive on both sides. The graph flattens for an instant and keeps rising. Whether a zero is a turn is decided by the sign of <span class="math" data-say="p prime">p′</span> on each side of it, and by nothing at the zero itself.</p></details><details class="recall"><summary>Maximum and minimum are local</summary><p>A maximum at <span class="math" data-say="t equals c">t = c</span> is the highest point of the graph near <span class="math" data-say="c">c</span>: higher than its neighbours on both sides. It need not be the highest point anywhere. A cubic climbs for ever, so any maximum it has is overtaken further along.</p></details></div>
+      <h3>Summary</h3>
       <p>A zero of the derivative is a place where the tangent is level, and that is the only place a polynomial's graph can turn. It is necessary for a turn and not enough: the graph turns only where <span class="math" data-say="p prime">p′</span> changes sign. Solve <span class="math" data-say="p prime equals 0">p′ = 0</span>, test the sign on each side of every zero, and each one is a maximum, a minimum or a flat step that keeps going the same way.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A graph can turn only where the tangent is level.</strong> Just before a turn the graph is rising, so <span class="math" data-say="p prime">p′</span> is positive; just after, it is falling, so <span class="math" data-say="p prime">p′</span> is negative. A polynomial's derivative is a polynomial, and a polynomial does not jump from positive to negative without passing through zero. So every turn sits at a zero of <span class="math" data-say="p prime">p′</span>.</li><li><strong>A level tangent is not always a turn.</strong> The converse is false. For <span class="math" data-say="p of t equals t cubed">p(t) = t³</span> the derivative <span class="math" data-say="3 t squared">3t²</span> is zero at <span class="math" data-say="t equals 0">t = 0</span>, and positive on both sides. The graph flattens for an instant and keeps rising. Whether a zero is a turn is decided by the sign of <span class="math" data-say="p prime">p′</span> on each side of it, and by nothing at the zero itself.</li><li><strong>Maximum and minimum are local.</strong> A maximum at <span class="math" data-say="t equals c">t = c</span> is the highest point of the graph near <span class="math" data-say="c">c</span>: higher than its neighbours on both sides. It need not be the highest point anywhere. A cubic climbs for ever, so any maximum it has is overtaken further along.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a turn needs p prime of t equals 0. p prime equals 0 is necessary, not sufficient. rising then falling, a maximum. falling then rising, a minimum. no sign change, a flat step, no turn. t cubed, p prime equals 3 t squared is 0 at 0, yet no turn" tabindex="0" role="region" aria-label="Mathematical notation">a turn needs p′(t) = 0
 p′ = 0 is necessary, not sufficient
 rising then falling: a maximum
@@ -3196,11 +3241,40 @@ t³: p′ = 3t² is 0 at 0, yet no turn</div><figcaption>Where <span data-say="p
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3268,7 +3342,7 @@ t³: p′ = 3t² is 0 at 0, yet no turn</div><figcaption>Where <span data-say="p
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

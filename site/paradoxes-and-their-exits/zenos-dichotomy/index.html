@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,33 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Paradoxes and Their Exits</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The infinite</p>
       <h1>Zeno&#x27;s Dichotomy</h1>
       <p class="lesson-lede">The halves of a unit distance form a geometric series whose partial sums are <span data-say="1 minus 1 over 2 to the power n">1 − 1/2ⁿ</span> and whose remainder shrinks below any bound.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The steps form a geometric series</li><li>A partial sum is exact</li><li>The limit is the number the sums settle on</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Halves that add up</h2>
-      <article class="prose reading"><p>Cross a room of length one. Before you can get all the way across you must get halfway. Before the rest, you must cover half of what remains, a quarter. Then an eighth, and the halving never stops, so the crossing has infinitely many parts. Zeno's argument is that a task with infinitely many parts cannot be finished.</p><ol><li>To cross you must complete every one of the steps: a half, a quarter, an eighth, and so on.</li><li>At constant speed each step takes a positive time, a half, a quarter and an eighth of the whole crossing time.</li><li>A sum of infinitely many positive times is infinite.</li><li>So the crossing takes infinite time, and you never arrive.</li></ol><p>The argument is valid, and the first two premises are as plausible as a description of walking can be. The third is the one with a hidden claim in it: it says that adding enough positive amounts always passes any size. That is true of equal steps, as the next lesson shows. Whether it is true of steps that shrink is a matter of arithmetic.</p><div class="mathblock" data-say="1 over 2 plus 1 over 4 plus 1 over 8 plus and so on. S of n equals 1 minus 1 over 2 to the power n" tabindex="0" role="region" aria-label="Mathematical notation">1/2 + 1/4 + 1/8 + …
-S(n) = 1 − 1/2^n</div><p>The sum of the first <span class="math" data-say="n">n</span> halves is <span class="math" data-say="1 minus 1 over 2 to the power n">1 − 1/2^n</span>. After one step it is <span class="math" data-say="1 over 2">1/2</span>; after two, <span class="math" data-say="3 over 4">3/4</span>; after three, <span class="math" data-say="7 over 8">7/8</span>. The lab prints these as exact fractions. With the first preset, ten halves, it reports the sum <span class="math" data-say="1023 over 1024">1023/1024</span> and the remainder <span class="math" data-say="1 over 1024">1/1024</span>, which is the distance still to go. The limit tile shows <span class="math" data-say="1">1</span>.</p><p>What does it mean to say the infinite sum equals one, when no step of the lab adds infinitely many numbers? It means this: whatever small fraction you name, the remainder falls below it from some step on. Name one thousandth. After nine steps the remainder is <span class="math" data-say="1 over 512">1/512</span>, too large; after ten it is <span class="math" data-say="1 over 1024">1/1024</span>, smaller than one thousandth, and it stays smaller for every step after. Name one millionth and the twentieth step does it. The third preset shows twenty steps: the remainder is <span class="math" data-say="1 over 1048576">1/1048576</span>. There is no number but 1 that the sums approach in this way, and that is all that &ldquo;the limit is 1&rdquo; says.</p><div class="example"><span class="label">Example &middot; A different cut</span><p>A walker who covers two thirds of what is left at each step has <span class="math" data-say="A equals 2 over 3">a = 2/3</span> and <span class="math" data-say="r equals 1 over 3">r = 1/3</span>. After five steps the sum is <span class="math" data-say="242 over 243">242/243</span> and the remainder is <span class="math" data-say="1 over 243">1/243</span>. The limit is again 1. The second preset is this walk, and a ratio of <span class="math" data-say="1 over 3">1/3</span> shrinks the remainder faster than a ratio of <span class="math" data-say="1 over 2">1/2</span>.</p></div><p>So the third premise is false for these steps. A sum of infinitely many positive times is not always infinite: when the times shrink in a fixed proportion the total is finite, and here it is the whole crossing time. The argument went wrong in saying that infinitely many steps take infinitely long. They take exactly as long as the crossing, because the steps are the crossing.</p><p>The answer has limits and they should be stated. The arithmetic settles the sum, and the sum was the premise at fault. It does not settle whether space is made of points or can be divided without end, or whether a physical body can perform a task for every one of an unending list. Those are questions about the world and not about the series. The next lesson takes the paradox in which the same series appears with the speeds stated, and the lesson after that asks what the series cannot give.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Exact partial sums</h2></div><p>n terms added as fractions, against the limit when there is one</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Halves that add up</h2><div class="prose reading"><p>Cross a room of length one. Before you can get all the way across you must get halfway. Before the rest, you must cover half of what remains, a quarter. Then an eighth, and the halving never stops, so the crossing has infinitely many parts. Zeno's argument is that a task with infinitely many parts cannot be finished.</p><ol><li>To cross you must complete every one of the steps: a half, a quarter, an eighth, and so on.</li><li>At constant speed each step takes a positive time, a half, a quarter and an eighth of the whole crossing time.</li><li>A sum of infinitely many positive times is infinite.</li><li>So the crossing takes infinite time, and you never arrive.</li></ol><p>The argument is valid, and the first two premises are as plausible as a description of walking can be. The third is the one with a hidden claim in it: it says that adding enough positive amounts always passes any size. That is true of equal steps, as the next lesson shows. Whether it is true of steps that shrink is a matter of arithmetic.</p><div class="mathblock" data-say="1 over 2 plus 1 over 4 plus 1 over 8 plus and so on. S of n equals 1 minus 1 over 2 to the power n" tabindex="0" role="region" aria-label="Mathematical notation">1/2 + 1/4 + 1/8 + …
+S(n) = 1 − 1/2^n</div><p>The sum of the first <span class="math" data-say="n">n</span> halves is <span class="math" data-say="1 minus 1 over 2 to the power n">1 − 1/2^n</span>. After one step it is <span class="math" data-say="1 over 2">1/2</span>; after two, <span class="math" data-say="3 over 4">3/4</span>; after three, <span class="math" data-say="7 over 8">7/8</span>. The lab prints these as exact fractions. With the first preset, ten halves, it reports the sum <span class="math" data-say="1023 over 1024">1023/1024</span> and the remainder <span class="math" data-say="1 over 1024">1/1024</span>, which is the distance still to go. The limit tile shows <span class="math" data-say="1">1</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Exact partial sums</h2></div><p>n terms added as fractions, against the limit when there is one</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Adding up infinitely many steps</strong><span>the sum of n terms, and what remains</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="srTable"></table></div>
       <div class="status-banner" id="srStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Partial sums, exactly</h3>
-          <p>Each preset gives the first term, the ratio and the number of steps. Read the sum of the steps taken, the limit, and the remainder, which is the limit less the sum. Slide the number of terms and watch the remainder halve each time in the first preset. Then type 2 for the ratio, so that each step is twice the last: the limit tile says none.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Partial sums, exactly</h3>
+            <p>Each preset gives the first term, the ratio and the number of steps. Read the sum of the steps taken, the limit, and the remainder, which is the limit less the sum. Slide the number of terms and watch the remainder halve each time in the first preset. Then type 2 for the ratio, so that each step is twice the last: the limit tile says none.</p>
         <div class="field">
           <label for="srPreset">Worked example</label>
           <select id="srPreset"><option value="halves" selected>halves, ten steps</option><option value="thirds">two thirds of what is left, five steps</option><option value="twenty">halves, twenty steps</option></select>
@@ -1439,12 +1482,15 @@ S(n) = 1 − 1/2^n</div><p>The sum of the first <span class="math" data-say="n">
           <div class="kpi"><span>Remainder</span><strong id="srRemain">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>What does it mean to say the infinite sum equals one, when no step of the lab adds infinitely many numbers? It means this: whatever small fraction you name, the remainder falls below it from some step on. Name one thousandth. After nine steps the remainder is <span class="math" data-say="1 over 512">1/512</span>, too large; after ten it is <span class="math" data-say="1 over 1024">1/1024</span>, smaller than one thousandth, and it stays smaller for every step after. Name one millionth and the twentieth step does it. The third preset shows twenty steps: the remainder is <span class="math" data-say="1 over 1048576">1/1048576</span>. There is no number but 1 that the sums approach in this way, and that is all that &ldquo;the limit is 1&rdquo; says.</p><div class="example"><span class="label">Example &middot; A different cut</span><p>A walker who covers two thirds of what is left at each step has <span class="math" data-say="A equals 2 over 3">a = 2/3</span> and <span class="math" data-say="r equals 1 over 3">r = 1/3</span>. After five steps the sum is <span class="math" data-say="242 over 243">242/243</span> and the remainder is <span class="math" data-say="1 over 243">1/243</span>. The limit is again 1. The second preset is this walk, and a ratio of <span class="math" data-say="1 over 3">1/3</span> shrinks the remainder faster than a ratio of <span class="math" data-say="1 over 2">1/2</span>.</p></div><p>So the third premise is false for these steps. A sum of infinitely many positive times is not always infinite: when the times shrink in a fixed proportion the total is finite, and here it is the whole crossing time. The argument went wrong in saying that infinitely many steps take infinitely long. They take exactly as long as the crossing, because the steps are the crossing.</p><p>The answer has limits and they should be stated. The arithmetic settles the sum, and the sum was the premise at fault. It does not settle whether space is made of points or can be divided without end, or whether a physical body can perform a task for every one of an unending list. Those are questions about the world and not about the series. The next lesson takes the paradox in which the same series appears with the speeds stated, and the lesson after that asks what the series cannot give.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Summing a geometric series</h2></div><p>Four moves, in this order, for any list in which each term is a fixed multiple of the last.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the first term and the ratio</h3><p>Write the first two steps. The first is <span class="math" data-say="A">a</span>; the second divided by the first is <span class="math" data-say="r">r</span>. For the halves, <span class="math" data-say="A equals 1 over 2">a = 1/2</span> and <span class="math" data-say="r equals 1 over 2">r = 1/2</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute a partial sum</h3><p>The sum of the first <span class="math" data-say="n">n</span> terms is <span class="math" data-say="A times the quantity 1 minus r to the power n, over the quantity 1 minus r">a·(1 − r^n) / (1 − r)</span>. For the halves it simplifies to <span class="math" data-say="1 minus 1 over 2 to the power n">1 − 1/2^n</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the remainder</h3><p>The limit less the partial sum is what is left. For the halves it is <span class="math" data-say="1 over 2 to the power n">1/2^n</span>, which halves with each new step.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask whether the remainder shrinks below every bound</h3><p>If the ratio is between −1 and 1, it does, and the limit is <span class="math" data-say="A over the quantity 1 minus r">a / (1 − r)</span>. If not, the sums do not settle and there is no limit.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Name the exit and its price</h3><p>For the dichotomy, exit one: the premise that infinitely many positive times must add to infinity is denied, and the series is the refutation. The price is a habit about adding up, and nothing about walking.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Summing a geometric series</h2>
+      <p class="lead-in">Four moves, in this order, for any list in which each term is a fixed multiple of the last.</p>
+      <ol class="key-ideas method"><li><strong>Find the first term and the ratio.</strong> Write the first two steps. The first is <span class="math" data-say="A">a</span>; the second divided by the first is <span class="math" data-say="r">r</span>. For the halves, <span class="math" data-say="A equals 1 over 2">a = 1/2</span> and <span class="math" data-say="r equals 1 over 2">r = 1/2</span>.</li><li><strong>Compute a partial sum.</strong> The sum of the first <span class="math" data-say="n">n</span> terms is <span class="math" data-say="A times the quantity 1 minus r to the power n, over the quantity 1 minus r">a·(1 − r^n) / (1 − r)</span>. For the halves it simplifies to <span class="math" data-say="1 minus 1 over 2 to the power n">1 − 1/2^n</span>.</li><li><strong>Read the remainder.</strong> The limit less the partial sum is what is left. For the halves it is <span class="math" data-say="1 over 2 to the power n">1/2^n</span>, which halves with each new step.</li><li><strong>Ask whether the remainder shrinks below every bound.</strong> If the ratio is between −1 and 1, it does, and the limit is <span class="math" data-say="A over the quantity 1 minus r">a / (1 − r)</span>. If not, the sums do not settle and there is no limit.</li><li><strong>Name the exit and its price.</strong> For the dichotomy, exit one: the premise that infinitely many positive times must add to infinity is denied, and the series is the refutation. The price is a habit about adding up, and nothing about walking.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1510,16 @@ remainder after 10 steps: 1/1024
 limit: a / (1 − r) = (1/2) / (1/2) = 1</div><p>Every step leaves half the previous remainder, so the remainder after <span class="math" data-say="n">n</span> steps is <span class="math" data-say="1 over 2 to the power n">1/2^n</span>. It is under one thousandth from the tenth step on and under one millionth from the twentieth. The sums approach 1 and no other number.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking infinitely many steps take infinitely long</strong><span>That holds only if the steps do not shrink. These do: each takes half the time of the one before, so the times add to the crossing time and no more. The lab shows it as a remainder, <span class="math" data-say="1 over 2 to the power n">1/2^n</span>, that falls below any fraction you name. The number of steps is infinite and the total is 1.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a partial sum as the limit</strong><span>No finite number of halves reaches 1: after ten steps the sum is <span class="math" data-say="1023 over 1024">1023/1024</span>, after twenty <span class="math" data-say="1048575 over 1048576">1048575/1048576</span>. The limit is the number the sums approach, and a limit does not have to be a sum anyone completes. Confusing the two is what makes it seem that the walker must finish the list.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the series as a proof about space</strong><span>The arithmetic removes a false premise about adding up. It does not show that space can be divided forever, or that a body can do something at each of infinitely many places. Say which of these you mean before claiming that Zeno is answered.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sum the halves exactly and bound the remainder.</strong><p>Given the first term and ratio of a geometric series, you should be able to compute the partial sum after a stated number of terms as an exact fraction, state the remainder, find the number of steps after which it is below a given fraction, and state the limit or say that there is none.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The same series, with a different story around it, is the next paradox. “Achilles and the Tortoise” states the speeds and asks where the sum ends. “The St Petersburg Game” in Decision and Rationality uses a series with equal-sized terms, and shows the other side of the third premise.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking infinitely many steps take infinitely long</strong><span>That holds only if the steps do not shrink. These do: each takes half the time of the one before, so the times add to the crossing time and no more. The lab shows it as a remainder, <span class="math" data-say="1 over 2 to the power n">1/2^n</span>, that falls below any fraction you name. The number of steps is infinite and the total is 1.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a partial sum as the limit</strong><span>No finite number of halves reaches 1: after ten steps the sum is <span class="math" data-say="1023 over 1024">1023/1024</span>, after twenty <span class="math" data-say="1048575 over 1048576">1048575/1048576</span>. The limit is the number the sums approach, and a limit does not have to be a sum anyone completes. Confusing the two is what makes it seem that the walker must finish the list.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the series as a proof about space</strong><span>The arithmetic removes a false premise about adding up. It does not show that space can be divided forever, or that a body can do something at each of infinitely many places. Say which of these you mean before claiming that Zeno is answered.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sum the halves exactly and bound the remainder.</strong><p>Given the first term and ratio of a geometric series, you should be able to compute the partial sum after a stated number of terms as an exact fraction, state the remainder, find the number of steps after which it is below a given fraction, and state the limit or say that there is none.</p></div></div><div class="note"><strong>Note:</strong> The same series, with a different story around it, is the next paradox. “Achilles and the Tortoise” states the speeds and asks where the sum ends. “The St Petersburg Game” in Decision and Rationality uses a series with equal-sized terms, and shows the other side of the third premise.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The steps form a geometric series</summary><p>Each step is half the one before. The first covers <span class="math" data-say="1 over 2">1/2</span> of the room, the second <span class="math" data-say="1 over 4">1/4</span>, the third <span class="math" data-say="1 over 8">1/8</span>. A list in which each term is a fixed multiple of the last, added up, is a geometric series, with first term <span class="math" data-say="A equals 1 over 2">a = 1/2</span> and ratio <span class="math" data-say="r equals 1 over 2">r = 1/2</span>.</p></details><details class="recall"><summary>A partial sum is exact</summary><p>The sum of the first <span class="math" data-say="n">n</span> steps is a fraction, computed exactly. The lab prints it, and prints what remains of the distance. The pattern in those fractions is what the limit is.</p></details><details class="recall"><summary>The limit is the number the sums settle on</summary><p>The limit is 1 because the remainder, <span class="math" data-say="1 over 2 to the power n">1/2^n</span>, falls below any fraction you name once <span class="math" data-say="n">n</span> is large enough. The sums never reach 1 at a finite step, and they do not need to.</p></details></div>
+      <h3>Summary</h3>
       <p>To cross a room you must first cover half of it, then half of what is left, and so on without end. Zeno concludes that you never arrive. The steps form a geometric series, and the lab computes its partial sums exactly: after ten halves the sum is 1023/1024, 1/1024 remains, and the limit is 1. The premise to deny is that infinitely many positive times must add to infinity.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The steps form a geometric series.</strong> Each step is half the one before. The first covers <span class="math" data-say="1 over 2">1/2</span> of the room, the second <span class="math" data-say="1 over 4">1/4</span>, the third <span class="math" data-say="1 over 8">1/8</span>. A list in which each term is a fixed multiple of the last, added up, is a geometric series, with first term <span class="math" data-say="A equals 1 over 2">a = 1/2</span> and ratio <span class="math" data-say="r equals 1 over 2">r = 1/2</span>.</li><li><strong>A partial sum is exact.</strong> The sum of the first <span class="math" data-say="n">n</span> steps is a fraction, computed exactly. The lab prints it, and prints what remains of the distance. The pattern in those fractions is what the limit is.</li><li><strong>The limit is the number the sums settle on.</strong> The limit is 1 because the remainder, <span class="math" data-say="1 over 2 to the power n">1/2^n</span>, falls below any fraction you name once <span class="math" data-say="n">n</span> is large enough. The sums never reach 1 at a finite step, and they do not need to.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="halves, 1 over 2 plus 1 over 4 plus 1 over 8 plus. after n steps the sum is 1 minus 1 over 2 to the power n. what remains is 1 over 2 to the power n. the limit is 1. exit, not every infinite sum is infinite" tabindex="0" role="region" aria-label="Mathematical notation">halves: 1/2 + 1/4 + 1/8 + ...
 after n steps the sum is 1 − 1/2^n
 what remains is 1/2^n
@@ -2153,11 +2198,40 @@ exit: not every infinite sum is infinite</div><figcaption>Infinitely many steps,
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2225,7 +2299,7 @@ exit: not every infinite sum is infinite</div><figcaption>Infinitely many steps,
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

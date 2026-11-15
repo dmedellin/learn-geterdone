@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,33 +1424,31 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Logic and Proof</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Propositional logic</p>
       <h1>Tautology, Contradiction, Satisfiability</h1>
       <p class="lesson-lede">Always true, never true, and sometimes true.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A tautology carries no information</li><li>Contradiction and negation are linked</li><li>Satisfiable is weaker than valid</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Classifying formulas</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Tautology, contradiction, contingency</span><p>A formula is a <strong>tautology</strong> if it is true under every assignment, a <strong>contradiction</strong> if it is true under none, and <strong>contingent</strong> otherwise.</p></div><div class="defbox"><span class="label">Definition &middot; Satisfiability</span><p>A formula is <strong>satisfiable</strong> if at least one assignment makes it true. Tautologies and contingent formulas are satisfiable; contradictions are not.</p></div><p>The relationships are worth stating as a single sentence: <span class="math" data-say="A">A</span> is a tautology exactly when <span class="math" data-say="not A">¬A</span> is unsatisfiable, and <span class="math" data-say="A">A</span> is satisfiable exactly when <span class="math" data-say="not A">¬A</span> is not a tautology. Every one of these questions reduces to any other, which is why an algorithm for one is an algorithm for all.</p><div class="thm"><span class="label">Theorem &middot; Equivalence as a tautology</span><p><span class="math" data-say="A is equivalent to B">A ≡ B</span> if and only if <span class="math" data-say="A if and only if B">A ↔ B</span> is a tautology. “Logical Equivalence”'s whole subject is therefore a special case of this lesson's.</p></div><p>Deciding satisfiability by truth table takes <span class="math" data-say="2 to the power n">2ⁿ</span> rows. For a formula with 300 variables &mdash; small by the standards of real applications &mdash; that is <span class="math" data-say="2 to the power 300">2³⁰⁰</span> rows, more than there are atoms in the observable universe, and no faster general method is known.</p><div class="thm"><span class="label">Theorem &middot; SAT is NP-complete (Cook, 1971)</span><p>The problem of deciding whether a propositional formula is satisfiable was the first problem shown NP-complete. Algorithms and Complexity defines the term; what matters here is that this lesson's innocent question is the reference point against which computational hardness is measured.</p></div><p>The practical situation is stranger than the theory suggests. Modern SAT solvers routinely handle formulas with millions of variables, because real instances have structure that the worst case does not. Hardness in the worst case and difficulty in practice are different claims.</p><div class="example"><span class="label">Example &middot; Classifying three formulas</span><p><span class="math" data-say="the quantity p implies q, or the quantity q implies p">(p → q) ∨ (q → p)</span> is a tautology &mdash; check all four rows. <span class="math" data-say="p if and only if q and the quantity p x or q">(p ↔ q) ∧ (p ⊕ q)</span> is a contradiction, since the two conjuncts are negations of each other. <span class="math" data-say="p implies the quantity q and r">p → (q ∧ r)</span> is contingent.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Truth table</h2></div><p>Every assignment, evaluated</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Classifying formulas</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Tautology, contradiction, contingency</span><p>A formula is a <strong>tautology</strong> if it is true under every assignment, a <strong>contradiction</strong> if it is true under none, and <strong>contingent</strong> otherwise.</p></div><div class="defbox"><span class="label">Definition &middot; Satisfiability</span><p>A formula is <strong>satisfiable</strong> if at least one assignment makes it true. Tautologies and contingent formulas are satisfiable; contradictions are not.</p></div><p>The relationships are worth stating as a single sentence: <span class="math" data-say="A">A</span> is a tautology exactly when <span class="math" data-say="not A">¬A</span> is unsatisfiable, and <span class="math" data-say="A">A</span> is satisfiable exactly when <span class="math" data-say="not A">¬A</span> is not a tautology. Every one of these questions reduces to any other, which is why an algorithm for one is an algorithm for all.</p><div class="thm"><span class="label">Theorem &middot; Equivalence as a tautology</span><p><span class="math" data-say="A is equivalent to B">A ≡ B</span> if and only if <span class="math" data-say="A if and only if B">A ↔ B</span> is a tautology. “Logical Equivalence”'s whole subject is therefore a special case of this lesson's.</p></div><p>Deciding satisfiability by truth table takes <span class="math" data-say="2 to the power n">2ⁿ</span> rows. For a formula with 300 variables &mdash; small by the standards of real applications &mdash; that is <span class="math" data-say="2 to the power 300">2³⁰⁰</span> rows, more than there are atoms in the observable universe, and no faster general method is known.</p><div class="thm"><span class="label">Theorem &middot; SAT is NP-complete (Cook, 1971)</span><p>The problem of deciding whether a propositional formula is satisfiable was the first problem shown NP-complete. Algorithms and Complexity defines the term; what matters here is that this lesson's innocent question is the reference point against which computational hardness is measured.</p></div><p>The practical situation is stranger than the theory suggests. Modern SAT solvers routinely handle formulas with millions of variables, because real instances have structure that the worst case does not. Hardness in the worst case and difficulty in practice are different claims.</p><div class="example"><span class="label">Example &middot; Classifying three formulas</span><p><span class="math" data-say="the quantity p implies q, or the quantity q implies p">(p → q) ∨ (q → p)</span> is a tautology &mdash; check all four rows. <span class="math" data-say="p if and only if q and the quantity p x or q">(p ↔ q) ∧ (p ⊕ q)</span> is a contradiction, since the two conjuncts are negations of each other. <span class="math" data-say="p implies the quantity q and r">p → (q ∧ r)</span> is contingent.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Truth table</h2></div><p>Every assignment, evaluated</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Truth table</strong><span id="ttCaption">Every assignment, every subexpression</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>T</span><span class="tone-red"><i class="legend-swatch"></i>F</span><span class="tone-cyan"><i class="legend-swatch"></i>Whole formula</span></div>
       </div>
       <div class="lab-stage"><div class="table-wrap" id="ttOut" tabindex="0" role="region" aria-label="Data table"></div></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Classify a formula</h3>
-          <p>The verdict is computed by counting the true rows: all of them, none of them, or some. Try <span class="math" data-say="p to q and q to p">((p -> q) & q) -> p</span> &mdash; it looks like a valid inference and is not one.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Classify a formula</h3>
+            <p>The verdict is computed by counting the true rows: all of them, none of them, or some. Try <span class="math" data-say="p to q and q to p">((p -> q) & q) -> p</span> &mdash; it looks like a valid inference and is not one.</p>
         <div class="field">
           <label for="ttMode">What to do</label>
           <select id="ttMode">
@@ -1433,12 +1476,14 @@
           <div class="kpi"><span>Verdict</span><strong id="ttVerdict">&mdash;</strong></div>
         </div>
         <div class="status-banner" id="ttStatus">Pick a formula.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Classifying a formula</h2></div><p>Look for a shortcut before writing <span class="math" data-say="2 to the power n">2ⁿ</span> rows.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Try to make it false</h3><p>To test for a tautology, assume the whole formula is false and work backwards. If that forces a contradiction, it is a tautology.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Try to make it true</h3><p>To test satisfiability, look for one assignment. Finding it ends the question; a table is only needed when you fail.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Use the structure</h3><p>A disjunction is satisfiable if either side is; a conjunction is a contradiction if either side is. Half the work is often unnecessary.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Fall back on the table</h3><p>When the shortcuts do not settle it, <span class="math" data-say="2 to the power n">2ⁿ</span> rows always will. Correctness beats elegance when the answer matters.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Classifying a formula</h2>
+      <p class="lead-in">Look for a shortcut before writing <span class="math" data-say="2 to the power n">2ⁿ</span> rows.</p>
+      <ol class="key-ideas method"><li><strong>Try to make it false.</strong> To test for a tautology, assume the whole formula is false and work backwards. If that forces a contradiction, it is a tautology.</li><li><strong>Try to make it true.</strong> To test satisfiability, look for one assignment. Finding it ends the question; a table is only needed when you fail.</li><li><strong>Use the structure.</strong> A disjunction is satisfiable if either side is; a conjunction is a contradiction if either side is. Half the work is often unnecessary.</li><li><strong>Fall back on the table.</strong> When the shortcuts do not settle it, <span class="math" data-say="2 to the power n">2ⁿ</span> rows always will. Correctness beats elegance when the answer matters.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1458,17 +1503,16 @@
 No assignment makes it false, so it is a TAUTOLOGY.</div><p>This tautology has a name: <em>modus tollens</em>, the inference rule of “Rules of Inference”. Every valid rule of inference is a tautology in exactly this shape &mdash; premises conjoined, implying the conclusion.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing satisfiable with true</strong><span>A satisfiable formula is one that <em>could</em> be true. Whether it is true depends on the assignment, which the formula alone does not fix.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a tautology says something</strong><span>Tautologies are exactly the formulas that carry no information about the world. Their usefulness lies in being safe to assert, not in being informative.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading NP-complete as &quot;impossible&quot;</strong><span>It is a statement about worst-case scaling. SAT solvers handle industrial instances with millions of variables every day.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can settle a tautology claim by assuming it false.</strong><p>Take <span class="math" data-say="the quantity p or q, implies the quantity p and q">(p ∨ q) → (p ∧ q)</span> and decide its class without a full table, by trying to construct a falsifying assignment. You should find one in two lines &mdash; and be able to say which row it is.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab reports the count of satisfying rows, not only the verdict. That count is the number of models of the formula, and counting models is a strictly harder problem than deciding whether one exists.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing satisfiable with true</strong><span>A satisfiable formula is one that <em>could</em> be true. Whether it is true depends on the assignment, which the formula alone does not fix.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a tautology says something</strong><span>Tautologies are exactly the formulas that carry no information about the world. Their usefulness lies in being safe to assert, not in being informative.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading NP-complete as &quot;impossible&quot;</strong><span>It is a statement about worst-case scaling. SAT solvers handle industrial instances with millions of variables every day.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can settle a tautology claim by assuming it false.</strong><p>Take <span class="math" data-say="the quantity p or q, implies the quantity p and q">(p ∨ q) → (p ∧ q)</span> and decide its class without a full table, by trying to construct a falsifying assignment. You should find one in two lines &mdash; and be able to say which row it is.</p></div></div><div class="note"><strong>Note:</strong> The lab reports the count of satisfying rows, not only the verdict. That count is the number of models of the formula, and counting models is a strictly harder problem than deciding whether one exists.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A tautology carries no information</summary><p><span class="math" data-say="p or not p">p ∨ ¬p</span> is true whatever <span class="math" data-say="p">p</span> says, so learning it tells you nothing about the world. That is exactly why tautologies are useful as reasoning steps.</p></details><details class="recall"><summary>Contradiction and negation are linked</summary><p><span class="math" data-say="A">A</span> is a contradiction exactly when <span class="math" data-say="not A">¬A</span> is a tautology. Every question about one is a question about the other.</p></details><details class="recall"><summary>Satisfiable is weaker than valid</summary><p>Satisfiable asks whether SOME row is true; tautology asks whether EVERY row is. Most useful formulas are satisfiable and not tautologies.</p></details></div>
+      <h3>Summary</h3>
       <p>Classify a formula by its final column: all true, all false, or mixed. Then meet satisfiability &mdash; the question of whether any assignment works &mdash; and why it is the problem computer science measures hardness against.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A tautology carries no information.</strong> <span class="math" data-say="p or not p">p ∨ ¬p</span> is true whatever <span class="math" data-say="p">p</span> says, so learning it tells you nothing about the world. That is exactly why tautologies are useful as reasoning steps.</li><li><strong>Contradiction and negation are linked.</strong> <span class="math" data-say="A">A</span> is a contradiction exactly when <span class="math" data-say="not A">¬A</span> is a tautology. Every question about one is a question about the other.</li><li><strong>Satisfiable is weaker than valid.</strong> Satisfiable asks whether SOME row is true; tautology asks whether EVERY row is. Most useful formulas are satisfiable and not tautologies.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="tautology, true under EVERY assignment, p or not p. contradiction, true under NO assignment, p and not p. contingent, true under some, false under others, p and q. satisfiable, true under at least one assignment" tabindex="0" role="region" aria-label="Mathematical notation">tautology      true under EVERY assignment          p ∨ ¬p
 contradiction  true under NO assignment             p ∧ ¬p
 contingent     true under some, false under others  p ∧ q
@@ -2084,11 +2128,40 @@ satisfiable    true under at least one assignment</div><figcaption>Three classes
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2156,7 +2229,7 @@ satisfiable    true under at least one assignment</div><figcaption>Three classes
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

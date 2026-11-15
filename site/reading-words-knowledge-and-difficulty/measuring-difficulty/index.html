@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Words, Knowledge and Difficulty</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Difficulty</p>
       <h1>Measuring Difficulty</h1>
       <p class="lesson-lede">Count words, sentences and syllables, and compute two readability scores from them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Two counts stand in for difficulty</li><li>Two scales, one pair of inputs</li><li>A count, not a judgement</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Counting a text</h2>
-      <article class="prose reading"><p>Begin with the warm-up at the top of the lab, Endgame at the Rosedal, at your usual pace. It is a practice reading from the Subject's passage pool, logged as practice, and it keeps every lesson in this Subject a lesson with a timed reading in it.</p><div class="defbox"><span class="label">Definition &middot; Flesch Reading Ease and the Flesch–Kincaid grade</span><p>With W words, S sentences and Y syllables, Rudolf Flesch's 1948 <strong>Reading Ease</strong> is 206.835, less 1.015 times the words per sentence, less 84.6 times the syllables per word; the <strong>Flesch–Kincaid grade</strong>, derived by Kincaid and colleagues in 1975 for Navy enlisted personnel, is 0.39 times the words per sentence, plus 11.8 times the syllables per word, less 15.59. The key lines above give both in symbols.</p></div><p>The counts need rules, and the lab states its own. A word is a whitespace-separated token with a letter or a digit in it. A sentence ends at a full stop, a question mark or an exclamation mark followed by a space. Syllables are counted by a rule: the groups of vowels in a word, with y as a vowel, less one for a silent e at the end, and at least one a word. The rule miscounts some words, so every syllable figure is an approximation, and another program's counts will differ a little.</p><p>Work the example by hand first. A text of 100 words in 5 sentences with 140 syllables has 20 words a sentence and 1.4 syllables a word. The preset <strong>by-hand</strong> carries those counts.</p><div class="mathblock" data-say="W over S equals 100 over 5 equals 20, Y over W equals 140 over 100 equals 1.4. ease, equals 206.835 minus 1.015 times 20 minus 84.6 times 1.4. equals 206.835 minus 20.3 minus 118.44 equals 68.095. grade equals 0.39 times 20 plus 11.8 times 1.4 minus 15.59. equals 7.8 plus 16.52 minus 15.59 equals 8.73" tabindex="0" role="region" aria-label="Mathematical notation">W/S = 100 / 5 = 20      Y/W = 140 / 100 = 1.4
-ease  = 206.835 − 1.015 × 20 − 84.6 × 1.4
-      = 206.835 − 20.3 − 118.44 = 68.095
-grade = 0.39 × 20 + 11.8 × 1.4 − 15.59
-      = 7.8 + 16.52 − 15.59 = 8.73</div><p>Now the passages. The preset <strong>octopus</strong> counts The Octopus: 395 words, 21 sentences and 504 syllables, so about 18.8 words a sentence and 1.28 syllables a word, for a reading ease of about 79.8 and a grade of about 6.8. The preset <strong>continents</strong> counts From Drifting Continents to Moving Plates: 391 words, 16 sentences, 775 syllables, about 24.4 words a sentence and 1.98 syllables a word, for an ease of about 14.3 and a grade of about 17.3. Between them is the preset <strong>church-clock</strong>, The Church Clock at Wexley, the first passage you timed in Measure Your Reading: 491 words, 21 sentences, an ease of about 70.2 and a grade of about 9.3.</p><p>Look at where the difference comes from. The sentences of the hard passage are only about a third longer than the easy one's, but its words carry more than half as many syllables again, and syllables a word are multiplied by 84.6. Most of the gap between 79.8 and 14.3 is word length.</p><p>The passages you read for time in this Subject were sorted into bands by exactly these counts: easy at grades 5 to 7, standard at 8 to 11, hard at 13 and above. That is the honest use of a formula: to sort many texts quickly by how long their sentences and words are.</p><p>The formulas cannot see anything else. They do not know whether a word is common or rare, so a short technical word counts as easy. They do not know whether you know the subject, and they cannot tell a passage of separate facts from one in which every sentence depends on the one before. A sentence of short words about an idea you have never met can score as easy as a nursery rhyme, and What You Already Know puts two passages of nearly the same grade side by side to measure exactly that.</p><p>The lab also counts your own text: open Count a text of your own, paste a few paragraphs of something you are reading this week, and compare its grade with the three passages.</p><p>The next lesson, Unknown Words and Coverage, measures one of the things the formulas miss: the words in a text that you do not know.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Readability by formula</h2></div><p>counted by a stated rule</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Counting a text</h2><div class="prose reading"><p>Begin with the warm-up at the top of the lab, Endgame at the Rosedal, at your usual pace. It is a practice reading from the Subject's passage pool, logged as practice, and it keeps every lesson in this Subject a lesson with a timed reading in it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Readability by formula</h2></div><p>counted by a stated rule</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Readability by formula</strong><span>counted by a stated rule</span></div>
       </div>
@@ -1421,10 +1460,10 @@ grade = 0.39 × 20 + 11.8 × 1.4 − 15.59
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="txTable"></table></div>
       <div class="status-banner" id="txStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Three counts and two formulas</h3>
-          <p>A count over a text: words, sentences and syllables by the kit's stated rule (vowel groups, less a final silent e, at least one a word), which is an approximation; then Flesch's Reading Ease and the Flesch–Kincaid grade.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Three counts and two formulas</h3>
+            <p>A count over a text: words, sentences and syllables by the kit's stated rule (vowel groups, less a final silent e, at least one a word), which is an approximation; then Flesch's Reading Ease and the Flesch–Kincaid grade.</p>
         <div class="field">
           <label for="txPreset">Worked example</label>
           <select id="txPreset"><option value="octopus" selected>The Octopus (easy)</option><option value="church-clock">The Church Clock at Wexley (standard)</option><option value="continents">From Drifting Continents to Moving Plates (hard)</option><option value="by-hand">by hand: 100 words, 5 sentences, 140 syllables</option></select>
@@ -1449,12 +1488,19 @@ grade = 0.39 × 20 + 11.8 × 1.4 − 15.59
           <div class="kpi"><span>Flesch–Kincaid grade</span><strong id="txGrade">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Flesch Reading Ease and the Flesch–Kincaid grade</span><p>With W words, S sentences and Y syllables, Rudolf Flesch's 1948 <strong>Reading Ease</strong> is 206.835, less 1.015 times the words per sentence, less 84.6 times the syllables per word; the <strong>Flesch–Kincaid grade</strong>, derived by Kincaid and colleagues in 1975 for Navy enlisted personnel, is 0.39 times the words per sentence, plus 11.8 times the syllables per word, less 15.59. The key lines above give both in symbols.</p></div><p>The counts need rules, and the lab states its own. A word is a whitespace-separated token with a letter or a digit in it. A sentence ends at a full stop, a question mark or an exclamation mark followed by a space. Syllables are counted by a rule: the groups of vowels in a word, with y as a vowel, less one for a silent e at the end, and at least one a word. The rule miscounts some words, so every syllable figure is an approximation, and another program's counts will differ a little.</p><p>Work the example by hand first. A text of 100 words in 5 sentences with 140 syllables has 20 words a sentence and 1.4 syllables a word. The preset <strong>by-hand</strong> carries those counts.</p><div class="mathblock" data-say="W over S equals 100 over 5 equals 20, Y over W equals 140 over 100 equals 1.4. ease, equals 206.835 minus 1.015 times 20 minus 84.6 times 1.4. equals 206.835 minus 20.3 minus 118.44 equals 68.095. grade equals 0.39 times 20 plus 11.8 times 1.4 minus 15.59. equals 7.8 plus 16.52 minus 15.59 equals 8.73" tabindex="0" role="region" aria-label="Mathematical notation">W/S = 100 / 5 = 20      Y/W = 140 / 100 = 1.4
+ease  = 206.835 − 1.015 × 20 − 84.6 × 1.4
+      = 206.835 − 20.3 − 118.44 = 68.095
+grade = 0.39 × 20 + 11.8 × 1.4 − 15.59
+      = 7.8 + 16.52 − 15.59 = 8.73</div><p>Now the passages. The preset <strong>octopus</strong> counts The Octopus: 395 words, 21 sentences and 504 syllables, so about 18.8 words a sentence and 1.28 syllables a word, for a reading ease of about 79.8 and a grade of about 6.8. The preset <strong>continents</strong> counts From Drifting Continents to Moving Plates: 391 words, 16 sentences, 775 syllables, about 24.4 words a sentence and 1.98 syllables a word, for an ease of about 14.3 and a grade of about 17.3. Between them is the preset <strong>church-clock</strong>, The Church Clock at Wexley, the first passage you timed in Measure Your Reading: 491 words, 21 sentences, an ease of about 70.2 and a grade of about 9.3.</p><p>Look at where the difference comes from. The sentences of the hard passage are only about a third longer than the easy one's, but its words carry more than half as many syllables again, and syllables a word are multiplied by 84.6. Most of the gap between 79.8 and 14.3 is word length.</p><p>The passages you read for time in this Subject were sorted into bands by exactly these counts: easy at grades 5 to 7, standard at 8 to 11, hard at 13 and above. That is the honest use of a formula: to sort many texts quickly by how long their sentences and words are.</p><p>The formulas cannot see anything else. They do not know whether a word is common or rare, so a short technical word counts as easy. They do not know whether you know the subject, and they cannot tell a passage of separate facts from one in which every sentence depends on the one before. A sentence of short words about an idea you have never met can score as easy as a nursery rhyme, and What You Already Know puts two passages of nearly the same grade side by side to measure exactly that.</p><p>The lab also counts your own text: open Count a text of your own, paste a few paragraphs of something you are reading this week, and compare its grade with the three passages.</p><p>The next lesson, Unknown Words and Coverage, measures one of the things the formulas miss: the words in a text that you do not know.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring a text yourself</h2></div><p>Four steps for any text you want to place, then the day's practice.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the three things</h3><p>Words, sentences and syllables, by one rule kept the same for every text. Paste the text into the lab's counter, or count a 100-word sample by hand.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the two averages</h3><p>Words per sentence and syllables per word. Write them down: they are the whole of what the formulas know about the text.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both scores</h3><p>Reading Ease is 206.835, less 1.015 times the words per sentence, less 84.6 times the syllables per word; the grade is 0.39 times the words per sentence, plus 11.8 times the syllables per word, less 15.59. Keep one decimal.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what the score leaves out</h3><p>Before you trust the number, ask whether the words are common, whether you know the topic, and whether each sentence leans on the last. The formula has seen none of that.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Open The Daily Drill and do today's session as its routine says. When the pool reaches its hard passages, find your hold target again: it will probably be lower, and that is this course's subject measured on your own practice.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Scoring a text yourself</h2>
+      <p class="lead-in">Four steps for any text you want to place, then the day's practice.</p>
+      <ol class="key-ideas method"><li><strong>Count the three things.</strong> Words, sentences and syllables, by one rule kept the same for every text. Paste the text into the lab's counter, or count a 100-word sample by hand.</li><li><strong>Compute the two averages.</strong> Words per sentence and syllables per word. Write them down: they are the whole of what the formulas know about the text.</li><li><strong>Compute both scores.</strong> Reading Ease is 206.835, less 1.015 times the words per sentence, less 84.6 times the syllables per word; the grade is 0.39 times the words per sentence, plus 11.8 times the syllables per word, less 15.59. Keep one decimal.</li><li><strong>Say what the score leaves out.</strong> Before you trust the number, ask whether the words are common, whether you know the topic, and whether each sentence leans on the last. The formula has seen none of that.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Open The Daily Drill and do today's session as its routine says. When the pool reaches its hard passages, find your hold target again: it will probably be lower, and that is this course's subject measured on your own practice.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ ease  = 206.835 − 20.3 − 118.44 = 68.095
 grade = 7.8 + 16.52 − 15.59     = 8.73</div><p>The lab prints the ease as about 68.1 and the grade as 8.73, exact. A grade of 8.73 sits in this Subject's standard band.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a readability score for how hard a text is to understand</strong><span>The score measures sentence length and syllables a word, nothing more. Short words about unfamiliar ideas score easy, and a passage in which every sentence depends on the last scores the same as a list of separate facts with the same counts. The score is a count; whether you understand the text is a measurement only a reading can make.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the two scales the same way round</strong><span>Reading Ease falls as difficulty rises; the grade rises. The octopus passage has an ease of about 79.8 and a grade of about 6.8, the continents passage about 14.3 and 17.3. A high ease is an easy text and a high grade a hard one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trusting the second decimal</strong><span>Syllables are counted by a rule that gets some words wrong, and different programs count sentences differently. A grade of 9.3 against 9.4 is no difference at all; use the formulas to sort texts into broad bands.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a text by hand and say what the score misses.</strong><p>Given counts of words, sentences and syllables, compute Flesch Reading Ease and the Flesch–Kincaid grade by hand to one decimal, and name two things that make a text hard which neither formula can see.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every syllable figure here comes from a counting rule, an approximation, and another program will give slightly different scores for the same text. The formulas were fitted to readers and texts of their time; they sort texts by sentence and word length, and that is all they can be asked to do.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a readability score for how hard a text is to understand</strong><span>The score measures sentence length and syllables a word, nothing more. Short words about unfamiliar ideas score easy, and a passage in which every sentence depends on the last scores the same as a list of separate facts with the same counts. The score is a count; whether you understand the text is a measurement only a reading can make.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the two scales the same way round</strong><span>Reading Ease falls as difficulty rises; the grade rises. The octopus passage has an ease of about 79.8 and a grade of about 6.8, the continents passage about 14.3 and 17.3. A high ease is an easy text and a high grade a hard one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trusting the second decimal</strong><span>Syllables are counted by a rule that gets some words wrong, and different programs count sentences differently. A grade of 9.3 against 9.4 is no difference at all; use the formulas to sort texts into broad bands.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a text by hand and say what the score misses.</strong><p>Given counts of words, sentences and syllables, compute Flesch Reading Ease and the Flesch–Kincaid grade by hand to one decimal, and name two things that make a text hard which neither formula can see.</p></div></div><div class="note"><strong>Note:</strong> Every syllable figure here comes from a counting rule, an approximation, and another program will give slightly different scores for the same text. The formulas were fitted to readers and texts of their time; they sort texts by sentence and word length, and that is all they can be asked to do.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Two counts stand in for difficulty</summary><p>Both formulas use the average sentence length in words and the average word length in syllables. Long sentences and long words make a text score harder; nothing else enters.</p></details><details class="recall"><summary>Two scales, one pair of inputs</summary><p>Flesch Reading Ease runs downward with difficulty: the higher the score, the easier the text. The Flesch–Kincaid grade runs upward and is read as a school grade. The same two averages drive both, so they almost always agree on which of two texts is harder.</p></details><details class="recall"><summary>A count, not a judgement</summary><p>The formulas cannot see whether the ideas are familiar, whether one sentence depends on the last, or whether the words are common. Short words about unfamiliar ideas score easy.</p></details></div>
+      <h3>Summary</h3>
       <p>A readability formula turns three counts into a score: words, sentences and syllables. Compute Flesch Reading Ease and the Flesch–Kincaid grade for the passages you have read, by the kit's counting rule, and see what the formulas measure and what they cannot see.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Two counts stand in for difficulty.</strong> Both formulas use the average sentence length in words and the average word length in syllables. Long sentences and long words make a text score harder; nothing else enters.</li><li><strong>Two scales, one pair of inputs.</strong> Flesch Reading Ease runs downward with difficulty: the higher the score, the easier the text. The Flesch–Kincaid grade runs upward and is read as a school grade. The same two averages drive both, so they almost always agree on which of two texts is harder.</li><li><strong>A count, not a judgement.</strong> The formulas cannot see whether the ideas are familiar, whether one sentence depends on the last, or whether the words are common. Short words about unfamiliar ideas score easy.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="W over S equals words per sentence. Y over W equals syllables per word. ease equals 206.835 minus 1.015 times W over S minus 84.6 times Y over W. grade equals 0.39 times W over S plus 11.8 times Y over W minus 15.59. higher ease, easier, higher grade, harder" tabindex="0" role="region" aria-label="Mathematical notation">W/S = words per sentence
 Y/W = syllables per word
 ease = 206.835 − 1.015 × W/S − 84.6 × Y/W
@@ -2472,11 +2517,40 @@ higher ease, easier; higher grade, harder</div><figcaption>Two formulas from thr
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2544,7 +2618,7 @@ higher ease, easier; higher grade, harder</div><figcaption>Two formulas from thr
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

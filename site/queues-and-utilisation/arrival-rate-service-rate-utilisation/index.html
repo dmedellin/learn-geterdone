@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Queues and Utilisation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Rates and Little&#x27;s Law</p>
       <h1>λ, μ and ρ</h1>
       <p class="lesson-lede">Compute <span data-say="rho">ρ</span> from an arrival rate and a service time, and give the growth rate when <span data-say="rho">ρ</span> reaches one.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li><span class="math" data-say="mu">μ</span> is a rate; <span class="math" data-say="S">S</span> is the duration</li><li><span class="math" data-say="rho">ρ</span> is a fraction of a server, not a speed</li><li>Above <span class="math" data-say="rho equals 1">ρ = 1</span> there is nothing to average</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Rates, reciprocals, and the ratio between them</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Arrival rate, service time, service rate</span><p>The <strong>arrival rate</strong> <span class="math" data-say="lambda">λ</span> is the mean number of arrivals per unit time. The <strong>mean service time</strong> <span class="math" data-say="S">S</span> is how long one server takes over one job. The <strong>service rate</strong> <span class="math" data-say="mu equals 1 over S">μ = 1/S</span> is how many jobs that server can finish per unit time when it never waits for work.</p></div><p>Both <span class="math" data-say="lambda">λ</span> and <span class="math" data-say="mu">μ</span> are rates and <span class="math" data-say="S">S</span> is a duration. Keeping that straight is the whole of this lesson, because the two quantities a designer is handed are usually a rate (requests per second, from a dashboard) and a duration (a service time in milliseconds, from a trace), and they cannot be divided until one of them has been turned into the other's kind.</p><div class="example"><span class="label">Example &middot; A 1 ms service under 800 requests a second</span><p><span class="math" data-say="S equals 1">S = 1</span> ms is <span class="math" data-say="1 over 1000">1/1000</span> of a second, so <span class="math" data-say="mu equals 1000">μ = 1000</span> per second. Then <span class="math" data-say="rho equals 800 over 1000 equals 4 over 5">ρ = 800/1000 = 4/5</span>: the server is busy four fifths of the time. It is not 800 times too slow and it is not running at 800; it has a fifth of itself spare.</p></div><div class="defbox"><span class="label">Definition &middot; Utilisation</span><p>The <strong>utilisation</strong> <span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> is the long-run fraction of time a single server is busy. It is dimensionless: a rate divided by a rate. Equivalently it is the <strong>offered load</strong> measured in servers &mdash; <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> says the work offered would keep four fifths of one server occupied.</p></div><div class="mathblock" data-say="lambda equals 800 per second, S equals 1 milliseconds equals 1 over 1000 seconds. mu equals 1 over S, equals 1000 per second. rho equals lambda over mu, equals 800 over 1000 equals 4 over 5, busy 4 seconds in every 5. 1 minus rho, equals 1 over 5, the headroom a burst lands in" tabindex="0" role="region" aria-label="Mathematical notation">λ = 800 / s          S = 1 ms = 1/1000 s
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Rates, reciprocals, and the ratio between them</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Arrival rate, service time, service rate</span><p>The <strong>arrival rate</strong> <span class="math" data-say="lambda">λ</span> is the mean number of arrivals per unit time. The <strong>mean service time</strong> <span class="math" data-say="S">S</span> is how long one server takes over one job. The <strong>service rate</strong> <span class="math" data-say="mu equals 1 over S">μ = 1/S</span> is how many jobs that server can finish per unit time when it never waits for work.</p></div><p>Both <span class="math" data-say="lambda">λ</span> and <span class="math" data-say="mu">μ</span> are rates and <span class="math" data-say="S">S</span> is a duration. Keeping that straight is the whole of this lesson, because the two quantities a designer is handed are usually a rate (requests per second, from a dashboard) and a duration (a service time in milliseconds, from a trace), and they cannot be divided until one of them has been turned into the other's kind.</p><div class="example"><span class="label">Example &middot; A 1 ms service under 800 requests a second</span><p><span class="math" data-say="S equals 1">S = 1</span> ms is <span class="math" data-say="1 over 1000">1/1000</span> of a second, so <span class="math" data-say="mu equals 1000">μ = 1000</span> per second. Then <span class="math" data-say="rho equals 800 over 1000 equals 4 over 5">ρ = 800/1000 = 4/5</span>: the server is busy four fifths of the time. It is not 800 times too slow and it is not running at 800; it has a fifth of itself spare.</p></div><div class="defbox"><span class="label">Definition &middot; Utilisation</span><p>The <strong>utilisation</strong> <span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> is the long-run fraction of time a single server is busy. It is dimensionless: a rate divided by a rate. Equivalently it is the <strong>offered load</strong> measured in servers &mdash; <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> says the work offered would keep four fifths of one server occupied.</p></div><div class="mathblock" data-say="lambda equals 800 per second, S equals 1 milliseconds equals 1 over 1000 seconds. mu equals 1 over S, equals 1000 per second. rho equals lambda over mu, equals 800 over 1000 equals 4 over 5, busy 4 seconds in every 5. 1 minus rho, equals 1 over 5, the headroom a burst lands in" tabindex="0" role="region" aria-label="Mathematical notation">λ = 800 / s          S = 1 ms = 1/1000 s
 
 μ = 1/S  = 1000 / s
 ρ = λ/μ  = 800/1000 = 4/5          busy 4 s in every 5
@@ -1399,12 +1443,11 @@
 
 λ − μ = 200 / s                    the line&#x27;s slope
 after one minute    200 × 60    = 12 000 waiting
-after one hour      200 × 3600  = 720 000 waiting</div><p>Below one the queue does settle, and the rest of this course is about what it settles at. The one thing to carry forward from here is that <span class="math" data-say="rho">ρ</span> is the input to all of it: every later formula is a function of <span class="math" data-say="rho">ρ</span> alone, and the closer <span class="math" data-say="rho">ρ</span> is to one the more violently that function moves.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Rates, not latencies</h2></div><p>ρ = λ/μ is a ratio of two rates, and ρ ≥ 1 is a straight line</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+after one hour      200 × 3600  = 720 000 waiting</div><p>Below one the queue does settle, and the rest of this course is about what it settles at. The one thing to carry forward from here is that <span class="math" data-say="rho">ρ</span> is the input to all of it: every later formula is a function of <span class="math" data-say="rho">ρ</span> alone, and the closer <span class="math" data-say="rho">ρ</span> is to one the more violently that function moves.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Rates, not latencies</h2></div><p>ρ = λ/μ is a ratio of two rates, and ρ ≥ 1 is a straight line</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Arrival rate, service rate, utilisation</strong><span>&rho; = &lambda;/&mu;, and what happens to the backlog when it reaches 1</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>arrivals &lambda;</span><span class="tone-green"><i class="legend-swatch"></i>service &mu;</span><span class="tone-red"><i class="legend-swatch"></i>the gap when &rho; &ge; 1</span></div>
@@ -1412,10 +1455,10 @@ after one hour      200 × 3600  = 720 000 waiting</div><p>Below one the queue d
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="raPlot" viewBox="0 0 520 160" role="img" aria-label="Arrival rate and service rate drawn as two bars, with the gap between them."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="raTable"></table></div>
       <div class="status-banner" id="raStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the load and the service time</h3>
-          <p>Move the arrival rate and the service time and watch <span class="math" data-say="mu">μ</span>, <span class="math" data-say="rho">ρ</span> and the growth rate follow as exact fractions. Push the service time up without touching the load and find the point where the system stops settling.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the load and the service time</h3>
+            <p>Move the arrival rate and the service time and watch <span class="math" data-say="mu">μ</span>, <span class="math" data-say="rho">ρ</span> and the growth rate follow as exact fractions. Push the service time up without touching the load and find the point where the system stops settling.</p>
         <div class="field">
           <label for="raPreset">Worked example</label>
           <select id="raPreset"><option value="eighty-percent" selected>800 rps into a 1 ms service — the lesson's example</option><option value="overloaded">1200 rps into the same service — rho above 1</option><option value="slow-service">800 rps into a 2 ms service — the same load, half the rate</option></select>
@@ -1435,12 +1478,14 @@ after one hour      200 × 3600  = 720 000 waiting</div><p>Below one the queue d
           <div class="kpi"><span>Backlog after one minute</span><strong id="raAfter">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="raHint" style="margin:0;">&mu; is a <em>rate</em>, not a latency. A service that takes S = 2 ms has &mu; = 500 per second, and &rho; = &lambda;/&mu; is a ratio of two rates &mdash; a pure number with no seconds left in it.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Turning a service time into a utilisation</h2></div><p>Four lines of arithmetic, of which the second is the one that goes wrong.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the service time down with its unit</h3><p><span class="math" data-say="S equals 2">S = 2</span> ms, not <span class="math" data-say="S equals 2">S = 2</span>. Half the errors below are unit errors, and they are invisible once the unit has been dropped.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Invert it, carrying the conversion</h3><p><span class="math" data-say="mu equals 1 over S">μ = 1/S</span>. In milliseconds that is <span class="math" data-say="mu equals 1000 over S">μ = 1000/S</span> per second: <span class="math" data-say="S equals 2">S = 2</span> ms gives <span class="math" data-say="mu equals 500">μ = 500</span> per second, <span class="math" data-say="S equals 40">S = 40</span> ms gives <span class="math" data-say="mu equals 25">μ = 25</span> per second.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Put <span data-say="lambda">λ</span> in the same unit of time and divide</h3><p><span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> is a pure number. If the answer has seconds or milliseconds attached to it, the division was not the one intended.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check <span data-say="rho">ρ</span> against 1 before computing anything else</h3><p>Below one, the queue settles and every formula on this course applies. At or above one, report <span class="math" data-say="lambda minus mu">λ − μ</span> per second and the backlog after the interval you care about, and stop.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Turning a service time into a utilisation</h2>
+      <p class="lead-in">Four lines of arithmetic, of which the second is the one that goes wrong.</p>
+      <ol class="key-ideas method"><li><strong>Write the service time down with its unit.</strong> <span class="math" data-say="S equals 2">S = 2</span> ms, not <span class="math" data-say="S equals 2">S = 2</span>. Half the errors below are unit errors, and they are invisible once the unit has been dropped.</li><li><strong>Invert it, carrying the conversion.</strong> <span class="math" data-say="mu equals 1 over S">μ = 1/S</span>. In milliseconds that is <span class="math" data-say="mu equals 1000 over S">μ = 1000/S</span> per second: <span class="math" data-say="S equals 2">S = 2</span> ms gives <span class="math" data-say="mu equals 500">μ = 500</span> per second, <span class="math" data-say="S equals 40">S = 40</span> ms gives <span class="math" data-say="mu equals 25">μ = 25</span> per second.</li><li><strong>Put <span data-say="lambda">λ</span> in the same unit of time and divide.</strong> <span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> is a pure number. If the answer has seconds or milliseconds attached to it, the division was not the one intended.</li><li><strong>Check <span data-say="rho">ρ</span> against 1 before computing anything else.</strong> Below one, the queue settles and every formula on this course applies. At or above one, report <span class="math" data-say="lambda minus mu">λ − μ</span> per second and the backlog after the interval you care about, and stop.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1510,16 @@ S = 2 ms           μ = 500 / s
 after one minute   300 × 60 = 18 000 waiting</div><p>Nothing about the traffic changed between the two columns. A service time of 1 ms leaves a fifth of a server spare; a service time of 2 ms asks for eight fifths of one, and the shortfall of 300 a second does not average away &mdash; it accumulates.</p><p>For a faded rehearsal, keep the 1 ms service and raise the load to 1200 a second instead. The supplied first move is that <span class="math" data-say="mu">μ</span> is unchanged at 1000. Work out <span class="math" data-say="rho">ρ</span>, say whether it settles, and if it does not give the backlog after five minutes before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading <span class="math" data-say="mu">μ</span> as a latency</strong><span>&ldquo;The service takes 2 ms, so <span class="math" data-say="mu equals 2">μ = 2</span>&rdquo; is the error this lesson exists to prevent. <span class="math" data-say="mu">μ</span> counts completions per unit time: 2 ms per job is 500 jobs a second. Any <span class="math" data-say="rho">ρ</span> that comes out in the hundreds or thousands is this mistake, because it is <span class="math" data-say="lambda">λ</span> multiplied by a duration rather than divided by a rate.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dividing a per-second rate by a millisecond figure</strong><span><span class="math" data-say="800 over 2">800/2</span> is 400 only if both numbers are in the same unit of time, and they are not: one is per second and the other is milliseconds per job. Convert first, divide second. Writing the unit next to every number makes this error visible before the division rather than after it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting a queue length above <span class="math" data-say="rho equals 1">ρ = 1</span></strong><span><span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> at <span class="math" data-say="rho equals 8 over 5">ρ = 8/5</span> returns <span class="math" data-say="negative 8 over 3">-8/3</span>, and a negative queue is the formula reporting that its assumption has failed. Above one there is no steady state to average; the honest answer is the growth rate <span class="math" data-say="lambda minus mu">λ − μ</span> and the interval you are prepared to let it run.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “a 2 ms service” and “<span data-say="mu equals 500">μ = 500</span> per second” are the same sentence to you.</strong><p>You should be able to take a service time in milliseconds to <span class="math" data-say="mu">μ</span>, take <span class="math" data-say="lambda">λ</span> and <span class="math" data-say="mu">μ</span> to <span class="math" data-say="rho">ρ</span>, say at a glance whether a system settles at all, and when it does not give the growth rate rather than a queue length.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything above is one server at one moment. The next lesson leaves models behind entirely: “Little&rsquo;s Law from a Trace” proves the one relation on this course that assumes nothing at all &mdash; no distribution, no steady state, not even a queue discipline &mdash; by counting the same area twice.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading <span class="math" data-say="mu">μ</span> as a latency</strong><span>&ldquo;The service takes 2 ms, so <span class="math" data-say="mu equals 2">μ = 2</span>&rdquo; is the error this lesson exists to prevent. <span class="math" data-say="mu">μ</span> counts completions per unit time: 2 ms per job is 500 jobs a second. Any <span class="math" data-say="rho">ρ</span> that comes out in the hundreds or thousands is this mistake, because it is <span class="math" data-say="lambda">λ</span> multiplied by a duration rather than divided by a rate.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dividing a per-second rate by a millisecond figure</strong><span><span class="math" data-say="800 over 2">800/2</span> is 400 only if both numbers are in the same unit of time, and they are not: one is per second and the other is milliseconds per job. Convert first, divide second. Writing the unit next to every number makes this error visible before the division rather than after it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting a queue length above <span class="math" data-say="rho equals 1">ρ = 1</span></strong><span><span class="math" data-say="rho over the quantity 1 minus rho">ρ/(1 − ρ)</span> at <span class="math" data-say="rho equals 8 over 5">ρ = 8/5</span> returns <span class="math" data-say="negative 8 over 3">-8/3</span>, and a negative queue is the formula reporting that its assumption has failed. Above one there is no steady state to average; the honest answer is the growth rate <span class="math" data-say="lambda minus mu">λ − μ</span> and the interval you are prepared to let it run.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “a 2 ms service” and “<span data-say="mu equals 500">μ = 500</span> per second” are the same sentence to you.</strong><p>You should be able to take a service time in milliseconds to <span class="math" data-say="mu">μ</span>, take <span class="math" data-say="lambda">λ</span> and <span class="math" data-say="mu">μ</span> to <span class="math" data-say="rho">ρ</span>, say at a glance whether a system settles at all, and when it does not give the growth rate rather than a queue length.</p></div></div><div class="note"><strong>Note:</strong> Everything above is one server at one moment. The next lesson leaves models behind entirely: “Little&rsquo;s Law from a Trace” proves the one relation on this course that assumes nothing at all &mdash; no distribution, no steady state, not even a queue discipline &mdash; by counting the same area twice.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary><span class="math" data-say="mu">μ</span> is a rate; <span class="math" data-say="S">S</span> is the duration</summary><p>A request that takes <span class="math" data-say="S equals 1">S = 1</span> ms is served at <span class="math" data-say="mu equals 1000">μ = 1000</span> per second, not at <span class="math" data-say="mu equals 1">μ = 1</span>. The two are reciprocals, <span class="math" data-say="mu equals 1 over S">μ = 1/S</span>, and they are never interchangeable. When <span class="math" data-say="S">S</span> is quoted in milliseconds the conversion carries a thousand with it: <span class="math" data-say="mu equals 1000 over S">μ = 1000/S</span>.</p></details><details class="recall"><summary><span class="math" data-say="rho">ρ</span> is a fraction of a server, not a speed</summary><p><span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> divides a rate by a rate, so the seconds cancel and what is left is a pure number: the fraction of time the one server is busy. At <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> it works four seconds in every five and is idle the fifth, and that idle fifth is the only thing a burst has to land in.</p></details><details class="recall"><summary>Above <span class="math" data-say="rho equals 1">ρ = 1</span> there is nothing to average</summary><p>Every closed form later in this course divides by <span class="math" data-say="1 minus rho">1 − ρ</span>, and at <span class="math" data-say="rho is at least 1">ρ ≥ 1</span> that is zero or negative because there is no settled queue length to report. What there is instead is a slope: work accumulates at <span class="math" data-say="lambda minus mu">λ − μ</span> a second and keeps doing it until something changes.</p></details></div>
+      <h3>Summary</h3>
       <p>Three symbols carry the whole course. <span class="math" data-say="lambda">λ</span> is how fast work arrives, <span class="math" data-say="mu">μ</span> is how fast one server finishes it, and <span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> is the fraction of the time that server is busy. The trap is the middle one: <span class="math" data-say="mu">μ</span> is a rate and not a duration, so a service taking 2 ms has <span class="math" data-say="mu equals 500">μ = 500</span> per second.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong><span class="math" data-say="mu">μ</span> is a rate; <span class="math" data-say="S">S</span> is the duration.</strong> A request that takes <span class="math" data-say="S equals 1">S = 1</span> ms is served at <span class="math" data-say="mu equals 1000">μ = 1000</span> per second, not at <span class="math" data-say="mu equals 1">μ = 1</span>. The two are reciprocals, <span class="math" data-say="mu equals 1 over S">μ = 1/S</span>, and they are never interchangeable. When <span class="math" data-say="S">S</span> is quoted in milliseconds the conversion carries a thousand with it: <span class="math" data-say="mu equals 1000 over S">μ = 1000/S</span>.</li><li><strong><span class="math" data-say="rho">ρ</span> is a fraction of a server, not a speed.</strong> <span class="math" data-say="rho equals lambda over mu">ρ = λ/μ</span> divides a rate by a rate, so the seconds cancel and what is left is a pure number: the fraction of time the one server is busy. At <span class="math" data-say="rho equals 4 over 5">ρ = 4/5</span> it works four seconds in every five and is idle the fifth, and that idle fifth is the only thing a burst has to land in.</li><li><strong>Above <span class="math" data-say="rho equals 1">ρ = 1</span> there is nothing to average.</strong> Every closed form later in this course divides by <span class="math" data-say="1 minus rho">1 − ρ</span>, and at <span class="math" data-say="rho is at least 1">ρ ≥ 1</span> that is zero or negative because there is no settled queue length to report. What there is instead is a slope: work accumulates at <span class="math" data-say="lambda minus mu">λ − μ</span> a second and keeps doing it until something changes.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="lambda, arrivals per second, a rate. S, mean service time, a duration. mu equals 1 over S, services per second, S equals 2 milliseconds gives mu equals 500 per second. rho equals lambda over mu, utilisation, a pure number, the seconds cancel. rho is at least 1, nothing settles, the backlog grows at lambda minus mu, for ever" tabindex="0" role="region" aria-label="Mathematical notation">λ         arrivals per second           a rate
 S         mean service time             a duration
 μ = 1/S   services per second           S = 2 ms gives μ = 500/s
@@ -2794,11 +2838,40 @@ S         mean service time             a duration
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2866,7 +2939,7 @@ S         mean service time             a duration
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

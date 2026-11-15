@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Objects and Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · Object-Relational Structural Patterns</p>
       <h1>Embedded Value and Serialized LOB</h1>
       <p class="lesson-lede">A small value goes into its owner&#x27;s row as columns; a whole tree of objects can go into one column, read at once and invisible to SQL.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Embedded Value</li><li>Serialized LOB</li><li>BLOB and CLOB</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two patterns for objects without tables</h2>
-      <article class="prose reading"><p>&ldquo;If you use it too much, it ends up turning your database into little more than a transactional file system.&rdquo; That is Chapter 3's caution about Serialized LOB, in Structural Mapping Patterns, and this lesson reads it with the companion pattern, Embedded Value, both in Chapter 12. Read them in your own copy first.</p><p>The chapter's question is which objects deserve a table. Its first answer is about small values. A date range or an amount of money is a Value Object, a pattern from Organizing Domain Logic: it has no identity, only a value, so nobody needs to find it by key, and Chapter 12's Embedded Value thinks a table of nothing but amounts absurd. Its fields go into the owner's row instead, and the owner loads and saves them. Because a value has no identity it needs no Identity Map either: you can make a new one on every read.</p><p>Embedded Value's grey area is the reference object, a shipping record on an order, say. The questions Fowler asks are whether it means anything outside the order, whether it is always loaded with it, and whether anyone queries it separately through SQL. He uses the pattern for a reference object mostly where the link is one-to-one. Its great advantage over a LOB, he says, is that SQL can still query the embedded values.</p><p>Here is an embedded value written for this lesson. A lease's term is a <span class="math" data-say="date range">DateRange</span>, built on lines 3 to 5 from two columns of the lease's own row, <span class="math" data-say="term start">term_start</span> and <span class="math" data-say="term end">term_end</span>. The range has no key and no table; line 6 hands it to the lease with the lease's own key.</p><pre class="codeblock" data-say="line 1, comment, The lease&#x27;s term has no table of its own it is two columns.. line 2, lease load of result set rs throws SQL exception. line 3, date range term is set to new date range. line 4, rs dot get date of term start dot to local date. line 5, rs dot get date of term end dot to local date. line 6, return new lease of rs dot get long of id, term" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The lease&#x27;s term has no table of its own: it is two columns.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two patterns for objects without tables</h2><div class="prose reading"><p>&ldquo;If you use it too much, it ends up turning your database into little more than a transactional file system.&rdquo; That is Chapter 3's caution about Serialized LOB, in Structural Mapping Patterns, and this lesson reads it with the companion pattern, Embedded Value, both in Chapter 12. Read them in your own copy first.</p><p>The chapter's question is which objects deserve a table. Its first answer is about small values. A date range or an amount of money is a Value Object, a pattern from Organizing Domain Logic: it has no identity, only a value, so nobody needs to find it by key, and Chapter 12's Embedded Value thinks a table of nothing but amounts absurd. Its fields go into the owner's row instead, and the owner loads and saves them. Because a value has no identity it needs no Identity Map either: you can make a new one on every read.</p><p>Embedded Value's grey area is the reference object, a shipping record on an order, say. The questions Fowler asks are whether it means anything outside the order, whether it is always loaded with it, and whether anyone queries it separately through SQL. He uses the pattern for a reference object mostly where the link is one-to-one. Its great advantage over a LOB, he says, is that SQL can still query the embedded values.</p><p>Here is an embedded value written for this lesson. A lease's term is a <span class="math" data-say="date range">DateRange</span>, built on lines 3 to 5 from two columns of the lease's own row, <span class="math" data-say="term start">term_start</span> and <span class="math" data-say="term end">term_end</span>. The range has no key and no table; line 6 hands it to the lease with the lease's own key.</p><pre class="codeblock" data-say="line 1, comment, The lease&#x27;s term has no table of its own it is two columns.. line 2, lease load of result set rs throws SQL exception. line 3, date range term is set to new date range. line 4, rs dot get date of term start dot to local date. line 5, rs dot get date of term end dot to local date. line 6, return new lease of rs dot get long of id, term" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The lease&#x27;s term has no table of its own: it is two columns.</span>
 <span class="cl">Lease load(ResultSet rs) throws SQLException {</span>
 <span class="cl">    DateRange term = new DateRange(</span>
 <span class="cl">        rs.getDate(&quot;term_start&quot;).toLocalDate(),</span>
@@ -1469,12 +1513,11 @@
 <span class="cl">        }</span>
 <span class="cl">    }</span>
 <span class="cl">    return out.toString();</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab reads a tree as records <span class="math" data-say="node, parent">node, parent</span>, with a dash for the root, and prints five tiles: the nodes; the depth, counting the root as 1; the queries to read the tree one node at a time, one for the root and then one for each node's children; the queries one level at a time; and the queries for a LOB, always 1. In <code>thread</code>, a first post <span class="math" data-say="start">start</span> with two replies, <span class="math" data-say="ann">ann</span> and <span class="math" data-say="dee">dee</span>; <span class="math" data-say="bo">bo</span> and <span class="math" data-say="cy">cy</span> answering <span class="math" data-say="ann">ann</span>; <span class="math" data-say="eli">eli</span> answering <span class="math" data-say="dee">dee</span>; and <span class="math" data-say="fay">fay</span> and <span class="math" data-say="gus">gus</span> answering <span class="math" data-say="eli">eli</span>, there are 8 posts, depth 4, 9 queries post by post, 5 level by level and 1 from the column.</p><p>Both multi-query counts include the queries that come back empty: each leaf's query for children it does not have, and the query for the level below the deepest, which is how a program reading level by level finds that it has finished. The preset <code>flat-thread</code>, a first post with three replies and nothing below them, has 4 nodes and depth 2: 5 queries node by node, 3 level by level, 1 as a LOB. The column always wins on queries, and the tiles cannot show what it costs: every query you might have run against the posts, such as all of one person's replies, is gone.</p><p>That cost is the one part of the chapter that time has moved. Fowler already expected XML query extensions to SQL to soften it, while noting that they were largely nonstandard. Many databases now store a JSON or XML document in a column and can index and query inside it, which takes away part of the reason not to use a LOB. The other reasons, duplication, references into the blob, and other programs that read the tables, are untouched by that, and whether a queryable document column is a LOB or a small database of its own is still argued.</p><h3>Exercise</h3><p>A tree has the records <span class="math" data-say="root, no parent, a under root, b under a, c under b, d under c, e under root">root, -; a, root; b, a; c, b; d, c; e, root</span>. By hand, give its nodes and depth, and the queries to read it node by node, level by level and as a Serialized LOB. Then type it into the lab.</p><p>A reply thread is one kind of hierarchy. The next lesson, Single Table Inheritance, reads the other kind Chapter 3 names, a hierarchy of classes, and the first of three ways to map it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Loading from the database</h2></div><p>queries to load a tree</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The lab reads a tree as records <span class="math" data-say="node, parent">node, parent</span>, with a dash for the root, and prints five tiles: the nodes; the depth, counting the root as 1; the queries to read the tree one node at a time, one for the root and then one for each node's children; the queries one level at a time; and the queries for a LOB, always 1. In <code>thread</code>, a first post <span class="math" data-say="start">start</span> with two replies, <span class="math" data-say="ann">ann</span> and <span class="math" data-say="dee">dee</span>; <span class="math" data-say="bo">bo</span> and <span class="math" data-say="cy">cy</span> answering <span class="math" data-say="ann">ann</span>; <span class="math" data-say="eli">eli</span> answering <span class="math" data-say="dee">dee</span>; and <span class="math" data-say="fay">fay</span> and <span class="math" data-say="gus">gus</span> answering <span class="math" data-say="eli">eli</span>, there are 8 posts, depth 4, 9 queries post by post, 5 level by level and 1 from the column.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Loading from the database</h2></div><p>queries to load a tree</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Loading from the database</strong><span>queries to load a tree</span></div>
       </div>
@@ -1482,10 +1525,10 @@
       <div class="table-wrap" id="ldTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ldTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The root is at depth 1. A query a node: one for the root, then one for each node's children, a leaf's finding none (1 + nodes queries). A query a level: one for each level, the last finding the level below the leaves empty (depth + 1 queries). A Serialized LOB reads the tree from one column (1 query). Both counts include the queries that come back empty.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Queries to read a tree</h3>
-          <p>A count over the situation the lesson states. Each record is one node and its parent, with - for the root. The lab counts the queries to read the tree a node at a time, a level at a time, and from one column. The trees are the lesson's, and illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Queries to read a tree</h3>
+            <p>A count over the situation the lesson states. Each record is one node and its parent, with - for the root. The lab counts the queries to read the tree a node at a time, a level at a time, and from one column. The trees are the lesson's, and illustrative.</p>
         <div class="field">
           <label for="ldPreset">Worked example</label>
           <select id="ldPreset"><option value="thread" selected>A reply thread: a first post and seven replies, four levels deep</option><option value="flat-thread">A flat thread: a first post with three replies</option></select>
@@ -1502,12 +1545,15 @@
           <div class="kpi"><span>Queries, the tree in one column</span><strong id="ldLob">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Both multi-query counts include the queries that come back empty: each leaf's query for children it does not have, and the query for the level below the deepest, which is how a program reading level by level finds that it has finished. The preset <code>flat-thread</code>, a first post with three replies and nothing below them, has 4 nodes and depth 2: 5 queries node by node, 3 level by level, 1 as a LOB. The column always wins on queries, and the tiles cannot show what it costs: every query you might have run against the posts, such as all of one person's replies, is gone.</p><p>That cost is the one part of the chapter that time has moved. Fowler already expected XML query extensions to SQL to soften it, while noting that they were largely nonstandard. Many databases now store a JSON or XML document in a column and can index and query inside it, which takes away part of the reason not to use a LOB. The other reasons, duplication, references into the blob, and other programs that read the tables, are untouched by that, and whether a queryable document column is a LOB or a small database of its own is still argued.</p><h3>Exercise</h3><p>A tree has the records <span class="math" data-say="root, no parent, a under root, b under a, c under b, d under c, e under root">root, -; a, root; b, a; c, b; d, c; e, root</span>. By hand, give its nodes and depth, and the queries to read it node by node, level by level and as a Serialized LOB. Then type it into the lab.</p><p>A reply thread is one kind of hierarchy. The next lesson, Single Table Inheritance, reads the other kind Chapter 3 names, a hierarchy of classes, and the first of three ways to map it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the queries a tree needs</h2></div><p>Four steps, the last of them on a schema of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the nodes and the depth</h3><p>Count every node, and find the longest path from the root down, counting the root as level 1.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count node by node</h3><p>One query reads the root, and each node then needs one query for its children, leaves included, whose queries return nothing: 1 + the nodes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count level by level and as a LOB</h3><p>One query per level, plus the one that finds the level below the deepest empty: the depth + 1. Read from one column, the whole tree is 1 query.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a column of your own</h3><p>Find one column in a schema you know that holds JSON, XML or another serialized structure, and write down one query someone might want that the column now prevents or makes harder.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the queries a tree needs</h2>
+      <p class="lead-in">Four steps, the last of them on a schema of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the nodes and the depth.</strong> Count every node, and find the longest path from the root down, counting the root as level 1.</li><li><strong>Count node by node.</strong> One query reads the root, and each node then needs one query for its children, leaves included, whose queries return nothing: 1 + the nodes.</li><li><strong>Count level by level and as a LOB.</strong> One query per level, plus the one that finds the level below the deepest empty: the depth + 1. Read from one column, the whole tree is 1 query.</li><li><strong>Do it on a column of your own.</strong> Find one column in a schema you know that holds JSON, XML or another serialized structure, and write down one query someone might want that the column now prevents or makes harder.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1525,17 +1571,16 @@ level by level: 4 levels + 1 empty, so 5
 from one column: 1</div><p>The node-by-node count grows with the size of the tree and the level count with its depth; the LOB stays at one. What the one query gives up is every query SQL could have run on the rows.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Preferring a Serialized LOB because it is fast</strong><span>On this view one query beats nine, so the LOB is the better design. It is one read, and on the lesson's illustration, <code>thread</code>, one against 9 node by node; but nothing else can query inside it, and Fowler's caution is the opening quotation: lean on it everywhere and the database is reduced to storing files with transactions. He recommends it for a fairly self-contained group of objects nobody will query from outside the application.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving an Embedded Value a key of its own</strong><span>An embedded value seems to need an id like any other object. It has none: it is part of its owner's row and is loaded and saved with it, which is exactly why it suits a Value Object, whose identity is its value.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying shared data into many LOBs</strong><span>A LOB is easy to write, so it is tempting to serialize whatever an object holds, a customer's details on each order, say. The data is then duplicated, and an update must find every copy. Chapter 12's rule is that what a LOB holds should be reachable only through the one object that owns it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a tree&#x27;s queries under three choices by hand.</strong><p>Given a tree as node, parent records, state its depth and the queries to read it one node at a time, one level at a time, and from one column.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts queries, not their cost or what they return, so it shows the LOB's one read and nothing of what it gives up: the queries SQL can no longer run, the duplication, the old serializations a changed class cannot read. Whether your database can query inside a document column is a fact about your database that the count cannot know.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Preferring a Serialized LOB because it is fast</strong><span>On this view one query beats nine, so the LOB is the better design. It is one read, and on the lesson's illustration, <code>thread</code>, one against 9 node by node; but nothing else can query inside it, and Fowler's caution is the opening quotation: lean on it everywhere and the database is reduced to storing files with transactions. He recommends it for a fairly self-contained group of objects nobody will query from outside the application.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Giving an Embedded Value a key of its own</strong><span>An embedded value seems to need an id like any other object. It has none: it is part of its owner's row and is loaded and saved with it, which is exactly why it suits a Value Object, whose identity is its value.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying shared data into many LOBs</strong><span>A LOB is easy to write, so it is tempting to serialize whatever an object holds, a customer's details on each order, say. The data is then duplicated, and an update must find every copy. Chapter 12's rule is that what a LOB holds should be reachable only through the one object that owns it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a tree&#x27;s queries under three choices by hand.</strong><p>Given a tree as node, parent records, state its depth and the queries to read it one node at a time, one level at a time, and from one column.</p></div></div><div class="note"><strong>Note:</strong> The lab counts queries, not their cost or what they return, so it shows the LOB's one read and nothing of what it gives up: the queries SQL can no longer run, the duplication, the old serializations a changed class cannot read. Whether your database can query inside a document column is a fact about your database that the count cannot know.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Embedded Value</summary><p>An object mapped into several fields of its owner's table. The owner loads and saves it, and it has no persistence of its own; Fowler calls it a special case of Dependent Mapping with a single dependent.</p></details><details class="recall"><summary>Serialized LOB</summary><p>A graph of objects serialized into one large object and stored in one database field. It reads a whole structure in one go, and SQL cannot see inside it.</p></details><details class="recall"><summary>BLOB and CLOB</summary><p>The two forms of a large object: binary, compact and impenetrable to anyone browsing the table; or character text, readable and larger, which XML makes easy to parse and more verbose still.</p></details></div>
+      <h3>Summary</h3>
       <p>Some objects are not worth a table of their own. Chapter 12's Embedded Value stores a small Value Object, a date range or an amount, as columns in its owner's row; its Serialized LOB stores a whole graph of objects, a tree, in one large column. Count the queries that read a tree one node at a time, one level at a time, and from one column.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Embedded Value.</strong> An object mapped into several fields of its owner's table. The owner loads and saves it, and it has no persistence of its own; Fowler calls it a special case of Dependent Mapping with a single dependent.</li><li><strong>Serialized LOB.</strong> A graph of objects serialized into one large object and stored in one database field. It reads a whole structure in one go, and SQL cannot see inside it.</li><li><strong>BLOB and CLOB.</strong> The two forms of a large object: binary, compact and impenetrable to anyone browsing the table; or character text, readable and larger, which XML makes easy to parse and more verbose still.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a small value, columns in the owner row. an embedded value has no key of its own. a whole graph, one large column. read in one query, but opaque to sql. node by node, 1 plus nodes queries. level by level, depth plus 1 queries" tabindex="0" role="region" aria-label="Mathematical notation">a small value: columns in the owner row
 an embedded value has no key of its own
 a whole graph: one large column
@@ -2218,11 +2263,40 @@ level by level: depth + 1 queries</div><figcaption>Two ways to skip a table, in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2290,7 +2364,7 @@ level by level: depth + 1 queries</div><figcaption>Two ways to skip a table, in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

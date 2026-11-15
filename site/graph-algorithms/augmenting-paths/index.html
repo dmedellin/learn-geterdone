@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Flow and matching</p>
       <h1>Augmenting Paths</h1>
       <p class="lesson-lede">Push flow along a path, discover that a first choice has to be undone, and watch a backward arc undo it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A flow is two constraints, and both are checkable</li><li>The residual network is where the search happens</li><li>Undoing an earlier choice is not an optimisation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What a flow is, and the one arc the search must have</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Flow, and its value</span><p>Given a digraph with a non-negative capacity <span class="math" data-say="c of A">c(a)</span> on every arc, a source <span class="math" data-say="s">s</span> and a sink <span class="math" data-say="t">t</span>, a <strong>flow</strong> assigns to each arc a number <span class="math" data-say="f of A">f(a)</span> with <span class="math" data-say="0 is at most f of A, is at most c of A">0 &le; f(a) &le; c(a)</span>, such that at every vertex other than <span class="math" data-say="s">s</span> and <span class="math" data-say="t">t</span> the total on incoming arcs equals the total on outgoing ones. Its <strong>value</strong> is the net amount leaving <span class="math" data-say="s">s</span>.</p></div><div class="defbox"><span class="label">Definition &middot; The residual network</span><p>For a flow <span class="math" data-say="f">f</span>, the <strong>residual network</strong> has, for each arc <span class="math" data-say="A">a</span> from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span>, a forward arc from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> of capacity <span class="math" data-say="c of A minus f of A">c(a) - f(a)</span> and a backward arc from <span class="math" data-say="v">v</span> to <span class="math" data-say="u">u</span> of capacity <span class="math" data-say="f of A">f(a)</span>. Arcs of residual capacity 0 are omitted. An <strong>augmenting path</strong> is any path from <span class="math" data-say="s">s</span> to <span class="math" data-say="t">t</span> in it, and its <strong>bottleneck</strong> is the least residual capacity along it.</p></div><p>Pushing the bottleneck along an augmenting path &mdash; adding it on each forward arc and subtracting it on each backward one &mdash; produces a flow again, whose value is higher by the bottleneck. Capacities hold because the bottleneck was the minimum, and conservation holds because each interior vertex of the path gains the same amount on one side as the other.</p><h3>The method</h3><ol><li>Start with zero on every arc.</li><li>Build the residual network and look for a path from <span class="math" data-say="s">s</span> to <span class="math" data-say="t">t</span> in it.</li><li>If there is one, push its bottleneck along it and repeat.</li><li>If there is not, stop.</li></ol><div class="example"><span class="label">Example &middot; Four vertices, and a first push that has to be undone</span><p>The lab opens on <span class="math" data-say="1 is greater than 2 1, 1 is greater than 3 1, 2 is greater than 3 1, 2 is greater than 4 1, 3 is greater than 4 1">1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1</span> with source 1 and sink 4, and with backward arcs switched OFF. The first-found rule takes the three-arc path <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 4">1>2, 2>3, 3>4</span>, pushes its bottleneck of 1, and then finds nothing: the search reaches only vertices 1 and 3, although the arc <span class="math" data-say="1 is greater than 3">1>3</span> still has spare capacity. The value stops at 1. Switch the backward arcs on and the same rule finds <span class="math" data-say="1 is greater than 3">1>3</span>, then backwards along <span class="math" data-say="2 is greater than 3">2>3</span>, then <span class="math" data-say="2 is greater than 4">2>4</span>, pushes 1 more, and reaches 2.</p></div><p>Look at what the second path does. It sends a new unit from 1 to 3, cancels the unit that was going 2 to 3, and sends that one on to 4 instead. The net effect is two units arriving at the sink by two disjoint routes, and it was reachable only by rewriting a decision the first path had made. That is why the backward arc is part of the algorithm and not a refinement of it.</p><p>The stuck flow is worth naming precisely. It satisfies both constraints &mdash; the lab confirms conservation at every interior vertex &mdash; and no more can be pushed without taking something back. It is MAXIMAL. The maximum is 2. Two words that differ by three letters and by the whole content of this module.</p><h3>The rule that chooses the path is a second question</h3><p>The failure above was exhibited with a RULE rather than with a hand-picked path, and that matters: it is a claim about what an implementation does, not about what an adversary could do. On the same network the shortest-path rule happens never to take the middle arc, so it reaches 2 even with backward arcs off. That does not rescue the forward-only method, it just means this network does not defeat that particular rule.</p><div class="example"><span class="label">Example &middot; One thin arc between two fat ones</span><p>On <span class="math" data-say="1 is greater than 2100, 1 is greater than 3100, 2 is greater than 3 1, 2 is greater than 4100, 3 is greater than 4100">1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100</span> both rules reach the maximum of 200, and they take different numbers of steps to do it. The shortest-path rule augments twice, by 100 each time. The first-found rule augments four times, by 1, then 99, then 1, then 99: it walks into the thin arc, pays for it with a backward arc later, and does it twice.</p></div><p>That is the case the choice of rule is usually justified by, and the lab lets you watch it rather than describing it. The shortest-path rule &mdash; always take an augmenting path with the fewest arcs &mdash; is the one the kit's own maximum-flow routine uses, and its augmentation count on this network is the one the panel reports.</p><p>On the six-vertex network with capacities from 4 to 20, the shortest-path rule reaches 23 in three augmentations, pushing 12, then 4, then 7. Three numbers that add to the answer, and the third path is four arcs long where the first two were three &mdash; the rule takes the shortest available, and what is available changes as the residual network does.</p><p>Measured against proved, and this lesson is where the two are furthest apart. Three augmentations reaching 23 is a measurement. That 23 cannot be beaten is not something any number of augmentations can establish, because stopping means only that this search found no path. &ldquo;Max Flow and Min Cut&rdquo; supplies the missing half, and it is the one place on this course where the algorithm hands back its own proof.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Maximum flow by augmenting paths</h2></div><p>The residual network carries the flow already sent, so a later path can take it back</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What a flow is, and the one arc the search must have</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Flow, and its value</span><p>Given a digraph with a non-negative capacity <span class="math" data-say="c of A">c(a)</span> on every arc, a source <span class="math" data-say="s">s</span> and a sink <span class="math" data-say="t">t</span>, a <strong>flow</strong> assigns to each arc a number <span class="math" data-say="f of A">f(a)</span> with <span class="math" data-say="0 is at most f of A, is at most c of A">0 &le; f(a) &le; c(a)</span>, such that at every vertex other than <span class="math" data-say="s">s</span> and <span class="math" data-say="t">t</span> the total on incoming arcs equals the total on outgoing ones. Its <strong>value</strong> is the net amount leaving <span class="math" data-say="s">s</span>.</p></div><div class="defbox"><span class="label">Definition &middot; The residual network</span><p>For a flow <span class="math" data-say="f">f</span>, the <strong>residual network</strong> has, for each arc <span class="math" data-say="A">a</span> from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span>, a forward arc from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span> of capacity <span class="math" data-say="c of A minus f of A">c(a) - f(a)</span> and a backward arc from <span class="math" data-say="v">v</span> to <span class="math" data-say="u">u</span> of capacity <span class="math" data-say="f of A">f(a)</span>. Arcs of residual capacity 0 are omitted. An <strong>augmenting path</strong> is any path from <span class="math" data-say="s">s</span> to <span class="math" data-say="t">t</span> in it, and its <strong>bottleneck</strong> is the least residual capacity along it.</p></div><p>Pushing the bottleneck along an augmenting path &mdash; adding it on each forward arc and subtracting it on each backward one &mdash; produces a flow again, whose value is higher by the bottleneck. Capacities hold because the bottleneck was the minimum, and conservation holds because each interior vertex of the path gains the same amount on one side as the other.</p><h3>The method</h3><ol><li>Start with zero on every arc.</li><li>Build the residual network and look for a path from <span class="math" data-say="s">s</span> to <span class="math" data-say="t">t</span> in it.</li><li>If there is one, push its bottleneck along it and repeat.</li><li>If there is not, stop.</li></ol><div class="example"><span class="label">Example &middot; Four vertices, and a first push that has to be undone</span><p>The lab opens on <span class="math" data-say="1 is greater than 2 1, 1 is greater than 3 1, 2 is greater than 3 1, 2 is greater than 4 1, 3 is greater than 4 1">1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1</span> with source 1 and sink 4, and with backward arcs switched OFF. The first-found rule takes the three-arc path <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 4">1>2, 2>3, 3>4</span>, pushes its bottleneck of 1, and then finds nothing: the search reaches only vertices 1 and 3, although the arc <span class="math" data-say="1 is greater than 3">1>3</span> still has spare capacity. The value stops at 1. Switch the backward arcs on and the same rule finds <span class="math" data-say="1 is greater than 3">1>3</span>, then backwards along <span class="math" data-say="2 is greater than 3">2>3</span>, then <span class="math" data-say="2 is greater than 4">2>4</span>, pushes 1 more, and reaches 2.</p></div><p>Look at what the second path does. It sends a new unit from 1 to 3, cancels the unit that was going 2 to 3, and sends that one on to 4 instead. The net effect is two units arriving at the sink by two disjoint routes, and it was reachable only by rewriting a decision the first path had made. That is why the backward arc is part of the algorithm and not a refinement of it.</p><p>The stuck flow is worth naming precisely. It satisfies both constraints &mdash; the lab confirms conservation at every interior vertex &mdash; and no more can be pushed without taking something back. It is MAXIMAL. The maximum is 2. Two words that differ by three letters and by the whole content of this module.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Maximum flow by augmenting paths</h2></div><p>The residual network carries the flow already sent, so a later path can take it back</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Augmenting paths in the residual network</strong><span>a backward arc carries the flow already sent, so a later path can take it back</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>on this augmenting path</span><span class="tone-purple"><i class="legend-swatch"></i>a backward arc</span><span class="tone-red"><i class="legend-swatch"></i>saturated, no residual left</span></div>
@@ -1405,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agSteps"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agFlow"></table></div>
       <div class="status-banner" id="agStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Type the network, then switch the backward arcs off</h3>
-          <p>Each augmentation is one row: the path through the residual network, the bottleneck pushed along it, and the value afterwards. The result is checked against the maximum the shortest-path rule reaches with backward arcs in place, so a run that stops early is shown stopping early rather than reported as finished.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Type the network, then switch the backward arcs off</h3>
+            <p>Each augmentation is one row: the path through the residual network, the bottleneck pushed along it, and the value afterwards. The result is checked against the maximum the shortest-path rule reaches with backward arcs in place, so a run that stops early is shown stopping early rather than reported as finished.</p>
         <div class="field">
           <label for="agPreset">Worked example</label>
           <select id="agPreset"><option value="forwardonly" selected>four vertices, five arcs, every capacity 1</option><option value="classic">six vertices, capacities from 4 to 20</option><option value="zigzag">one thin arc between two fat ones</option><option value="parallel">two arcs between the same pair</option></select>
@@ -1446,12 +1489,15 @@
           <div class="kpi"><span>Arcs saturated at the end</span><strong id="agSat">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="agHint" style="margin:0;">An arc is <span class="tt">1&gt;2 16</span>: tail, head, capacity. The residual network holds a forward arc wherever capacity is left and a backward arc wherever flow has been sent; pushing along a backward arc <em>reduces</em> the flow on the arc it came from. Switch the backward arcs off and take the first path a search finds, and the algorithm stops below the maximum &mdash; that is the whole reason they are there.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The rule that chooses the path is a second question</h3><p>The failure above was exhibited with a RULE rather than with a hand-picked path, and that matters: it is a claim about what an implementation does, not about what an adversary could do. On the same network the shortest-path rule happens never to take the middle arc, so it reaches 2 even with backward arcs off. That does not rescue the forward-only method, it just means this network does not defeat that particular rule.</p><div class="example"><span class="label">Example &middot; One thin arc between two fat ones</span><p>On <span class="math" data-say="1 is greater than 2100, 1 is greater than 3100, 2 is greater than 3 1, 2 is greater than 4100, 3 is greater than 4100">1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100</span> both rules reach the maximum of 200, and they take different numbers of steps to do it. The shortest-path rule augments twice, by 100 each time. The first-found rule augments four times, by 1, then 99, then 1, then 99: it walks into the thin arc, pays for it with a backward arc later, and does it twice.</p></div><p>That is the case the choice of rule is usually justified by, and the lab lets you watch it rather than describing it. The shortest-path rule &mdash; always take an augmenting path with the fewest arcs &mdash; is the one the kit's own maximum-flow routine uses, and its augmentation count on this network is the one the panel reports.</p><p>On the six-vertex network with capacities from 4 to 20, the shortest-path rule reaches 23 in three augmentations, pushing 12, then 4, then 7. Three numbers that add to the answer, and the third path is four arcs long where the first two were three &mdash; the rule takes the shortest available, and what is available changes as the residual network does.</p><p>Measured against proved, and this lesson is where the two are furthest apart. Three augmentations reaching 23 is a measurement. That 23 cannot be beaten is not something any number of augmentations can establish, because stopping means only that this search found no path. &ldquo;Max Flow and Min Cut&rdquo; supplies the missing half, and it is the one place on this course where the algorithm hands back its own proof.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Augmenting by hand</h2></div><p>Build the residual network first; the search is then an ordinary reachability question.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the residual network, both directions</h3><p>For every arc write its spare capacity forwards and its current flow backwards, and omit anything at 0. Doing the search on the original network with the flow in your head is where the backward arcs get lost, and losing them does not look like an error &mdash; it looks like being finished.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take the bottleneck, and take it everywhere on the path</h3><p>The amount pushed is the smallest residual capacity on the path, added on forward arcs and subtracted on backward ones. Pushing different amounts on different arcs breaks conservation, and pushing more than the minimum breaks a capacity.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check that what you have is still a flow</h3><p>Both constraints, every arc and every interior vertex. It is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> and it catches a sign error on a backward arc immediately, which is the mistake that otherwise survives until the final value is compared with something.</p></article><article class="card concept-card"><div class="icon">4</div><h3>When no path is left, do not conclude anything yet</h3><p>&ldquo;My search found no path&rdquo; and &ldquo;no augmenting path exists&rdquo; are the same statement only if the search was on the full residual network. The lab's opening preset is the case where they differ, and the honest report at this point is a value plus the rule that produced it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Augmenting by hand</h2>
+      <p class="lead-in">Build the residual network first; the search is then an ordinary reachability question.</p>
+      <ol class="key-ideas method"><li><strong>Draw the residual network, both directions.</strong> For every arc write its spare capacity forwards and its current flow backwards, and omit anything at 0. Doing the search on the original network with the flow in your head is where the backward arcs get lost, and losing them does not look like an error &mdash; it looks like being finished.</li><li><strong>Take the bottleneck, and take it everywhere on the path.</strong> The amount pushed is the smallest residual capacity on the path, added on forward arcs and subtracted on backward ones. Pushing different amounts on different arcs breaks conservation, and pushing more than the minimum breaks a capacity.</li><li><strong>Check that what you have is still a flow.</strong> Both constraints, every arc and every interior vertex. It is <span class="math" data-say="theta of the quantity V plus E">Θ(V + E)</span> and it catches a sign error on a backward arc immediately, which is the mistake that otherwise survives until the final value is compared with something.</li><li><strong>When no path is left, do not conclude anything yet.</strong> &ldquo;My search found no path&rdquo; and &ldquo;no augmenting path exists&rdquo; are the same statement only if the search was on the full residual network. The lab's opening preset is the case where they differ, and the honest report at this point is a value plus the rule that produced it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1483,17 +1529,16 @@ the shortest-path rule, backward arcs OFF
   path 2    1&gt;3   3&gt;4                            value 2</div><p>The forward-only run ends with the source's own arcs not both full: <span class="math" data-say="1 is greater than 3">1>3</span> still has its whole unit of spare capacity. That is the signature of being stuck rather than finished, and it is visible without knowing the answer &mdash; a maximum flow in this network would have to saturate one side of every cut, and the source's two arcs are a cut.</p><p>The last three lines are the reason the failure was demonstrated with a rule. The shortest-path rule never enters the middle arc here, so it does not need to undo anything on this particular network. A reader who saw only that rule would conclude the backward arcs are optional, and on a slightly larger network they would be wrong.</p><p>For a faded rehearsal, raise the capacity of <span class="math" data-say="2 is greater than 3">2>3</span> from 1 to 5 and predict what the first-found rule does with backward arcs off. The supplied first move is this: the first path is still <span class="math" data-say="1 is greater than 2, 2 is greater than 3, 3 is greater than 4">1>2, 2>3, 3>4</span> and its bottleneck is still 1, because <span class="math" data-say="1 is greater than 2">1>2</span> and <span class="math" data-say="3 is greater than 4">3>4</span> are unchanged. Say whether the run still stops at 1, and then say what happens if you raise <span class="math" data-say="1 is greater than 2">1>2</span> to 5 as well.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Searching the original network instead of the residual one</strong><span>The arcs with spare capacity are only half of what is available, and the half that is missing is the one that makes the method correct. The symptom is a run that terminates cleanly with a legal flow below the maximum, which is the hardest kind of wrong answer to notice: nothing crashes and every constraint holds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a failed search as a proof that no path exists</strong><span>They are the same statement only when the search covered the full residual network and the graph is the one you think it is. The lab's opening preset separates them deliberately, and the separation is the reason the certificate in &ldquo;Max Flow and Min Cut&rdquo; matters: it is what turns a failed search into a proof.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding the backward arcs are unnecessary because one rule managed without them</strong><span>The shortest-path rule reaches the maximum on the opening preset with backward arcs off, which is a fact about that network and that rule. Change the network and it stops being true. A demonstration that a restriction sometimes does no harm is not an argument that the restriction is safe.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can augment by hand, including backwards, and say what stopping does and does not prove.</strong><p>You should be able to build a residual network from a flow, find a path in it, push the bottleneck with the right sign on each arc, verify both constraints afterwards, and say precisely why a run that finds no further path has not yet established that its value is the maximum.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> &ldquo;Max Flow and Min Cut&rdquo; closes that gap, and it closes it completely. When the search fails, the set of vertices it reached is itself a cut, and the total capacity of the arcs leaving that set equals the value of the flow &mdash; which means the algorithm hands back a proof of its own optimality rather than needing one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Searching the original network instead of the residual one</strong><span>The arcs with spare capacity are only half of what is available, and the half that is missing is the one that makes the method correct. The symptom is a run that terminates cleanly with a legal flow below the maximum, which is the hardest kind of wrong answer to notice: nothing crashes and every constraint holds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a failed search as a proof that no path exists</strong><span>They are the same statement only when the search covered the full residual network and the graph is the one you think it is. The lab's opening preset separates them deliberately, and the separation is the reason the certificate in &ldquo;Max Flow and Min Cut&rdquo; matters: it is what turns a failed search into a proof.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding the backward arcs are unnecessary because one rule managed without them</strong><span>The shortest-path rule reaches the maximum on the opening preset with backward arcs off, which is a fact about that network and that rule. Change the network and it stops being true. A demonstration that a restriction sometimes does no harm is not an argument that the restriction is safe.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can augment by hand, including backwards, and say what stopping does and does not prove.</strong><p>You should be able to build a residual network from a flow, find a path in it, push the bottleneck with the right sign on each arc, verify both constraints afterwards, and say precisely why a run that finds no further path has not yet established that its value is the maximum.</p></div></div><div class="note"><strong>Note:</strong> &ldquo;Max Flow and Min Cut&rdquo; closes that gap, and it closes it completely. When the search fails, the set of vertices it reached is itself a cut, and the total capacity of the arcs leaving that set equals the value of the flow &mdash; which means the algorithm hands back a proof of its own optimality rather than needing one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A flow is two constraints, and both are checkable</summary><p>Every arc carries a number between 0 and its capacity, and at every vertex other than the source and the sink the total in equals the total out. The value of the flow is what leaves the source. The lab checks both constraints on whatever it produces and reports a verdict per vertex, so &ldquo;this is a flow&rdquo; is a measured statement rather than an assumption.</p></details><details class="recall"><summary>The residual network is where the search happens</summary><p>For each arc carrying <span class="math" data-say="f">f</span> out of a capacity <span class="math" data-say="c">c</span>, the residual network holds a forward arc of capacity <span class="math" data-say="c minus f">c - f</span>, meaning how much more can be pushed, and a backward arc of capacity <span class="math" data-say="f">f</span>, meaning how much of the existing flow can be taken back. A path from source to sink in that network is an augmenting path, and the bottleneck is the smallest residual capacity on it.</p></details><details class="recall"><summary>Undoing an earlier choice is not an optimisation</summary><p>On the lab's opening network the first-found rule takes a path through the middle arc, pushes 1, and then cannot find a second path at all &mdash; the value stops at 1. With backward arcs available the same rule finds a second path that runs backwards along the middle arc, and reaches 2. The stuck flow is a perfectly legal flow; it is maximal, in that nothing can be added to it under that restriction, and it is not maximum.</p></details></div>
+      <h3>Summary</h3>
       <p>A flow is an assignment of a number to every arc that respects capacities and conserves at every interior vertex. Raise its value by finding a path from source to sink with spare capacity and pushing the bottleneck along it. The whole subject turns on one detail: the path may also run backwards along an arc that already carries flow, and without that the method stops below the maximum.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A flow is two constraints, and both are checkable.</strong> Every arc carries a number between 0 and its capacity, and at every vertex other than the source and the sink the total in equals the total out. The value of the flow is what leaves the source. The lab checks both constraints on whatever it produces and reports a verdict per vertex, so &ldquo;this is a flow&rdquo; is a measured statement rather than an assumption.</li><li><strong>The residual network is where the search happens.</strong> For each arc carrying <span class="math" data-say="f">f</span> out of a capacity <span class="math" data-say="c">c</span>, the residual network holds a forward arc of capacity <span class="math" data-say="c minus f">c - f</span>, meaning how much more can be pushed, and a backward arc of capacity <span class="math" data-say="f">f</span>, meaning how much of the existing flow can be taken back. A path from source to sink in that network is an augmenting path, and the bottleneck is the smallest residual capacity on it.</li><li><strong>Undoing an earlier choice is not an optimisation.</strong> On the lab's opening network the first-found rule takes a path through the middle arc, pushes 1, and then cannot find a second path at all &mdash; the value stops at 1. With backward arcs available the same rule finds a second path that runs backwards along the middle arc, and reaches 2. The stuck flow is a perfectly legal flow; it is maximal, in that nothing can be added to it under that restriction, and it is not maximum.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="capacity constraint, 0 is at most f of A, is at most c of A, on every arc. conservation, in equals out, at every vertex but s and t. residual network, forward spare c minus f, and backward f. augment, push the bottleneck along a path from s to t. maximal is not maximum, no path left under a restricted rule is not the same thing" tabindex="0" role="region" aria-label="Mathematical notation">capacity constraint  0 &lt;= f(a) &lt;= c(a)        on every arc
 conservation         in = out                 at every vertex but s and t
 residual network     forward spare c - f, and backward f
@@ -2888,11 +2933,40 @@ maximal is not maximum: no path left under a restricted rule is not the same thi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2960,7 +3034,7 @@ maximal is not maximum: no path left under a restricted rule is not the same thi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

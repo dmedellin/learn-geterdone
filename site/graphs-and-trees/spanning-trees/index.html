@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graphs and Trees</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Trees</p>
       <h1>Spanning Trees and Minimum Spanning Trees</h1>
       <p class="lesson-lede">Connect everything with as few — or as cheap — edges as possible.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Every connected graph has a spanning tree</li><li>Kruskal is greedy and correct</li><li>Greedy is usually wrong</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Spanning trees</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Spanning tree</span><p>A <strong>spanning tree</strong> of a connected graph <span class="math" data-say="G">G</span> is a subgraph that is a tree and contains every vertex of <span class="math" data-say="G">G</span>. It has <span class="math" data-say="n minus 1">n − 1</span> edges.</p></div><div class="thm"><span class="label">Theorem &middot; Existence</span><p>Every connected graph has a spanning tree.</p></div><div class="proof"><p>If <span class="math" data-say="G">G</span> is acyclic it is already a tree. Otherwise take any cycle and remove one of its edges; that edge is not a bridge (“Paths and Connectivity”), so the graph stays connected, and the number of edges has decreased.</p><p>Repeating terminates, since the edge count strictly decreases, and it ends with a connected acyclic subgraph on all the vertices &mdash; a spanning tree.</p><p><span class="qed">&#9633;</span></p></div><p>Breadth-first and depth-first search each produce one directly: the tree edges of a search from any vertex form a spanning tree of its component. So the object is available for free from “Breadth-First and Depth-First Search”.</p><h3>Minimum spanning trees</h3><div class="defbox"><span class="label">Definition &middot; Minimum spanning tree</span><p>In a weighted connected graph, a <strong>minimum spanning tree</strong> is a spanning tree of least total weight.</p></div><div class="mathblock" data-say="KRUSKAL of G. sort the edges by increasing weight. T equals the empty set. for each edge e in order. if e does not close a cycle in T, add e to T. return T" tabindex="0" role="region" aria-label="Mathematical notation">KRUSKAL(G):
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Spanning trees</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Spanning tree</span><p>A <strong>spanning tree</strong> of a connected graph <span class="math" data-say="G">G</span> is a subgraph that is a tree and contains every vertex of <span class="math" data-say="G">G</span>. It has <span class="math" data-say="n minus 1">n − 1</span> edges.</p></div><div class="thm"><span class="label">Theorem &middot; Existence</span><p>Every connected graph has a spanning tree.</p></div><div class="proof"><p>If <span class="math" data-say="G">G</span> is acyclic it is already a tree. Otherwise take any cycle and remove one of its edges; that edge is not a bridge (“Paths and Connectivity”), so the graph stays connected, and the number of edges has decreased.</p><p>Repeating terminates, since the edge count strictly decreases, and it ends with a connected acyclic subgraph on all the vertices &mdash; a spanning tree.</p><p><span class="qed">&#9633;</span></p></div><p>Breadth-first and depth-first search each produce one directly: the tree edges of a search from any vertex form a spanning tree of its component. So the object is available for free from “Breadth-First and Depth-First Search”.</p><h3>Minimum spanning trees</h3><div class="defbox"><span class="label">Definition &middot; Minimum spanning tree</span><p>In a weighted connected graph, a <strong>minimum spanning tree</strong> is a spanning tree of least total weight.</p></div><div class="mathblock" data-say="KRUSKAL of G. sort the edges by increasing weight. T equals the empty set. for each edge e in order. if e does not close a cycle in T, add e to T. return T" tabindex="0" role="region" aria-label="Mathematical notation">KRUSKAL(G):
     sort the edges by increasing weight
     T = ∅
     for each edge e in order:
         if e does not close a cycle in T:  add e to T
-    return T</div><div class="thm"><span class="label">Theorem &middot; The cut property</span><p>Let <span class="math" data-say="S">S</span> be any nonempty proper subset of the vertices. The lightest edge with exactly one end in <span class="math" data-say="S">S</span> belongs to some minimum spanning tree. If it is strictly lightest, it belongs to every one.</p></div><div class="proof"><p>Let <span class="math" data-say="e">e</span> be that lightest crossing edge and let <span class="math" data-say="T">T</span> be a minimum spanning tree not containing it. Adding <span class="math" data-say="e">e</span> to <span class="math" data-say="T">T</span> creates exactly one cycle (“Trees”), and that cycle must cross the cut a second time, at some edge <span class="math" data-say="f is not equal to e">f ≠ e</span>.</p><p>Swapping <span class="math" data-say="f">f</span> for <span class="math" data-say="e">e</span> keeps the graph spanning and acyclic, and since <span class="math" data-say="w of e is at most w of f">w(e) ≤ w(f)</span> the total weight does not increase. So the result is also a minimum spanning tree, and it contains <span class="math" data-say="e">e</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Kruskal's correctness follows: whenever it adds an edge, that edge is the lightest crossing the cut between the component it is joining and the rest, so the cut property guarantees a minimum spanning tree containing everything chosen so far.</p><p>Prim's algorithm is the same theorem used differently: grow a single tree from one vertex, always adding the lightest edge leaving it. It is Dijkstra's shape with a different priority, and it is often faster on dense graphs.</p><h3>Why greed works here and usually does not</h3><p>The cut property is a strong structural fact: a locally cheapest choice is provably part of a global optimum. Most optimisation problems have no such property, and greed then fails &mdash; sometimes badly. Coin change with denominations <span class="math" data-say="the set 1, 3, 4">{1, 3, 4}</span> is greedy-wrong at 6, and the travelling salesman is greedy-wrong routinely.</p><p>The technical name for the structure that makes greed correct is a <strong>matroid</strong>, and the forests of a graph form one. “Greedy Algorithms” in Algorithms and Complexity discusses greedy algorithms without the theory; what matters here is that "greedy works" is a theorem about this problem, not a general method.</p><h3>Cost</h3><p>Kruskal sorts the edges &mdash; <span class="math" data-say="theta of the size of E, log the size of E">Θ(|E| log |E|)</span> &mdash; and then tests each for a cycle using a union&ndash;find structure, at nearly constant cost per test. So the sort dominates. Prim with a heap runs in <span class="math" data-say="theta of the quantity n plus the size of E, times log n">Θ((n + |E|) log n)</span>.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    return T</div><div class="thm"><span class="label">Theorem &middot; The cut property</span><p>Let <span class="math" data-say="S">S</span> be any nonempty proper subset of the vertices. The lightest edge with exactly one end in <span class="math" data-say="S">S</span> belongs to some minimum spanning tree. If it is strictly lightest, it belongs to every one.</p></div><div class="proof"><p>Let <span class="math" data-say="e">e</span> be that lightest crossing edge and let <span class="math" data-say="T">T</span> be a minimum spanning tree not containing it. Adding <span class="math" data-say="e">e</span> to <span class="math" data-say="T">T</span> creates exactly one cycle (“Trees”), and that cycle must cross the cut a second time, at some edge <span class="math" data-say="f is not equal to e">f ≠ e</span>.</p><p>Swapping <span class="math" data-say="f">f</span> for <span class="math" data-say="e">e</span> keeps the graph spanning and acyclic, and since <span class="math" data-say="w of e is at most w of f">w(e) ≤ w(f)</span> the total weight does not increase. So the result is also a minimum spanning tree, and it contains <span class="math" data-say="e">e</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Kruskal's correctness follows: whenever it adds an edge, that edge is the lightest crossing the cut between the component it is joining and the rest, so the cut property guarantees a minimum spanning tree containing everything chosen so far.</p><p>Prim's algorithm is the same theorem used differently: grow a single tree from one vertex, always adding the lightest edge leaving it. It is Dijkstra's shape with a different priority, and it is often faster on dense graphs.</p><h3>Why greed works here and usually does not</h3><p>The cut property is a strong structural fact: a locally cheapest choice is provably part of a global optimum. Most optimisation problems have no such property, and greed then fails &mdash; sometimes badly. Coin change with denominations <span class="math" data-say="the set 1, 3, 4">{1, 3, 4}</span> is greedy-wrong at 6, and the travelling salesman is greedy-wrong routinely.</p><p>The technical name for the structure that makes greed correct is a <strong>matroid</strong>, and the forests of a graph form one. “Greedy Algorithms” in Algorithms and Complexity discusses greedy algorithms without the theory; what matters here is that "greedy works" is a theorem about this problem, not a general method.</p><h3>Cost</h3><p>Kruskal sorts the edges &mdash; <span class="math" data-say="theta of the size of E, log the size of E">Θ(|E| log |E|)</span> &mdash; and then tests each for a cycle using a union&ndash;find structure, at nearly constant cost per test. So the sort dominates. Prim with a heap runs in <span class="math" data-say="theta of the quantity n plus the size of E, times log n">Θ((n + |E|) log n)</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
@@ -1414,10 +1457,10 @@
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gFacts"></table></div>
       </div>
       <div class="status-banner" id="gStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Kruskal, edge by edge</h3>
-          <p>The worked example is loaded with its weights, <span class="math" data-say="A and so on E">A … E</span> as <span class="math" data-say="1 and so on 5">1 … 5</span>. The panel lists the seven edges in weight order &mdash; <span class="math" data-say="1 to 2, 2 to 3, 3 to 4, 4 to 5">1–2, 2–3, 3–4, 4–5</span> taken, then <span class="math" data-say="1 to 5">1–5</span>, <span class="math" data-say="1 to 3">1–3</span>, <span class="math" data-say="2 to 4">2–4</span> each rejected because its ends were already connected &mdash; and the total 10 with <span class="math" data-say="4 equals n minus 1">4 = n − 1</span> edges chosen. Switch the algorithm to Dijkstra on the same graph: the cheapest route <span class="math" data-say="1 goes to 5">1 → 5</span> is the direct edge of weight 5, which the tree rejected; the tree's own route from 1 to 5 weighs 10. A minimum spanning tree is not a shortest-path tree.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Kruskal, edge by edge</h3>
+            <p>The worked example is loaded with its weights, <span class="math" data-say="A and so on E">A … E</span> as <span class="math" data-say="1 and so on 5">1 … 5</span>. The panel lists the seven edges in weight order &mdash; <span class="math" data-say="1 to 2, 2 to 3, 3 to 4, 4 to 5">1–2, 2–3, 3–4, 4–5</span> taken, then <span class="math" data-say="1 to 5">1–5</span>, <span class="math" data-say="1 to 3">1–3</span>, <span class="math" data-say="2 to 4">2–4</span> each rejected because its ends were already connected &mdash; and the total 10 with <span class="math" data-say="4 equals n minus 1">4 = n − 1</span> edges chosen. Switch the algorithm to Dijkstra on the same graph: the cheapest route <span class="math" data-say="1 goes to 5">1 → 5</span> is the direct edge of weight 5, which the tree rejected; the tree's own route from 1 to 5 weighs 10. A minimum spanning tree is not a shortest-path tree.</p>
         <div class="field">
           <label for="gAlgo">Algorithm</label>
           <select id="gAlgo">
@@ -1463,12 +1506,14 @@
           <div class="kpi"><span>|E|</span><strong id="gE">&mdash;</strong></div>
           <div class="kpi"><span>Σ deg</span><strong id="gSum">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a minimum spanning tree</h2></div><p>Sort, then add whatever does not close a cycle.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort the edges by weight</h3><p>This is the dominant cost and the only global step in the algorithm.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take each edge in order if it joins two components</h3><p>Skip it if both ends are already connected &mdash; that would close a cycle.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Stop at <span class="math" data-say="n minus 1">n − 1</span> edges</h3><p>Or when the list is exhausted. Fewer than <span class="math" data-say="n minus 1">n − 1</span> means the graph was disconnected and you have a minimum spanning forest.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Verify the count and the connectivity</h3><p><span class="math" data-say="n minus 1">n − 1</span> edges reaching every vertex. Both are cheap checks and either failing means the input was disconnected.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a minimum spanning tree</h2>
+      <p class="lead-in">Sort, then add whatever does not close a cycle.</p>
+      <ol class="key-ideas method"><li><strong>Sort the edges by weight.</strong> This is the dominant cost and the only global step in the algorithm.</li><li><strong>Take each edge in order if it joins two components.</strong> Skip it if both ends are already connected &mdash; that would close a cycle.</li><li><strong>Stop at <span class="math" data-say="n minus 1">n − 1</span> edges.</strong> Or when the list is exhausted. Fewer than <span class="math" data-say="n minus 1">n − 1</span> means the graph was disconnected and you have a minimum spanning forest.</li><li><strong>Verify the count and the connectivity.</strong> <span class="math" data-say="n minus 1">n − 1</span> edges reaching every vertex. Both are cheap checks and either failing means the input was disconnected.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1494,17 +1539,16 @@ MST = {AB, BC, CD, DE},  4 = n − 1 edges,  total weight 10
 Note the algorithm never reconsidered a choice.</div><p>Every edge was decided once and never revisited, which is what makes the algorithm greedy &mdash; and what makes its correctness surprising. The cut property is the theorem that licenses never looking back.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming greedy works generally</strong><span>It works here because of the cut property. “Greedy Algorithms” in Algorithms and Complexity shows greedy failing on a problem that looks no harder.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the tree as a shortest-path tree</strong><span>It minimises the total weight of the tree, not the distance between any pair. In the worked example the tree route <span class="math" data-say="A to B to C to D to E">A–B–C–D–E</span> weighs 10 while the rejected edge <span class="math" data-say="AE">AE</span> weighs 5. Dijkstra's tree and Kruskal's tree optimise different things.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the minimum spanning tree is unique</strong><span>It is unique when all edge weights are distinct. With ties there may be several, all of the same total weight.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run Kruskal and justify each rejection.</strong><p>Take a weighted graph on six vertices and run the algorithm, saying for each rejected edge which two vertices were already connected. That justification is the correctness argument in miniature.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Minimum spanning trees are used for network design, clustering (cut the heaviest edges of the tree and the components are the clusters), and as a subroutine in approximation algorithms &mdash; including a 2-approximation for the travelling salesman problem.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming greedy works generally</strong><span>It works here because of the cut property. “Greedy Algorithms” in Algorithms and Complexity shows greedy failing on a problem that looks no harder.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the tree as a shortest-path tree</strong><span>It minimises the total weight of the tree, not the distance between any pair. In the worked example the tree route <span class="math" data-say="A to B to C to D to E">A–B–C–D–E</span> weighs 10 while the rejected edge <span class="math" data-say="AE">AE</span> weighs 5. Dijkstra's tree and Kruskal's tree optimise different things.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the minimum spanning tree is unique</strong><span>It is unique when all edge weights are distinct. With ties there may be several, all of the same total weight.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run Kruskal and justify each rejection.</strong><p>Take a weighted graph on six vertices and run the algorithm, saying for each rejected edge which two vertices were already connected. That justification is the correctness argument in miniature.</p></div></div><div class="note"><strong>Note:</strong> Minimum spanning trees are used for network design, clustering (cut the heaviest edges of the tree and the components are the clusters), and as a subroutine in approximation algorithms &mdash; including a 2-approximation for the travelling salesman problem.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Every connected graph has a spanning tree</summary><p>Remove cycle edges until none remain; connectivity survives because a cycle edge is never a bridge.</p></details><details class="recall"><summary>Kruskal is greedy and correct</summary><p>Take the cheapest edge that does not close a cycle, repeatedly. The cut property is why this cannot go wrong.</p></details><details class="recall"><summary>Greedy is usually wrong</summary><p>“Greedy Algorithms” in Algorithms and Complexity shows greedy failing on coin change and on the travelling salesman. Minimum spanning trees are the exception, and the reason is structural.</p></details></div>
+      <h3>Summary</h3>
       <p>A spanning tree reaches every vertex with <span class="math" data-say="n minus 1">n − 1</span> edges. When the edges are weighted, Kruskal's greedy algorithm finds the cheapest one, and its optimality is genuinely surprising.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Every connected graph has a spanning tree.</strong> Remove cycle edges until none remain; connectivity survives because a cycle edge is never a bridge.</li><li><strong>Kruskal is greedy and correct.</strong> Take the cheapest edge that does not close a cycle, repeatedly. The cut property is why this cannot go wrong.</li><li><strong>Greedy is usually wrong.</strong> “Greedy Algorithms” in Algorithms and Complexity shows greedy failing on coin change and on the travelling salesman. Minimum spanning trees are the exception, and the reason is structural.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="spanning tree, a subgraph that is a tree containing every vertex. exists, if and only if, the graph is connected, has n minus 1 edges. KRUSKAL, take edges in increasing weight, skip any that closes a cycle. greedy is OPTIMAL here, unusually" tabindex="0" role="region" aria-label="Mathematical notation">spanning tree: a subgraph that is a tree containing every vertex
 exists  ⟺  the graph is connected;  has n − 1 edges
 KRUSKAL  take edges in increasing weight, skip any that closes a cycle
@@ -2653,11 +2697,40 @@ greedy is OPTIMAL here — unusually</div><figcaption>Cheapest connection</figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2725,7 +2798,7 @@ greedy is OPTIMAL here — unusually</div><figcaption>Cheapest connection</figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

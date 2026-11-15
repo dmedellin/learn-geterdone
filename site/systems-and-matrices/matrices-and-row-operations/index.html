@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,33 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and Matrices</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Matrices</p>
       <h1>Matrices and Row Operations</h1>
       <p class="lesson-lede">Translate a system to an augmented matrix and apply one reversible row operation at a time.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A matrix is bookkeeping, not a new idea</li><li>Position carries all the meaning</li><li>The three row operations are exactly the reversible ones</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Writing a system as a matrix</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Matrix</span><p>A <strong>matrix</strong> is a rectangular array of numbers. One with <span class="math" data-say="m">m</span> rows and <span class="math" data-say="n">n</span> columns is an <span class="math" data-say="m times n">m × n</span> matrix &mdash; rows first, always, and the convention is arbitrary but universal.</p><p>Entries are named by position: <span class="math" data-say="A sub 23">a₂₃</span> is the entry in row <span class="math" data-say="2">2</span>, column <span class="math" data-say="3">3</span>. Row index first, again by convention.</p></div><div class="defbox"><span class="label">Definition &middot; Coefficient matrix, augmented matrix</span><p>For a system written in standard form, the <strong>coefficient matrix</strong> holds the coefficients: one row per equation, one column per variable. The <strong>augmented matrix</strong> adds a final column holding the constants, usually separated by a vertical bar.</p><p>The bar is a reading aid and nothing more. It marks where the equals signs were.</p></div><p>The translation runs both ways and is entirely mechanical, on one condition: every equation is in standard form, with the same variables in the same order. Meeting that condition is the reader's job, and the matrix cannot check it.</p><div class="mathblock" data-say="2 y minus 5 equals 3 x minus z, goes to, negative 3 x plus 2 y plus, z equals 5, goes to, negative 3, 2, 1, 5. x plus 4 z equals 0, goes to, x plus 0 y plus 4 z equals 0, goes to, 1, 0, 4, 0" tabindex="0" role="region" aria-label="Mathematical notation">2y − 5 = 3x − z       →     −3x + 2y +  z = 5     →    −3   2   1 | 5
-x + 4z = 0            →       x + 0y + 4z = 0     →     1   0   4 | 0</div><p>The <span class="math" data-say="0">0</span> in the second row is not padding. In a three-variable system every row has four entries; a row with three entries is a row whose columns no longer line up with anybody else's, and every subsequent operation is then adding the wrong numbers together.</p><h3>The three elementary row operations</h3><ul><li><strong>Swap.</strong> <span class="math" data-say="R 1 if and only if R 3">R1 ↔ R3</span> exchanges two rows. Its inverse is itself. This corresponds to writing the equations in a different order, which changes nothing about what is being asked.</li><li><strong>Scale.</strong> <span class="math" data-say="kR 2 goes to R 2">kR2 → R2</span> multiplies every entry of a row, including the constant, by <span class="math" data-say="k is not equal to 0">k ≠ 0</span>. Its inverse is <span class="math" data-say="the quantity 1 over k, times R 2 goes to R 2">(1/k)R2 → R2</span>.</li><li><strong>Replace.</strong> <span class="math" data-say="R 3 plus k R 1 goes to R 3">R3 + kR1 → R3</span> adds <span class="math" data-say="k">k</span> times one row to another and stores the result in the second. Its inverse is <span class="math" data-say="R 3 minus k R 1 goes to R 3">R3 − kR1 → R3</span>. Only the row named on the right of the arrow changes.</li></ul><div class="thm"><span class="label">Theorem &middot; Row operations preserve the solution set</span><p>If one augmented matrix is obtained from another by a sequence of elementary row operations, the two systems they represent have exactly the same solution set. Such matrices are called <strong>row equivalent</strong>.</p></div><div class="proof"><p>Each of the three operations is a restatement of something already settled. Swapping two rows reorders the equations, and a solution satisfies a set of equations regardless of the order they are written in. Scaling a row by <span class="math" data-say="k is not equal to 0">k ≠ 0</span> is “Solving by Elimination”'s second claim. Replacing <span class="math" data-say="R 3">R3</span> by <span class="math" data-say="R 3 plus k R 1">R3 + kR1</span> is “Solving by Elimination”'s first claim, with <span class="math" data-say="R 1">R1</span> left in place as that theorem requires.</p><p>Each operation has an inverse of the same kind, so any solution of the new system is a solution of the old one as well. A sequence of reversible steps is reversible: undo them in the opposite order.</p><p><span class="qed">&#9633;</span></p></div><p>Three things are not row operations. Multiplying a row by <span class="math" data-say="0">0</span> destroys an equation and cannot be undone. Operating on columns renames variables: exchanging two columns produces a matrix whose answers are attached to the wrong letters, with nothing on the page to record the swap. And two operations performed at once are not a sequence of operations &mdash; from the rows <span class="math" data-say="1 0, 1">1 0 | 1</span> and <span class="math" data-say="0 1, 1">0 1 | 1</span>, adding each to the other simultaneously gives <span class="math" data-say="1 1, 2">1 1 | 2</span> twice, turning a unique solution into a line.</p><div class="example"><span class="label">Example &middot; Two operations, written out</span><p>Start from the augmented matrix of the system in “Systems in Three Variables”. <span class="math" data-say="R 2 minus 2 R 1 goes to R 2">R2 − 2R1 → R2</span> gives the row <span class="math" data-say="0 negative 3 1, negative 3">0 −3 1 | −3</span>, and <span class="math" data-say="R 3 plus R 1 goes to R 3">R3 + R1 → R3</span> gives <span class="math" data-say="0 3 5, 21">0 3 5 | 21</span>.</p><p>Those are the equations <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> of “Systems in Three Variables”, entry for entry. The matrix has not made the arithmetic easier; it has made the position of every number decidable in advance.</p></div><p>Write each operation beside the row it produces, exactly as the combinations were labelled in “Systems in Three Variables”. “Gaussian Elimination” performs eight or ten of these in a row, and an unlabelled sequence of matrices is impossible to debug.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The three elementary row operations</h2></div><p>Swap, scale, add a multiple -- each applied on its own, with its effect on the determinant</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Writing a system as a matrix</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Matrix</span><p>A <strong>matrix</strong> is a rectangular array of numbers. One with <span class="math" data-say="m">m</span> rows and <span class="math" data-say="n">n</span> columns is an <span class="math" data-say="m times n">m × n</span> matrix &mdash; rows first, always, and the convention is arbitrary but universal.</p><p>Entries are named by position: <span class="math" data-say="A sub 23">a₂₃</span> is the entry in row <span class="math" data-say="2">2</span>, column <span class="math" data-say="3">3</span>. Row index first, again by convention.</p></div><div class="defbox"><span class="label">Definition &middot; Coefficient matrix, augmented matrix</span><p>For a system written in standard form, the <strong>coefficient matrix</strong> holds the coefficients: one row per equation, one column per variable. The <strong>augmented matrix</strong> adds a final column holding the constants, usually separated by a vertical bar.</p><p>The bar is a reading aid and nothing more. It marks where the equals signs were.</p></div><p>The translation runs both ways and is entirely mechanical, on one condition: every equation is in standard form, with the same variables in the same order. Meeting that condition is the reader's job, and the matrix cannot check it.</p><div class="mathblock" data-say="2 y minus 5 equals 3 x minus z, goes to, negative 3 x plus 2 y plus, z equals 5, goes to, negative 3, 2, 1, 5. x plus 4 z equals 0, goes to, x plus 0 y plus 4 z equals 0, goes to, 1, 0, 4, 0" tabindex="0" role="region" aria-label="Mathematical notation">2y − 5 = 3x − z       →     −3x + 2y +  z = 5     →    −3   2   1 | 5
+x + 4z = 0            →       x + 0y + 4z = 0     →     1   0   4 | 0</div><p>The <span class="math" data-say="0">0</span> in the second row is not padding. In a three-variable system every row has four entries; a row with three entries is a row whose columns no longer line up with anybody else's, and every subsequent operation is then adding the wrong numbers together.</p><h3>The three elementary row operations</h3><ul><li><strong>Swap.</strong> <span class="math" data-say="R 1 if and only if R 3">R1 ↔ R3</span> exchanges two rows. Its inverse is itself. This corresponds to writing the equations in a different order, which changes nothing about what is being asked.</li><li><strong>Scale.</strong> <span class="math" data-say="kR 2 goes to R 2">kR2 → R2</span> multiplies every entry of a row, including the constant, by <span class="math" data-say="k is not equal to 0">k ≠ 0</span>. Its inverse is <span class="math" data-say="the quantity 1 over k, times R 2 goes to R 2">(1/k)R2 → R2</span>.</li><li><strong>Replace.</strong> <span class="math" data-say="R 3 plus k R 1 goes to R 3">R3 + kR1 → R3</span> adds <span class="math" data-say="k">k</span> times one row to another and stores the result in the second. Its inverse is <span class="math" data-say="R 3 minus k R 1 goes to R 3">R3 − kR1 → R3</span>. Only the row named on the right of the arrow changes.</li></ul><div class="thm"><span class="label">Theorem &middot; Row operations preserve the solution set</span><p>If one augmented matrix is obtained from another by a sequence of elementary row operations, the two systems they represent have exactly the same solution set. Such matrices are called <strong>row equivalent</strong>.</p></div><div class="proof"><p>Each of the three operations is a restatement of something already settled. Swapping two rows reorders the equations, and a solution satisfies a set of equations regardless of the order they are written in. Scaling a row by <span class="math" data-say="k is not equal to 0">k ≠ 0</span> is “Solving by Elimination”'s second claim. Replacing <span class="math" data-say="R 3">R3</span> by <span class="math" data-say="R 3 plus k R 1">R3 + kR1</span> is “Solving by Elimination”'s first claim, with <span class="math" data-say="R 1">R1</span> left in place as that theorem requires.</p><p>Each operation has an inverse of the same kind, so any solution of the new system is a solution of the old one as well. A sequence of reversible steps is reversible: undo them in the opposite order.</p><p><span class="qed">&#9633;</span></p></div><p>Three things are not row operations. Multiplying a row by <span class="math" data-say="0">0</span> destroys an equation and cannot be undone. Operating on columns renames variables: exchanging two columns produces a matrix whose answers are attached to the wrong letters, with nothing on the page to record the swap. And two operations performed at once are not a sequence of operations &mdash; from the rows <span class="math" data-say="1 0, 1">1 0 | 1</span> and <span class="math" data-say="0 1, 1">0 1 | 1</span>, adding each to the other simultaneously gives <span class="math" data-say="1 1, 2">1 1 | 2</span> twice, turning a unique solution into a line.</p><div class="example"><span class="label">Example &middot; Two operations, written out</span><p>Start from the augmented matrix of the system in “Systems in Three Variables”. <span class="math" data-say="R 2 minus 2 R 1 goes to R 2">R2 − 2R1 → R2</span> gives the row <span class="math" data-say="0 negative 3 1, negative 3">0 −3 1 | −3</span>, and <span class="math" data-say="R 3 plus R 1 goes to R 3">R3 + R1 → R3</span> gives <span class="math" data-say="0 3 5, 21">0 3 5 | 21</span>.</p><p>Those are the equations <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> of “Systems in Three Variables”, entry for entry. The matrix has not made the arithmetic easier; it has made the position of every number decidable in advance.</p></div><p>Write each operation beside the row it produces, exactly as the combinations were labelled in “Systems in Three Variables”. “Gaussian Elimination” performs eight or ten of these in a row, and an unlabelled sequence of matrices is impossible to debug.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The three elementary row operations</h2></div><p>Swap, scale, add a multiple -- each applied on its own, with its effect on the determinant</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="maTitle">Matrix</strong><span id="maSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the row acted on</span><span class="tone-amber"><i class="legend-swatch"></i>the determinant, recomputed</span></div>
       </div>
       <div id="maWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="maStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Apply one operation</h3>
-          <p>Type an augmented matrix and apply a single row operation at a time. Run the operations from “Systems in Three Variables” &mdash; <span class="math" data-say="R 2 minus 2 R 1">R2 − 2R1</span> and <span class="math" data-say="R 3 plus R 1">R3 + R1</span> &mdash; and compare the entries with the equations there: the same numbers, in fixed places.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Apply one operation</h3>
+            <p>Type an augmented matrix and apply a single row operation at a time. Run the operations from “Systems in Three Variables” &mdash; <span class="math" data-say="R 2 minus 2 R 1">R2 − 2R1</span> and <span class="math" data-say="R 3 plus R 1">R3 + R1</span> &mdash; and compare the entries with the equations there: the same numbers, in fixed places.</p>
         <div class="field" id="maFieldPreset">
           <label for="maPreset">Worked example</label>
           <select id="maPreset"><option value="0">a 3 by 3 with determinant -1</option><option value="1">swapping two rows flips the sign</option><option value="2">scaling by 0 throws information away for good</option><option value="3">a fractional multiplier</option><option value="4">singular, and no row operation can rescue it</option><option value="5">rectangular: row operations never needed squareness</option></select>
@@ -1434,12 +1477,14 @@ x + 4z = 0            →       x + 0y + 4z = 0     →     1   0   4 | 0</div><
           <div class="kpi"><span id="maK3Lab">&mdash;</span><strong id="maK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="maHint" style="margin:0;">Rows are separated by <code>;</code> and entries by spaces, so <code>2 1 -1; -3 -1 2; -2 1 2</code> is a 3 by 3. Fractions such as <code>-1/2</code> are entries like any other, and stay exact through every operation below.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>From a system to a matrix and back</h2></div><p>Four moves. The first two are where the meaning is fixed.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Put every equation in standard form</h3><p>Variables on the left in one agreed order, constant alone on the right. The order is a choice, and once made it binds every row.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write one row per equation, with a zero for every absent variable</h3><p>In an <span class="math" data-say="n">n</span>-variable system every row has <span class="math" data-say="n plus 1">n + 1</span> entries, without exception. A short row is a row that has lost its alignment.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Operate on rows only, one operation at a time</h3><p>Name the operation as you perform it: <span class="math" data-say="R 2 minus 2 R 1 goes to R 2">R2 − 2R1 → R2</span>. The row named after the arrow is the only row that changes, and the row read from is left exactly as it was.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Translate back before believing the answer</h3><p>A matrix is shorthand for equations. The answer is a triple, and it is checked by substituting into the original equations &mdash; not by admiring the final matrix.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>From a system to a matrix and back</h2>
+      <p class="lead-in">Four moves. The first two are where the meaning is fixed.</p>
+      <ol class="key-ideas method"><li><strong>Put every equation in standard form.</strong> Variables on the left in one agreed order, constant alone on the right. The order is a choice, and once made it binds every row.</li><li><strong>Write one row per equation, with a zero for every absent variable.</strong> In an <span class="math" data-say="n">n</span>-variable system every row has <span class="math" data-say="n plus 1">n + 1</span> entries, without exception. A short row is a row that has lost its alignment.</li><li><strong>Operate on rows only, one operation at a time.</strong> Name the operation as you perform it: <span class="math" data-say="R 2 minus 2 R 1 goes to R 2">R2 − 2R1 → R2</span>. The row named after the arrow is the only row that changes, and the row read from is left exactly as it was.</li><li><strong>Translate back before believing the answer.</strong> A matrix is shorthand for equations. The answer is a triple, and it is checked by substituting into the original equations &mdash; not by admiring the final matrix.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1510,16 @@ R3 +  R1 → R3      −1 + 1    = 0      2 + 1    =  3
                              0   3   5 | 21</div><p>The constant column takes part in every operation. <span class="math" data-say="9 minus 2 times 6 equals negative 3">9 − 2(6) = −3</span> is the right-hand side of <span class="math" data-say="E 2 minus 2 E 1">E2 − 2E1</span> from “Systems in Three Variables”, and omitting it is the commonest way to end up with a matrix that no longer represents the system it started as &mdash; a matrix which then reduces perfectly and reports a wrong triple.</p><p>Notice what the two operations achieved: the first column below the top row is now zero. That is <span class="math" data-say="x">x</span> eliminated, and it is the first column rather than the first variable only because of where it was written.</p><p>Faded rehearsal: write the augmented matrix for <span class="math" data-say="2 x minus z equals 5">2x − z = 5</span>, <span class="math" data-say="y plus 3 z equals negative 1">y + 3z = −1</span>, <span class="math" data-say="x plus 2 y equals 4">x + 2y = 4</span> in the column order <span class="math" data-say="x, y, z">x, y, z</span>. The first row begins <span class="math" data-say="2, 0, negative 1">2  0  −1</span>; supply every remaining zero and constant, then perform <span class="math" data-say="R 1 minus 2 R 3 goes to R 1">R1 − 2R3 → R1</span> on the whole row and translate the new first row back into an equation.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Leaving the constant column out of the operation</strong><span>A row operation applies to the whole row. Doubling <span class="math" data-say="2 negative 1 3, 9">2 −1 3 | 9</span> gives <span class="math" data-say="4 negative 2 6, 18">4 −2 6 | 18</span>, and a matrix whose left half was scaled and whose right half was not represents a system nobody asked about.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Building a row from an equation not in standard form</strong><span><span class="math" data-say="3 x equals 2 y plus 5">3x = 2y + 5</span> is not the row <span class="math" data-say="3 2, 5">3 2 | 5</span>. Until the variables are on the left in the agreed order and the constant is alone on the right, the positions do not mean what the matrix claims they mean.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Swapping columns</strong><span>Rows are equations and may be recombined freely. Columns are variables. Exchanging two columns silently renames two unknowns, and the numbers that emerge are attached to the wrong letters with no record of it anywhere on the page.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can translate both ways without thinking.</strong><p>Given a system, write its augmented matrix with every zero in place; given a matrix, write the system back. Then perform three row operations and name the inverse of each. If you cannot name the inverse, the step you performed was probably not one of the three.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Nothing has been gained yet: this is the same arithmetic in less ink. What it buys is “Gaussian Elimination”. With the letters gone there is an obvious order in which to do the operations &mdash; leftmost column first, then the next &mdash; and an order that obvious is an algorithm rather than a decision.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Leaving the constant column out of the operation</strong><span>A row operation applies to the whole row. Doubling <span class="math" data-say="2 negative 1 3, 9">2 −1 3 | 9</span> gives <span class="math" data-say="4 negative 2 6, 18">4 −2 6 | 18</span>, and a matrix whose left half was scaled and whose right half was not represents a system nobody asked about.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Building a row from an equation not in standard form</strong><span><span class="math" data-say="3 x equals 2 y plus 5">3x = 2y + 5</span> is not the row <span class="math" data-say="3 2, 5">3 2 | 5</span>. Until the variables are on the left in the agreed order and the constant is alone on the right, the positions do not mean what the matrix claims they mean.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Swapping columns</strong><span>Rows are equations and may be recombined freely. Columns are variables. Exchanging two columns silently renames two unknowns, and the numbers that emerge are attached to the wrong letters with no record of it anywhere on the page.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can translate both ways without thinking.</strong><p>Given a system, write its augmented matrix with every zero in place; given a matrix, write the system back. Then perform three row operations and name the inverse of each. If you cannot name the inverse, the step you performed was probably not one of the three.</p></div></div><div class="note"><strong>Note:</strong> Nothing has been gained yet: this is the same arithmetic in less ink. What it buys is “Gaussian Elimination”. With the letters gone there is an obvious order in which to do the operations &mdash; leftmost column first, then the next &mdash; and an order that obvious is an algorithm rather than a decision.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A matrix is bookkeeping, not a new idea</summary><p>Every row is an equation, every column is a variable, and the bar stands for the equals sign. Deleting the letters removes the one part of the page that was never doing any work.</p></details><details class="recall"><summary>Position carries all the meaning</summary><p>In the row <span class="math" data-say="2 negative 1 3, 9">2 −1 3 | 9</span> the <span class="math" data-say="negative 1">−1</span> means <span class="math" data-say="negative 1 y">−1y</span> because it sits in the second column and for no other reason. A missing term must be written as <span class="math" data-say="0">0</span>, and an equation not in standard form produces a row that means something other than the equation.</p></details><details class="recall"><summary>The three row operations are exactly the reversible ones</summary><p>Swap two rows; multiply a row by a nonzero number; add a multiple of one row to another. Each has an inverse of the same kind, and that is the whole reason the solution set survives them.</p></details></div>
+      <h3>Summary</h3>
       <p>An augmented matrix is a system with the variable names deleted: one row per equation, one column per variable, one column for the constants. The three row operations are the three things you were already doing to equations, and each of them is reversible.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A matrix is bookkeeping, not a new idea.</strong> Every row is an equation, every column is a variable, and the bar stands for the equals sign. Deleting the letters removes the one part of the page that was never doing any work.</li><li><strong>Position carries all the meaning.</strong> In the row <span class="math" data-say="2 negative 1 3, 9">2 −1 3 | 9</span> the <span class="math" data-say="negative 1">−1</span> means <span class="math" data-say="negative 1 y">−1y</span> because it sits in the second column and for no other reason. A missing term must be written as <span class="math" data-say="0">0</span>, and an equation not in standard form produces a row that means something other than the equation.</li><li><strong>The three row operations are exactly the reversible ones.</strong> Swap two rows; multiply a row by a nonzero number; add a multiple of one row to another. Each has an inverse of the same kind, and that is the whole reason the solution set survives them.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a table, shown on the page. negative x plus 2 y plus 4 z equals 15, negative 1, 2, 4, 15. R 1 if and only if R 2, kR 2 goes to R 2, k is not equal to 0, R 3 plus k R 1 goes to R 3" tabindex="0" role="region" aria-label="Mathematical notation"> x +  y +  z =  6            1   1   1 |  6
 2x −  y + 3z =  9      →     2  −1   3 |  9
 −x + 2y + 4z = 15           −1   2   4 | 15
@@ -3371,11 +3415,40 @@ R1 ↔ R2       kR2 → R2  (k ≠ 0)       R3 + kR1 → R3</div><figcaption>The
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3443,7 +3516,7 @@ R1 ↔ R2       kR2 → R2  (k ≠ 0)       R3 + kR1 → R3</div><figcaption>The
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

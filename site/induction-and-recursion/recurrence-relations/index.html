@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Induction and Recursion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Recurrences</p>
       <h1>Recurrence Relations</h1>
       <p class="lesson-lede">Sequences defined by their own earlier terms.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A recurrence plus initial conditions determines the sequence</li><li>Linear means the terms appear to the first power</li><li>Homogeneous means no standalone term</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Setting up a recurrence</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Recurrence relation</span><p>A <strong>recurrence relation</strong> expresses <span class="math" data-say="A sub n">aₙ</span> in terms of earlier terms of the sequence. Its <strong>order</strong> is how far back it reaches. <strong>Initial conditions</strong> supply the first terms outright.</p></div><div class="defbox"><span class="label">Definition &middot; Linear homogeneous with constant coefficients</span><p><span class="math" data-say="A sub n equals c sub 1 a sub n minus 1 plus c sub 2 a sub n minus 2, and so on, plus c sub k a sub n minus k">aₙ = c₁aₙ₋₁ + c₂aₙ₋₂ + ⋯ + c_k aₙ₋ₖ</span>, with the <span class="math" data-say="c sub i">cᵢ</span> constants and <span class="math" data-say="c sub k is not equal to 0">c_k ≠ 0</span>. <strong>Linear</strong>: terms appear to the first power and are not multiplied together. <strong>Homogeneous</strong>: no term without an <span class="math" data-say="A">a</span> in it.</p></div><h3>Building recurrences</h3><div class="example"><span class="label">Example &middot; Compound interest</span><p>A balance growing at <span class="math" data-say="r">r</span> per period: <span class="math" data-say="A sub n equals the quantity 1 plus r, times A sub n minus 1">aₙ = (1 + r)aₙ₋₁</span>, with <span class="math" data-say="A sub 0">a₀</span> the initial deposit. First order, linear, homogeneous, and its solution <span class="math" data-say="A sub 0 times the quantity 1 plus r, to the power n">a₀(1+r)ⁿ</span> is immediate.</p></div><div class="example"><span class="label">Example &middot; Tower of Hanoi</span><p><span class="math" data-say="H sub n equals 2 H sub n minus 1 plus 1">Hₙ = 2Hₙ₋₁ + 1</span>, <span class="math" data-say="H sub 1 equals 1">H₁ = 1</span>. First order, linear, <em>non</em>homogeneous &mdash; the <span class="math" data-say="plus 1">+1</span> is the single move of the largest disc, and it is what makes the answer <span class="math" data-say="2 to the power n minus 1">2ⁿ − 1</span> rather than a power of 2.</p></div><div class="example"><span class="label">Example &middot; Rabbits, or bit strings</span><p>Fibonacci <span class="math" data-say="F sub n equals F sub n minus 1 plus F sub n minus 2">Fₙ = Fₙ₋₁ + Fₙ₋₂</span> is second order, linear, homogeneous. It counts more than rabbits: the number of binary strings of length <span class="math" data-say="n">n</span> with no two consecutive 1s satisfies it too, because such a string either ends in 0 (any valid string of length <span class="math" data-say="n minus 1">n−1</span>) or in 01 (any valid string of length <span class="math" data-say="n minus 2">n−2</span>).</p></div><p>That derivation is the model for setting up a counting recurrence: split the objects by their last piece, and each part is counted by a smaller instance of the same problem. Getting the split right &mdash; exhaustive and non-overlapping &mdash; is the whole task.</p><div class="example"><span class="label">Example &middot; Codewords</span><p>How many strings of length <span class="math" data-say="n">n</span> over <span class="math" data-say="the set 0, 1, 2">{0,1,2}</span> contain an even number of 0s? Let <span class="math" data-say="A sub n">aₙ</span> be that count. A valid string of length <span class="math" data-say="n">n</span> is a valid string of length <span class="math" data-say="n minus 1">n−1</span> followed by 1 or 2, or an <em>invalid</em> one followed by 0. Since there are <span class="math" data-say="3 to the power n minus 1">3ⁿ⁻¹</span> strings in total, <span class="math" data-say="A sub n equals 2 a sub n minus 1 plus 3 to the power n minus 1 minus A sub n minus 1 equals A sub n minus 1 plus 3 to the power n minus 1">aₙ = 2aₙ₋₁ + (3ⁿ⁻¹ − aₙ₋₁) = aₙ₋₁ + 3ⁿ⁻¹</span>, with <span class="math" data-say="A sub 1 equals 2">a₁ = 2</span>. Nonhomogeneous, with <span class="math" data-say="f of n equals 3 to the power n minus 1">f(n) = 3ⁿ⁻¹</span>.</p></div><h3>Iteration: solving by unrolling</h3><p>Before any technique, a recurrence can often be solved by unrolling it and spotting the pattern &mdash; then proving the guess by induction. That last step is not optional: unrolling produces a conjecture.</p><div class="mathblock" data-say="H sub n equals 2 H sub n minus 1 plus 1. equals 2 times the quantity 2 H sub n minus 2 plus 1, plus 1, equals 4 H sub n minus 2 plus 2 plus 1. equals 4 times the quantity 2 H sub n minus 3 plus 1, plus 3, equals 8 H sub n minus 3 plus 4 plus 2 plus 1. and so on. equals 2 to the power n minus 1 H sub 1 plus 2 to the power n minus 2, and so on, plus 2 plus 1. equals 2 to the power n minus 1 plus 2 to the power n minus 1 minus 1, equals 2 to the power n minus 1" tabindex="0" role="region" aria-label="Mathematical notation">Hₙ = 2Hₙ₋₁ + 1
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Setting up a recurrence</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Recurrence relation</span><p>A <strong>recurrence relation</strong> expresses <span class="math" data-say="A sub n">aₙ</span> in terms of earlier terms of the sequence. Its <strong>order</strong> is how far back it reaches. <strong>Initial conditions</strong> supply the first terms outright.</p></div><div class="defbox"><span class="label">Definition &middot; Linear homogeneous with constant coefficients</span><p><span class="math" data-say="A sub n equals c sub 1 a sub n minus 1 plus c sub 2 a sub n minus 2, and so on, plus c sub k a sub n minus k">aₙ = c₁aₙ₋₁ + c₂aₙ₋₂ + ⋯ + c_k aₙ₋ₖ</span>, with the <span class="math" data-say="c sub i">cᵢ</span> constants and <span class="math" data-say="c sub k is not equal to 0">c_k ≠ 0</span>. <strong>Linear</strong>: terms appear to the first power and are not multiplied together. <strong>Homogeneous</strong>: no term without an <span class="math" data-say="A">a</span> in it.</p></div><h3>Building recurrences</h3><div class="example"><span class="label">Example &middot; Compound interest</span><p>A balance growing at <span class="math" data-say="r">r</span> per period: <span class="math" data-say="A sub n equals the quantity 1 plus r, times A sub n minus 1">aₙ = (1 + r)aₙ₋₁</span>, with <span class="math" data-say="A sub 0">a₀</span> the initial deposit. First order, linear, homogeneous, and its solution <span class="math" data-say="A sub 0 times the quantity 1 plus r, to the power n">a₀(1+r)ⁿ</span> is immediate.</p></div><div class="example"><span class="label">Example &middot; Tower of Hanoi</span><p><span class="math" data-say="H sub n equals 2 H sub n minus 1 plus 1">Hₙ = 2Hₙ₋₁ + 1</span>, <span class="math" data-say="H sub 1 equals 1">H₁ = 1</span>. First order, linear, <em>non</em>homogeneous &mdash; the <span class="math" data-say="plus 1">+1</span> is the single move of the largest disc, and it is what makes the answer <span class="math" data-say="2 to the power n minus 1">2ⁿ − 1</span> rather than a power of 2.</p></div><div class="example"><span class="label">Example &middot; Rabbits, or bit strings</span><p>Fibonacci <span class="math" data-say="F sub n equals F sub n minus 1 plus F sub n minus 2">Fₙ = Fₙ₋₁ + Fₙ₋₂</span> is second order, linear, homogeneous. It counts more than rabbits: the number of binary strings of length <span class="math" data-say="n">n</span> with no two consecutive 1s satisfies it too, because such a string either ends in 0 (any valid string of length <span class="math" data-say="n minus 1">n−1</span>) or in 01 (any valid string of length <span class="math" data-say="n minus 2">n−2</span>).</p></div><p>That derivation is the model for setting up a counting recurrence: split the objects by their last piece, and each part is counted by a smaller instance of the same problem. Getting the split right &mdash; exhaustive and non-overlapping &mdash; is the whole task.</p><div class="example"><span class="label">Example &middot; Codewords</span><p>How many strings of length <span class="math" data-say="n">n</span> over <span class="math" data-say="the set 0, 1, 2">{0,1,2}</span> contain an even number of 0s? Let <span class="math" data-say="A sub n">aₙ</span> be that count. A valid string of length <span class="math" data-say="n">n</span> is a valid string of length <span class="math" data-say="n minus 1">n−1</span> followed by 1 or 2, or an <em>invalid</em> one followed by 0. Since there are <span class="math" data-say="3 to the power n minus 1">3ⁿ⁻¹</span> strings in total, <span class="math" data-say="A sub n equals 2 a sub n minus 1 plus 3 to the power n minus 1 minus A sub n minus 1 equals A sub n minus 1 plus 3 to the power n minus 1">aₙ = 2aₙ₋₁ + (3ⁿ⁻¹ − aₙ₋₁) = aₙ₋₁ + 3ⁿ⁻¹</span>, with <span class="math" data-say="A sub 1 equals 2">a₁ = 2</span>. Nonhomogeneous, with <span class="math" data-say="f of n equals 3 to the power n minus 1">f(n) = 3ⁿ⁻¹</span>.</p></div><h3>Iteration: solving by unrolling</h3><p>Before any technique, a recurrence can often be solved by unrolling it and spotting the pattern &mdash; then proving the guess by induction. That last step is not optional: unrolling produces a conjecture.</p><div class="mathblock" data-say="H sub n equals 2 H sub n minus 1 plus 1. equals 2 times the quantity 2 H sub n minus 2 plus 1, plus 1, equals 4 H sub n minus 2 plus 2 plus 1. equals 4 times the quantity 2 H sub n minus 3 plus 1, plus 3, equals 8 H sub n minus 3 plus 4 plus 2 plus 1. and so on. equals 2 to the power n minus 1 H sub 1 plus 2 to the power n minus 2, and so on, plus 2 plus 1. equals 2 to the power n minus 1 plus 2 to the power n minus 1 minus 1, equals 2 to the power n minus 1" tabindex="0" role="region" aria-label="Mathematical notation">Hₙ = 2Hₙ₋₁ + 1
    = 2(2Hₙ₋₂ + 1) + 1      = 4Hₙ₋₂ + 2 + 1
    = 4(2Hₙ₋₃ + 1) + 3      = 8Hₙ₋₃ + 4 + 2 + 1
    …
    = 2ⁿ⁻¹H₁ + (2ⁿ⁻² + … + 2 + 1)
-   = 2ⁿ⁻¹ + 2ⁿ⁻¹ − 1       = 2ⁿ − 1</div><p>The geometric sum from “Induction with Sums and Products” finished it. Unrolling works well for first-order recurrences and becomes unmanageable for higher orders, which is why “Solving Linear Recurrences” exists.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Recurrence and closed form</h2></div><p>Iterated and solved, then compared</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   = 2ⁿ⁻¹ + 2ⁿ⁻¹ − 1       = 2ⁿ − 1</div><p>The geometric sum from “Induction with Sums and Products” finished it. Unrolling works well for first-order recurrences and becomes unmanageable for higher orders, which is why “Solving Linear Recurrences” exists.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Recurrence and closed form</h2></div><p>Iterated and solved, then compared</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>a<sub>n</sub> = c₁·a<sub>n−1</sub> + c₂·a<sub>n−2</sub> + f(n)</strong><span id="recCaption"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>iterated</span><span class="tone-purple"><i class="legend-swatch"></i>closed form</span></div>
@@ -1411,10 +1454,10 @@
         <div class="table-wrap" style="margin-top:10px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="recTable"></table></div>
       </div>
       <div class="status-banner" id="recStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set up, unroll, compare</h3>
-          <p>Each preset shows the recurrence unrolled beside its closed form. The note under the status line explains where the closed form came from &mdash; which is “Solving Linear Recurrences” and “Divide-and-Conquer Recurrences”. The Tower of Hanoi here starts at <span class="math" data-say="A sub 0 equals 0">a₀ = 0</span> rather than the lesson's <span class="math" data-say="H sub 1 equals 1">H₁ = 1</span> and agrees from <span class="math" data-say="A sub 1">a₁</span> on. Then select <span class="math" data-say="A sub n equals A sub n minus 1 plus n">aₙ = aₙ₋₁ + n</span>: it unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its closed form is the first identity of “Induction with Sums and Products” arrived at from the other direction.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set up, unroll, compare</h3>
+            <p>Each preset shows the recurrence unrolled beside its closed form. The note under the status line explains where the closed form came from &mdash; which is “Solving Linear Recurrences” and “Divide-and-Conquer Recurrences”. The Tower of Hanoi here starts at <span class="math" data-say="A sub 0 equals 0">a₀ = 0</span> rather than the lesson's <span class="math" data-say="H sub 1 equals 1">H₁ = 1</span> and agrees from <span class="math" data-say="A sub 1">a₁</span> on. Then select <span class="math" data-say="A sub n equals A sub n minus 1 plus n">aₙ = aₙ₋₁ + n</span>: it unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its closed form is the first identity of “Induction with Sums and Products” arrived at from the other direction.</p>
         <div class="field">
           <label for="recPreset">Recurrence</label>
           <select id="recPreset">
@@ -1435,12 +1478,14 @@
           <label>Closed form</label>
           <div class="mathblock" id="recClosed" style="font-size:0.84rem;" tabindex="0" role="region" aria-label="Mathematical notation"></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Setting up a recurrence</h2></div><p>Find the last decision; everything before it is a smaller instance.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Define <span class="math" data-say="A sub n">aₙ</span> precisely</h3><p>"The number of …of length <span class="math" data-say="n">n</span>". A vague definition produces a recurrence that counts something else.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Split by the last piece</h3><p>Classify the objects by their final element or final move. Each class should correspond to a smaller instance.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the split is exhaustive and non-overlapping</h3><p>Every object in exactly one class. Overlap double-counts; a gap undercounts, and neither shows up until the numbers are wrong.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Supply as many initial conditions as the order</h3><p>A second-order recurrence needs two, and computing them by hand from the definition is where off-by-one errors surface.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Setting up a recurrence</h2>
+      <p class="lead-in">Find the last decision; everything before it is a smaller instance.</p>
+      <ol class="key-ideas method"><li><strong>Define <span class="math" data-say="A sub n">aₙ</span> precisely.</strong> "The number of …of length <span class="math" data-say="n">n</span>". A vague definition produces a recurrence that counts something else.</li><li><strong>Split by the last piece.</strong> Classify the objects by their final element or final move. Each class should correspond to a smaller instance.</li><li><strong>Check the split is exhaustive and non-overlapping.</strong> Every object in exactly one class. Overlap double-counts; a gap undercounts, and neither shows up until the numbers are wrong.</li><li><strong>Supply as many initial conditions as the order.</strong> A second-order recurrence needs two, and computing them by hand from the definition is where off-by-one errors surface.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1512,16 @@ Initial conditions, by listing:
 Sequence: 2, 3, 5, 8, 13, 21, 34 …   = Fₙ₊₂</div><p>Same recurrence as Fibonacci, different initial conditions, so the sequence is shifted. That is the general situation: the recurrence determines the shape of the solution and the initial conditions select which one, which is exactly what “Solving Linear Recurrences” formalises.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Overlapping cases in the split</strong><span>Strings counted in two classes are counted twice. Check by listing the small cases and comparing with the recurrence's prediction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Wrong number of initial conditions</strong><span>Order <span class="math" data-say="k">k</span> needs <span class="math" data-say="k">k</span> of them. Fewer leaves the sequence undetermined; more may be inconsistent with the recurrence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an unrolled pattern as proved</strong><span>Unrolling produces a conjecture. The induction proof is what turns it into a solution, and “Cases, Counterexamples, and Writing a Proof” in Logic and Proof explains why that step is not a formality.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can derive a recurrence and verify its first terms by hand.</strong><p>Find a recurrence for the number of ways to tile a <span class="math" data-say="2 times n">2 × n</span> strip with <span class="math" data-say="1 times 2">1 × 2</span> dominoes, and check <span class="math" data-say="A sub 1">a₁</span> through <span class="math" data-say="A sub 4">a₄</span> by drawing them. You should get Fibonacci again, which is worth understanding rather than noticing.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Recurrences are the discrete counterpart of differential equations, and the solution methods parallel each other closely: characteristic equations, homogeneous plus particular solutions, and the same trouble when a root of the characteristic equation collides with the forcing term.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Overlapping cases in the split</strong><span>Strings counted in two classes are counted twice. Check by listing the small cases and comparing with the recurrence's prediction.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Wrong number of initial conditions</strong><span>Order <span class="math" data-say="k">k</span> needs <span class="math" data-say="k">k</span> of them. Fewer leaves the sequence undetermined; more may be inconsistent with the recurrence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating an unrolled pattern as proved</strong><span>Unrolling produces a conjecture. The induction proof is what turns it into a solution, and “Cases, Counterexamples, and Writing a Proof” in Logic and Proof explains why that step is not a formality.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can derive a recurrence and verify its first terms by hand.</strong><p>Find a recurrence for the number of ways to tile a <span class="math" data-say="2 times n">2 × n</span> strip with <span class="math" data-say="1 times 2">1 × 2</span> dominoes, and check <span class="math" data-say="A sub 1">a₁</span> through <span class="math" data-say="A sub 4">a₄</span> by drawing them. You should get Fibonacci again, which is worth understanding rather than noticing.</p></div></div><div class="note"><strong>Note:</strong> Recurrences are the discrete counterpart of differential equations, and the solution methods parallel each other closely: characteristic equations, homogeneous plus particular solutions, and the same trouble when a root of the characteristic equation collides with the forcing term.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A recurrence plus initial conditions determines the sequence</summary><p>Order <span class="math" data-say="k">k</span> needs <span class="math" data-say="k">k</span> initial values. With them every term is determined; without them the recurrence describes a family.</p></details><details class="recall"><summary>Linear means the terms appear to the first power</summary><p><span class="math" data-say="A sub n equals 2 a sub n minus 1 plus 3 a sub n minus 2">aₙ = 2aₙ₋₁ + 3aₙ₋₂</span> is linear. <span class="math" data-say="A sub n equals A sub n minus 1 squared">aₙ = aₙ₋₁²</span> and <span class="math" data-say="A sub n equals A sub n minus 1 times A sub n minus 2">aₙ = aₙ₋₁ · aₙ₋₂</span> are not, and the techniques of “Solving Linear Recurrences” do not apply to them.</p></details><details class="recall"><summary>Homogeneous means no standalone term</summary><p>The <span class="math" data-say="plus f of n">+ f(n)</span> in a nonhomogeneous recurrence is what makes the Tower of Hanoi <span class="math" data-say="2 a sub n minus 1 plus 1">2aₙ₋₁ + 1</span> rather than <span class="math" data-say="2 a sub n minus 1">2aₙ₋₁</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>A recurrence gives each term from previous ones. Setting one up is modelling; solving it means finding a closed form. This lesson does the first and prepares the second.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A recurrence plus initial conditions determines the sequence.</strong> Order <span class="math" data-say="k">k</span> needs <span class="math" data-say="k">k</span> initial values. With them every term is determined; without them the recurrence describes a family.</li><li><strong>Linear means the terms appear to the first power.</strong> <span class="math" data-say="A sub n equals 2 a sub n minus 1 plus 3 a sub n minus 2">aₙ = 2aₙ₋₁ + 3aₙ₋₂</span> is linear. <span class="math" data-say="A sub n equals A sub n minus 1 squared">aₙ = aₙ₋₁²</span> and <span class="math" data-say="A sub n equals A sub n minus 1 times A sub n minus 2">aₙ = aₙ₋₁ · aₙ₋₂</span> are not, and the techniques of “Solving Linear Recurrences” do not apply to them.</li><li><strong>Homogeneous means no standalone term.</strong> The <span class="math" data-say="plus f of n">+ f(n)</span> in a nonhomogeneous recurrence is what makes the Tower of Hanoi <span class="math" data-say="2 a sub n minus 1 plus 1">2aₙ₋₁ + 1</span> rather than <span class="math" data-say="2 a sub n minus 1">2aₙ₋₁</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="linear homogeneous, order k, a sub n equals c sub 1 a sub n minus 1, and so on, plus c sub k a sub n minus k. nonhomogeneous, and so on plus f of n. k initial conditions determine the sequence completely. solving equals finding a formula for a sub n that does not mention earlier terms" tabindex="0" role="region" aria-label="Mathematical notation">linear homogeneous, order k:   aₙ = c₁aₙ₋₁ + … + c_k aₙ₋ₖ
 nonhomogeneous:                 … + f(n)
 k initial conditions determine the sequence completely
@@ -1944,11 +1988,40 @@ solving = finding a formula for aₙ that does not mention earlier terms</div><f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2016,7 +2089,7 @@ solving = finding a formula for aₙ that does not mention earlier terms</div><f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

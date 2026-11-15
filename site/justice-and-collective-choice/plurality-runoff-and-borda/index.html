@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,41 +1424,35 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Justice and Collective Choice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Collective choice</p>
       <h1>Plurality, Runoff and Borda</h1>
       <p class="lesson-lede">One set of ballots, four counting rules, and more than one winner.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Plurality reads only the top</li><li>Runoff rules count first places more than once</li><li>Borda reads every position</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four counts of one profile</h2>
-      <article class="prose reading"><p>The previous lesson asked whether majorities can be assembled into a ranking and found that sometimes they cannot. Real elections need a winner anyway, and the rules in use answer in different ways. The way to compare them is to hold the ballots fixed and change only the rule.</p><p>Take nine voters and three candidates. Four voters rank them <span class="math" data-say="A B C">A B C</span>, three rank them <span class="math" data-say="B C A">B C A</span>, and two rank them <span class="math" data-say="C B A">C B A</span>.</p><div class="mathblock" data-say="voters, first, second, third. 4, A, B, C. 3, B, C, A. 2, C, B, A" tabindex="0" role="region" aria-label="Mathematical notation">     voters   first   second   third
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four counts of one profile</h2><div class="prose reading"><p>The previous lesson asked whether majorities can be assembled into a ranking and found that sometimes they cannot. Real elections need a winner anyway, and the rules in use answer in different ways. The way to compare them is to hold the ballots fixed and change only the rule.</p><p>Take nine voters and three candidates. Four voters rank them <span class="math" data-say="A B C">A B C</span>, three rank them <span class="math" data-say="B C A">B C A</span>, and two rank them <span class="math" data-say="C B A">C B A</span>.</p><div class="mathblock" data-say="voters, first, second, third. 4, A, B, C. 3, B, C, A. 2, C, B, A" tabindex="0" role="region" aria-label="Mathematical notation">     voters   first   second   third
      4        A       B        C
      3        B       C        A
-     2        C       B        A</div><p><strong>Plurality</strong> reads the first column. <span class="math" data-say="A">A</span> has <span class="math" data-say="4">4</span> first places, <span class="math" data-say="B">B</span> has <span class="math" data-say="3">3</span> and <span class="math" data-say="C">C</span> has <span class="math" data-say="2">2</span>, so <span class="math" data-say="A">A</span> wins with fewer than half the voters. The <strong>two-round runoff</strong> keeps <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>, the two with the most first places, and asks the voters to choose between them using their whole ballots: <span class="math" data-say="4">4</span> rank <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span> and <span class="math" data-say="5">5</span> rank <span class="math" data-say="B">B</span> above <span class="math" data-say="A">A</span>, so <span class="math" data-say="B">B</span> wins. <strong>Instant runoff</strong> reaches the same place by another road. <span class="math" data-say="C">C</span> has the fewest first places and is removed, its two ballots pass to their next choice, which is <span class="math" data-say="B">B</span>, and <span class="math" data-say="B">B</span> holds <span class="math" data-say="5">5</span> of the <span class="math" data-say="9">9</span> ballots.</p><p>The <strong>Borda count</strong> does not eliminate anyone. Each ballot gives <span class="math" data-say="2">2</span>, <span class="math" data-say="1">1</span> and <span class="math" data-say="0">0</span> points down the ranking, and the voters' points are summed. The sums below are the arithmetic the lab leaves to you; it prints the winner.</p><div class="mathblock" data-say="A, B, C. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">              A     B     C
-     4 voters   8     4     0
-     3 voters   0     6     3
-     2 voters   0     2     4
-     total      8     12    7</div><p><span class="math" data-say="B">B</span> wins the Borda count with <span class="math" data-say="12">12</span> points against <span class="math" data-say="8">8</span> and <span class="math" data-say="7">7</span>. <span class="math" data-say="B">B</span> is also the Condorcet winner: it beats <span class="math" data-say="A">A</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span> and <span class="math" data-say="C">C</span> by <span class="math" data-say="7">7</span> to <span class="math" data-say="2">2</span>. So three of the four counts elect <span class="math" data-say="B">B</span>, and plurality is the one that elects <span class="math" data-say="A">A</span>, a candidate who loses the head-to-head contest with <span class="math" data-say="B">B</span>.</p><h3>Three rules, three winners</h3><p>Change one ballot group. Let four voters rank the candidates <span class="math" data-say="A C B">A C B</span>, three <span class="math" data-say="B C A">B C A</span> and two <span class="math" data-say="C B A">C B A</span>. Plurality still elects <span class="math" data-say="A">A</span>, with <span class="math" data-say="4">4</span> first places against <span class="math" data-say="3">3</span> and <span class="math" data-say="2">2</span>. The runoff and instant runoff elect <span class="math" data-say="B">B</span>: <span class="math" data-say="A">A</span> meets <span class="math" data-say="B">B</span> and loses <span class="math" data-say="4">4</span> to <span class="math" data-say="5">5</span>, and <span class="math" data-say="C">C</span> is removed first. The Borda count elects <span class="math" data-say="C">C</span>, with <span class="math" data-say="11">11</span> points against <span class="math" data-say="8">8</span> and <span class="math" data-say="8">8</span>. <span class="math" data-say="C">C</span> is also the Condorcet winner, beating <span class="math" data-say="A">A</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span> and <span class="math" data-say="B">B</span> by <span class="math" data-say="6">6</span> to <span class="math" data-say="3">3</span>.</p><p>Three different counts, three different winners, from nine ballots. <span class="math" data-say="C">C</span> is never ranked last by anyone, and it is eliminated in the first round of both runoff rules because only two voters put it first. Nothing in the ballots has changed between the rules; what changed is which part of the ballots each rule looks at.</p><h3>What each rule is counting</h3><ul><li>Plurality counts <strong>enthusiasm</strong>: how many voters would be delighted. It cannot see how the others feel.</li><li>The runoffs count <strong>strength against the strongest rival</strong>, but only after first places have chosen who the rivals are.</li><li>Borda counts <strong>average standing</strong>: who is placed high by most voters, whether or not first.</li><li>The Condorcet rule counts <strong>victories</strong>: who beats every other candidate by majority, when anyone does.</li></ul><p>The lab runs these on the profile you type, with the winner under the chosen rule, the Condorcet result and the table of pairwise counts. It reports a tie as a tie. It scores Borda as <span class="math" data-say="2">2</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="0">0</span> for three candidates and with the matching run of points for more, and it takes every ballot as the voter's real ranking; whether voters would rank the same way under a different rule is the question of “Strategic Voting and Manipulation”.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+     2        C       B        A</div><p><strong>Plurality</strong> reads the first column. <span class="math" data-say="A">A</span> has <span class="math" data-say="4">4</span> first places, <span class="math" data-say="B">B</span> has <span class="math" data-say="3">3</span> and <span class="math" data-say="C">C</span> has <span class="math" data-say="2">2</span>, so <span class="math" data-say="A">A</span> wins with fewer than half the voters. The <strong>two-round runoff</strong> keeps <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span>, the two with the most first places, and asks the voters to choose between them using their whole ballots: <span class="math" data-say="4">4</span> rank <span class="math" data-say="A">A</span> above <span class="math" data-say="B">B</span> and <span class="math" data-say="5">5</span> rank <span class="math" data-say="B">B</span> above <span class="math" data-say="A">A</span>, so <span class="math" data-say="B">B</span> wins. <strong>Instant runoff</strong> reaches the same place by another road. <span class="math" data-say="C">C</span> has the fewest first places and is removed, its two ballots pass to their next choice, which is <span class="math" data-say="B">B</span>, and <span class="math" data-say="B">B</span> holds <span class="math" data-say="5">5</span> of the <span class="math" data-say="9">9</span> ballots.</p><p>The <strong>Borda count</strong> does not eliminate anyone. Each ballot gives <span class="math" data-say="2">2</span>, <span class="math" data-say="1">1</span> and <span class="math" data-say="0">0</span> points down the ranking, and the voters' points are summed. The sums below are the arithmetic the lab leaves to you; it prints the winner.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>From individual verdicts to a group's</strong><span>every winner recomputed from the profile as typed</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="voTable"></table></div>
       <div class="status-banner" id="voStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Run a rule on the profile</h3>
-          <p>A profile reads count: best to worst, groups separated by semicolons. Choose the rule below the profile; in the table each cell counts the voters who prefer the row candidate to the column candidate.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Run a rule on the profile</h3>
+            <p>A profile reads count: best to worst, groups separated by semicolons. Choose the rule below the profile; in the table each cell counts the voters who prefer the row candidate to the column candidate.</p>
         <div class="field">
           <label for="voPreset">Worked example</label>
           <select id="voPreset"><option value="most-firsts" selected>Nine voters, A has the most first places</option><option value="three-winners">Nine voters, C ranked last by nobody</option><option value="spoiler">Nine voters, two similar candidates and one rival</option></select>
@@ -1443,12 +1482,19 @@
           <div class="kpi"><span>One vote decisive</span><strong id="voPivot">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="A, B, C. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">              A     B     C
+     4 voters   8     4     0
+     3 voters   0     6     3
+     2 voters   0     2     4
+     total      8     12    7</div><p><span class="math" data-say="B">B</span> wins the Borda count with <span class="math" data-say="12">12</span> points against <span class="math" data-say="8">8</span> and <span class="math" data-say="7">7</span>. <span class="math" data-say="B">B</span> is also the Condorcet winner: it beats <span class="math" data-say="A">A</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span> and <span class="math" data-say="C">C</span> by <span class="math" data-say="7">7</span> to <span class="math" data-say="2">2</span>. So three of the four counts elect <span class="math" data-say="B">B</span>, and plurality is the one that elects <span class="math" data-say="A">A</span>, a candidate who loses the head-to-head contest with <span class="math" data-say="B">B</span>.</p><h3>Three rules, three winners</h3><p>Change one ballot group. Let four voters rank the candidates <span class="math" data-say="A C B">A C B</span>, three <span class="math" data-say="B C A">B C A</span> and two <span class="math" data-say="C B A">C B A</span>. Plurality still elects <span class="math" data-say="A">A</span>, with <span class="math" data-say="4">4</span> first places against <span class="math" data-say="3">3</span> and <span class="math" data-say="2">2</span>. The runoff and instant runoff elect <span class="math" data-say="B">B</span>: <span class="math" data-say="A">A</span> meets <span class="math" data-say="B">B</span> and loses <span class="math" data-say="4">4</span> to <span class="math" data-say="5">5</span>, and <span class="math" data-say="C">C</span> is removed first. The Borda count elects <span class="math" data-say="C">C</span>, with <span class="math" data-say="11">11</span> points against <span class="math" data-say="8">8</span> and <span class="math" data-say="8">8</span>. <span class="math" data-say="C">C</span> is also the Condorcet winner, beating <span class="math" data-say="A">A</span> by <span class="math" data-say="5">5</span> to <span class="math" data-say="4">4</span> and <span class="math" data-say="B">B</span> by <span class="math" data-say="6">6</span> to <span class="math" data-say="3">3</span>.</p><p>Three different counts, three different winners, from nine ballots. <span class="math" data-say="C">C</span> is never ranked last by anyone, and it is eliminated in the first round of both runoff rules because only two voters put it first. Nothing in the ballots has changed between the rules; what changed is which part of the ballots each rule looks at.</p><h3>What each rule is counting</h3><ul><li>Plurality counts <strong>enthusiasm</strong>: how many voters would be delighted. It cannot see how the others feel.</li><li>The runoffs count <strong>strength against the strongest rival</strong>, but only after first places have chosen who the rivals are.</li><li>Borda counts <strong>average standing</strong>: who is placed high by most voters, whether or not first.</li><li>The Condorcet rule counts <strong>victories</strong>: who beats every other candidate by majority, when anyone does.</li></ul><p>The lab runs these on the profile you type, with the winner under the chosen rule, the Condorcet result and the table of pairwise counts. It reports a tie as a tie. It scores Borda as <span class="math" data-say="2">2</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="0">0</span> for three candidates and with the matching run of points for more, and it takes every ballot as the voter's real ranking; whether voters would rank the same way under a different rule is the question of “Strategic Voting and Manipulation”.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running four rules on one profile</h2></div><p>Five moves, in this order, for any profile of three candidates. Keep the profile table in front of you throughout.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the profile as a table of rankings with counts</h3><p>One row per ranking, best to worst, with the number of voters who hold it. Check that the counts add up to the electorate.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Plurality: count the first column</h3><p>Add the counts of the rows that begin with each candidate. The largest total wins, however small a share of the voters it is.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Runoff: take the top two, then count whole ballots</h3><p>The two candidates with the most first places meet. For each row, see which of the two it ranks higher, and add the counts. Instant runoff instead removes the candidate with the fewest first places and moves those rows to their next choice.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Borda: give each row <span class="math" data-say="2">2</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="0">0</span> and sum</h3><p>Multiply a row's points by its count for each candidate, then add down the column. The largest total wins.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare with the Condorcet winner</h3><p>Count each pair of candidates. If one candidate beats both others it is the Condorcet winner, and each rule can now be described by whether it elected that candidate.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running four rules on one profile</h2>
+      <p class="lead-in">Five moves, in this order, for any profile of three candidates. Keep the profile table in front of you throughout.</p>
+      <ol class="key-ideas method"><li><strong>Write the profile as a table of rankings with counts.</strong> One row per ranking, best to worst, with the number of voters who hold it. Check that the counts add up to the electorate.</li><li><strong>Plurality: count the first column.</strong> Add the counts of the rows that begin with each candidate. The largest total wins, however small a share of the voters it is.</li><li><strong>Runoff: take the top two, then count whole ballots.</strong> The two candidates with the most first places meet. For each row, see which of the two it ranks higher, and add the counts. Instant runoff instead removes the candidate with the fewest first places and moves those rows to their next choice.</li><li><strong>Borda: give each row <span class="math" data-say="2">2</span>, <span class="math" data-say="1">1</span>, <span class="math" data-say="0">0</span> and sum.</strong> Multiply a row's points by its count for each candidate, then add down the column. The largest total wins.</li><li><strong>Compare with the Condorcet winner.</strong> Count each pair of candidates. If one candidate beats both others it is the Condorcet winner, and each rule can now be described by whether it elected that candidate.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ Borda       A 8, B 12, C 7              -&gt; B
 Condorcet   B beats A 5-4, C 7-2        -&gt; B</div><p>Plurality elects a candidate who loses a head-to-head contest with the Condorcet winner. The first column of a ballot is a small part of what the voter thinks, and a rule that reads only that part can disagree with every rule that reads more.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the most first choices as the people&#x27;s choice</strong><span>With three voters at A B C, two at B A C and four at C A B, C has the most first places, 4 against 3 and 2, and five of the nine voters rank C last. A beats C by 5 to 4 and B by 7 to 2. The first-place count measures how many voters are enthusiastic, and it says nothing about how the rest rank the winner, so a lead of 4 in 9 can be a majority's last choice.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Speaking of the winner without naming the rule</strong><span>With four voters at A C B, three at B C A and two at C B A, plurality elects A, the runoff elects B and Borda elects C. &ldquo;The winner&rdquo; is a statement about a profile and a rule together, and the same nine ballots give three answers to it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a runoff to rescue the Condorcet winner</strong><span>In that same profile C is the Condorcet winner, beating A by 5 to 4 and B by 6 to 3, and both runoff rules eliminate it in the first round because only two voters put it first. A runoff lets first places decide who may reach the contest, so a candidate everyone finds acceptable but few adore never gets to it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run plurality, runoff, instant runoff and Borda on a three-candidate profile and say what each counts.</strong><p>Given a profile with counts, compute each rule's winner by hand, find the Condorcet winner, and name a profile on which three of the rules elect three different candidates.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Change the rule below the profile and watch the winner move while the table of pairwise counts stays put: the counts belong to the ballots and the winner belongs to the rule. Then take the spoiler profile and move one voter from C A B to B A C, and the plurality count becomes a three-way tie.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the most first choices as the people&#x27;s choice</strong><span>With three voters at A B C, two at B A C and four at C A B, C has the most first places, 4 against 3 and 2, and five of the nine voters rank C last. A beats C by 5 to 4 and B by 7 to 2. The first-place count measures how many voters are enthusiastic, and it says nothing about how the rest rank the winner, so a lead of 4 in 9 can be a majority's last choice.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Speaking of the winner without naming the rule</strong><span>With four voters at A C B, three at B C A and two at C B A, plurality elects A, the runoff elects B and Borda elects C. &ldquo;The winner&rdquo; is a statement about a profile and a rule together, and the same nine ballots give three answers to it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a runoff to rescue the Condorcet winner</strong><span>In that same profile C is the Condorcet winner, beating A by 5 to 4 and B by 6 to 3, and both runoff rules eliminate it in the first round because only two voters put it first. A runoff lets first places decide who may reach the contest, so a candidate everyone finds acceptable but few adore never gets to it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run plurality, runoff, instant runoff and Borda on a three-candidate profile and say what each counts.</strong><p>Given a profile with counts, compute each rule's winner by hand, find the Condorcet winner, and name a profile on which three of the rules elect three different candidates.</p></div></div><div class="note"><strong>Note:</strong> Change the rule below the profile and watch the winner move while the table of pairwise counts stays put: the counts belong to the ballots and the winner belongs to the rule. Then take the spoiler profile and move one voter from C A B to B A C, and the plurality count becomes a three-way tie.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Plurality reads only the top</summary><p>Each ballot counts once, for its first choice. The candidate with the most first places wins, with a majority or without one, and the rest of every ballot is ignored.</p></details><details class="recall"><summary>Runoff rules count first places more than once</summary><p>The two-round runoff keeps the two candidates with the most first places and lets the voters choose between them. Instant runoff removes the candidate with the fewest first places, passes those ballots to their next choice, and repeats until someone holds a majority.</p></details><details class="recall"><summary>Borda reads every position</summary><p>With three candidates a ballot gives <span class="math" data-say="2">2</span> points to its first choice, <span class="math" data-say="1">1</span> to its second and <span class="math" data-say="0">0</span> to its last, and the points are added over all ballots. A candidate who is rarely ranked low can win without being ranked first often.</p></details></div>
+      <h3>Summary</h3>
       <p>Plurality counts first places. The two-round runoff counts first places and then holds a head-to-head contest, instant runoff removes one candidate at a time, and the Borda count adds points for every position on every ballot. Run on one profile they can elect different candidates, and each answers a different question about the voters. The wrong model is that the candidate with the most first choices is the people's choice.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Plurality reads only the top.</strong> Each ballot counts once, for its first choice. The candidate with the most first places wins, with a majority or without one, and the rest of every ballot is ignored.</li><li><strong>Runoff rules count first places more than once.</strong> The two-round runoff keeps the two candidates with the most first places and lets the voters choose between them. Instant runoff removes the candidate with the fewest first places, passes those ballots to their next choice, and repeats until someone holds a majority.</li><li><strong>Borda reads every position.</strong> With three candidates a ballot gives <span class="math" data-say="2">2</span> points to its first choice, <span class="math" data-say="1">1</span> to its second and <span class="math" data-say="0">0</span> to its last, and the points are added over all ballots. A candidate who is rarely ranked low can win without being ranked first often.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="plurality counts first places. runoff, the top two meet head to head. Borda, 2, 1, 0 points down each ballot. same ballots, different rule, new winner" tabindex="0" role="region" aria-label="Mathematical notation">plurality counts first places
 runoff: the top two meet head to head
 Borda: 2, 1, 0 points down each ballot
@@ -2458,11 +2503,40 @@ same ballots, different rule, new winner</div><figcaption>One profile, four coun
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2530,7 +2604,7 @@ same ballots, different rule, new winner</div><figcaption>One profile, four coun
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

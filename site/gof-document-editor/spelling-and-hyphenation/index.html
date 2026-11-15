@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>Spelling Checking and Hyphenation</h1>
       <p class="lesson-lede">Traversal given to iterators and each analysis given to a visitor, so that new analyses need no change to the document&#x27;s classes.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Iterator</li><li>Double dispatch</li><li>Visitor</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The walk, the work, and the eight patterns</h2>
-      <article class="prose reading"><p>&ldquo;An important question to ask yourself before applying the Visitor pattern is, Which class hierarchies change most often?&rdquo; Section 2.8, Spelling Checking and Hyphenation, ends on that question, and the chapter's summary, 2.9, follows. Read both in your own copy first; 2.8 is the longest section in the chapter.</p><p>The last problem is analysis. Like formatting, spelling checking and hyphenation each have several algorithms, trading space, time and quality; unlike formatting, they are two of many analyses Lexi will want, searching, counting words, adding up a table, checking grammar, and the authors do not want to change Glyph and all its subclasses for each one. They split the problem in two: reaching the information scattered through the structure, and doing the analysis.</p><p>Reaching it is harder than it looks. Children may sit in arrays, lists or something stranger, and analyses walk in different orders, forward, backward for a reverse search, or in order for an expression. The glyph's integer child index already favours arrays. A first fix puts traversal operations on Glyph, start, next, done and current, with a parameter naming the order. It removes the index, but a new order means changing that parameter's type or adding operations, the mechanism cannot be reused for other structures, and only one traversal can be under way at a time. So the authors encapsulate the concept that varies once more: an Iterator class hierarchy, with subclasses for arrays and lists and for preorder and other walks. Each glyph creates an iterator over its own children, a leaf a null iterator that is done at once, and a preorder iterator keeps a stack of them. The pattern is Iterator.</p><p>Doing the analysis comes next. Putting it in the iterators would tie each analysis to one walk, when many analyses share preorder. Putting it in the glyph classes, an operation per analysis, means editing every glyph class for each new analysis and burying the glyph's real interface under analytical operations. So the analysis becomes an object that the iterator carries to each glyph. It must still tell a letter from a picture, and the authors refuse to do that with type tests and casts, the kind of code, they say, object-oriented languages were meant to remove. Instead each glyph gets one operation that calls back the analyser's method for that glyph's own class. Give every analyser the same interface, call it a Visitor and the glyph's operation Accept, and a new analysis is a new visitor subclass with no glyph class touched. The hyphenation visitor, for instance, inserts discretionary glyphs, which show as a hyphen only at the end of a line.</p><p>The catalog's Visitor names the price beside the gain. Adding an operation is easy and related behaviour is gathered in one class; adding a new kind of element is hard, because every visitor gains a method for it, and visitors often need elements to expose state through public operations, which the catalog counts as a cost to encapsulation. The authors' answer for Lexi is that new analyses are far likelier than new kinds of glyph. The summary then lists the chapter's eight patterns, Composite, Strategy, Decorator, Abstract Factory, Bridge, Command, Iterator and Visitor, notes that none of these problems belongs to editors alone, from investment portfolios built as composites to compilers choosing register allocation as a strategy, and sends the reader on to the catalog and to their own designs.</p><pre class="codeblock" data-say="line 1, comment, One accept per element class one visit method per element class.. line 2, interface book visitor. line 3, void visit section of section s. line 4, void visit recipe of recipe r. line 5, void visit photo of photo p. line 7, interface book part void accept of book visitor v. line 8, final class recipe implements book part. line 9, public void accept of book visitor v v dot visit recipe of this. line 11, final class shopping list implements book visitor. line 12, private final list of string items is set to new array list. line 13, public void visit section of section s, comment, nothing to buy. line 14, public void visit recipe of recipe r items dot add all of r dot ingredients. line 15, public void visit photo of photo p. line 16, list of string items return items" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One accept per element class; one visit method per element class.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The walk, the work, and the eight patterns</h2><div class="prose reading"><p>&ldquo;An important question to ask yourself before applying the Visitor pattern is, Which class hierarchies change most often?&rdquo; Section 2.8, Spelling Checking and Hyphenation, ends on that question, and the chapter's summary, 2.9, follows. Read both in your own copy first; 2.8 is the longest section in the chapter.</p><p>The last problem is analysis. Like formatting, spelling checking and hyphenation each have several algorithms, trading space, time and quality; unlike formatting, they are two of many analyses Lexi will want, searching, counting words, adding up a table, checking grammar, and the authors do not want to change Glyph and all its subclasses for each one. They split the problem in two: reaching the information scattered through the structure, and doing the analysis.</p><p>Reaching it is harder than it looks. Children may sit in arrays, lists or something stranger, and analyses walk in different orders, forward, backward for a reverse search, or in order for an expression. The glyph's integer child index already favours arrays. A first fix puts traversal operations on Glyph, start, next, done and current, with a parameter naming the order. It removes the index, but a new order means changing that parameter's type or adding operations, the mechanism cannot be reused for other structures, and only one traversal can be under way at a time. So the authors encapsulate the concept that varies once more: an Iterator class hierarchy, with subclasses for arrays and lists and for preorder and other walks. Each glyph creates an iterator over its own children, a leaf a null iterator that is done at once, and a preorder iterator keeps a stack of them. The pattern is Iterator.</p><p>Doing the analysis comes next. Putting it in the iterators would tie each analysis to one walk, when many analyses share preorder. Putting it in the glyph classes, an operation per analysis, means editing every glyph class for each new analysis and burying the glyph's real interface under analytical operations. So the analysis becomes an object that the iterator carries to each glyph. It must still tell a letter from a picture, and the authors refuse to do that with type tests and casts, the kind of code, they say, object-oriented languages were meant to remove. Instead each glyph gets one operation that calls back the analyser's method for that glyph's own class. Give every analyser the same interface, call it a Visitor and the glyph's operation Accept, and a new analysis is a new visitor subclass with no glyph class touched. The hyphenation visitor, for instance, inserts discretionary glyphs, which show as a hyphen only at the end of a line.</p><p>The catalog's Visitor names the price beside the gain. Adding an operation is easy and related behaviour is gathered in one class; adding a new kind of element is hard, because every visitor gains a method for it, and visitors often need elements to expose state through public operations, which the catalog counts as a cost to encapsulation. The authors' answer for Lexi is that new analyses are far likelier than new kinds of glyph. The summary then lists the chapter's eight patterns, Composite, Strategy, Decorator, Abstract Factory, Bridge, Command, Iterator and Visitor, notes that none of these problems belongs to editors alone, from investment portfolios built as composites to compilers choosing register allocation as a strategy, and sends the reader on to the catalog and to their own designs.</p><pre class="codeblock" data-say="line 1, comment, One accept per element class one visit method per element class.. line 2, interface book visitor. line 3, void visit section of section s. line 4, void visit recipe of recipe r. line 5, void visit photo of photo p. line 7, interface book part void accept of book visitor v. line 8, final class recipe implements book part. line 9, public void accept of book visitor v v dot visit recipe of this. line 11, final class shopping list implements book visitor. line 12, private final list of string items is set to new array list. line 13, public void visit section of section s, comment, nothing to buy. line 14, public void visit recipe of recipe r items dot add all of r dot ingredients. line 15, public void visit photo of photo p. line 16, list of string items return items" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One accept per element class; one visit method per element class.</span>
 <span class="cl">interface BookVisitor {</span>
 <span class="cl">    void visitSection(Section s);</span>
 <span class="cl">    void visitRecipe(Recipe r);</span>
@@ -1461,21 +1505,11 @@
 <span class="cl">    public void visitRecipe(Recipe r) { items.addAll(r.ingredients()); }</span>
 <span class="cl">    public void visitPhoto(Photo p) { }</span>
 <span class="cl">    List&lt;String&gt; items() { return items; }</span>
-<span class="cl">}</span></code></pre><p>The lab returns to the recipe book of the first lesson, 10 nodes of 3 kinds, Section, Photo and Recipe, with two analyses as visitors, a timer and a costing. On the preset <code>book-new-analysis</code> every node accepts each visitor once: <span data-say="10 times 2 equals 20">10 × 2 = 20</span> accept calls, and each accept makes one visit call, 20 more. There are 1 + 3 = 4 element classes, counting the abstract element, and 1 + 2 = 3 visitor classes. Written as visitors, the analyses take <span data-say="3 times 2 plus 3 equals 9">3 × 2 + 3 = 9</span> methods, a visit method per kind per visitor and an accept per kind; written as operations on the elements, <span data-say="3 times 2 equals 6">3 × 2 = 6</span>. The preset adds a third analysis, a shopping list: with Visitor 1 class is added and none changed, against 4 classes changed, the abstract element and every element class, when each analysis is an operation of the elements.</p><p>The preset <code>book-new-kind</code> adds a new kind of part instead, a wine pairing, and the counts swap. With Visitor the new element class is added and 3 classes change, the abstract visitor and both visitors; with the operations on the elements, the new class is all, and nothing else changes. Neither design is cheaper in general. The count says which change each makes cheap, and the authors' question, which hierarchy changes more often, decides between them.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, mix, minus, list, minus. line 2, side minus A, mix, list, minus. line 3, t 1, side minus A, track, 3.5. line 4, t 2, side minus A, track, 4.25. line 5, side minus b, mix, list, minus. line 6, t 3, side minus b, track, 5. line 7, encore, side minus b, list, minus. line 8, t 4, encore, track, 2.75. line 9, t 5, mix, track, 6. line 10, visitors, duration, artists, playcount" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">mix, -, List, -;</span>
-<span class="cl">side-a, mix, List, -;</span>
-<span class="cl">t1, side-a, Track, 3.5;</span>
-<span class="cl">t2, side-a, Track, 4.25;</span>
-<span class="cl">side-b, mix, List, -;</span>
-<span class="cl">t3, side-b, Track, 5;</span>
-<span class="cl">encore, side-b, List, -;</span>
-<span class="cl">t4, encore, Track, 2.75;</span>
-<span class="cl">t5, mix, Track, 6</span>
-<span class="cl">visitors: duration, artists, playcount</span></code></pre><p>The mixtape of the first lesson's exercise, with three analyses. By hand, count the accept calls, the methods written with Visitor and without, and the classes a new kind of node changes under each design. Then type the records and visitors into the lab, with the addition set to a kind.</p><p>That ends the case study and its eight patterns. The next course, Creational Patterns, opens the catalog with Abstract Factory, which Lexi met in Supporting Multiple Look-and-Feel Standards.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A tree of parts</h2></div><p>operations as visitors, or as methods of the elements</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab returns to the recipe book of the first lesson, 10 nodes of 3 kinds, Section, Photo and Recipe, with two analyses as visitors, a timer and a costing. On the preset <code>book-new-analysis</code> every node accepts each visitor once: <span data-say="10 times 2 equals 20">10 × 2 = 20</span> accept calls, and each accept makes one visit call, 20 more. There are 1 + 3 = 4 element classes, counting the abstract element, and 1 + 2 = 3 visitor classes. Written as visitors, the analyses take <span data-say="3 times 2 plus 3 equals 9">3 × 2 + 3 = 9</span> methods, a visit method per kind per visitor and an accept per kind; written as operations on the elements, <span data-say="3 times 2 equals 6">3 × 2 = 6</span>. The preset adds a third analysis, a shopping list: with Visitor 1 class is added and none changed, against 4 classes changed, the abstract element and every element class, when each analysis is an operation of the elements.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A tree of parts</h2></div><p>operations as visitors, or as methods of the elements</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A tree of parts</strong><span>operations as visitors, or as methods of the elements</span></div>
       </div>
@@ -1483,10 +1517,10 @@
       <div class="table-wrap" id="gtrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gtrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one node: its name, its parent (- for the root; exactly one root), its kind (a class name) and its value, a decimal for a leaf and - for a composite. A leaf has no children; a composite may have none. Children are taken in record order. A kind is either a leaf class or a composite class, never both. Depth counts the edges on the longest path down from the root (a root alone is at depth 0). The structure asks every node to accept each visitor once, and each accept makes one visit call on the visitor's method for that node's kind: nodes × visitors of each. Element classes are 1 abstract element + 1 per kind; visitor classes are 1 abstract visitor + 1 per visitor. Methods written, counting implementations only: with Visitor, kinds × visitors visit methods + 1 accept per kind; with each operation a method of the element classes, kinds × visitors. A new operation is 1 new visitor and changes nothing, against a change to the abstract element and every element class; a new kind is 1 new element class that changes the abstract visitor and every visitor, against nothing changed.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Analyses as visitors, or as operations of the parts</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Analyses as visitors, or as operations of the parts</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gtrPreset">Worked example</label>
           <select id="gtrPreset"><option value="book-new-analysis" selected>The recipe book, two analyses, adding a third</option><option value="book-new-kind">The recipe book, two analyses, adding a kind of part</option></select>
@@ -1514,12 +1548,24 @@
           <div class="kpi"><span>The addition, operations on the elements</span><strong id="gtrAddPlain">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>book-new-kind</code> adds a new kind of part instead, a wine pairing, and the counts swap. With Visitor the new element class is added and 3 classes change, the abstract visitor and both visitors; with the operations on the elements, the new class is all, and nothing else changes. Neither design is cheaper in general. The count says which change each makes cheap, and the authors' question, which hierarchy changes more often, decides between them.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, mix, minus, list, minus. line 2, side minus A, mix, list, minus. line 3, t 1, side minus A, track, 3.5. line 4, t 2, side minus A, track, 4.25. line 5, side minus b, mix, list, minus. line 6, t 3, side minus b, track, 5. line 7, encore, side minus b, list, minus. line 8, t 4, encore, track, 2.75. line 9, t 5, mix, track, 6. line 10, visitors, duration, artists, playcount" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">mix, -, List, -;</span>
+<span class="cl">side-a, mix, List, -;</span>
+<span class="cl">t1, side-a, Track, 3.5;</span>
+<span class="cl">t2, side-a, Track, 4.25;</span>
+<span class="cl">side-b, mix, List, -;</span>
+<span class="cl">t3, side-b, Track, 5;</span>
+<span class="cl">encore, side-b, List, -;</span>
+<span class="cl">t4, encore, Track, 2.75;</span>
+<span class="cl">t5, mix, Track, 6</span>
+<span class="cl">visitors: duration, artists, playcount</span></code></pre><p>The mixtape of the first lesson's exercise, with three analyses. By hand, count the accept calls, the methods written with Visitor and without, and the classes a new kind of node changes under each design. Then type the records and visitors into the lab, with the addition set to a kind.</p><p>That ends the case study and its eight patterns. The next course, Creational Patterns, opens the catalog with Abstract Factory, which Lexi met in Supporting Multiple Look-and-Feel Standards.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting a visitor over a structure</h2></div><p>Four steps, the last of them on a structure of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the nodes, the kinds and the visitors</h3><p>Write N nodes, K kinds of node (each a class) and V visitors (each an analysis).</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the calls</h3><p>Each node accepts each visitor once, and each accept calls one visit method: <span data-say="N times V">N × V</span> accept calls and <span data-say="N times V">N × V</span> visit calls.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the methods and the changes</h3><p>With Visitor, <span data-say="K times V">K × V</span> visit methods and K accepts; without, <span data-say="K times V">K × V</span> operations on the elements. A new analysis adds a visitor and changes nothing, or changes the abstract element and all K classes; a new kind changes the abstract visitor and all V visitors, or nothing.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a structure of your own</h3><p>Take a structure in your own code that several operations walk: a syntax tree, a document model, an order with its lines. Count its kinds and operations, and say from its history which has grown more often, the kinds or the operations.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting a visitor over a structure</h2>
+      <p class="lead-in">Four steps, the last of them on a structure of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the nodes, the kinds and the visitors.</strong> Write N nodes, K kinds of node (each a class) and V visitors (each an analysis).</li><li><strong>Count the calls.</strong> Each node accepts each visitor once, and each accept calls one visit method: <span data-say="N times V">N × V</span> accept calls and <span data-say="N times V">N × V</span> visit calls.</li><li><strong>Count the methods and the changes.</strong> With Visitor, <span data-say="K times V">K × V</span> visit methods and K accepts; without, <span data-say="K times V">K × V</span> operations on the elements. A new analysis adds a visitor and changes nothing, or changes the abstract element and all K classes; a new kind changes the abstract visitor and all V visitors, or nothing.</li><li><strong>Do it on a structure of your own.</strong> Take a structure in your own code that several operations walk: a syntax tree, a document model, an order with its lines. Count its kinds and operations, and say from its history which has grown more often, the kinds or the operations.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1538,17 +1584,16 @@ a third analysis, Visitor: 1 added, 0 changed
 a third analysis, elements: 4 changed</div><p>Visitor costs three accept methods up front and buys an analysis that touches no element class. The bill comes due when a new kind of part arrives, as the other preset shows.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding an operation to every element class for each new analysis</strong><span>Section 2.8 names two costs: every glyph class is edited for each analysis, and the glyph's interface fills with analytical operations until its real purpose is hard to see. On the lesson's recipe book the lab counts 4 classes changed for a third analysis, against 1 new visitor and nothing changed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Telling kinds apart with type tests in the analysis</strong><span>The authors reject a checker that asks each glyph whether it is a character, a row or an image: it is hard to extend and must be edited whenever the hierarchy changes. Accept and visit let each element name its own class instead, at the cost of one accept method per kind.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Adopting Visitor without asking which hierarchy changes</strong><span>The catalog is explicit that new element classes are hard under Visitor: every visitor gains a method. On the lab's recipe book a new kind changes 3 classes with Visitor and none without. The authors chose it for Lexi because analyses were the likelier change.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a visitor&#x27;s calls and the changes it makes cheap.</strong><p>Given a structure's nodes and kinds and a set of analyses, state the accept and visit calls, the methods with and without Visitor, and what a new analysis and a new kind each change, and say what Iterator contributes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts calls, classes and methods on the structure as stated. It cannot tell you which of your hierarchies will change more often, which is the question the authors put first, and it does not count the traversal orders, which Iterator's own lesson does.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding an operation to every element class for each new analysis</strong><span>Section 2.8 names two costs: every glyph class is edited for each analysis, and the glyph's interface fills with analytical operations until its real purpose is hard to see. On the lesson's recipe book the lab counts 4 classes changed for a third analysis, against 1 new visitor and nothing changed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Telling kinds apart with type tests in the analysis</strong><span>The authors reject a checker that asks each glyph whether it is a character, a row or an image: it is hard to extend and must be edited whenever the hierarchy changes. Accept and visit let each element name its own class instead, at the cost of one accept method per kind.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Adopting Visitor without asking which hierarchy changes</strong><span>The catalog is explicit that new element classes are hard under Visitor: every visitor gains a method. On the lab's recipe book a new kind changes 3 classes with Visitor and none without. The authors chose it for Lexi because analyses were the likelier change.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a visitor&#x27;s calls and the changes it makes cheap.</strong><p>Given a structure's nodes and kinds and a set of analyses, state the accept and visit calls, the methods with and without Visitor, and what a new analysis and a new kind each change, and say what Iterator contributes.</p></div></div><div class="note"><strong>Note:</strong> The lab counts calls, classes and methods on the structure as stated. It cannot tell you which of your hierarchies will change more often, which is the question the authors put first, and it does not count the traversal orders, which Iterator's own lesson does.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Iterator</summary><p>An object that walks a structure: start, advance, test for the end, give the current item. Subclasses walk different containers or in different orders, and each keeps its own place, so several walks can run at once. It has a lesson of its own, Iterator, in Behavioral Patterns I.</p></details><details class="recall"><summary>Double dispatch</summary><p>The two calls that let an analysis treat each kind of part its own way without testing types: the traversal calls the part's accept with the visitor, and the part, which knows its own class, calls the visitor's method for that class.</p></details><details class="recall"><summary>Visitor</summary><p>The pattern: a Visitor declares one visit operation per ConcreteElement class, each ConcreteVisitor is one operation over the structure, and each element's accept calls the matching visit. It has a lesson of its own, Visitor, in Behavioral Patterns II.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.8 adds analyses such as spelling checking without growing the document's classes: iterators walk the structure, and a visitor carried to each part does the analysis. Read the argument and the chapter's summary, then run two analyses over the recipe book of the first lesson and count the calls, the methods, and what a new analysis and a new kind of part each change.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Iterator.</strong> An object that walks a structure: start, advance, test for the end, give the current item. Subclasses walk different containers or in different orders, and each keeps its own place, so several walks can run at once. It has a lesson of its own, Iterator, in Behavioral Patterns I.</li><li><strong>Double dispatch.</strong> The two calls that let an analysis treat each kind of part its own way without testing types: the traversal calls the part's accept with the visitor, and the part, which knows its own class, calls the visitor's method for that class.</li><li><strong>Visitor.</strong> The pattern: a Visitor declares one visit operation per ConcreteElement class, each ConcreteVisitor is one operation over the structure, and each element's accept calls the matching visit. It has a lesson of its own, Visitor, in Behavioral Patterns II.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="access is one problem, analysis another. an iterator holds its own traversal. separate the walk from the work. accept calls back the right visit. A new analysis, one new class. A new kind of part, every visitor edited" tabindex="0" role="region" aria-label="Mathematical notation">access is one problem, analysis another
 an iterator holds its own traversal
 separate the walk from the work
@@ -2355,11 +2400,40 @@ a new kind of part: every visitor edited</div><figcaption>Analysis in six lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2427,7 +2501,7 @@ a new kind of part: every visitor edited</div><figcaption>Analysis in six lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

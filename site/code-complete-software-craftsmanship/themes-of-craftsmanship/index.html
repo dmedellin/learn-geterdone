@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Software Craftsmanship</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapters 34–35 · Themes and Further Reading</p>
       <h1>Themes of Craftsmanship</h1>
       <p class="lesson-lede">The book&#x27;s last chapter names the themes its details serve, conquering complexity first, and ends by arguing that no method should be followed as a religion.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Conquer complexity</li><li>Warning signs</li><li>Eclecticism</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The book&#x27;s themes, then one routine measured</h2>
-      <article class="prose reading"><p><strong>Chapter 34, Key Points, p. 853.</strong> &ldquo;Dogmatic methodologies and high-quality software development don’t mix. Fill your intellectual toolbox with programming alternatives, and improve your skill at choosing the right tool for the job.&rdquo; Chapter 34, Themes in Software Craftsmanship, runs from page 837 to page 853, and Chapter 35, Where to Find More Information, from page 855 to page 862. Read Chapter 34 in your own copy before going on.</p><p>Take a routine you wrote last month, one you would rather nobody reviewed. Chapter 34 names what such a routine has lost sight of. The book has been about details, classes, names, loops, layout, and this chapter picks the details up again to show what they serve. The first theme is the one Chapter 5 argued (§34.1, p. 837): managing complexity is the heart of software development. Nobody's brain spans the range of detail a program has, so the book's practices are tools for holding less of it at once: subsystems, class interfaces that let you ignore what is behind them, avoiding global data, deep inheritance and deep nesting, short routines, clear names, few parameters, conventions. Abstraction is the most powerful of them; Fred Brooks, as the book cites him, counted the move from machine language to higher-level languages the biggest single gain the field has made.</p><p>Pick your process (§34.2, p. 839): on a team, how people work together decides whether their abilities add up or cancel out, and quality has to be built in from the first step, because testing only tells you how the software is defective. Write programs for people first, computers second (§34.3, p. 841): readability improves comprehension, review, debugging and change, and the gains accumulate from many small choices. Program into your language, not in it (§34.4, p. 843): decide what you want to do, then find the way your language can do it, writing your own assertions or named constants where it lacks them.</p><p>Focus your attention with conventions (§34.5, p. 844): a convention answers an arbitrary question once, conveys information concisely, guards against a known hazard, and can make up for a weakness in the language, though large projects can go overboard with them and small ones underboard. Program in terms of the problem domain (§34.6, p. 845): top-level code should read as the problem being solved, with the files, arrays and loop indexes kept at a lower level of abstraction.</p><p>Watch for falling rocks (§34.7, p. 848) is about warning signs. Tricky code, a class with more errors than average, a project with a great deal of debugging: each suggests something to look at. Design metrics are warning signs of the same kind. The section names more than about 10 decision points in a routine and more than three levels of logical nesting, the figures of Table 19-2 after McCabe and of Section 19.4, and says plainly that none of them necessarily means a routine is badly designed, only that it should be looked at skeptically. McConnell borrows a phrase from the philosopher Charles Sanders Peirce for the feeling to heed: the irritation of doubt, the unease you struggle to pass out of into belief.</p><p>Iterate, repeatedly, again and again (§34.8, p. 850): requirements, design, estimates and tuning all improve with repeated attempts, and the trick is to iterate early, when it is cheap. The last theme (§34.9, p. 851) is that software and religion should be kept apart. Dogmatic adherence to one design method, one formatting style or one rule is always out of place, because software development is heuristic rather than deterministic. Mix methods: experiment with the new ones, rely on the dependable ones, and be ready to change your beliefs when an experiment says so. McConnell's image is a toolbox, and a contractor friend, Simple Simon, who uses vise-grip pliers for every job.</p><p>Chapter 35 is a guide to further reading. It sorts what a developer needs into core programming books, the larger technical and management contexts, and references that last about one project (p. 855), describes books on construction and on the topics beyond it, and sets out the reading plan McConnell's company, Construx, used, in three levels: introductory, practitioner and professional (pp. 860&ndash;862). The list is the book's, from 2004, and is not reproduced here; read it in your copy with your own judgement about what has been superseded since.</p><p>Now the code. The lab's complexity view counts decision points by the rule printed under the listing, McCabe's as Section 19.6 gives it: 1, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. The Decision points tile is that count, Breakdown shows its parts, and Band places it in the book's ranges: 0&ndash;5, 6&ndash;10 and 10+. Deepest nesting is the greatest brace depth below the routine's own braces, so a statement directly in the body is at depth 0; this is not the layout lesson's depth, which counted the routine's body as one level. First line at that depth says where it is reached. Here is the <code>retry-delay</code> preset, which decides how long to wait before retrying a failed request:</p><pre class="codeblock" data-say="line 1, int retry delay millis of request request, int attempt. line 2, if request equals null or attempt is less than 1. line 3, return 0. line 5, int delay is set to 100. line 6, for int i is set to 1, i is less than attempt, i is incremented. line 7, delay is set to delay times 2. line 8, if delay is greater than 10000. line 9, delay is set to 10000. line 12, if request dot is idempotent and request dot has deadline. line 13, delay is set to math dot min of delay, request dot millis to deadline. line 15, return delay" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">int retryDelayMillis(Request request, int attempt) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The book&#x27;s themes, then one routine measured</h2><div class="prose reading"><p><strong>Chapter 34, Key Points, p. 853.</strong> &ldquo;Dogmatic methodologies and high-quality software development don’t mix. Fill your intellectual toolbox with programming alternatives, and improve your skill at choosing the right tool for the job.&rdquo; Chapter 34, Themes in Software Craftsmanship, runs from page 837 to page 853, and Chapter 35, Where to Find More Information, from page 855 to page 862. Read Chapter 34 in your own copy before going on.</p><p>Take a routine you wrote last month, one you would rather nobody reviewed. Chapter 34 names what such a routine has lost sight of. The book has been about details, classes, names, loops, layout, and this chapter picks the details up again to show what they serve. The first theme is the one Chapter 5 argued (§34.1, p. 837): managing complexity is the heart of software development. Nobody's brain spans the range of detail a program has, so the book's practices are tools for holding less of it at once: subsystems, class interfaces that let you ignore what is behind them, avoiding global data, deep inheritance and deep nesting, short routines, clear names, few parameters, conventions. Abstraction is the most powerful of them; Fred Brooks, as the book cites him, counted the move from machine language to higher-level languages the biggest single gain the field has made.</p><p>Pick your process (§34.2, p. 839): on a team, how people work together decides whether their abilities add up or cancel out, and quality has to be built in from the first step, because testing only tells you how the software is defective. Write programs for people first, computers second (§34.3, p. 841): readability improves comprehension, review, debugging and change, and the gains accumulate from many small choices. Program into your language, not in it (§34.4, p. 843): decide what you want to do, then find the way your language can do it, writing your own assertions or named constants where it lacks them.</p><p>Focus your attention with conventions (§34.5, p. 844): a convention answers an arbitrary question once, conveys information concisely, guards against a known hazard, and can make up for a weakness in the language, though large projects can go overboard with them and small ones underboard. Program in terms of the problem domain (§34.6, p. 845): top-level code should read as the problem being solved, with the files, arrays and loop indexes kept at a lower level of abstraction.</p><p>Watch for falling rocks (§34.7, p. 848) is about warning signs. Tricky code, a class with more errors than average, a project with a great deal of debugging: each suggests something to look at. Design metrics are warning signs of the same kind. The section names more than about 10 decision points in a routine and more than three levels of logical nesting, the figures of Table 19-2 after McCabe and of Section 19.4, and says plainly that none of them necessarily means a routine is badly designed, only that it should be looked at skeptically. McConnell borrows a phrase from the philosopher Charles Sanders Peirce for the feeling to heed: the irritation of doubt, the unease you struggle to pass out of into belief.</p><p>Iterate, repeatedly, again and again (§34.8, p. 850): requirements, design, estimates and tuning all improve with repeated attempts, and the trick is to iterate early, when it is cheap. The last theme (§34.9, p. 851) is that software and religion should be kept apart. Dogmatic adherence to one design method, one formatting style or one rule is always out of place, because software development is heuristic rather than deterministic. Mix methods: experiment with the new ones, rely on the dependable ones, and be ready to change your beliefs when an experiment says so. McConnell's image is a toolbox, and a contractor friend, Simple Simon, who uses vise-grip pliers for every job.</p><p>Chapter 35 is a guide to further reading. It sorts what a developer needs into core programming books, the larger technical and management contexts, and references that last about one project (p. 855), describes books on construction and on the topics beyond it, and sets out the reading plan McConnell's company, Construx, used, in three levels: introductory, practitioner and professional (pp. 860&ndash;862). The list is the book's, from 2004, and is not reproduced here; read it in your copy with your own judgement about what has been superseded since.</p><p>Now the code. The lab's complexity view counts decision points by the rule printed under the listing, McCabe's as Section 19.6 gives it: 1, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. The Decision points tile is that count, Breakdown shows its parts, and Band places it in the book's ranges: 0&ndash;5, 6&ndash;10 and 10+. Deepest nesting is the greatest brace depth below the routine's own braces, so a statement directly in the body is at depth 0; this is not the layout lesson's depth, which counted the routine's body as one level. First line at that depth says where it is reached. Here is the <code>retry-delay</code> preset, which decides how long to wait before retrying a failed request:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Decision points and nesting</h3>
+            <p>A count over code, by the rules stated below the listing. Decision points are 1 plus each branch keyword and boolean operator, by the rules under the listing; depth is brace depth below the routine's own braces. The bands are the book's guidance, after McCabe. Load a preset, or paste a routine of your own.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="retry-delay" selected>retryDelayMillis: a retry with a doubling, capped delay</option><option value="nested-shipping">shippingCost, nested (from Nesting and Complexity)</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, int retry delay millis of request request, int attempt. line 2, if request equals null or attempt is less than 1. line 3, return 0. line 5, int delay is set to 100. line 6, for int i is set to 1, i is less than attempt, i is incremented. line 7, delay is set to delay times 2. line 8, if delay is greater than 10000. line 9, delay is set to 10000. line 12, if request dot is idempotent and request dot has deadline. line 13, delay is set to math dot min of delay, request dot millis to deadline. line 15, return delay" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">int retryDelayMillis(Request request, int attempt) {</span>
 <span class="cl">    if (request == null || attempt &lt; 1) {</span>
 <span class="cl">        return 0;</span>
 <span class="cl">    }</span>
@@ -1481,53 +1568,12 @@
 <span class="cl">        }</span>
 <span class="cl">    }</span>
 <span class="cl">    return cost;</span>
-<span class="cl">}</span></code></pre><p>The <code>nested-shipping</code> preset is the shipping routine from the lesson “Nesting and Complexity”. The lab counts 9 decision points, <span class="math" data-say="1 plus if 5 plus for 1 plus and 1 plus or 1">1 + if 5 + for 1 + &amp;&amp; 1 + || 1</span>, in the band 6&ndash;10, and a deepest nesting of 5, first reached on line 14. Five levels is past the three that Section 34.7 names as a warning sign. That lesson rewrote the routine with guard clauses; here the point is only that the two counts, set beside the chapter's warning signs, tell you which of the two routines to look at first.</p><h3>Exercise</h3><p>The exercise is your own code. Take a routine of about fifteen lines that you wrote, and without the lab count its decision points by the rule above and its deepest nesting. Then name two changes you would make and the theme of Chapter 34 each one serves. Paste the routine into the lab to check your counts. One quiz question applies the same counts to a changed retry-delay, so that you can check the method on a routine whose answer is fixed.</p><p>This is the last lesson of the read-along. The book's own last word is its reading plan; this course's is to go back to the first, “Laying the Foundation”, with a routine of your own and see how much of what it argued you can now measure.</p></article>
+<span class="cl">}</span></code></pre><p>The <code>nested-shipping</code> preset is the shipping routine from the lesson “Nesting and Complexity”. The lab counts 9 decision points, <span class="math" data-say="1 plus if 5 plus for 1 plus and 1 plus or 1">1 + if 5 + for 1 + &amp;&amp; 1 + || 1</span>, in the band 6&ndash;10, and a deepest nesting of 5, first reached on line 14. Five levels is past the three that Section 34.7 names as a warning sign. That lesson rewrote the routine with guard clauses; here the point is only that the two counts, set beside the chapter's warning signs, tell you which of the two routines to look at first.</p><h3>Exercise</h3><p>The exercise is your own code. Take a routine of about fifteen lines that you wrote, and without the lab count its decision points by the rule above and its deepest nesting. Then name two changes you would make and the theme of Chapter 34 each one serves. Paste the routine into the lab to check your counts. One quiz question applies the same counts to a changed retry-delay, so that you can check the method on a routine whose answer is fixed.</p><p>This is the last lesson of the read-along. The book's own last word is its reading plan; this course's is to go back to the first, “Laying the Foundation”, with a routine of your own and see how much of what it argued you can now measure.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Decision points and nesting</h3>
-          <p>A count over code, by the rules stated below the listing. Decision points are 1 plus each branch keyword and boolean operator, by the rules under the listing; depth is brace depth below the routine's own braces. The bands are the book's guidance, after McCabe. Load a preset, or paste a routine of your own.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="retry-delay" selected>retryDelayMillis: a retry with a doubling, capped delay</option><option value="nested-shipping">shippingCost, nested (from Nesting and Complexity)</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring a routine against the book&#x27;s themes</h2></div><p>Five steps, the last on a routine of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the decision points</h3><p>Start at 1 and add one for each if, while, for, case, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An else, a default and a do add nothing. An else if is an if and counts; the while of a do … while counts, the do does not; the ?: operator is not counted, which is the lab's choice and not the book's.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the deepest nesting</h3><p>Count the braces open below the routine's own at each line, and note the greatest depth and where it is first reached.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the counts as warning signs</h3><p>Set the count beside the bands, 0 to 5, 6 to 10 and 10+, and the depth beside the three levels Section 34.7 names. A figure past them is a reason to look, not a fault.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Name the theme each change serves</h3><p>For each change the counts point you to, say which of Chapter 34's themes it serves: complexity, people first, conventions, the problem's terms.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Measure a routine of your own</h3><p>Paste a routine of yours into the lab and note its decision points, band and deepest nesting. Write one sentence for each theme of Chapter 34 the routine touches, naming the line that touches it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring a routine against the book&#x27;s themes</h2>
+      <p class="lead-in">Five steps, the last on a routine of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the decision points.</strong> Start at 1 and add one for each if, while, for, case, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An else, a default and a do add nothing. An else if is an if and counts; the while of a do … while counts, the do does not; the ?: operator is not counted, which is the lab's choice and not the book's.</li><li><strong>Find the deepest nesting.</strong> Count the braces open below the routine's own at each line, and note the greatest depth and where it is first reached.</li><li><strong>Read the counts as warning signs.</strong> Set the count beside the bands, 0 to 5, 6 to 10 and 10+, and the depth beside the three levels Section 34.7 names. A figure past them is a reason to look, not a fault.</li><li><strong>Name the theme each change serves.</strong> For each change the counts point you to, say which of Chapter 34's themes it serves: complexity, people first, conventions, the problem's terms.</li><li><strong>Measure a routine of your own.</strong> Paste a routine of yours into the lab and note its decision points, band and deepest nesting. Write one sentence for each theme of Chapter 34 the routine touches, naming the line that touches it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1546,17 +1592,16 @@ one || on line 2, one &amp;&amp; on line 12
 deepest nesting 2, first on line 9</div><p>Seven points and a depth of two put the routine below the thresholds Section 34.7 names (more than about 10, more than three levels), though in Table 19-2's band to start thinking about simplifying, and the counts still point at the loop of lines 6 to 11 as the part to look at.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking craftsmanship is a set of rules to follow</strong><span>After thirty-three chapters of advice it is natural to read the book as a rulebook. Its last theme argues against that reading (§34.9): dogmatic adherence to any method, style or rule is always out of place, because software development is heuristic, and the book's techniques are tools to choose among. Even its thresholds are offered as warning signs that call for a look, not as rules that settle a case (p. 848). The counts in this course are tools for judgement, which is the point of saying that a count is a reason to look.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a count under the threshold as a pass</strong><span>Retry-delay's 7 decision points and depth of 2 sit below the thresholds Section 34.7 names, and the counts still point at a loop that could be its own routine and two bare numbers that could be named. A count says where to look in both directions: a low one does not certify a routine, any more than a high one condemns it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking process is overhead that gets in the way of code</strong><span>Section 34.2 states the view that code is what matters and process an abstraction, and calls it shortsighted (p. 841). Quality has to be built in from the first step, and how a team works decides whether its members' abilities add up.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Measure a routine and name the themes</strong><p>For the 16-line retry-delay routine, state its decision points and its deepest nesting by the stated rules without looking at the lab or the worked example, name two improvements and the theme of Chapter 34 each serves. You meet the standard when your counts match the lab's and each improvement names the lines it changes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts decision points and nesting by a stated rule and nothing else. It cannot see a theme: whether a routine is written in the problem's terms, whether its conventions help, whether its process was sound. The bands are the book's guidance after McCabe, and Section 34.7 itself calls such figures warning signs. Chapter 35's reading list is named and not reproduced, and dates from 2004.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking craftsmanship is a set of rules to follow</strong><span>After thirty-three chapters of advice it is natural to read the book as a rulebook. Its last theme argues against that reading (§34.9): dogmatic adherence to any method, style or rule is always out of place, because software development is heuristic, and the book's techniques are tools to choose among. Even its thresholds are offered as warning signs that call for a look, not as rules that settle a case (p. 848). The counts in this course are tools for judgement, which is the point of saying that a count is a reason to look.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a count under the threshold as a pass</strong><span>Retry-delay's 7 decision points and depth of 2 sit below the thresholds Section 34.7 names, and the counts still point at a loop that could be its own routine and two bare numbers that could be named. A count says where to look in both directions: a low one does not certify a routine, any more than a high one condemns it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking process is overhead that gets in the way of code</strong><span>Section 34.2 states the view that code is what matters and process an abstraction, and calls it shortsighted (p. 841). Quality has to be built in from the first step, and how a team works decides whether its members' abilities add up.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Measure a routine and name the themes</strong><p>For the 16-line retry-delay routine, state its decision points and its deepest nesting by the stated rules without looking at the lab or the worked example, name two improvements and the theme of Chapter 34 each serves. You meet the standard when your counts match the lab's and each improvement names the lines it changes.</p></div></div><div class="note"><strong>Note:</strong> The lab counts decision points and nesting by a stated rule and nothing else. It cannot see a theme: whether a routine is written in the problem's terms, whether its conventions help, whether its process was sound. The bands are the book's guidance after McCabe, and Section 34.7 itself calls such figures warning signs. Chapter 35's reading list is named and not reproduced, and dates from 2004.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Conquer complexity</summary><p>The book's first theme, argued in Chapter 5 as software's primary technical imperative: most good practices exist to reduce how much of a program a person must hold in mind at once.</p></details><details class="recall"><summary>Warning signs</summary><p>Section 34.7's falling rocks: tricky code, a class with more errors than average, a routine with many decision points or deep nesting. Each is a reason to look skeptically, not proof of a fault.</p></details><details class="recall"><summary>Eclecticism</summary><p>Section 34.9's alternative to treating a method as a religion: keep a toolbox of techniques, try new ones, rely on the dependable ones, and choose for each problem.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 34 gathers the book's themes: conquer complexity, pick your process, write for people first, program into your language, use conventions, work in the problem's terms, watch for warning signs, iterate, and keep religion out of software. Chapter 35 points to further reading. Put one routine through the decision-point and nesting counts and say which theme each count serves.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Conquer complexity.</strong> The book's first theme, argued in Chapter 5 as software's primary technical imperative: most good practices exist to reduce how much of a program a person must hold in mind at once.</li><li><strong>Warning signs.</strong> Section 34.7's falling rocks: tricky code, a class with more errors than average, a routine with many decision points or deep nesting. Each is a reason to look skeptically, not proof of a fault.</li><li><strong>Eclecticism.</strong> Section 34.9's alternative to treating a method as a religion: keep a toolbox of techniques, try new ones, rely on the dependable ones, and choose for each problem.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="managing complexity comes first. points, 1 plus each if, for, while, case, and, or. depth counts braces below the routine. warning signs are reasons to look. eclecticism, not religion" tabindex="0" role="region" aria-label="Mathematical notation">managing complexity comes first
 points: 1 + each if, for, while, case, &amp;&amp;, ||
 depth counts braces below the routine
@@ -2570,11 +2615,40 @@ eclecticism, not religion</div><figcaption>Chapters 34 and 35 in five lines</fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2642,7 +2716,7 @@ eclecticism, not religion</div><figcaption>Chapters 34 and 35 in five lines</fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

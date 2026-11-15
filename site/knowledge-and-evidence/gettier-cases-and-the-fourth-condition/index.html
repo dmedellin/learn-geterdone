@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Knowledge and Evidence</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Analysing knowledge</p>
       <h1>Gettier Cases and the Fourth Condition</h1>
       <p class="lesson-lede">A case with justification, truth and belief that is not knowledge, and a repair that the next case breaks.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A Gettier case has all three conditions</li><li>A fourth condition is a new column</li><li>A repair is itself a definition</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Smith’s coins, the stopped clock and the fake barns</h2>
-      <article class="prose reading"><p>In Gettier’s own case Smith has strong evidence that Jones will get the job, and that Jones has ten coins in his pocket. Smith therefore believes that the man who will get the job has ten coins in his pocket. In fact Smith himself gets the job, and Smith himself has ten coins. The belief is justified, true and held. Almost nobody thinks Smith knew it.</p><p>Russell’s stopped clock is the same shape with a simpler mechanism. You look at a clock that stopped twelve hours ago, read the time off it, and believe it is a quarter past two. By chance it is. You had good reason to trust the clock, the belief is true, and you hold it.</p><div class="mathblock" data-say="case, J, T, B, knows ?. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">case                   J   T   B   knows?
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Smith’s coins, the stopped clock and the fake barns</h2><div class="prose reading"><p>In Gettier’s own case Smith has strong evidence that Jones will get the job, and that Jones has ten coins in his pocket. Smith therefore believes that the man who will get the job has ten coins in his pocket. In fact Smith himself gets the job, and Smith himself has ten coins. The belief is justified, true and held. Almost nobody thinks Smith knew it.</p><p>Russell’s stopped clock is the same shape with a simpler mechanism. You look at a clock that stopped twelve hours ago, read the time off it, and believe it is a quarter past two. By chance it is. You had good reason to trust the clock, the belief is true, and you hold it.</p><div class="mathblock" data-say="case, J, T, B, knows ?. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">case                   J   T   B   knows?
 ----------------------------------------
 ordinary perception    1   1   1   yes
 Smith&#x27;s coins          1   1   1   no
 stopped clock          1   1   1   no
-lucky guess            0   1   1   no</div><p>Two rows of this table are identical in all three columns and different in the verdict. Whatever the definition says about perception it must say about Smith’s coins, and the verdicts disagree. The lab’s search over one and two conditions finds no formula that fits, and none of any length could, because the inputs of two rows are the same and the outputs are not.</p><h3>A fourth condition</h3><p>The usual repair adds a condition that is true of the failing rows and false of perception. In both cases the belief depends on something false along the way: that Jones will get the job, that the clock is running. Call the condition <span class="math" data-say="L">L</span>, for “relies on a false lemma”, and require it to be absent: <span class="math" data-say="J and T and B and not L">J ∧ T ∧ B ∧ ¬L</span>. In the lab’s list of candidate definitions, not is written as a tilde.</p><div class="mathblock" data-say="case, J, T, B, L, knows ?. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">case                   J   T   B   L   knows?
----------------------------------------------
-ordinary perception    1   1   1   0   yes
-Smith&#x27;s coins          1   1   1   1   no
-stopped clock          1   1   1   1   no
-lucky guess            0   1   1   0   no
-fake barns             1   1   1   0   no</div><p>The fourth condition now separates Smith’s coins and the stopped clock from perception, and the lab now reports agreement on four of five rows. The last row is why it does not end there. Henry drives through country dotted with barn facades and looks at the one real barn. He sees a barn, believes it is a barn, and is right. He relies on no false lemma at all, so <span class="math" data-say="L equals 0">L = 0</span>, and most people think he does not know, because he could easily have been looking at a facade.</p><p>Perception and fake barns now agree on every column, <span class="math" data-say="J equals 1">J = 1</span>, <span class="math" data-say="T equals 1">T = 1</span>, <span class="math" data-say="B equals 1">B = 1</span>, <span class="math" data-say="L equals 0">L = 0</span>, and differ in the verdict. This is the same trouble as before at a new place, and the lab names the row. Fixing it takes a fifth condition, and the literature has tried several.</p><div class="thm"><span class="label">Theorem &middot; What the cases show and what they do not</span><p>They show that the three conditions are not jointly sufficient. They do not show that knowledge is impossible, and they do not show that justification is irrelevant: the lucky guess row still needs <span class="math" data-say="J">J</span>, because without it the repaired definition calls the guess knowledge.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The method of cases</h2></div><p>A definition tested against every case in the table</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+lucky guess            0   1   1   no</div><p>Two rows of this table are identical in all three columns and different in the verdict. Whatever the definition says about perception it must say about Smith’s coins, and the verdicts disagree. The lab’s search over one and two conditions finds no formula that fits, and none of any length could, because the inputs of two rows are the same and the outputs are not.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The method of cases</h2></div><p>A definition tested against every case in the table</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A definition against the cases</strong><span>click a value or a verdict to change the case</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>1 / yes</span><span class="tone-red"><i class="legend-swatch"></i>0 / no</span><span class="tone-amber"><i class="legend-swatch"></i>the definition disagrees</span></div>
@@ -1415,10 +1452,10 @@ fake barns             1   1   1   0   no</div><p>The fourth condition now separ
       <div class="lab-stage"><div class="table-wrap" id="anTable" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="anStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Add a condition and test the repair</h3>
-          <p>The first preset has three conditions and the second has a fourth, <span class="math" data-say="L">L</span>. The candidate search tries formulas of one or two conditions and reports how many fit every row.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Add a condition and test the repair</h3>
+            <p>The first preset has three conditions and the second has a fourth, <span class="math" data-say="L">L</span>. The candidate search tries formulas of one or two conditions and reports how many fit every row.</p>
         <div class="field">
           <label for="anPreset">Case table</label>
           <select id="anPreset"><option value="gettier">J, T and B only</option><option value="lemma" selected>with a false-lemma condition</option></select>
@@ -1439,12 +1476,21 @@ fake barns             1   1   1   0   no</div><p>The fourth condition now separ
         </div>
         <p class="small-copy" style="margin:0;">A definition is too broad when it counts a case the verdict excludes, and too narrow when it excludes a case the verdict counts.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>A fourth condition</h3><p>The usual repair adds a condition that is true of the failing rows and false of perception. In both cases the belief depends on something false along the way: that Jones will get the job, that the clock is running. Call the condition <span class="math" data-say="L">L</span>, for “relies on a false lemma”, and require it to be absent: <span class="math" data-say="J and T and B and not L">J ∧ T ∧ B ∧ ¬L</span>. In the lab’s list of candidate definitions, not is written as a tilde.</p><div class="mathblock" data-say="case, J, T, B, L, knows ?. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">case                   J   T   B   L   knows?
+---------------------------------------------
+ordinary perception    1   1   1   0   yes
+Smith&#x27;s coins          1   1   1   1   no
+stopped clock          1   1   1   1   no
+lucky guess            0   1   1   0   no
+fake barns             1   1   1   0   no</div><p>The fourth condition now separates Smith’s coins and the stopped clock from perception, and the lab now reports agreement on four of five rows. The last row is why it does not end there. Henry drives through country dotted with barn facades and looks at the one real barn. He sees a barn, believes it is a barn, and is right. He relies on no false lemma at all, so <span class="math" data-say="L equals 0">L = 0</span>, and most people think he does not know, because he could easily have been looking at a facade.</p><p>Perception and fake barns now agree on every column, <span class="math" data-say="J equals 1">J = 1</span>, <span class="math" data-say="T equals 1">T = 1</span>, <span class="math" data-say="B equals 1">B = 1</span>, <span class="math" data-say="L equals 0">L = 0</span>, and differ in the verdict. This is the same trouble as before at a new place, and the lab names the row. Fixing it takes a fifth condition, and the literature has tried several.</p><div class="thm"><span class="label">Theorem &middot; What the cases show and what they do not</span><p>They show that the three conditions are not jointly sufficient. They do not show that knowledge is impossible, and they do not show that justification is irrelevant: the lucky guess row still needs <span class="math" data-say="J">J</span>, because without it the repaired definition calls the guess knowledge.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working a Gettier case</h2></div><p>Constructing a case and then testing a repair, in the order the lab expects.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start from an ordinary case of knowing</h3><p>Take a case you are sure about, such as seeing a cup on the table, and write its row. Everything else is a variation on it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Break the connection but keep the three conditions</h3><p>Add luck that sits between the justification and the truth. The evidence points the right way for the wrong reason, so <span class="math" data-say="J">J</span>, <span class="math" data-say="T">T</span> and <span class="math" data-say="B">B</span> stay at one.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Record the verdict and classify the failure</h3><p>If you judge that the person does not know, the definition is too broad on this row. Say so: it is the direction that tells you the repair must add a condition.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Propose a fourth condition</h3><p>Choose a condition that is present on the failing row and absent on ordinary perception, and add its negation or itself to the definition.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Look for a case the new condition cannot separate</h3><p>Build a case with the same four values as perception and a different verdict. If you can, the repair is too broad on that row, and you are back at the second step.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working a Gettier case</h2>
+      <p class="lead-in">Constructing a case and then testing a repair, in the order the lab expects.</p>
+      <ol class="key-ideas method"><li><strong>Start from an ordinary case of knowing.</strong> Take a case you are sure about, such as seeing a cup on the table, and write its row. Everything else is a variation on it.</li><li><strong>Break the connection but keep the three conditions.</strong> Add luck that sits between the justification and the truth. The evidence points the right way for the wrong reason, so <span class="math" data-say="J">J</span>, <span class="math" data-say="T">T</span> and <span class="math" data-say="B">B</span> stay at one.</li><li><strong>Record the verdict and classify the failure.</strong> If you judge that the person does not know, the definition is too broad on this row. Say so: it is the direction that tells you the repair must add a condition.</li><li><strong>Propose a fourth condition.</strong> Choose a condition that is present on the failing row and absent on ordinary perception, and add its negation or itself to the definition.</li><li><strong>Look for a case the new condition cannot separate.</strong> Build a case with the same four values as perception and a different verdict. If you can, the repair is too broad on that row, and you are back at the second step.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1462,17 +1508,16 @@ fake barns:     J=1 T=1 B=1 L=0, verdict no
 J ∧ T ∧ B ∧ ¬L: says knows -&gt; too broad again</div><p>The repair did what it was built to do and removed one row. It did not stop the failure; it moved it. That is the usual history of a proposed fourth condition.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Gettier to show that knowledge is impossible, or that justification is irrelevant</strong><span>The ordinary perception row still has all conditions and the verdict yes, so cases of knowing survive. The lucky guess row still needs justification excluded, and the lab shows the repaired definition calling the guess knowledge as soon as <span class="math" data-say="J">J</span> is dropped. What the cases refute is the claim that the three conditions are enough. A definition that is too broad on some rows is not a definition of nothing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a fourth condition ends the matter</strong><span>A repair is a new definition and meets the same test. The false-lemma condition removes the coins and the clock and then fails on the fake barns, where there is no false lemma. The failure moves to a case the repair did not anticipate, and the lab’s search finds no formula of one or two of the listed conditions that fits the table; the two rows that agree in every column and differ in the verdict show that none of any size could.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading “justified” as “certain”</strong><span>Smith is not careless. His evidence is strong, and it is only the luck between evidence and truth that fails him. Raising the standard of justification does not help, because any standard short of the truth itself can be met by a case with this structure.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the row and classify it.</strong><p>You should be able to write down a case with all three conditions present and the verdict no, say that the definition is too broad on it, propose a fourth condition, and construct a case with the same values as perception that the new condition cannot separate. A case described in prose without its row of values has not yet been tested.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The labs search only the conditions that you list. If the table has no column that separates two rows, no search can succeed, and finding what the missing column would be is the philosophical work the lab leaves to you.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking Gettier to show that knowledge is impossible, or that justification is irrelevant</strong><span>The ordinary perception row still has all conditions and the verdict yes, so cases of knowing survive. The lucky guess row still needs justification excluded, and the lab shows the repaired definition calling the guess knowledge as soon as <span class="math" data-say="J">J</span> is dropped. What the cases refute is the claim that the three conditions are enough. A definition that is too broad on some rows is not a definition of nothing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a fourth condition ends the matter</strong><span>A repair is a new definition and meets the same test. The false-lemma condition removes the coins and the clock and then fails on the fake barns, where there is no false lemma. The failure moves to a case the repair did not anticipate, and the lab’s search finds no formula of one or two of the listed conditions that fits the table; the two rows that agree in every column and differ in the verdict show that none of any size could.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading “justified” as “certain”</strong><span>Smith is not careless. His evidence is strong, and it is only the luck between evidence and truth that fails him. Raising the standard of justification does not help, because any standard short of the truth itself can be met by a case with this structure.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the row and classify it.</strong><p>You should be able to write down a case with all three conditions present and the verdict no, say that the definition is too broad on it, propose a fourth condition, and construct a case with the same values as perception that the new condition cannot separate. A case described in prose without its row of values has not yet been tested.</p></div></div><div class="note"><strong>Note:</strong> The labs search only the conditions that you list. If the table has no column that separates two rows, no search can succeed, and finding what the missing column would be is the philosophical work the lab leaves to you.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A Gettier case has all three conditions</summary><p>The belief is justified, true and held, and the person does not know. The definition says the person knows, so it admits a case that should be excluded. That is the direction called too broad.</p></details><details class="recall"><summary>A fourth condition is a new column</summary><p>To exclude the failing row the table needs a way to tell it apart from ordinary perception. A new condition is a new column that is 1 on the failing row and 0 on perception.</p></details><details class="recall"><summary>A repair is itself a definition</summary><p>A repaired analysis is tested the way the original was. The cases that broke the first version are not the only cases, and the repair must meet the ones that follow.</p></details></div>
+      <h3>Summary</h3>
       <p>Gettier cases are rows where all three conditions hold and the verdict is still that the person does not know, so the definition is too broad. A fourth condition can be added to remove the failing row, and a new case can then be found that the fourth condition cannot separate.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A Gettier case has all three conditions.</strong> The belief is justified, true and held, and the person does not know. The definition says the person knows, so it admits a case that should be excluded. That is the direction called too broad.</li><li><strong>A fourth condition is a new column.</strong> To exclude the failing row the table needs a way to tell it apart from ordinary perception. A new condition is a new column that is 1 on the failing row and 0 on perception.</li><li><strong>A repair is itself a definition.</strong> A repaired analysis is tested the way the original was. The cases that broke the first version are not the only cases, and the repair must meet the ones that follow.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="J, T and B all hold, and no knowledge. the definition is too broad on that row. a fourth condition removes the row. a new case breaks the fourth condition" tabindex="0" role="region" aria-label="Mathematical notation">J, T and B all hold, and no knowledge
 the definition is too broad on that row
 a fourth condition removes the row
@@ -2135,11 +2180,40 @@ a new case breaks the fourth condition</div><figcaption>Too broad, then repaired
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2207,7 +2281,7 @@ a new case breaks the fourth condition</div><figcaption>Too broad, then repaired
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

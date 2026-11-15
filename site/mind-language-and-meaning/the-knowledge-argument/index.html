@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Mind, Language and Meaning</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Mind</p>
       <h1>The Knowledge Argument</h1>
       <p class="lesson-lede">Formalise Mary&#x27;s argument, find it valid, and place the physicalist&#x27;s reply in a premise rather than in the logic.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Mary&#x27;s story gives two premises</li><li>Validity is the first question, and the lab answers it</li><li>Changing an atom changes the argument</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Mary, in three presets</h2>
-      <article class="prose reading"><p>Mary is a scientist who knows every physical fact there is to know about colour and the vision of colour. She has lived her whole life in a room where everything is black, white or grey. One day she is let out and sees a ripe tomato. The knowledge argument says that she learns what red looks like, that this is something she did not already know, and that therefore not every fact is a physical fact.</p><p>Put it in standard form. Let <span class="math" data-say="A">a</span> say that physicalism is true: every fact is a physical fact. Let <span class="math" data-say="n">n</span> say that on release Mary learns a new fact.</p><ol><li>If physicalism is true, Mary, who already knew every physical fact, learns no new fact: <span class="math" data-say="A implies not n">a → ¬n</span>.</li><li>Mary does learn a new fact on release: <span class="math" data-say="n">n</span>.</li><li>So physicalism is false: <span class="math" data-say="not a">¬a</span>.</li></ol><p>This is modus tollens. The lab builds a row for every assignment of <span class="math" data-say="A">a</span> and <span class="math" data-say="n">n</span>, four in all, and finds none in which both premises are true and the conclusion false. The verdict is valid, and the form is named. That settles the logic, and puts all the weight on the premises.</p><div class="defbox"><span class="label">Definition &middot; The physicalist&#x27;s two ways out</span><p>A physicalist can <strong>deny a premise</strong>, most naturally the second, or can say that the argument <strong>equivocates</strong>, so that its two premises do not share the sense they need. Neither is a claim that the form is invalid.</p></div><p>The first is the ability reply. What Mary gains is not a fact but an ability: to recognise red, to imagine it, to remember it. Knowing how is not knowing that, and a new ability is not a new fact. This denies <span class="math" data-say="n">n</span>. The second preset shows what happens when the argument is restated with the ability in the place of the fact: let <span class="math" data-say="k">k</span> say that Mary gains a new ability. Then <span class="math" data-say="A implies not n">a → ¬n</span> and <span class="math" data-say="k">k</span> do not lead to <span class="math" data-say="not a">¬a</span>, and the lab finds a counterexample row, with <span class="math" data-say="A">a</span> and <span class="math" data-say="k">k</span> true and <span class="math" data-say="n">n</span> false. A new ability does not conflict with physicalism. The reply is not that the argument is invalid. It is that the fact premise is false, and that the ability premise, which is true, does not carry the conclusion.</p><p>The second is the charge of equivocation. Knowing a physical fact is knowing that something is so; knowing what red looks like seems to be knowing it by acquaintance. If the two are different senses, then the premise that links them for physicalism fails. In the third preset the senses are separate atoms: <span class="math" data-say="f">f</span> for Mary's knowing all the physical facts, <span class="math" data-say="l">l</span> for her lacking what red looks like in the same sense, and <span class="math" data-say="m">m</span> for her lacking it in the sense of acquaintance. The premises are <span class="math" data-say="A implies not the quantity f and l">a → ¬(f ∧ l)</span>, <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span>. The lab finds a counterexample row, with <span class="math" data-say="A">a</span>, <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> true and <span class="math" data-say="l">l</span> false.</p><p>That is the physicalist's point, and the dualist's answer is also visible. Make <span class="math" data-say="l">l</span> and <span class="math" data-say="m">m</span> one atom, so that what Mary lacks is the same in both premises, and the lab finds the argument valid again. Whether they are one atom is what the dispute is: the dualist holds that acquaintance with red is knowledge of a fact, and the physicalist that it is not.</p><p>Each side has a cost. To deny that Mary learns a new fact is to say that her coming to know what red looks like adds nothing to what is so, which many find hard to say with a straight face. To accept the new fact is to accept that something is left out of the physical story, which is what the physicalist cannot. The lab checks the logic and leaves the costs for you to weigh.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Validity by cases</h2></div><p>Every row, every counterexample, and the form</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Mary, in three presets</h2><div class="prose reading"><p>Mary is a scientist who knows every physical fact there is to know about colour and the vision of colour. She has lived her whole life in a room where everything is black, white or grey. One day she is let out and sees a ripe tomato. The knowledge argument says that she learns what red looks like, that this is something she did not already know, and that therefore not every fact is a physical fact.</p><p>Put it in standard form. Let <span class="math" data-say="A">a</span> say that physicalism is true: every fact is a physical fact. Let <span class="math" data-say="n">n</span> say that on release Mary learns a new fact.</p><ol><li>If physicalism is true, Mary, who already knew every physical fact, learns no new fact: <span class="math" data-say="A implies not n">a → ¬n</span>.</li><li>Mary does learn a new fact on release: <span class="math" data-say="n">n</span>.</li><li>So physicalism is false: <span class="math" data-say="not a">¬a</span>.</li></ol><p>This is modus tollens. The lab builds a row for every assignment of <span class="math" data-say="A">a</span> and <span class="math" data-say="n">n</span>, four in all, and finds none in which both premises are true and the conclusion false. The verdict is valid, and the form is named. That settles the logic, and puts all the weight on the premises.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Validity by cases</h2></div><p>Every row, every counterexample, and the form</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Every row, and the rows that refute</strong><span>a counterexample row makes every premise true and the conclusion false</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>T</span><span class="tone-red"><i class="legend-swatch"></i>F</span><span class="tone-amber"><i class="legend-swatch"></i>counterexample row</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage"><div class="table-wrap" id="vaTable" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="vaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Which atom the premise is about</h3>
-          <p>In the first preset find the premises and the conclusion, and check that no row makes the premises true and the conclusion false. In the others the highlighted row is the case the reply describes. Then, in the last, type l in place of m and see the verdict return.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Which atom the premise is about</h3>
+            <p>In the first preset find the premises and the conclusion, and check that no row makes the premises true and the conclusion false. In the others the highlighted row is the case the reply describes. Then, in the last, type l in place of m and see the verdict return.</p>
         <div class="field">
           <label for="vaPreset">Argument</label>
           <select id="vaPreset"><option value="mary" selected>Physicalism, a new fact, the conclusion</option><option value="ability-reply">Physicalism, a new ability, the conclusion</option><option value="equivocation">Two senses of knowing, as two atoms</option></select>
@@ -1432,12 +1475,15 @@
         </div>
         <p class="small-copy" style="margin:0;">Sentence letters are words such as p or q; type ~ for not, &amp; for and, | for or, -&gt; for if-then and &lt;-&gt; for if and only if, or use the symbols.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The physicalist&#x27;s two ways out</span><p>A physicalist can <strong>deny a premise</strong>, most naturally the second, or can say that the argument <strong>equivocates</strong>, so that its two premises do not share the sense they need. Neither is a claim that the form is invalid.</p></div><p>The first is the ability reply. What Mary gains is not a fact but an ability: to recognise red, to imagine it, to remember it. Knowing how is not knowing that, and a new ability is not a new fact. This denies <span class="math" data-say="n">n</span>. The second preset shows what happens when the argument is restated with the ability in the place of the fact: let <span class="math" data-say="k">k</span> say that Mary gains a new ability. Then <span class="math" data-say="A implies not n">a → ¬n</span> and <span class="math" data-say="k">k</span> do not lead to <span class="math" data-say="not a">¬a</span>, and the lab finds a counterexample row, with <span class="math" data-say="A">a</span> and <span class="math" data-say="k">k</span> true and <span class="math" data-say="n">n</span> false. A new ability does not conflict with physicalism. The reply is not that the argument is invalid. It is that the fact premise is false, and that the ability premise, which is true, does not carry the conclusion.</p><p>The second is the charge of equivocation. Knowing a physical fact is knowing that something is so; knowing what red looks like seems to be knowing it by acquaintance. If the two are different senses, then the premise that links them for physicalism fails. In the third preset the senses are separate atoms: <span class="math" data-say="f">f</span> for Mary's knowing all the physical facts, <span class="math" data-say="l">l</span> for her lacking what red looks like in the same sense, and <span class="math" data-say="m">m</span> for her lacking it in the sense of acquaintance. The premises are <span class="math" data-say="A implies not the quantity f and l">a → ¬(f ∧ l)</span>, <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span>. The lab finds a counterexample row, with <span class="math" data-say="A">a</span>, <span class="math" data-say="f">f</span> and <span class="math" data-say="m">m</span> true and <span class="math" data-say="l">l</span> false.</p><p>That is the physicalist's point, and the dualist's answer is also visible. Make <span class="math" data-say="l">l</span> and <span class="math" data-say="m">m</span> one atom, so that what Mary lacks is the same in both premises, and the lab finds the argument valid again. Whether they are one atom is what the dispute is: the dualist holds that acquaintance with red is knowledge of a fact, and the physicalist that it is not.</p><p>Each side has a cost. To deny that Mary learns a new fact is to say that her coming to know what red looks like adds nothing to what is so, which many find hard to say with a straight face. To accept the new fact is to accept that something is left out of the physical story, which is what the physicalist cannot. The lab checks the logic and leaves the costs for you to weigh.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Formalising a philosophical argument</h2></div><p>Five steps. The third is where replies get their grip.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick one letter for each claim</h3><p>Physicalism, Mary learns a new fact, and so on. Two letters for two claims, and no letter for a claim that is used in two senses.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write each premise and the conclusion</h3><p>Use the connectives of the earlier course. A conditional for what physicalism says Mary would not learn, and a plain letter for what she does learn.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the atoms across the premises</h3><p>A letter must mean the same in each premise it appears in. If &ldquo;knows&rdquo; is used in two senses, give each its own letter and see whether the argument survives.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Ask the lab for the verdict and the row</h3><p>A verdict of valid leaves only the premises to doubt. A verdict of invalid shows the row, and the row says which case was overlooked.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Place the reply</h3><p>Say which premise a reply denies, or which atom it splits. A reply that does neither has not yet met the argument.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Formalising a philosophical argument</h2>
+      <p class="lead-in">Five steps. The third is where replies get their grip.</p>
+      <ol class="key-ideas method"><li><strong>Pick one letter for each claim.</strong> Physicalism, Mary learns a new fact, and so on. Two letters for two claims, and no letter for a claim that is used in two senses.</li><li><strong>Write each premise and the conclusion.</strong> Use the connectives of the earlier course. A conditional for what physicalism says Mary would not learn, and a plain letter for what she does learn.</li><li><strong>Check the atoms across the premises.</strong> A letter must mean the same in each premise it appears in. If &ldquo;knows&rdquo; is used in two senses, give each its own letter and see whether the argument survives.</li><li><strong>Ask the lab for the verdict and the row.</strong> A verdict of valid leaves only the premises to doubt. A verdict of invalid shows the row, and the row says which case was overlooked.</li><li><strong>Place the reply.</strong> Say which premise a reply denies, or which atom it splits. A reply that does neither has not yet met the argument.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ F  T  |  T         T   |  T
 F  F  |  T         F   |  T</div><p>Only the third row makes both premises true, and in it the conclusion is true. The argument is valid. The ability reply goes after the premise <span class="math" data-say="n">n</span>, and the equivocation reply after the match between the senses; neither touches the table.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the knowledge argument is invalid</strong><span>The lab checks it. With <span class="math" data-say="A implies not n">a → ¬n</span> and <span class="math" data-say="n">n</span> as premises and <span class="math" data-say="not a">¬a</span> as the conclusion there are four rows and no counterexample, and the form is modus tollens. A physicalist who wants to resist it must deny a premise or charge equivocation, and the replies are good or bad according to what they say about the premises.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting a change of atom as a refutation</strong><span>The ability preset has a counterexample row, but it has changed the argument. <span class="math" data-say="k">k</span> is not <span class="math" data-say="n">n</span>. The ability reply does not show that Mary's argument fails to follow; it asks the dualist to defend the claim that Mary learns a fact.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the equivocation charge as settled</strong><span>The third preset shows what the charge would show, if the two senses are different. Make <span class="math" data-say="l">l</span> and <span class="math" data-say="m">m</span> one letter and the argument is valid again. Whether they are one is the question between the sides, and the lab does not decide it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a reply to the argument.</strong><p>Given the knowledge argument or a reply to it, you should be able to write the premises with one letter for each claim, check the validity in a lab, and say which premise the reply denies or which atom it splits.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The dualist and the physicalist can both read this lesson as favouring them. The lab does not choose, because choosing is a matter of which premise to give up.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the knowledge argument is invalid</strong><span>The lab checks it. With <span class="math" data-say="A implies not n">a → ¬n</span> and <span class="math" data-say="n">n</span> as premises and <span class="math" data-say="not a">¬a</span> as the conclusion there are four rows and no counterexample, and the form is modus tollens. A physicalist who wants to resist it must deny a premise or charge equivocation, and the replies are good or bad according to what they say about the premises.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting a change of atom as a refutation</strong><span>The ability preset has a counterexample row, but it has changed the argument. <span class="math" data-say="k">k</span> is not <span class="math" data-say="n">n</span>. The ability reply does not show that Mary's argument fails to follow; it asks the dualist to defend the claim that Mary learns a fact.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the equivocation charge as settled</strong><span>The third preset shows what the charge would show, if the two senses are different. Make <span class="math" data-say="l">l</span> and <span class="math" data-say="m">m</span> one letter and the argument is valid again. Whether they are one is the question between the sides, and the lab does not decide it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a reply to the argument.</strong><p>Given the knowledge argument or a reply to it, you should be able to write the premises with one letter for each claim, check the validity in a lab, and say which premise the reply denies or which atom it splits.</p></div></div><div class="note"><strong>Note:</strong> The dualist and the physicalist can both read this lesson as favouring them. The lab does not choose, because choosing is a matter of which premise to give up.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Mary&#x27;s story gives two premises</summary><p>If physicalism is true, a person who knows all the physical facts has nothing left to learn about what red looks like. And on seeing red, Mary does learn something. The conclusion is that physicalism is false.</p></details><details class="recall"><summary>Validity is the first question, and the lab answers it</summary><p>The form is modus tollens, which has no counterexample row. So the physicalist must deny a premise, and the lesson is about which, and at what cost.</p></details><details class="recall"><summary>Changing an atom changes the argument</summary><p>If the premise about a new fact is replaced by one about a new ability, or if &ldquo;knows&rdquo; is used in two senses, the argument is no longer the same argument. The lab shows this as a counterexample row.</p></details></div>
+      <h3>Summary</h3>
       <p>Mary knows every physical fact about colour and has never seen red. Formalise the argument that she learns something on release, show it valid as modus tollens, and show that the physicalist's replies deny a premise or charge equivocation, and do not dispute the validity.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Mary&#x27;s story gives two premises.</strong> If physicalism is true, a person who knows all the physical facts has nothing left to learn about what red looks like. And on seeing red, Mary does learn something. The conclusion is that physicalism is false.</li><li><strong>Validity is the first question, and the lab answers it.</strong> The form is modus tollens, which has no counterexample row. So the physicalist must deny a premise, and the lesson is about which, and at what cost.</li><li><strong>Changing an atom changes the argument.</strong> If the premise about a new fact is replaced by one about a new ability, or if &ldquo;knows&rdquo; is used in two senses, the argument is no longer the same argument. The lab shows this as a counterexample row.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A, physicalism, n, Mary learns a fact. A implies not n, n, therefore, not a. valid, no row has true premises, false not a. reply, deny n, an ability, not a fact. reply, two senses of knowing, two atoms" tabindex="0" role="region" aria-label="Mathematical notation">a: physicalism     n: Mary learns a fact
 a → ¬n,  n  ∴  ¬a
 valid: no row has true premises, false ¬a
@@ -2161,11 +2206,40 @@ reply: two senses of knowing, two atoms</div><figcaption>A valid argument, a den
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2233,7 +2307,7 @@ reply: two senses of knowing, two atoms</div><figcaption>A valid argument, a den
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

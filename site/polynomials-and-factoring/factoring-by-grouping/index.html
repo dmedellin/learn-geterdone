@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,26 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Polynomials and Factoring</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Factoring</p>
       <h1>Factoring by Grouping</h1>
       <p class="lesson-lede">Test all pairings of four terms, extract a shared bracket, and keep factoring.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The shared binomial is an ordinary common factor</li><li>It only works if BOTH pairs leave the same binomial</li><li>Failure of the method is not failure to factor</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Pairing terms so a common factor appears</h2>
-      <article class="prose reading"><p>Grouping is the standard move for four terms. Take the GCF out of the first two and out of the last two, and if the same binomial is left in both places, take <em>that</em> out.</p><div class="mathblock" data-say="x cubed plus 3 x squared minus 4 x minus 12. x cubed plus 3 x squared, plus, negative 4 x minus 12, pair them. x squared x plus 3, plus, the quantity negative 4, times the quantity x plus 3, GCF of each pair. the quantity x plus 3, times the quantity x squared minus 4, x plus 3 is common" tabindex="0" role="region" aria-label="Mathematical notation">x³ + 3x² − 4x − 12
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Pairing terms so a common factor appears</h2><div class="prose reading"><p>Grouping is the standard move for four terms. Take the GCF out of the first two and out of the last two, and if the same binomial is left in both places, take <em>that</em> out.</p><div class="mathblock" data-say="x cubed plus 3 x squared minus 4 x minus 12. x cubed plus 3 x squared, plus, negative 4 x minus 12, pair them. x squared x plus 3, plus, the quantity negative 4, times the quantity x plus 3, GCF of each pair. the quantity x plus 3, times the quantity x squared minus 4, x plus 3 is common" tabindex="0" role="region" aria-label="Mathematical notation">x³ + 3x² − 4x − 12
 
   (x³ + 3x²)  +  (−4x − 12)      pair them
    x²(x + 3)  +  (−4)(x + 3)     GCF of each pair
-   (x + 3)(x² − 4)               (x + 3) is common</div><div class="thm"><span class="label">Theorem &middot; Why the last step is legal</span><p>For any polynomials <span class="math" data-say="A">A</span>, <span class="math" data-say="B">B</span> and <span class="math" data-say="P">P</span>, <span class="math" data-say="A times P plus B times P equals the quantity A plus B, times P">A·P + B·P = (A + B)·P</span>.</p><p>This is the distributive law with the common factor <span class="math" data-say="P">P</span> a binomial rather than a monomial. The law never cared what <span class="math" data-say="P">P</span> was.</p></div><h3>The sign in the second pair</h3><p>When the third term is negative, take the negative out with the GCF. In the example above the second pair is <span class="math" data-say="negative 4 x minus 12">−4x − 12</span>; factoring out <span class="math" data-say="negative 4">−4</span> rather than <span class="math" data-say="4">4</span> gives <span class="math" data-say="negative 4 times the quantity x plus 3">−4(x + 3)</span>, which matches the first bracket. Factoring out <span class="math" data-say="plus 4">+4</span> gives <span class="math" data-say="4 times the quantity negative x minus 3">4(−x − 3)</span>, which does not &mdash; and the method appears to fail when it has not.</p><p>The rule of thumb: make the second bracket match the first. If it cannot be made to match by choosing the sign, the pairing is genuinely wrong.</p><h3>Regrouping</h3><p>The order of the terms is yours to choose, and sometimes the given order is unhelpful. Consider <span class="math" data-say="A x plus b y plus A y plus b x">ax + by + ay + bx</span>. Pairing as given leaves <span class="math" data-say="A">a</span>-something and <span class="math" data-say="b">b</span>-something with nothing shared. Reorder:</p><div class="mathblock" data-say="A x plus A y plus b x plus b y, equals, A times the quantity x plus y, plus b times the quantity x plus y, equals, the quantity x plus y, times the quantity A plus b" tabindex="0" role="region" aria-label="Mathematical notation">ax + ay + bx + by  =  a(x + y) + b(x + y)  =  (x + y)(a + b)</div><p>Rearranging terms of a sum is always legal, so trying another pairing costs nothing but a line. With four terms there are only three genuinely different pairings, so the search is short and finite.</p><h3>Finish the job</h3><p>A factorisation is complete only when no factor factors further. In the worked example <span class="math" data-say="the quantity x plus 3, times the quantity x squared minus 4">(x + 3)(x² − 4)</span> is not the end: <span class="math" data-say="x squared minus 4">x² − 4</span> is a difference of squares, so the complete answer is <span class="math" data-say="the quantity x plus 3, times the quantity x minus 2, times the quantity x plus 2">(x + 3)(x − 2)(x + 2)</span>.</p><p>Stopping early is the most common way to lose marks on a factoring question that was otherwise done correctly. After every step, look at each factor again.</p><div class="example"><span class="label">Example &middot; When grouping does not apply</span><p><span class="math" data-say="x cubed plus x squared plus 2 x plus 6">x³ + x² + 2x + 6</span> gives <span class="math" data-say="x squared x plus 1 plus 2 times the quantity x plus 3">x²(x + 1) + 2(x + 3)</span>. The brackets differ, and no reordering fixes it. The honest conclusion is "grouping fails here" &mdash; not "this does not factor". That second claim needs “The Factor Theorem and Rational Roots”.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Factoring by grouping</h2></div><p>All three pairings tried, not just the obvious one</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   (x + 3)(x² − 4)               (x + 3) is common</div><div class="thm"><span class="label">Theorem &middot; Why the last step is legal</span><p>For any polynomials <span class="math" data-say="A">A</span>, <span class="math" data-say="B">B</span> and <span class="math" data-say="P">P</span>, <span class="math" data-say="A times P plus B times P equals the quantity A plus B, times P">A·P + B·P = (A + B)·P</span>.</p><p>This is the distributive law with the common factor <span class="math" data-say="P">P</span> a binomial rather than a monomial. The law never cared what <span class="math" data-say="P">P</span> was.</p></div><h3>The sign in the second pair</h3><p>When the third term is negative, take the negative out with the GCF. In the example above the second pair is <span class="math" data-say="negative 4 x minus 12">−4x − 12</span>; factoring out <span class="math" data-say="negative 4">−4</span> rather than <span class="math" data-say="4">4</span> gives <span class="math" data-say="negative 4 times the quantity x plus 3">−4(x + 3)</span>, which matches the first bracket. Factoring out <span class="math" data-say="plus 4">+4</span> gives <span class="math" data-say="4 times the quantity negative x minus 3">4(−x − 3)</span>, which does not &mdash; and the method appears to fail when it has not.</p><p>The rule of thumb: make the second bracket match the first. If it cannot be made to match by choosing the sign, the pairing is genuinely wrong.</p><h3>Regrouping</h3><p>The order of the terms is yours to choose, and sometimes the given order is unhelpful. Consider <span class="math" data-say="A x plus b y plus A y plus b x">ax + by + ay + bx</span>. Pairing as given leaves <span class="math" data-say="A">a</span>-something and <span class="math" data-say="b">b</span>-something with nothing shared. Reorder:</p><div class="mathblock" data-say="A x plus A y plus b x plus b y, equals, A times the quantity x plus y, plus b times the quantity x plus y, equals, the quantity x plus y, times the quantity A plus b" tabindex="0" role="region" aria-label="Mathematical notation">ax + ay + bx + by  =  a(x + y) + b(x + y)  =  (x + y)(a + b)</div><p>Rearranging terms of a sum is always legal, so trying another pairing costs nothing but a line. With four terms there are only three genuinely different pairings, so the search is short and finite.</p><h3>Finish the job</h3><p>A factorisation is complete only when no factor factors further. In the worked example <span class="math" data-say="the quantity x plus 3, times the quantity x squared minus 4">(x + 3)(x² − 4)</span> is not the end: <span class="math" data-say="x squared minus 4">x² − 4</span> is a difference of squares, so the complete answer is <span class="math" data-say="the quantity x plus 3, times the quantity x minus 2, times the quantity x plus 2">(x + 3)(x − 2)(x + 2)</span>.</p><p>Stopping early is the most common way to lose marks on a factoring question that was otherwise done correctly. After every step, look at each factor again.</p><div class="example"><span class="label">Example &middot; When grouping does not apply</span><p><span class="math" data-say="x cubed plus x squared plus 2 x plus 6">x³ + x² + 2x + 6</span> gives <span class="math" data-say="x squared x plus 1 plus 2 times the quantity x plus 3">x²(x + 1) + 2(x + 3)</span>. The brackets differ, and no reordering fixes it. The honest conclusion is "grouping fails here" &mdash; not "this does not factor". That second claim needs “The Factor Theorem and Rational Roots”.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Factoring by grouping</h2></div><p>All three pairings tried, not just the obvious one</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="fcTitle">Factoring by grouping</strong><span id="fcSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the polynomial</span><span class="tone-green"><i class="legend-swatch"></i>rational roots</span><span class="tone-muted"><i class="legend-swatch"></i>candidates that failed</span></div>
@@ -1408,10 +1451,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="fcPlot"></svg></div>
       <div id="fcWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="fcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pair, factor, compare</h3>
-          <p>The lab tries each pairing of a four-term polynomial, shows the binomial each pair leaves, and says plainly when no pairing produces a match.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pair, factor, compare</h3>
+            <p>The lab tries each pairing of a four-term polynomial, shows the binomial each pair leaves, and says plainly when no pairing produces a match.</p>
         <div class="field">
           <label for="fcPreset">Example</label>
           <select id="fcPreset"><option value="x^3 + 3x^2 + 2x + 6">x^3 + 3x^2 + 2x + 6</option><option value="2x^3 - 6x^2 + 5x - 15">2x^3 - 6x^2 + 5x - 15</option><option value="x^3 + 2x^2 - 3x - 6">x^3 + 2x^2 - 3x - 6   (the sign trap)</option><option value="x^3 + 2x^2 + 2x + 1">x^3 + 2x^2 + 2x + 1   (grouping fails, it still factors)</option><option value="x^3 + x^2 + 2x + 6">x^3 + x^2 + 2x + 6   (grouping fails, nothing factors)</option><option value="6x^3 + 4x^2 + 9x + 6">6x^3 + 4x^2 + 9x + 6</option></select>
@@ -1424,12 +1467,14 @@
         <p class="small-copy" style="margin:0;">Type as you would write it: <code>6x^3 + 9x^2 - 15x</code>,
         <code>(1/2)x^2 + 3/4</code>. Every divisor list, every pair tried and every test below is
         computed in your browser from what is in this box.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Factoring four terms by grouping</h2></div><p>Step 1 is the same as it was in “Factoring Out the Greatest Common Factor”, and it is still not optional.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take out the overall GCF first</h3><p>Grouping is stated for a polynomial with no common factor across all four terms. If there is one, remove it and group what is left.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Pair the terms and take the GCF of each pair</h3><p>Usually first-two and last-two. Where the second pair begins with a minus, factor out the negative so the bracket has a chance of matching.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare the two brackets</h3><p>Identical brackets mean the method has worked. Different brackets mean try another pairing &mdash; there are only three &mdash; before concluding anything.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Take out the shared binomial, then factor each factor</h3><p><span class="math" data-say="A times P plus B times P equals the quantity A plus B, times P">A·P + B·P = (A + B)·P</span>. Then look at both results: a difference of squares or a factorable trinomial often remains, and the answer is not complete until nothing factors.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Factoring four terms by grouping</h2>
+      <p class="lead-in">Step 1 is the same as it was in “Factoring Out the Greatest Common Factor”, and it is still not optional.</p>
+      <ol class="key-ideas method"><li><strong>Take out the overall GCF first.</strong> Grouping is stated for a polynomial with no common factor across all four terms. If there is one, remove it and group what is left.</li><li><strong>Pair the terms and take the GCF of each pair.</strong> Usually first-two and last-two. Where the second pair begins with a minus, factor out the negative so the bracket has a chance of matching.</li><li><strong>Compare the two brackets.</strong> Identical brackets mean the method has worked. Different brackets mean try another pairing &mdash; there are only three &mdash; before concluding anything.</li><li><strong>Take out the shared binomial, then factor each factor.</strong> <span class="math" data-say="A times P plus B times P equals the quantity A plus B, times P">A·P + B·P = (A + B)·P</span>. Then look at both results: a difference of squares or a factorable trinomial often remains, and the answer is not complete until nothing factors.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1456,17 +1501,16 @@ B.  6x³ − 9x² + 4x − 6
     3x² + 2 is positive for every real x, so it has no real linear factor.</div><p>In A, factoring <span class="math" data-say="plus 4">+4</span> out of the second pair would have given <span class="math" data-say="4 times the quantity negative x minus 3">4(−x − 3)</span>, and the two brackets would not have matched. The method would have looked broken; only the sign choice was.</p><p>In B the second factor <span class="math" data-say="3 x squared plus 2">3x² + 2</span> cannot be factored over the reals &mdash; it is positive for every <span class="math" data-say="x">x</span>, so it has no root and therefore no linear factor. Recognising when to stop is part of the technique.</p><p>For a faded grouping, begin <span class="math" data-say="2 x cubed plus 4 x squared minus 8 x minus 16">2x³ + 4x² − 8x − 16</span> with the supplied first move <span class="math" data-say="2 times the quantity x cubed plus 2 x squared minus 4 x minus 8">2(x³ + 2x² − 4x − 8)</span>. Pair the four terms, choose the sign of the second GCF, and factor every piece. The complete result is <span class="math" data-say="2 times the quantity x plus 2, squared x minus 2">2(x + 2)²(x − 2)</span>; stopping at <span class="math" data-say="2 times the quantity x plus 2, times the quantity x squared minus 4">2(x + 2)(x² − 4)</span> leaves a difference of squares unfactored.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Factoring <span class="math" data-say="plus">+</span> out of a negative second pair</strong><span><span class="math" data-say="negative 4 x minus 12">−4x − 12</span> should give <span class="math" data-say="negative 4 times the quantity x plus 3">−4(x + 3)</span>. Taking out <span class="math" data-say="plus 4">+4</span> produces a bracket that cannot match, and the method is abandoned for no reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forcing two different brackets to be the same</strong><span><span class="math" data-say="x plus 3">(x + 3)</span> and <span class="math" data-say="x minus 3">(x − 3)</span> are different polynomials. If the pairs do not agree, regroup; never adjust one bracket to fit.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Stopping at the first product</strong><span><span class="math" data-say="the quantity x plus 3, times the quantity x squared minus 4">(x + 3)(x² − 4)</span> is a factorisation but not a complete one. Check every factor for a further factorisation before you call it finished.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when four terms make you reach for a pairing automatically.</strong><p>You should try the pairings without hesitation, get the sign right on the second pair first time, and always look again at both factors afterwards. You should also be comfortable saying "grouping does not work here" without claiming more than that.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Grouping earns its place twice. Here it handles four terms, and in “The AC Method” the AC method deliberately splits a three-term polynomial into four so that this technique can be used on it. Getting the signs reliable now pays for itself two lessons from now.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Factoring <span class="math" data-say="plus">+</span> out of a negative second pair</strong><span><span class="math" data-say="negative 4 x minus 12">−4x − 12</span> should give <span class="math" data-say="negative 4 times the quantity x plus 3">−4(x + 3)</span>. Taking out <span class="math" data-say="plus 4">+4</span> produces a bracket that cannot match, and the method is abandoned for no reason.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Forcing two different brackets to be the same</strong><span><span class="math" data-say="x plus 3">(x + 3)</span> and <span class="math" data-say="x minus 3">(x − 3)</span> are different polynomials. If the pairs do not agree, regroup; never adjust one bracket to fit.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Stopping at the first product</strong><span><span class="math" data-say="the quantity x plus 3, times the quantity x squared minus 4">(x + 3)(x² − 4)</span> is a factorisation but not a complete one. Check every factor for a further factorisation before you call it finished.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when four terms make you reach for a pairing automatically.</strong><p>You should try the pairings without hesitation, get the sign right on the second pair first time, and always look again at both factors afterwards. You should also be comfortable saying "grouping does not work here" without claiming more than that.</p></div></div><div class="note"><strong>Note:</strong> Grouping earns its place twice. Here it handles four terms, and in “The AC Method” the AC method deliberately splits a three-term polynomial into four so that this technique can be used on it. Getting the signs reliable now pays for itself two lessons from now.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The shared binomial is an ordinary common factor</summary><p>After the first step you have <span class="math" data-say="x squared times P minus 4 times P">x²·P − 4·P</span> with <span class="math" data-say="P equals x plus 3">P = (x + 3)</span>. That is <span class="math" data-say="A b plus A c">ab + ac</span> again, with <span class="math" data-say="A equals P">a = P</span>. Nothing new is being assumed &mdash; the common factor just happens to be a bracket.</p></details><details class="recall"><summary>It only works if BOTH pairs leave the same binomial</summary><p>If one pair leaves <span class="math" data-say="x plus 3">(x + 3)</span> and the other <span class="math" data-say="x minus 3">(x − 3)</span>, there is no common factor and the step has failed. You may not adjust one of them to match; you regroup, or you conclude this technique does not apply.</p></details><details class="recall"><summary>Failure of the method is not failure to factor</summary><p>If no pairing works, all you have learned is that grouping did not crack it. Whether the polynomial factors at all is settled by the root theorems in “Synthetic Division and the Remainder Theorem” and “The Factor Theorem and Rational Roots”, not here.</p></details></div>
+      <h3>Summary</h3>
       <p>With four terms and no common factor, split into pairs, take the GCF out of each, and hope the same binomial is left behind. What makes the method work is that the shared binomial is itself a common factor.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The shared binomial is an ordinary common factor.</strong> After the first step you have <span class="math" data-say="x squared times P minus 4 times P">x²·P − 4·P</span> with <span class="math" data-say="P equals x plus 3">P = (x + 3)</span>. That is <span class="math" data-say="A b plus A c">ab + ac</span> again, with <span class="math" data-say="A equals P">a = P</span>. Nothing new is being assumed &mdash; the common factor just happens to be a bracket.</li><li><strong>It only works if BOTH pairs leave the same binomial.</strong> If one pair leaves <span class="math" data-say="x plus 3">(x + 3)</span> and the other <span class="math" data-say="x minus 3">(x − 3)</span>, there is no common factor and the step has failed. You may not adjust one of them to match; you regroup, or you conclude this technique does not apply.</li><li><strong>Failure of the method is not failure to factor.</strong> If no pairing works, all you have learned is that grouping did not crack it. Whether the polynomial factors at all is settled by the root theorems in “Synthetic Division and the Remainder Theorem” and “The Factor Theorem and Rational Roots”, not here.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="x cubed plus 3 x squared minus 4 x minus 12. equals, x squared x plus 3 minus 4 times the quantity x plus 3, both pairs leave x plus 3. equals, the quantity x plus 3, times the quantity x squared minus 4, the binomial is the common factor. equals, the quantity x plus 3, times the quantity x minus 2, times the quantity x plus 2, keep going until nothing factors" tabindex="0" role="region" aria-label="Mathematical notation">x³ + 3x² − 4x − 12
   =  x²(x + 3) − 4(x + 3)        both pairs leave (x + 3)
   =  (x + 3)(x² − 4)             the binomial is the common factor
@@ -3805,11 +3849,40 @@ B.  6x³ − 9x² + 4x − 6
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3877,7 +3950,7 @@ B.  6x³ − 9x² + 4x − 6
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

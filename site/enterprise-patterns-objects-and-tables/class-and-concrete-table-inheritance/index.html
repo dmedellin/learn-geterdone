@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,30 +1478,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Objects and Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · Object-Relational Structural Patterns</p>
       <h1>Class and Concrete Table Inheritance</h1>
       <p class="lesson-lede">A table per class joins to load and changes least; a table per concrete class loads from one table and changes everywhere a superclass does.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Class Table Inheritance</li><li>Concrete Table Inheritance</li><li>Inheritance Mappers</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two patterns, read against each other</h2>
-      <article class="prose reading"><p>&ldquo;You need to touch multiple tables to load an object, which means a join or multiple queries and sewing in memory.&rdquo; That is the first weakness Chapter 12 lists for Class Table Inheritance, and the lesson reads it against its opposite, Concrete Table Inheritance, and the structure both share, Inheritance Mappers. Read the three patterns in your own copy first.</p><p>Class Table Inheritance gives every class a table of the fields it declares. Its strengths, as the pattern lists them, are that no row carries a column it does not use, so nothing is wasted, and that classes and tables correspond one to one, which makes the mapping easy to follow. The rows of one object can share one key value across the tables, or each table can have its own key and a foreign key into the superclass table. The cost is the quotation: loading an object reads several tables, and a join across more than three or four of them is slow on most databases. Worse, a query for a group of objects of mixed classes does not know which tables to join, so it needs outer joins or a first read of the root table followed by more queries. Moving a field up or down the hierarchy changes the database, and the superclass tables, read on every access, can become a bottleneck.</p><p>Concrete Table Inheritance makes the opposite trade. Each concrete class gets one self-contained table with all its fields, so loading an object of a known class reads one table, and each table is touched only when its class is. But superclass fields are duplicated across the tables, so a superclass change alters every table that holds the field, and a find on the superclass must look in all of them. Keys must be unique across the tables, not just within each, or one key could name two rows; and the database cannot enforce a reference to the abstract class, because it has no table.</p><p>Inheritance Mappers is the structure behind all three. Each domain class has a mapper that loads and saves its own fields and calls its superclass's mapper for the rest, and a mapper for the abstract class works out which concrete mapper should handle a request and delegates to it. Fowler finds it hard to think of a good alternative; duplicating the superclass's mapping code in every concrete mapper is, in his phrase, &ldquo;a heinous crime&rdquo;. And Chapter 3 reminds you that the three mappings can be mixed in one hierarchy, at the cost of more complexity.</p><p>Here is the query a class-table load needs, written for this lesson. A manager's name is in <span class="math" data-say="person">person</span>, its salary in <span class="math" data-say="employee">employee</span> and its reports in <span class="math" data-say="manager">manager</span>, so the <span class="math" data-say="select">SELECT</span> on line 3 names a column from each, and lines 5 and 6 <span class="math" data-say="join">JOIN</span> the three tables on the shared key. Under concrete table the same object would be one row of one table.</p><pre class="codeblock" data-say="line 1, comment, A manager&#x27;s fields live in three tables, one per class.. line 2, static final string find manager is set to. line 3, SELECT p.name, e.salary, m.reports. line 4, plus FROM person p. line 5, plus JOIN employee e ON e.id p.id. line 6, plus JOIN manager m ON m.id p.id. line 7, plus WHERE p.id ?" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A manager&#x27;s fields live in three tables, one per class.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two patterns, read against each other</h2><div class="prose reading"><p>&ldquo;You need to touch multiple tables to load an object, which means a join or multiple queries and sewing in memory.&rdquo; That is the first weakness Chapter 12 lists for Class Table Inheritance, and the lesson reads it against its opposite, Concrete Table Inheritance, and the structure both share, Inheritance Mappers. Read the three patterns in your own copy first.</p><p>Class Table Inheritance gives every class a table of the fields it declares. Its strengths, as the pattern lists them, are that no row carries a column it does not use, so nothing is wasted, and that classes and tables correspond one to one, which makes the mapping easy to follow. The rows of one object can share one key value across the tables, or each table can have its own key and a foreign key into the superclass table. The cost is the quotation: loading an object reads several tables, and a join across more than three or four of them is slow on most databases. Worse, a query for a group of objects of mixed classes does not know which tables to join, so it needs outer joins or a first read of the root table followed by more queries. Moving a field up or down the hierarchy changes the database, and the superclass tables, read on every access, can become a bottleneck.</p><p>Concrete Table Inheritance makes the opposite trade. Each concrete class gets one self-contained table with all its fields, so loading an object of a known class reads one table, and each table is touched only when its class is. But superclass fields are duplicated across the tables, so a superclass change alters every table that holds the field, and a find on the superclass must look in all of them. Keys must be unique across the tables, not just within each, or one key could name two rows; and the database cannot enforce a reference to the abstract class, because it has no table.</p><p>Inheritance Mappers is the structure behind all three. Each domain class has a mapper that loads and saves its own fields and calls its superclass's mapper for the rest, and a mapper for the abstract class works out which concrete mapper should handle a request and delegates to it. Fowler finds it hard to think of a good alternative; duplicating the superclass's mapping code in every concrete mapper is, in his phrase, &ldquo;a heinous crime&rdquo;. And Chapter 3 reminds you that the three mappings can be mixed in one hierarchy, at the cost of more complexity.</p><p>Here is the query a class-table load needs, written for this lesson. A manager's name is in <span class="math" data-say="person">person</span>, its salary in <span class="math" data-say="employee">employee</span> and its reports in <span class="math" data-say="manager">manager</span>, so the <span class="math" data-say="select">SELECT</span> on line 3 names a column from each, and lines 5 and 6 <span class="math" data-say="join">JOIN</span> the three tables on the shared key. Under concrete table the same object would be one row of one table.</p><pre class="codeblock" data-say="line 1, comment, A manager&#x27;s fields live in three tables, one per class.. line 2, static final string find manager is set to. line 3, SELECT p.name, e.salary, m.reports. line 4, plus FROM person p. line 5, plus JOIN employee e ON e.id p.id. line 6, plus JOIN manager m ON m.id p.id. line 7, plus WHERE p.id ?" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A manager&#x27;s fields live in three tables, one per class.</span>
 <span class="cl">static final String FIND_MANAGER =</span>
 <span class="cl">    &quot;SELECT p.name, e.salary, m.reports&quot;</span>
 <span class="cl">    + &quot; FROM person p&quot;</span>
 <span class="cl">    + &quot; JOIN employee e ON e.id = p.id&quot;</span>
 <span class="cl">    + &quot; JOIN manager m ON m.id = p.id&quot;</span>
-<span class="cl">    + &quot; WHERE p.id = ?&quot;;</span></code></pre><p>Now the count, on the last lesson's staff hierarchy, single table, class table, concrete table in each tile. In <code>staff-find-person</code> the lab loads a manager: <span class="math" data-say="1, 3, 1">1, 3, 1</span> tables, a class-table load joining person, employee and manager. Finding every person, subclasses included, reads <span class="math" data-say="1, 4, 3">1, 4, 3</span>: under class table the find joins the class's ancestors and unions its descendants, here all four tables, and under concrete table it unions the concrete tables below person, employee, manager and contractor. Adding a field to person alters <span class="math" data-say="1, 1, 3">1, 1, 3</span>: one table for single and class table, all three concrete tables.</p><p>The preset <code>staff-find-employee</code> moves down the hierarchy. Loading a contractor touches <span class="math" data-say="1, 2, 1">1, 2, 1</span>, person and contractor under class table. Finding every employee reads <span class="math" data-say="1, 3, 2">1, 3, 2</span>: class table joins person above and unions manager below, and concrete table unions employee and manager. Adding a field to employee alters <span class="math" data-say="1, 1, 2">1, 1, 2</span>. The lower the class, the more a class-table load joins and the fewer tables a concrete-table change or find touches.</p><p>Read the two patterns against those figures. Class Table Inheritance pays on every load, more the deeper the class, and never alters more than one table to add a field. Concrete Table Inheritance pays nothing to load a class it knows, and pays in every concrete table below the class it finds or alters. Which costs more depends on whether the system mostly loads objects it can name or mostly searches and changes the hierarchy, and the count does not know that.</p><h3>Exercise</h3><p>A bank's hierarchy has the records <span class="math" data-say="account, no parent, 3 fields, not concrete, saving under account, 2, not concrete, isa under saving, 1, concrete, bond under saving, 2, concrete, current under account, 2, concrete">account, -, 3, no; saving, account, 2, no; isa, saving, 1, yes; bond, saving, 2, yes; current, account, 2, yes</span>: a saving account is abstract, with two concrete kinds below it. You load a <span class="math" data-say="bond">bond</span>, find every saving account and add a field to saving. By hand, give the tables each touches under the three mappings, then check them in the lab.</p><p>Every mapping so far has been written by hand. The next lesson, Metadata Mapping, Query Object and Repository, reads Chapter 13's way of holding the mapping as data instead.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Inheritance mappings</h2></div><p>single, class and concrete table inheritance</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">    + &quot; WHERE p.id = ?&quot;;</span></code></pre><p>Now the count, on the last lesson's staff hierarchy, single table, class table, concrete table in each tile. In <code>staff-find-person</code> the lab loads a manager: <span class="math" data-say="1, 3, 1">1, 3, 1</span> tables, a class-table load joining person, employee and manager. Finding every person, subclasses included, reads <span class="math" data-say="1, 4, 3">1, 4, 3</span>: under class table the find joins the class's ancestors and unions its descendants, here all four tables, and under concrete table it unions the concrete tables below person, employee, manager and contractor. Adding a field to person alters <span class="math" data-say="1, 1, 3">1, 1, 3</span>: one table for single and class table, all three concrete tables.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Inheritance mappings</h2></div><p>single, class and concrete table inheritance</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Inheritance mappings</strong><span>single, class and concrete table inheritance</span></div>
       </div>
@@ -1464,10 +1507,10 @@
       <div class="table-wrap" id="ihTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ihTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A class's chain is the class and its ancestors; its subtree the class and its descendants. Every table has a key column, and the single table a type column too. Single table: one table, 2 + every field columns. Class table: a table a class, 1 + its own fields each. Concrete table: a table a concrete class, 1 + its chain's fields each. To load an object the class table joins the class's chain. To find every instance of a class, subclasses included, the class table reads its chain and its subtree (joins up, unions down) and the concrete table unions the concrete tables in its subtree. To add a field, the concrete table alters every concrete table in the subtree.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What loading, finding and altering touch</h3>
-          <p>A count over the situation the lesson states. Each record is a class, its parent, the fields it declares itself, and whether it is concrete. Every three-part tile is single table, class table, concrete table, in that order. A class-table find joins the class's ancestors and unions its descendants; a concrete-table find unions the concrete tables below it. The hierarchies are the lesson's, and illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What loading, finding and altering touch</h3>
+            <p>A count over the situation the lesson states. Each record is a class, its parent, the fields it declares itself, and whether it is concrete. Every three-part tile is single table, class table, concrete table, in that order. A class-table find joins the class's ancestors and unions its descendants; a concrete-table find unions the concrete tables below it. The hierarchies are the lesson's, and illustrative.</p>
         <div class="field">
           <label for="ihPreset">Worked example</label>
           <select id="ihPreset"><option value="staff-find-person" selected>Staff: load a manager, find every person, add a field to person</option><option value="staff-find-employee">Staff: load a contractor, find employees, add a field to employee</option></select>
@@ -1497,12 +1540,15 @@
           <div class="kpi"><span>Tables altered to add a field (single, class, concrete)</span><strong id="ihAlter">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>staff-find-employee</code> moves down the hierarchy. Loading a contractor touches <span class="math" data-say="1, 2, 1">1, 2, 1</span>, person and contractor under class table. Finding every employee reads <span class="math" data-say="1, 3, 2">1, 3, 2</span>: class table joins person above and unions manager below, and concrete table unions employee and manager. Adding a field to employee alters <span class="math" data-say="1, 1, 2">1, 1, 2</span>. The lower the class, the more a class-table load joins and the fewer tables a concrete-table change or find touches.</p><p>Read the two patterns against those figures. Class Table Inheritance pays on every load, more the deeper the class, and never alters more than one table to add a field. Concrete Table Inheritance pays nothing to load a class it knows, and pays in every concrete table below the class it finds or alters. Which costs more depends on whether the system mostly loads objects it can name or mostly searches and changes the hierarchy, and the count does not know that.</p><h3>Exercise</h3><p>A bank's hierarchy has the records <span class="math" data-say="account, no parent, 3 fields, not concrete, saving under account, 2, not concrete, isa under saving, 1, concrete, bond under saving, 2, concrete, current under account, 2, concrete">account, -, 3, no; saving, account, 2, no; isa, saving, 1, yes; bond, saving, 2, yes; current, account, 2, yes</span>: a saving account is abstract, with two concrete kinds below it. You load a <span class="math" data-say="bond">bond</span>, find every saving account and add a field to saving. By hand, give the tables each touches under the three mappings, then check them in the lab.</p><p>Every mapping so far has been written by hand. The next lesson, Metadata Mapping, Query Object and Repository, reads Chapter 13's way of holding the mapping as data instead.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the tables an operation touches</h2></div><p>Four steps, the last of them on a hierarchy of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count a load</h3><p>Under class table, a load reads the class and each of its ancestors. Under single and concrete table it reads one table.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count a find</h3><p>Under class table, a find of a class reads its ancestors and every class below it. Under concrete table it reads each concrete class at or below it. Single table reads one.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count an alteration</h3><p>Adding a field alters one table under single and class table. Under concrete table it alters every concrete class at or below the class changed.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a hierarchy of your own</h3><p>Take the hierarchy from the last lesson's final step, and count the tables a query for every instance of its root touches under each of the three mappings. Write the three numbers down.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the tables an operation touches</h2>
+      <p class="lead-in">Four steps, the last of them on a hierarchy of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count a load.</strong> Under class table, a load reads the class and each of its ancestors. Under single and concrete table it reads one table.</li><li><strong>Count a find.</strong> Under class table, a find of a class reads its ancestors and every class below it. Under concrete table it reads each concrete class at or below it. Single table reads one.</li><li><strong>Count an alteration.</strong> Adding a field alters one table under single and class table. Under concrete table it alters every concrete class at or below the class changed.</li><li><strong>Do it on a hierarchy of your own.</strong> Take the hierarchy from the last lesson's final step, and count the tables a query for every instance of its root touches under each of the three mappings. Write the three numbers down.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1520,17 +1566,16 @@ concrete: one row of the manager table
 manager table: key + 3 + 2 + 2, so 8</div><p>The concrete manager table repeats person's 3 columns and employee's 2, which is why adding a field to person alters all 3 concrete tables.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Choosing Concrete Table Inheritance as the fast one</strong><span>On this view the mapping that loads from one table must be the best. It does load from one table, but a find on the superclass touches every concrete table, and altering the superclass alters all of them: on the lesson's illustration, <code>staff-find-person</code>, 3 tables each time. It also makes keys and references to the abstract class awkward. Chapter 3's trade-off between duplication and speed is still a trade-off.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every load to join every table</strong><span>Class Table Inheritance can sound as if every load joins every table. It joins one table per class in the loaded object's chain: a contractor touches 2 tables, a manager 3. The whole hierarchy is read only by a find on the root, which must also cover every class below it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying the superclass&#x27;s mapping into each mapper</strong><span>With one table per concrete class, it is tempting to write each mapper whole, superclass fields included. Inheritance Mappers' answer is a mapper per class that maps its own fields and calls its superclass's mapper for the rest; Fowler calls the duplication a heinous crime, and it is the code-level twin of the duplicated columns.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the tables each operation touches under each mapping.</strong><p>Given a hierarchy, a class to load, a class to find all instances of and a class to alter, state the tables each touches under each of the three mappings.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts tables touched, not the cost of a join or a union, which depends on the rows and the database. It also cannot show the concrete-table problems that are about keys rather than tables: keeping keys unique across tables and referring to an abstract class that has no table.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Choosing Concrete Table Inheritance as the fast one</strong><span>On this view the mapping that loads from one table must be the best. It does load from one table, but a find on the superclass touches every concrete table, and altering the superclass alters all of them: on the lesson's illustration, <code>staff-find-person</code>, 3 tables each time. It also makes keys and references to the abstract class awkward. Chapter 3's trade-off between duplication and speed is still a trade-off.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every load to join every table</strong><span>Class Table Inheritance can sound as if every load joins every table. It joins one table per class in the loaded object's chain: a contractor touches 2 tables, a manager 3. The whole hierarchy is read only by a find on the root, which must also cover every class below it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying the superclass&#x27;s mapping into each mapper</strong><span>With one table per concrete class, it is tempting to write each mapper whole, superclass fields included. Inheritance Mappers' answer is a mapper per class that maps its own fields and calls its superclass's mapper for the rest; Fowler calls the duplication a heinous crime, and it is the code-level twin of the duplicated columns.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the tables each operation touches under each mapping.</strong><p>Given a hierarchy, a class to load, a class to find all instances of and a class to alter, state the tables each touches under each of the three mappings.</p></div></div><div class="note"><strong>Note:</strong> The lab counts tables touched, not the cost of a join or a union, which depends on the rows and the database. It also cannot show the concrete-table problems that are about keys rather than tables: keeping keys unique across tables and referring to an abstract class that has no table.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Class Table Inheritance</summary><p>One table for each class in the hierarchy, holding the fields that class declares. The rows of one object usually share one key value across the tables, and loading it joins the tables of its class and its ancestors.</p></details><details class="recall"><summary>Concrete Table Inheritance</summary><p>One table for each concrete class, holding all its fields, inherited ones included. Loading needs no join, but superclass fields are duplicated in every table, and keys must be unique across all of them.</p></details><details class="recall"><summary>Inheritance Mappers</summary><p>A structure of mapper classes for any of the three mappings: one mapper per domain class, each loading its own class's fields and calling its superclass mapper for the rest, with a mapper for the abstract class that delegates to the right concrete one.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 12's other two inheritance mappings make opposite trade-offs. Class Table Inheritance gives each class its own table and joins them to load an object; Concrete Table Inheritance gives each concrete class one table holding every inherited field. Count what loading, finding and altering touch under each, and read how Inheritance Mappers organizes the code for all three.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Class Table Inheritance.</strong> One table for each class in the hierarchy, holding the fields that class declares. The rows of one object usually share one key value across the tables, and loading it joins the tables of its class and its ancestors.</li><li><strong>Concrete Table Inheritance.</strong> One table for each concrete class, holding all its fields, inherited ones included. Loading needs no join, but superclass fields are duplicated in every table, and keys must be unique across all of them.</li><li><strong>Inheritance Mappers.</strong> A structure of mapper classes for any of the three mappings: one mapper per domain class, each loading its own class's fields and calling its superclass mapper for the rest, with a mapper for the abstract class that delegates to the right concrete one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="class table, a table per class. loading joins every ancestor table. concrete table, one per concrete class. loading reads one table, no joins. a superclass find unions every table. a superclass change alters every table" tabindex="0" role="region" aria-label="Mathematical notation">class table: a table per class
 loading joins every ancestor table
 concrete table: one per concrete class
@@ -2229,11 +2274,40 @@ a superclass change alters every table</div><figcaption>The other two mappings i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2301,7 +2375,7 @@ a superclass change alters every table</div><figcaption>The other two mappings i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

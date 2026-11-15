@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Analysis Patterns, Design Patterns and Refactoring</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · Relating Design Patterns to the Model</p>
       <h1>Strategy and Composite in the Model</h1>
       <p class="lesson-lede">Two of the Gang of Four&#x27;s design patterns read on two levels at once: a technique in the code, and a concept in the domain.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Domain pattern</li><li>Strategy, or Policy</li><li>Composite</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the patterns, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The only requirement is that the pattern should say something about the conceptual domain, not just be a technical solution to a technical problem.&rdquo; Evans ends Chapter 12, Relating Design Patterns to the Model, with that test. The chapter is short: an opening, two patterns, Strategy and Composite, and Why Not Flyweight?. Read it in your own copy first.</p><p>The argument starts from a difference of level. The patterns of Part II and Part III were written for domain models; most published patterns are technical. Evans quotes the authors of Design Patterns on the level of theirs, objects and classes that communicate, tailored to a recurring design problem in its setting, neither reusable data structures nor whole domain-specific designs. Some of them, not all, can serve as domain patterns, because they match concepts that arise in many domains. To use one that way you read it twice at once: as a technical pattern in the code and as a conceptual pattern in the model.</p><p>Strategy, which Evans also calls Policy, is the first. Domain processes often have more than one legitimate form, and once the alternatives are written into the process, choosing among them tangles with the alternatives themselves and the real options disappear into the rest of the behaviour. His remedy: make the variable part an object of the model in its own right, kept apart from the process it steers, with one such object for each way the process can go, built as the design pattern builds it. The design pattern's emphasis is substituting one algorithm for another; the domain pattern's is expressing a concept, most often a policy or a process.</p><p>His example is a routing service in the book's shipping domain, tuned to find the quickest or the least costly route, with that choice tested inside every computation. Passing in a policy that scores each leg lets the service treat every request the same way, its behaviour stated in one sentence of the domain's language, and new policies need no change to it. The design pattern's consequences still hold, Evans adds: clients must know the strategies, which is a modelling concern, and there are more objects, which stateless shared strategies can reduce.</p><p>Now the count, on a bike-share's ride pricing. The preset <code>plan-tests</code> is one class's two methods, the fare and the deposit, each testing the rider's plan. The lab counts decision points by a stated rule, one plus one for each <span class="math" data-say="if">if</span>, loop, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, and finds 7: <span class="math" data-say="1 plus if 4 plus and 1 plus or 1">1 + if 4 + &amp;&amp; 1 + || 1</span>, in the band 6–10. Five of the six decisions ask which plan the rider is on, the <span class="math" data-say="and">&amp;&amp;</span> on line 3 asking about the ride instead, and a new plan would add a test to both methods.</p><pre class="codeblock" data-say="line 1, comment, The rider&#x27;s plan is tested in each computation that depends on it.. line 2, long fare cents of ride r. line 3, if r dot plan equals plan dot member and r dot minutes is at most 45. line 4, return 0. line 6, if r dot plan equals plan dot member. line 7, return 15 times, open bracket, r dot minutes minus 45, close bracket. line 9, if r dot plan equals plan dot student. line 10, return 10 times r dot minutes. line 12, return 100 plus 25 times r dot minutes. line 15, long deposit cents of ride r. line 16, if r dot plan equals plan dot member or r dot plan equals plan dot student. line 17, return 0. line 19, return 2000" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The rider&#x27;s plan is tested in each computation that depends on it.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the patterns, then the count</h2><div class="prose reading"><p>&ldquo;The only requirement is that the pattern should say something about the conceptual domain, not just be a technical solution to a technical problem.&rdquo; Evans ends Chapter 12, Relating Design Patterns to the Model, with that test. The chapter is short: an opening, two patterns, Strategy and Composite, and Why Not Flyweight?. Read it in your own copy first.</p><p>The argument starts from a difference of level. The patterns of Part II and Part III were written for domain models; most published patterns are technical. Evans quotes the authors of Design Patterns on the level of theirs, objects and classes that communicate, tailored to a recurring design problem in its setting, neither reusable data structures nor whole domain-specific designs. Some of them, not all, can serve as domain patterns, because they match concepts that arise in many domains. To use one that way you read it twice at once: as a technical pattern in the code and as a conceptual pattern in the model.</p><p>Strategy, which Evans also calls Policy, is the first. Domain processes often have more than one legitimate form, and once the alternatives are written into the process, choosing among them tangles with the alternatives themselves and the real options disappear into the rest of the behaviour. His remedy: make the variable part an object of the model in its own right, kept apart from the process it steers, with one such object for each way the process can go, built as the design pattern builds it. The design pattern's emphasis is substituting one algorithm for another; the domain pattern's is expressing a concept, most often a policy or a process.</p><p>His example is a routing service in the book's shipping domain, tuned to find the quickest or the least costly route, with that choice tested inside every computation. Passing in a policy that scores each leg lets the service treat every request the same way, its behaviour stated in one sentence of the domain's language, and new policies need no change to it. The design pattern's consequences still hold, Evans adds: clients must know the strategies, which is a modelling concern, and there are more objects, which stateless shared strategies can reduce.</p><p>Now the count, on a bike-share's ride pricing. The preset <code>plan-tests</code> is one class's two methods, the fare and the deposit, each testing the rider's plan. The lab counts decision points by a stated rule, one plus one for each <span class="math" data-say="if">if</span>, loop, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>, and finds 7: <span class="math" data-say="1 plus if 4 plus and 1 plus or 1">1 + if 4 + &amp;&amp; 1 + || 1</span>, in the band 6–10. Five of the six decisions ask which plan the rider is on, the <span class="math" data-say="and">&amp;&amp;</span> on line 3 asking about the ride instead, and a new plan would add a test to both methods.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where a policy&#x27;s decisions go</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Evans gives no count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="plan-tests" selected>The rider's plan tested in the fare and in the deposit</option><option value="pricing-policies">The same prices as interchangeable pricing policies</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, The rider&#x27;s plan is tested in each computation that depends on it.. line 2, long fare cents of ride r. line 3, if r dot plan equals plan dot member and r dot minutes is at most 45. line 4, return 0. line 6, if r dot plan equals plan dot member. line 7, return 15 times, open bracket, r dot minutes minus 45, close bracket. line 9, if r dot plan equals plan dot student. line 10, return 10 times r dot minutes. line 12, return 100 plus 25 times r dot minutes. line 15, long deposit cents of ride r. line 16, if r dot plan equals plan dot member or r dot plan equals plan dot student. line 17, return 0. line 19, return 2000" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The rider&#x27;s plan is tested in each computation that depends on it.</span>
 <span class="cl">long fareCents(Ride r) {</span>
 <span class="cl">    if (r.plan() == Plan.MEMBER &amp;&amp; r.minutes() &lt;= 45) {</span>
 <span class="cl">        return 0;</span>
@@ -1516,53 +1603,12 @@
 <span class="cl"></span>
 <span class="cl">boolean refundable(Booking b) {</span>
 <span class="cl">    return b.scheme() == Scheme.STANDARD || b.scheme() == Scheme.GROUP;</span>
-<span class="cl">}</span></code></pre><p>A theatre prices seats and refunds by the booking's scheme: standard, concession or group. Count the decision points by the lab's rule, with the breakdown, then sketch the three scheme policies that would give every booking the same price and refund, and count again. Paste each into the lab to check; the policies are yours.</p><p>Chapters 11 and 12 bring models from outside. The next lesson, Refactoring Toward Deeper Insight, reads Chapter 13, where Evans gathers Part III into one account of when and how a model changes.</p></article>
+<span class="cl">}</span></code></pre><p>A theatre prices seats and refunds by the booking's scheme: standard, concession or group. Count the decision points by the lab's rule, with the breakdown, then sketch the three scheme policies that would give every booking the same price and refund, and count again. Paste each into the lab to check; the policies are yours.</p><p>Chapters 11 and 12 bring models from outside. The next lesson, Refactoring Toward Deeper Insight, reads Chapter 13, where Evans gathers Part III into one account of when and how a model changes.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where a policy&#x27;s decisions go</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Evans gives no count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="plan-tests" selected>The rider's plan tested in the fare and in the deposit</option><option value="pricing-policies">The same prices as interchangeable pricing policies</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Factoring a policy out of a process</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the decisions</h3><p>Count one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the tests on the policy</h3><p>For each decision, say whether it asks which policy applies or applies a rule within one. Tests of the first kind repeated across methods are what a Strategy gathers.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write one class a policy</h3><p>Give each policy a class with every method that varied, and check that each input still gets the result it got before. Then name the one place where a policy is chosen.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find a routine in a system you know that tests the same kind, plan or mode in more than one method. Count its decisions, say whether the alternatives are a policy your domain's experts name, and only then decide whether a Strategy belongs in the model.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Factoring a policy out of a process</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the decisions.</strong> Count one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> adds nothing.</li><li><strong>Mark the tests on the policy.</strong> For each decision, say whether it asks which policy applies or applies a rule within one. Tests of the first kind repeated across methods are what a Strategy gathers.</li><li><strong>Write one class a policy.</strong> Give each policy a class with every method that varied, and check that each input still gets the result it got before. Then name the one place where a policy is chosen.</li><li><strong>Do it on your own code.</strong> Find a routine in a system you know that tests the same kind, plan or mode in more than one method. Count its decisions, say whether the alternatives are a policy your domain's experts name, and only then decide whether a Strategy belongs in the model.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1582,17 +1628,16 @@ line 16: if, and ||: +2
 after: one if, the 45 minutes: 2</div><p>Lines 3, 6 and 9 test the plan once each and line 16 twice; the second half of line 3 asks about the ride. The policies keep the second kind and move the first to wherever a ride is given its policy.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using a design pattern in the domain because it is convenient in code</strong><span>Evans's first concern whenever a design pattern is brought into the domain is whether its idea fits a concept the domain has. Recursion through some objects may be convenient without a real hierarchy of wholes and parts, and Flyweight is useful with no domain meaning at all. The test, which the lesson's opening quotation states, is that the pattern says something about the conceptual domain.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a Strategy removes the decision</strong><span>It moves it. On the lesson's illustration the count falls from 7 to 2 because the plan is no longer tested in every method; it is still chosen, once, wherever a ride is given its policy, in code the lab does not see. Evans names the related cost: clients must know the strategies exist.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Adding a Composite before the domain needs one</strong><span>Evans's route example ends with the observation that before the segments and their distinct legs were needed, the plain model did fine without Composite: a design pattern earns its place when the need for it has arrived. The nesting it allows is a capability, not a requirement.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say whether a design pattern is also a domain pattern.</strong><p>Count a routine's decisions before and after a Strategy, name where the choice of policy went, and say what concept the pattern names in the domain.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts decisions in the listing it is given. It does not see the code that chooses a policy, and it cannot say whether a plan, a scheme or a programme is a concept your domain's experts use; that, for Evans, is what decides whether a design pattern belongs in the model.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using a design pattern in the domain because it is convenient in code</strong><span>Evans's first concern whenever a design pattern is brought into the domain is whether its idea fits a concept the domain has. Recursion through some objects may be convenient without a real hierarchy of wholes and parts, and Flyweight is useful with no domain meaning at all. The test, which the lesson's opening quotation states, is that the pattern says something about the conceptual domain.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a Strategy removes the decision</strong><span>It moves it. On the lesson's illustration the count falls from 7 to 2 because the plan is no longer tested in every method; it is still chosen, once, wherever a ride is given its policy, in code the lab does not see. Evans names the related cost: clients must know the strategies exist.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Adding a Composite before the domain needs one</strong><span>Evans's route example ends with the observation that before the segments and their distinct legs were needed, the plain model did fine without Composite: a design pattern earns its place when the need for it has arrived. The nesting it allows is a capability, not a requirement.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say whether a design pattern is also a domain pattern.</strong><p>Count a routine's decisions before and after a Strategy, name where the choice of policy went, and say what concept the pattern names in the domain.</p></div></div><div class="note"><strong>Note:</strong> The lab counts decisions in the listing it is given. It does not see the code that chooses a policy, and it cannot say whether a plan, a scheme or a programme is a concept your domain's experts use; that, for Evans, is what decides whether a design pattern belongs in the model.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Domain pattern</summary><p>A pattern that says something about the domain, not only about the code. A design pattern from Gamma, Helm, Johnson and Vlissides can be one when it corresponds to a concept the domain has, and then it is read on two levels: a technique in the code and a concept in the model.</p></details><details class="recall"><summary>Strategy, or Policy</summary><p>A family of interchangeable ways of doing one thing, each an object of its own. As a domain pattern it separates a process's varying part, often a rule or policy the business talks about, from the stable part, so that each can be seen and changed alone.</p></details><details class="recall"><summary>Composite</summary><p>A tree whose parts are of the same kind as the whole they make up, behind one shared type: a whole answers from its parts, a single part from itself, and a client asks either the same way.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 12 asks when a design pattern can also be a domain pattern, with Strategy, Composite and the counter-example of Flyweight. Read Evans's argument, then count the decision points of a pricing routine that tests a rider's plan in every computation, against the same prices given by interchangeable policies.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Domain pattern.</strong> A pattern that says something about the domain, not only about the code. A design pattern from Gamma, Helm, Johnson and Vlissides can be one when it corresponds to a concept the domain has, and then it is read on two levels: a technique in the code and a concept in the model.</li><li><strong>Strategy, or Policy.</strong> A family of interchangeable ways of doing one thing, each an object of its own. As a domain pattern it separates a process's varying part, often a rule or policy the business talks about, from the stable part, so that each can be seen and changed alone.</li><li><strong>Composite.</strong> A tree whose parts are of the same kind as the whole they make up, behind one shared type: a whole answers from its parts, a single part from itself, and a client asks either the same way.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a design pattern read on two levels. strategy, a policy the domain names. pull the varying rule out of a process. composite, parts the same kind as wholes. same questions at every level. flyweight, no domain concept at all" tabindex="0" role="region" aria-label="Mathematical notation">a design pattern read on two levels
 strategy: a policy the domain names
 pull the varying rule out of a process
@@ -2620,11 +2665,40 @@ flyweight: no domain concept at all</div><figcaption>Chapter 12 in six lines</fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2692,7 +2766,7 @@ flyweight: no domain concept at all</div><figcaption>Chapter 12 in six lines</fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

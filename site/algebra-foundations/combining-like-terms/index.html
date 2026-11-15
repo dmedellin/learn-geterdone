@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Foundations of Algebra</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Building expressions</p>
       <h1>Combining Like Terms</h1>
       <p class="lesson-lede">What makes two terms alike, and what does not.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Like terms have identical variable parts</li><li>The coefficients have no say in it</li><li>Combining like terms is the distributive law backwards</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Which terms may be added</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Like terms</span><p>Two terms are <strong>like terms</strong> when their variable parts are identical: the same variables, each raised to the same exponent.</p><p><span class="math" data-say="5 x squared y">5x²y</span> and <span class="math" data-say="negative 2 x squared y">−2x²y</span> are like terms. <span class="math" data-say="5 x squared y">5x²y</span> and <span class="math" data-say="5 x y squared">5xy²</span> are not: the letters match but the exponents are attached to different ones. Constant terms are all alike, since each has an empty variable part.</p></div><p>The order in which the letters are written does not affect anything, because multiplication is commutative (“Properties of the Real Numbers”). <span class="math" data-say="3 x y">3xy</span> and <span class="math" data-say="2 y x">2yx</span> have the same variable part written two ways, and they are like terms. Sorting the letters alphabetically inside every term is a cheap habit that makes this visible instead of a judgement call.</p><div class="thm"><span class="label">Theorem &middot; Why like terms combine</span><p>For any numbers <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> and any variable part <span class="math" data-say="v">v</span>, <span class="math" data-say="A v plus b v equals the quantity A plus b, times v">av + bv = (a + b)v</span>.</p></div><div class="proof"><p>This is the distributive law <span class="math" data-say="A c plus b c equals the quantity A plus b, times c">ac + bc = (a + b)c</span> of “The Distributive Law”, read from right to left, with <span class="math" data-say="c">c</span> taken to be the variable part <span class="math" data-say="v">v</span>.</p><p>The law holds for all real numbers, and <span class="math" data-say="v">v</span> stands for a real number whatever value the letters in it take, so the statement holds for every value of every variable involved.</p><p><span class="qed">&#9633;</span></p></div><div class="mathblock" data-say="3 x plus 4 y minus x plus 2 y. x, terms, 3 x plus negative x, equals, the quantity 3 minus 1, times x, equals, 2 x. y, terms, 4 y plus 2 y, equals, the quantity 4 plus 2, times y, equals, 6 y. answer, 2 x plus 6 y" tabindex="0" role="region" aria-label="Mathematical notation">3x + 4y − x + 2y
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Which terms may be added</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Like terms</span><p>Two terms are <strong>like terms</strong> when their variable parts are identical: the same variables, each raised to the same exponent.</p><p><span class="math" data-say="5 x squared y">5x²y</span> and <span class="math" data-say="negative 2 x squared y">−2x²y</span> are like terms. <span class="math" data-say="5 x squared y">5x²y</span> and <span class="math" data-say="5 x y squared">5xy²</span> are not: the letters match but the exponents are attached to different ones. Constant terms are all alike, since each has an empty variable part.</p></div><p>The order in which the letters are written does not affect anything, because multiplication is commutative (“Properties of the Real Numbers”). <span class="math" data-say="3 x y">3xy</span> and <span class="math" data-say="2 y x">2yx</span> have the same variable part written two ways, and they are like terms. Sorting the letters alphabetically inside every term is a cheap habit that makes this visible instead of a judgement call.</p><div class="thm"><span class="label">Theorem &middot; Why like terms combine</span><p>For any numbers <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span> and any variable part <span class="math" data-say="v">v</span>, <span class="math" data-say="A v plus b v equals the quantity A plus b, times v">av + bv = (a + b)v</span>.</p></div><div class="proof"><p>This is the distributive law <span class="math" data-say="A c plus b c equals the quantity A plus b, times c">ac + bc = (a + b)c</span> of “The Distributive Law”, read from right to left, with <span class="math" data-say="c">c</span> taken to be the variable part <span class="math" data-say="v">v</span>.</p><p>The law holds for all real numbers, and <span class="math" data-say="v">v</span> stands for a real number whatever value the letters in it take, so the statement holds for every value of every variable involved.</p><p><span class="qed">&#9633;</span></p></div><div class="mathblock" data-say="3 x plus 4 y minus x plus 2 y. x, terms, 3 x plus negative x, equals, the quantity 3 minus 1, times x, equals, 2 x. y, terms, 4 y plus 2 y, equals, the quantity 4 plus 2, times y, equals, 6 y. answer, 2 x plus 6 y" tabindex="0" role="region" aria-label="Mathematical notation">3x + 4y − x + 2y
 
   x  terms :   3x + (−x)   =  (3 − 1)x   =  2x
   y  terms :   4y + 2y     =  (4 + 2)y   =  6y
 
-  answer   :   2x + 6y</div><p>The <span class="math" data-say="negative x">−x</span> contributes <span class="math" data-say="negative 1">−1</span>, not <span class="math" data-say="negative 0">−0</span> and not <span class="math" data-say="plus 1">+1</span>. This is the invisible coefficient from “Variables, Expressions, and Terms” doing real work: <span class="math" data-say="3 minus 1 equals 2">3 − 1 = 2</span>, and a reader who treats <span class="math" data-say="negative x">−x</span> as contributing nothing gets <span class="math" data-say="3 x">3x</span> instead.</p><h3>Four ways two terms fail to be alike</h3><ul><li><strong>Different exponent on the same letter.</strong> <span class="math" data-say="x squared">x²</span> and <span class="math" data-say="x cubed">x³</span>. There is nothing to add: <span class="math" data-say="x squared plus x cubed">x² + x³</span> is already as short as it gets.</li><li><strong>Different letters.</strong> <span class="math" data-say="4 x">4x</span> and <span class="math" data-say="4 y">4y</span>. Equal coefficients are irrelevant, and <span class="math" data-say="4 x plus 4 y">4x + 4y</span> is finished.</li><li><strong>The same letters with the exponents swapped.</strong> <span class="math" data-say="5 x squared y">5x²y</span> and <span class="math" data-say="2 x y squared">2xy²</span>. At <span class="math" data-say="x equals 2, y equals 3">x = 2, y = 3</span> the first is <span class="math" data-say="60">60</span> and the second is <span class="math" data-say="36">36</span>, so they are not even close to interchangeable.</li><li><strong>One inside a bracket that has not been expanded.</strong> <span class="math" data-say="3 x plus 2 times the quantity x plus 1">3x + 2(x + 1)</span> has no two like terms as it stands. Distribute first, getting <span class="math" data-say="3 x plus 2 x plus 2">3x + 2x + 2</span>, and then there are.</li></ul><p>That last case is the ordering rule for the whole subject: expand, then collect. Collecting first is not wrong so much as premature, because the terms you need are still hidden inside the bracket.</p><p>Like terms are not a polynomial-only idea. <span class="math" data-say="3 times the square root of 2 plus 5 times the square root of 2 equals 8 times the square root of 2">3√2 + 5√2 = 8√2</span> for exactly the same reason, with <span class="math" data-say="the square root of 2">√2</span> playing the part of the variable part &mdash; it is one fixed number, whatever it is. And <span class="math" data-say="the square root of 2 plus the square root of 3">√2 + √3</span> cannot be combined, for exactly the same reason <span class="math" data-say="x plus y">x + y</span> cannot.</p><div class="example"><span class="label">Example &middot; Two collections, in full</span><p><span class="math" data-say="4 A minus 3 b plus 2 A minus b plus 7">4a − 3b + 2a − b + 7</span> collects to <span class="math" data-say="6 A minus 4 b plus 7">6a − 4b + 7</span>: the <span class="math" data-say="A">a</span> terms give <span class="math" data-say="4 plus 2 equals 6">4 + 2 = 6</span>, the <span class="math" data-say="b">b</span> terms give <span class="math" data-say="negative 3 minus 1 equals negative 4">−3 − 1 = −4</span>, and the <span class="math" data-say="7">7</span> has nothing to join. <span class="math" data-say="2 x plus 3 minus 5 minus 2 x">2x + 3 − 5 − 2x</span> collects to <span class="math" data-say="negative 2">−2</span>: the <span class="math" data-say="x">x</span> terms give <span class="math" data-say="2 minus 2 equals 0">2 − 2 = 0</span> and vanish, and <span class="math" data-say="3 minus 5 equals negative 2">3 − 5 = −2</span> remains.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Like terms</h2></div><p>Same letters, same exponents, or they are not like</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  answer   :   2x + 6y</div><p>The <span class="math" data-say="negative x">−x</span> contributes <span class="math" data-say="negative 1">−1</span>, not <span class="math" data-say="negative 0">−0</span> and not <span class="math" data-say="plus 1">+1</span>. This is the invisible coefficient from “Variables, Expressions, and Terms” doing real work: <span class="math" data-say="3 minus 1 equals 2">3 − 1 = 2</span>, and a reader who treats <span class="math" data-say="negative x">−x</span> as contributing nothing gets <span class="math" data-say="3 x">3x</span> instead.</p><h3>Four ways two terms fail to be alike</h3><ul><li><strong>Different exponent on the same letter.</strong> <span class="math" data-say="x squared">x²</span> and <span class="math" data-say="x cubed">x³</span>. There is nothing to add: <span class="math" data-say="x squared plus x cubed">x² + x³</span> is already as short as it gets.</li><li><strong>Different letters.</strong> <span class="math" data-say="4 x">4x</span> and <span class="math" data-say="4 y">4y</span>. Equal coefficients are irrelevant, and <span class="math" data-say="4 x plus 4 y">4x + 4y</span> is finished.</li><li><strong>The same letters with the exponents swapped.</strong> <span class="math" data-say="5 x squared y">5x²y</span> and <span class="math" data-say="2 x y squared">2xy²</span>. At <span class="math" data-say="x equals 2, y equals 3">x = 2, y = 3</span> the first is <span class="math" data-say="60">60</span> and the second is <span class="math" data-say="36">36</span>, so they are not even close to interchangeable.</li><li><strong>One inside a bracket that has not been expanded.</strong> <span class="math" data-say="3 x plus 2 times the quantity x plus 1">3x + 2(x + 1)</span> has no two like terms as it stands. Distribute first, getting <span class="math" data-say="3 x plus 2 x plus 2">3x + 2x + 2</span>, and then there are.</li></ul><p>That last case is the ordering rule for the whole subject: expand, then collect. Collecting first is not wrong so much as premature, because the terms you need are still hidden inside the bracket.</p><p>Like terms are not a polynomial-only idea. <span class="math" data-say="3 times the square root of 2 plus 5 times the square root of 2 equals 8 times the square root of 2">3√2 + 5√2 = 8√2</span> for exactly the same reason, with <span class="math" data-say="the square root of 2">√2</span> playing the part of the variable part &mdash; it is one fixed number, whatever it is. And <span class="math" data-say="the square root of 2 plus the square root of 3">√2 + √3</span> cannot be combined, for exactly the same reason <span class="math" data-say="x plus y">x + y</span> cannot.</p><div class="example"><span class="label">Example &middot; Two collections, in full</span><p><span class="math" data-say="4 A minus 3 b plus 2 A minus b plus 7">4a − 3b + 2a − b + 7</span> collects to <span class="math" data-say="6 A minus 4 b plus 7">6a − 4b + 7</span>: the <span class="math" data-say="A">a</span> terms give <span class="math" data-say="4 plus 2 equals 6">4 + 2 = 6</span>, the <span class="math" data-say="b">b</span> terms give <span class="math" data-say="negative 3 minus 1 equals negative 4">−3 − 1 = −4</span>, and the <span class="math" data-say="7">7</span> has nothing to join. <span class="math" data-say="2 x plus 3 minus 5 minus 2 x">2x + 3 − 5 − 2x</span> collects to <span class="math" data-say="negative 2">−2</span>: the <span class="math" data-say="x">x</span> terms give <span class="math" data-say="2 minus 2 equals 0">2 − 2 = 0</span> and vanish, and <span class="math" data-say="3 minus 5 equals negative 2">3 − 5 = −2</span> remains.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Like terms</h2></div><p>Same letters, same exponents, or they are not like</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Like terms</strong><span id="exSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a group of like terms</span></div>
@@ -1409,10 +1452,10 @@
       <div class="lab-stage" id="exStage"></div>
       <div id="exWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="exStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Group the terms by variable part</h3>
-          <p>The lab sorts the letters inside each term and then groups terms whose variable parts match exactly. Enter <span class="math" data-say="3 x y plus 2 y x minus x y">3xy + 2yx - xy</span> and predict the groups before changing to <span class="math" data-say="5 x squared y minus 2 x y squared">5x^2y - 2xy^2</span>. The group labels diagnose whether a coefficient, letter or exponent was used to make the decision.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Group the terms by variable part</h3>
+            <p>The lab sorts the letters inside each term and then groups terms whose variable parts match exactly. Enter <span class="math" data-say="3 x y plus 2 y x minus x y">3xy + 2yx - xy</span> and predict the groups before changing to <span class="math" data-say="5 x squared y minus 2 x y squared">5x^2y - 2xy^2</span>. The group labels diagnose whether a coefficient, letter or exponent was used to make the decision.</p>
         <div class="field">
           <label for="exPreset">Expression</label>
           <select id="exPreset"><option value="3x + 4y - x + 2y">3x + 4y - x + 2y</option><option value="5x^2 + 2x - 3x^2 + x">5x^2 + 2x - 3x^2 + x</option><option value="3xy + 2yx - xy">3xy + 2yx - xy</option><option value="5x^2y - 2xy^2">5x^2y - 2xy^2</option><option value="2x + 3 - 5 - 2x">2x + 3 - 5 - 2x</option><option value="4a - 3b + 2a - b + 7">4a - 3b + 2a - b + 7</option></select>
@@ -1423,12 +1466,14 @@
         </div>
         <div class="kpi-grid"><div class="kpi"><span>Terms</span><strong id="exK1">&mdash;</strong></div><div class="kpi"><span>Groups</span><strong id="exK2">&mdash;</strong></div><div class="kpi"><span>After collecting</span><strong id="exK3">&mdash;</strong></div></div>
         <p class="small-copy" style="margin:0;">One expression, several terms: <code>3x + 4y - x + 2y</code>.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Collecting like terms</h2></div><p>Step 1 is skipped more often than it is done, and step 1 is what makes the rest safe.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Expand every bracket first</h3><p>Terms inside a bracket are not available to be collected. Distribute, using “The Distributive Law”, and only then look at what you have.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Attach every sign to the term that follows it</h3><p>Rewrite the expression as a sum of signed terms if that helps. A term carried across the page without its sign is the commonest way a correct grouping produces a wrong answer.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Group by variable part, sorting the letters within each term</h3><p>Write the letters of each term in alphabetical order, then gather the terms whose variable parts are now literally identical. Terms with no letters form their own group.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add the coefficients within each group, and leave the variable part alone</h3><p>The exponent never changes: <span class="math" data-say="3 x squared plus 5 x squared">3x² + 5x²</span> is <span class="math" data-say="8 x squared">8x²</span>. If a group's coefficients sum to zero, that whole group disappears from the answer.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Collecting like terms</h2>
+      <p class="lead-in">Step 1 is skipped more often than it is done, and step 1 is what makes the rest safe.</p>
+      <ol class="key-ideas method"><li><strong>Expand every bracket first.</strong> Terms inside a bracket are not available to be collected. Distribute, using “The Distributive Law”, and only then look at what you have.</li><li><strong>Attach every sign to the term that follows it.</strong> Rewrite the expression as a sum of signed terms if that helps. A term carried across the page without its sign is the commonest way a correct grouping produces a wrong answer.</li><li><strong>Group by variable part, sorting the letters within each term.</strong> Write the letters of each term in alphabetical order, then gather the terms whose variable parts are now literally identical. Terms with no letters form their own group.</li><li><strong>Add the coefficients within each group, and leave the variable part alone.</strong> The exponent never changes: <span class="math" data-say="3 x squared plus 5 x squared">3x² + 5x²</span> is <span class="math" data-say="8 x squared">8x²</span>. If a group's coefficients sum to zero, that whole group disappears from the answer.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1452,17 +1497,16 @@ check at a = 1, b = 1:
         answer     6 − 4 + 7           =  9</div><p>The <span class="math" data-say="b">b</span> group is where the arithmetic is. <span class="math" data-say="negative b">−b</span> contributes <span class="math" data-say="negative 1">−1</span>, so the sum is <span class="math" data-say="negative 3 minus 1 equals negative 4">−3 − 1 = −4</span> and not <span class="math" data-say="negative 3 minus 0 equals negative 3">−3 − 0 = −3</span> or <span class="math" data-say="negative 3 plus 1 equals negative 2">−3 + 1 = −2</span>. Both of those wrong answers are produced by the same cause: the invisible <span class="math" data-say="1">1</span> was not read.</p><p>The check tests <span class="math" data-say="A equals 1, b equals 1">a = 1, b = 1</span> only, which is enough to catch a dropped term or a wrong sign and is not a proof of equality. What proves it is the theorem above, which holds for every value of <span class="math" data-say="A">a</span> and <span class="math" data-say="b">b</span>.</p><p>For a faded collection, group <span class="math" data-say="6 a squared b minus A squared b plus 3 A b squared">6a²b − a²b + 3ab²</span> without touching the coefficients until the groups are marked. Only the first two terms join, so the result is <span class="math" data-say="5 a squared b plus 3 A b squared">5a²b + 3ab²</span>. Combining all three means the swapped exponents were treated as though their variable parts matched.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding the exponents instead of the coefficients</strong><span><span class="math" data-say="3 x squared plus 5 x squared equals 8 x squared">3x² + 5x² = 8x²</span>. Exponents add when powers are <em>multiplied</em>, which is “Integer Exponents”. Adding like terms leaves the variable part exactly as it was, and only the coefficients change.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Writing <span class="math" data-say="3 x plus 4 y equals 7 x y">3x + 4y = 7xy</span></strong><span>There is nothing to combine: the variable parts differ, so no common factor can be taken out. Testing at <span class="math" data-say="x equals 1, y equals 1">x = 1, y = 1</span> gives <span class="math" data-say="7">7</span> on both sides and proves nothing; testing at <span class="math" data-say="x equals 2, y equals 1">x = 2, y = 1</span> gives <span class="math" data-say="10">10</span> against <span class="math" data-say="14">14</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Dropping the sign of a subtracted term</strong><span>In <span class="math" data-say="5 x squared plus 2 x minus 3 x squared plus x">5x² + 2x − 3x² + x</span> the third term is <span class="math" data-say="negative 3 x squared">−3x²</span>, so the <span class="math" data-say="x squared">x²</span> group is <span class="math" data-say="5 minus 3 equals 2">5 − 3 = 2</span>, not <span class="math" data-say="5 plus 3 equals 8">5 + 3 = 8</span>. Attach every sign before grouping and this cannot happen.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say instantly whether two terms may be added, and why.</strong><p>Expand and collect <span class="math" data-say="3 times the quantity 2 x minus y, minus x plus 4 y minus 7">3(2x − y) − x + 4y − 7</span>, marking every group by its variable part before adding coefficients. Justify each merge by the distributive law read backwards and explain why an unlike term stays. Linear Equations and Inequalities collects on each side of an equation and preserves every sign error made here.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This is the last of the three reading skills. “Variables, Expressions, and Terms” found the terms, “The Distributive Law” got them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding the exponents instead of the coefficients</strong><span><span class="math" data-say="3 x squared plus 5 x squared equals 8 x squared">3x² + 5x² = 8x²</span>. Exponents add when powers are <em>multiplied</em>, which is “Integer Exponents”. Adding like terms leaves the variable part exactly as it was, and only the coefficients change.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Writing <span class="math" data-say="3 x plus 4 y equals 7 x y">3x + 4y = 7xy</span></strong><span>There is nothing to combine: the variable parts differ, so no common factor can be taken out. Testing at <span class="math" data-say="x equals 1, y equals 1">x = 1, y = 1</span> gives <span class="math" data-say="7">7</span> on both sides and proves nothing; testing at <span class="math" data-say="x equals 2, y equals 1">x = 2, y = 1</span> gives <span class="math" data-say="10">10</span> against <span class="math" data-say="14">14</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Dropping the sign of a subtracted term</strong><span>In <span class="math" data-say="5 x squared plus 2 x minus 3 x squared plus x">5x² + 2x − 3x² + x</span> the third term is <span class="math" data-say="negative 3 x squared">−3x²</span>, so the <span class="math" data-say="x squared">x²</span> group is <span class="math" data-say="5 minus 3 equals 2">5 − 3 = 2</span>, not <span class="math" data-say="5 plus 3 equals 8">5 + 3 = 8</span>. Attach every sign before grouping and this cannot happen.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say instantly whether two terms may be added, and why.</strong><p>Expand and collect <span class="math" data-say="3 times the quantity 2 x minus y, minus x plus 4 y minus 7">3(2x − y) − x + 4y − 7</span>, marking every group by its variable part before adding coefficients. Justify each merge by the distributive law read backwards and explain why an unlike term stays. Linear Equations and Inequalities collects on each side of an equation and preserves every sign error made here.</p></div></div><div class="note"><strong>Note:</strong> This is the last of the three reading skills. “Variables, Expressions, and Terms” found the terms, “The Distributive Law” got them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Like terms have identical variable parts</summary><p>The same letters, each to the same exponent. <span class="math" data-say="3 x squared">3x²</span> and <span class="math" data-say="negative 7 x squared">−7x²</span> are alike; <span class="math" data-say="3 x squared">3x²</span> and <span class="math" data-say="3 x cubed">3x³</span> are not, and no rearrangement will make them so. Both conditions, every time.</p></details><details class="recall"><summary>The coefficients have no say in it</summary><p><span class="math" data-say="100 x cubed">100x³</span> and <span class="math" data-say="x cubed">x³</span> are like terms. <span class="math" data-say="x cubed">x³</span> and <span class="math" data-say="x squared">x²</span> are not, however close they look. Whether two terms may be combined is decided entirely by the letters, and the numbers are what you then do arithmetic on.</p></details><details class="recall"><summary>Combining like terms is the distributive law backwards</summary><p><span class="math" data-say="3 x squared plus 5 x squared equals the quantity 3 plus 5, times x squared equals 8 x squared">3x² + 5x² = (3 + 5)x² = 8x²</span> is <span class="math" data-say="A c plus b c equals the quantity A plus b, times c">ac + bc = (a + b)c</span> with <span class="math" data-say="c equals x squared">c = x²</span>. That is why no new rule is needed, and it is also why unlike terms cannot be combined: there is no common <span class="math" data-say="c">c</span> to take out.</p></details></div>
+      <h3>Summary</h3>
       <p>Two terms can be added into one exactly when their variable parts are identical, and the licence to do it is the distributive law read backwards. The rule is short; the work is in seeing which terms qualify and in keeping the signs attached while you collect.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Like terms have identical variable parts.</strong> The same letters, each to the same exponent. <span class="math" data-say="3 x squared">3x²</span> and <span class="math" data-say="negative 7 x squared">−7x²</span> are alike; <span class="math" data-say="3 x squared">3x²</span> and <span class="math" data-say="3 x cubed">3x³</span> are not, and no rearrangement will make them so. Both conditions, every time.</li><li><strong>The coefficients have no say in it.</strong> <span class="math" data-say="100 x cubed">100x³</span> and <span class="math" data-say="x cubed">x³</span> are like terms. <span class="math" data-say="x cubed">x³</span> and <span class="math" data-say="x squared">x²</span> are not, however close they look. Whether two terms may be combined is decided entirely by the letters, and the numbers are what you then do arithmetic on.</li><li><strong>Combining like terms is the distributive law backwards.</strong> <span class="math" data-say="3 x squared plus 5 x squared equals the quantity 3 plus 5, times x squared equals 8 x squared">3x² + 5x² = (3 + 5)x² = 8x²</span> is <span class="math" data-say="A c plus b c equals the quantity A plus b, times c">ac + bc = (a + b)c</span> with <span class="math" data-say="c equals x squared">c = x²</span>. That is why no new rule is needed, and it is also why unlike terms cannot be combined: there is no common <span class="math" data-say="c">c</span> to take out.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="3 x plus 4 y minus x plus 2 y, equals, 2 x plus 6 y, collected. 3 x y plus 2 y x minus x y, equals, 4 x y, the order of the letters is irrelevant. 5 x squared y minus 2 x y squared, already finished, x squared y and x y squared are not alike. 3 x squared plus 5 x squared, equals, 8 x squared, NOT 8 x to the power 4, the exponent is untouched" tabindex="0" role="region" aria-label="Mathematical notation">3x + 4y − x + 2y   =  2x + 6y        collected
 3xy + 2yx − xy     =  4xy            the order of the letters is irrelevant
 5x²y − 2xy²        already finished  x²y and xy² are not alike
@@ -2789,11 +2833,40 @@ check at a = 1, b = 1:
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2861,7 +2934,7 @@ check at a = 1, b = 1:
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

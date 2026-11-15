@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,39 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Decision and Rationality</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Risk</p>
       <h1>The Allais Paradox and the Sure-Thing Principle</h1>
       <p class="lesson-lede">Two common choices test the same expression for opposite signs, so no set of utilities can make both.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Two choices, one common part</li><li>The sure-thing principle</li><li>The pattern A and D</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Four gambles and a term that cancels</h2>
-      <article class="prose reading"><p>Maurice Allais put two choices to people in 1953. In the first, gamble A pays a million for certain, and gamble B pays five million with probability 10%, a million with probability 89% and nothing with probability 1%. In the second, gamble C pays a million with probability 11% and nothing otherwise, and gamble D pays five million with probability 10% and nothing otherwise. Most people choose A over B, and D over C.</p><p>Each choice looks sensible on its own. A gives up a little expected money for certainty, which is just what a concave utility was shown to allow in “Risk Aversion and the Value of Information”, and B risks ending with nothing at all, which is a poor price for a small improvement. In the second choice nobody is certain of anything, so the bigger prize for nearly the same chance is the natural pick.</p><p>Lay the gambles out as a table of tickets, numbered 1 to 100. Tickets 1 to 89 are the shared part, ticket 90 is the single ticket that decides the 1% and tickets 91 to 100 decide the 10%. Payoffs are in millions.</p><div class="mathblock" data-say="gamble, 1 to 89, 90, 91 to 100. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">gamble    1 to 89    90    91 to 100
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Four gambles and a term that cancels</h2><div class="prose reading"><p>Maurice Allais put two choices to people in 1953. In the first, gamble A pays a million for certain, and gamble B pays five million with probability 10%, a million with probability 89% and nothing with probability 1%. In the second, gamble C pays a million with probability 11% and nothing otherwise, and gamble D pays five million with probability 10% and nothing otherwise. Most people choose A over B, and D over C.</p><p>Each choice looks sensible on its own. A gives up a little expected money for certainty, which is just what a concave utility was shown to allow in “Risk Aversion and the Value of Information”, and B risks ending with nothing at all, which is a poor price for a small improvement. In the second choice nobody is certain of anything, so the bigger prize for nearly the same chance is the natural pick.</p><p>Lay the gambles out as a table of tickets, numbered 1 to 100. Tickets 1 to 89 are the shared part, ticket 90 is the single ticket that decides the 1% and tickets 91 to 100 decide the 10%. Payoffs are in millions.</p><div class="mathblock" data-say="gamble, 1 to 89, 90, 91 to 100. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">gamble    1 to 89    90    91 to 100
 A              1     1            1
 B              1     0            5
 C              0     1            1
 D              0     0            5</div><p>Read the first column. A and B agree on it, both paying 1, and C and D agree on it too, both paying 0. The only difference between the first choice and the second is what the shared tickets pay. The last two columns are the same in both choices: A and C pay 1 and 1, B and D pay 0 and 5.</p><div class="defbox"><span class="label">Definition &middot; The sure-thing principle</span><p>If two acts pay the same in some states, then which of them you prefer should depend only on the states where they differ. Changing what they both pay in the shared states should leave the preference unchanged. The name is Leonard Savage's, from 1954; the principle is older than the name.</p></div><p>Expected utility satisfies this by construction. Write the utilities of nothing, a million and five million as <span class="math" data-say="u of 0">u(0)</span>, <span class="math" data-say="u of one million">u(1M)</span> and <span class="math" data-say="the utility of five million">u(5M)</span>. The difference between A and B is computed below, and so is the difference between C and D. The 89% term is common to A and B and cancels; the corresponding term cancels between C and D.</p><div class="mathblock" data-say="the expected utility of A minus that of B equals eleven hundredths times the utility of one million, minus ten hundredths times the utility of five million, minus one hundredth times the utility of nothing. the expected utility of C minus that of D equals eleven hundredths times the utility of one million, minus ten hundredths times the utility of five million, minus one hundredth times the utility of nothing" tabindex="0" role="region" aria-label="Mathematical notation">EU(A) − EU(B) = 11/100·u(1M) − 10/100·u(5M) − 1/100·u(0)
-EU(C) − EU(D) = 11/100·u(1M) − 10/100·u(5M) − 1/100·u(0)</div><div class="thm"><span class="label">Theorem &middot; The same expression</span><p>For any utilities whatever, <span class="math" data-say="EU of A minus EU of B">EU(A) − EU(B)</span> and <span class="math" data-say="EU of C minus EU of D">EU(C) − EU(D)</span> are equal. So preferring A to B makes the first positive, preferring D to C makes the second negative, and one number cannot be both.</p></div><p>The lab enters the utilities <span class="math" data-say="the utility of nothing is 0">u(0) = 0</span>, <span class="math" data-say="the utility of one million is 10">u(1M) = 10</span> and <span class="math" data-say="the utility of five million is 14">u(5M) = 14</span> and scores each pair. In the first it prints 103/10 for B and 10 for A; in the second 7/5 for D and 11/10 for C. Expected utility picks B and D here. Both gaps are 3/10 in favour of the gamble. Change the utilities and the gaps move together, always by the same amount.</p><p>That is the whole result: the rule can prefer A and C, or it can prefer B and D, but it cannot prefer A and D. Preferring A to B needs <span class="math" data-say="the utility of five million">u(5M)</span> below <span class="math" data-say="eleven tenths times the utility of one million">11/10·u(1M)</span> when <span class="math" data-say="u of 0">u(0)</span> is zero, and preferring D to C needs it above. The popular pair asks for both.</p><p>What is said for the popular pair is not foolish. Certainty is a state of mind as well as a payoff: a chooser who ends up with nothing after turning down a sure million may feel a regret that nothing in the second choice can produce. On this view the shared 89% of tickets is not the same in the two choices, because in the first it contributes certainty. A defender must then say what the outcome is: if regret is part of it, the payoff table should list it, and the choices are no longer about the same payoffs.</p><p>The reader has two ways out. One keeps the table as stated and gives up the sure-thing principle, which means giving up expected utility as the measure of these acts. The other keeps the principle and revises one of the two choices. The lab computes what each costs, not which to pay.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+EU(C) − EU(D) = 11/100·u(1M) − 10/100·u(5M) − 1/100·u(0)</div><div class="thm"><span class="label">Theorem &middot; The same expression</span><p>For any utilities whatever, <span class="math" data-say="EU of A minus EU of B">EU(A) − EU(B)</span> and <span class="math" data-say="EU of C minus EU of D">EU(C) − EU(D)</span> are equal. So preferring A to B makes the first positive, preferring D to C makes the second negative, and one number cannot be both.</p></div><p>The lab enters the utilities <span class="math" data-say="the utility of nothing is 0">u(0) = 0</span>, <span class="math" data-say="the utility of one million is 10">u(1M) = 10</span> and <span class="math" data-say="the utility of five million is 14">u(5M) = 14</span> and scores each pair. In the first it prints 103/10 for B and 10 for A; in the second 7/5 for D and 11/10 for C. Expected utility picks B and D here. Both gaps are 3/10 in favour of the gamble. Change the utilities and the gaps move together, always by the same amount.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Acts by states</strong><span>a row per act, a column per state; the rule decides</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="deTable"></table></div>
       <div class="status-banner" id="deStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Move the utilities and watch both gaps move together</h3>
-          <p>The payoffs are utilities, with u(0) = 0, u(1M) = 10 and u(5M) = 14. Score the first pair, then the second, and compare each winning score with the other act's. Now change the 14 to 21/2 in both presets. Gamble A beats B in the first, and C beats D in the second: the preference flips in both places at once, which is the point. No value of the 14 produces A with D.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Move the utilities and watch both gaps move together</h3>
+            <p>The payoffs are utilities, with u(0) = 0, u(1M) = 10 and u(5M) = 14. Score the first pair, then the second, and compare each winning score with the other act's. Now change the 14 to 21/2 in both presets. Gamble A beats B in the first, and C beats D in the second: the preference flips in both places at once, which is the point. No value of the 14 produces A with D.</p>
         <div class="field">
           <label for="dePreset">Worked example</label>
           <select id="dePreset"><option value="allais-a" selected>the sure million against the gamble</option><option value="allais-b">eleven in a hundred against ten in a hundred</option><option value="all-four">all four gambles in one table</option></select>
@@ -1451,12 +1494,15 @@ EU(C) − EU(D) = 11/100·u(1M) − 10/100·u(5M) − 1/100·u(0)</div><div clas
           <div class="kpi"><span>Expected utilities tie at</span><strong id="deFlip">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>That is the whole result: the rule can prefer A and C, or it can prefer B and D, but it cannot prefer A and D. Preferring A to B needs <span class="math" data-say="the utility of five million">u(5M)</span> below <span class="math" data-say="eleven tenths times the utility of one million">11/10·u(1M)</span> when <span class="math" data-say="u of 0">u(0)</span> is zero, and preferring D to C needs it above. The popular pair asks for both.</p><p>What is said for the popular pair is not foolish. Certainty is a state of mind as well as a payoff: a chooser who ends up with nothing after turning down a sure million may feel a regret that nothing in the second choice can produce. On this view the shared 89% of tickets is not the same in the two choices, because in the first it contributes certainty. A defender must then say what the outcome is: if regret is part of it, the payoff table should list it, and the choices are no longer about the same payoffs.</p><p>The reader has two ways out. One keeps the table as stated and gives up the sure-thing principle, which means giving up expected utility as the measure of these acts. The other keeps the principle and revises one of the two choices. The lab computes what each costs, not which to pay.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a pair of choices against expected utility</h2></div><p>Four steps, and none needs a number for any utility.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Tabulate on common tickets</h3><p>Give the gambles the same states, one column for what they share and one for each place they differ. Without common states the shared part is hidden.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write each gap</h3><p>Write <span class="math" data-say="EU">EU</span> of the first act minus <span class="math" data-say="EU">EU</span> of the second as a sum over the states, with the probabilities and utilities left as symbols.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Cancel the shared columns</h3><p>In each pair, the states where the two acts pay the same give equal terms, which subtract to zero.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare what remains</h3><p>If the two remainders are the same expression, the two choices must go the same way under expected utility, and a pattern that splits them contradicts it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a pair of choices against expected utility</h2>
+      <p class="lead-in">Four steps, and none needs a number for any utility.</p>
+      <ol class="key-ideas method"><li><strong>Tabulate on common tickets.</strong> Give the gambles the same states, one column for what they share and one for each place they differ. Without common states the shared part is hidden.</li><li><strong>Write each gap.</strong> Write <span class="math" data-say="EU">EU</span> of the first act minus <span class="math" data-say="EU">EU</span> of the second as a sum over the states, with the probabilities and utilities left as symbols.</li><li><strong>Cancel the shared columns.</strong> In each pair, the states where the two acts pay the same give equal terms, which subtract to zero.</li><li><strong>Compare what remains.</strong> If the two remainders are the same expression, the two choices must go the same way under expected utility, and a pattern that splits them contradicts it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1475,17 +1521,16 @@ EU(D) = 89/100·0 + 1/100·0 + 10/100·14 = 7/5
 EU(C) - EU(D) = -3/10</div><p>The two gaps print the same fraction. These utilities favour B and D; lower the five-million utility far enough and they favour A and C. Preferring A and D is choosing both signs of one number.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a sure thing always earns a premium under expected utility</strong><span>Under the rule a sure million is worth <span class="math" data-say="u of one million">u(1M)</span> and nothing more. With <span class="math" data-say="the utility of nothing is 0">u(0) = 0</span>, <span class="math" data-say="the utility of one million is 10">u(1M) = 10</span> and <span class="math" data-say="the utility of five million is 14">u(5M) = 14</span> the gamble B scores 103/10 against 10 for A, so the sure thing loses. It wins only if <span class="math" data-say="the utility of five million">u(5M)</span> is below 11 on this scale, and then it must also win the second choice for C over D. Certainty carries no bonus of its own; that is the thing the popular pattern adds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging each choice alone</strong><span>Taken alone, A over B fits expected utility for some utilities, and so does D over C. The contradiction lives in the pair. Checking the choices one at a time will find nothing wrong, which is why the pattern persisted for so long.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that the people are simply irrational</strong><span>The argument shows the pair is inconsistent with the rule, not that anyone has made an error. A defender may say the rule leaves out something outcomes carry, such as regret. Whether to revise the choices or the rule is the open question.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show that a pair of choices breaks expected utility.</strong><p>Given the four gambles, you should be able to tabulate them on common tickets, write both gaps, show that they are the same expression, and say what accepting the popular pattern costs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The utilities are the same assumption as everywhere else on this course: a number somebody chose. The argument does not depend on them, which is why the paradox is stated for any utilities. The reasons people choose as they do are not computed here.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a sure thing always earns a premium under expected utility</strong><span>Under the rule a sure million is worth <span class="math" data-say="u of one million">u(1M)</span> and nothing more. With <span class="math" data-say="the utility of nothing is 0">u(0) = 0</span>, <span class="math" data-say="the utility of one million is 10">u(1M) = 10</span> and <span class="math" data-say="the utility of five million is 14">u(5M) = 14</span> the gamble B scores 103/10 against 10 for A, so the sure thing loses. It wins only if <span class="math" data-say="the utility of five million">u(5M)</span> is below 11 on this scale, and then it must also win the second choice for C over D. Certainty carries no bonus of its own; that is the thing the popular pattern adds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging each choice alone</strong><span>Taken alone, A over B fits expected utility for some utilities, and so does D over C. The contradiction lives in the pair. Checking the choices one at a time will find nothing wrong, which is why the pattern persisted for so long.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding that the people are simply irrational</strong><span>The argument shows the pair is inconsistent with the rule, not that anyone has made an error. A defender may say the rule leaves out something outcomes carry, such as regret. Whether to revise the choices or the rule is the open question.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show that a pair of choices breaks expected utility.</strong><p>Given the four gambles, you should be able to tabulate them on common tickets, write both gaps, show that they are the same expression, and say what accepting the popular pattern costs.</p></div></div><div class="note"><strong>Note:</strong> The utilities are the same assumption as everywhere else on this course: a number somebody chose. The argument does not depend on them, which is why the paradox is stated for any utilities. The reasons people choose as they do are not computed here.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Two choices, one common part</summary><p>In the first choice the two gambles share an 89% chance of a million. In the second they share an 89% chance of nothing. Take the shared part away and the same two remainders are left to compare.</p></details><details class="recall"><summary>The sure-thing principle</summary><p>If two acts give the same outcome in some states, those states should not affect which act you prefer. Expected utility obeys this automatically, because a shared term appears on both sides and cancels.</p></details><details class="recall"><summary>The pattern A and D</summary><p>Preferring the sure million and then preferring the one-in-ten shot at five million is the popular response. It lets the shared part change the verdict, and that is the violation.</p></details></div>
+      <h3>Summary</h3>
       <p>Most people prefer a sure million to a gamble that might pay five, and also prefer a one-in-ten chance of five million to an eleven-in-a-hundred chance of one. Expected utility scores the gap in each pair by the same expression, so the two preferences together contradict it whatever numbers the utilities take.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Two choices, one common part.</strong> In the first choice the two gambles share an 89% chance of a million. In the second they share an 89% chance of nothing. Take the shared part away and the same two remainders are left to compare.</li><li><strong>The sure-thing principle.</strong> If two acts give the same outcome in some states, those states should not affect which act you prefer. Expected utility obeys this automatically, because a shared term appears on both sides and cancels.</li><li><strong>The pattern A and D.</strong> Preferring the sure million and then preferring the one-in-ten shot at five million is the popular response. It lets the shared part change the verdict, and that is the violation.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A, 1 M for sure. B, 89 percent 1 M, 10 percent 5 M, 1 percent nothing. C, 11 percent 1 M, otherwise nothing. D, 10 percent 5 M, otherwise nothing. EU of A minus EU of B equals EU of C minus EU of D. A and D together contradict EU" tabindex="0" role="region" aria-label="Mathematical notation">A: 1M for sure
 B: 89% 1M, 10% 5M, 1% nothing
 C: 11% 1M, otherwise nothing
@@ -2313,11 +2358,40 @@ A and D together contradict EU</div><figcaption>One number, tested twice</figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2385,7 +2459,7 @@ A and D together contradict EU</div><figcaption>One number, tested twice</figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

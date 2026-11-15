@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Reason, Science and the Passions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · Of the Severall Subjects of Knowledge</p>
       <h1>The Several Subjects of Knowledge</h1>
       <p class="lesson-lede">Hobbes divides knowledge into fact and consequence, history from philosophy, and draws a table in which every science hangs from natural or civil philosophy.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Knowledge of fact and of consequence</li><li>History and philosophy</li><li>The table</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Fact, science and a table</h2>
-      <article class="prose reading"><p><strong>Chapter 9.</strong> &ldquo;There are of Knowledge two kinds; whereof one is Knowledge of Fact; the other Knowledge of the Consequence of one Affirmation to another. The former is nothing else, but Sense and Memory, and is Absolute Knowledge; as when we see a Fact doing, or remember it done: And this is the Knowledge required in a Witnesse. The later is called Science; and is Conditionall; as when we know, that, If the figure showne be a circle, then any straight line throught the Center shall divide it into two equall parts. And this is the Knowledge required in a Philosopher; that is to say, of him that pretends to Reasoning.&rdquo;</p><p>Think of a trial. The witness is asked what she saw and nothing else, and her knowledge is absolute in Hobbes's sense: she saw it, or she did not. The judge, if he is reasoning, is asked something of a different kind, what follows from what: if the contract was signed under threat, then it does not bind. Hobbes turns that courtroom difference into the whole of Chapter 9. The first knowledge is sense and memory and is the whole of what is required in a witness. The second is science and is conditional, and it is what a philosopher is required to have. And the circle example is the one the last lesson borrowed: it is an <em>if</em>.</p><p>Each kind has its register, which is to say its sort of book. &ldquo;The Register of Knowledge of Fact is called History&rdquo;, and there are two sorts: natural history, &ldquo;the History of such Facts, or Effects of Nature, as have no Dependance on Mans Will&rdquo;, of metals, plants, animals and regions, and civil history, &ldquo;the History of the Voluntary Actions of men in Common-wealths&rdquo;. The registers of science are another sort of book entirely: those that &ldquo;contain the Demonstrations of Consequences of one Affirmation, to another&rdquo;, commonly called books of philosophy. So a book of history, however learned, records what was seen; a book of philosophy demonstrates what follows. The one is not a lesser version of the other: it is another kind of knowing.</p><p>Then comes the table, which Hobbes promises will divide the books of philosophy &ldquo;in such manner as I have divided them in the following Table&rdquo;. In the printed edition it runs on its side across a page, with brackets running left to right. At the root stands science, which is also called philosophy. It splits first into consequences from the accidents of natural bodies, natural philosophy, and consequences from the accidents of politic bodies, politics and civil philosophy. Natural philosophy splits again: consequences from the accidents common to all natural bodies, which are quantity and motion, and consequences from qualities, physics. Under the first branch come the sciences of figure and number, geometry and arithmetic; the sciences of the great parts of the world, astronomy and geography; and the sciences of special bodies, the engineers' science, architecture and navigation. Under qualities come meteorology, astrology, optics and music, and, under consequences from the passions and the speech of men, ethics, poetry, rhetoric, logic and the science of just and unjust. Civil philosophy splits in two: the consequences of the institution of commonwealths for the rights and duties of the sovereign, and the consequences of the same for the duty and right of subjects.</p><p>The lab writes part of that table as nested definitions, flattened and simplified. Each science is defined as the sum of the names of the branches it hangs from, so natural philosophy is natural bodies, mathematics is natural philosophy with common accidents, the determined and the branch of figure and number, geometry is mathematics with figure, and so on; politics is civil philosophy with the rights of the sovereign. Natural and politic bodies are an opposed pair, since a branch of the table cannot lie under both. Then a claim says that one thing falls under another, and the lab checks it as it checked the claims of the last lessons.</p><p>Run the table preset. Geometry is mathematics, and since mathematics contains natural philosophy, geometry is natural philosophy; arithmetic is mathematics; astronomy is cosmography; navigation is mechanics; optics and music are physics; ethics is physics too, and the science of just and unjust is physics; politics is civil philosophy. All true, and each could be read off the table by following the brackets back. What the nesting adds is that you can ask a question that the table only answers by inspection. A reader looking at the ethics entry will notice, because the lab does, that it sits under natural philosophy and that <em>ethics is civil philosophy</em> comes out absurd, since it would put one science under natural and politic bodies at once.</p><p>That is worth a pause, since it is where Hobbes's table differs from the one he was taught. The schools divided philosophy into the theoretical sciences and the practical, ethics and politics among the practical. In Hobbes's table ethics comes from the passions of men, and justice from contracting by speech; they are consequences, like optics, from the qualities of bodies that are men. Civil philosophy is the other branch, derived from the making of a commonwealth. A defender of the older division would say that ethics has a different subject, the ends of human action, and that the table pulls it from its roots. And Francis Bacon had divided learning by the three faculties, memory, imagination and reason, into history, poesy and philosophy; Hobbes keeps history apart as knowledge of fact but puts poetry into physics, with the passions.</p><p>The misplaced preset is the exercise. It uses the same definitions and makes claims that put a science in the wrong place. Geometry is cosmography is false: geometry has no part of the great parts of the world. Astronomy is mechanics is false. Arithmetic is geometry is false, since the figure is missing, and navigation is mathematics is false, since it lacks the branch of figure and number that mathematics hangs from. But politics is natural philosophy, and politics is mechanics, are both absurd, since each puts a science of politic bodies under natural bodies. The lesson is that placing a science in the table is a claim about what it follows from, and can fail in two different ways, by missing a part or by clashing with one.</p><p>One caution. The lab's four verdicts, true, false, absurd and insignificant, are its own sorting, not Hobbes's. He counts a false general affirmation as absurd too, so 'false but not absurd' is a distinction of the lab's, made to show two ways a placement can fail.</p><p>There are two things the table does not say. It does not rank the sciences by worth, only by what they are consequences of. And it does not claim, when it puts politics under civil philosophy, that politics had already been demonstrated: that is the work of the book it sits in. The objection to the ambition is old, and strong: that an exact science of commonwealths, deduced from definitions, is not available, because the subject matter, men in societies, does not hold still the way a circle does. Hobbes's own answer, in the Introduction, is that the commonwealth is an artificial man, made by human art and not found in nature. Whether that makes it as knowable as a circle is what the lab cannot say.</p><p>With this table the first half of Part I is complete: sense, speech, reason and the passions, the machinery that Hobbes says every man carries in his head. The next course, <em>Power, Manners and Religion</em>, starts with what those passions, in company, seek: power, and what it is worth.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reckoning with names</h2></div><p>what a name adds up to, and whether an affirmation is true by it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Fact, science and a table</h2><div class="prose reading"><p><strong>Chapter 9.</strong> &ldquo;There are of Knowledge two kinds; whereof one is Knowledge of Fact; the other Knowledge of the Consequence of one Affirmation to another. The former is nothing else, but Sense and Memory, and is Absolute Knowledge; as when we see a Fact doing, or remember it done: And this is the Knowledge required in a Witnesse. The later is called Science; and is Conditionall; as when we know, that, If the figure showne be a circle, then any straight line throught the Center shall divide it into two equall parts. And this is the Knowledge required in a Philosopher; that is to say, of him that pretends to Reasoning.&rdquo;</p><p>Think of a trial. The witness is asked what she saw and nothing else, and her knowledge is absolute in Hobbes's sense: she saw it, or she did not. The judge, if he is reasoning, is asked something of a different kind, what follows from what: if the contract was signed under threat, then it does not bind. Hobbes turns that courtroom difference into the whole of Chapter 9. The first knowledge is sense and memory and is the whole of what is required in a witness. The second is science and is conditional, and it is what a philosopher is required to have. And the circle example is the one the last lesson borrowed: it is an <em>if</em>.</p><p>Each kind has its register, which is to say its sort of book. &ldquo;The Register of Knowledge of Fact is called History&rdquo;, and there are two sorts: natural history, &ldquo;the History of such Facts, or Effects of Nature, as have no Dependance on Mans Will&rdquo;, of metals, plants, animals and regions, and civil history, &ldquo;the History of the Voluntary Actions of men in Common-wealths&rdquo;. The registers of science are another sort of book entirely: those that &ldquo;contain the Demonstrations of Consequences of one Affirmation, to another&rdquo;, commonly called books of philosophy. So a book of history, however learned, records what was seen; a book of philosophy demonstrates what follows. The one is not a lesser version of the other: it is another kind of knowing.</p><p>Then comes the table, which Hobbes promises will divide the books of philosophy &ldquo;in such manner as I have divided them in the following Table&rdquo;. In the printed edition it runs on its side across a page, with brackets running left to right. At the root stands science, which is also called philosophy. It splits first into consequences from the accidents of natural bodies, natural philosophy, and consequences from the accidents of politic bodies, politics and civil philosophy. Natural philosophy splits again: consequences from the accidents common to all natural bodies, which are quantity and motion, and consequences from qualities, physics. Under the first branch come the sciences of figure and number, geometry and arithmetic; the sciences of the great parts of the world, astronomy and geography; and the sciences of special bodies, the engineers' science, architecture and navigation. Under qualities come meteorology, astrology, optics and music, and, under consequences from the passions and the speech of men, ethics, poetry, rhetoric, logic and the science of just and unjust. Civil philosophy splits in two: the consequences of the institution of commonwealths for the rights and duties of the sovereign, and the consequences of the same for the duty and right of subjects.</p><p>The lab writes part of that table as nested definitions, flattened and simplified. Each science is defined as the sum of the names of the branches it hangs from, so natural philosophy is natural bodies, mathematics is natural philosophy with common accidents, the determined and the branch of figure and number, geometry is mathematics with figure, and so on; politics is civil philosophy with the rights of the sovereign. Natural and politic bodies are an opposed pair, since a branch of the table cannot lie under both. Then a claim says that one thing falls under another, and the lab checks it as it checked the claims of the last lessons.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reckoning with names</h2></div><p>what a name adds up to, and whether an affirmation is true by it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reckoning with names</strong><span>what a name adds up to, and whether an affirmation is true by it</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="lrkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lrkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A defined name is the sum of its parts, and a part may itself be defined; adding up every part down to the simple names gives the name's expansion (listed in alphabetical order). A claim 'subject is predicate' may give several names on either side, read as their sum. Its verdict, in this order of precedence: insignificant, when a name in it, or a name it is defined through, is neither simple nor defined, so stands for nothing; else absurd, when the subject, the predicate, or the two together contain a pair of names that cannot be added; else true, when every simple name of the predicate is in the subject's expansion; else false. A name defined through itself, directly or through others, is refused, naming the circle.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where does a science fall in the table?</h3>
-          <p>A figure computed from what the lesson states. Each science is the sum of the branches it hangs from. A claim that one falls under another is true when everything in the predicate is in the subject, and absurd when the two would sit under both natural and politic bodies. Run the two presets, then move a definition and watch the verdicts change.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where does a science fall in the table?</h3>
+            <p>A figure computed from what the lesson states. Each science is the sum of the branches it hangs from. A claim that one falls under another is true when everything in the predicate is in the subject, and absurd when the two would sit under both natural and politic bodies. Run the two presets, then move a definition and watch the verdicts change.</p>
         <div class="field">
           <label for="lrkPreset">Worked example</label>
           <select id="lrkPreset"><option value="table" selected>Part of Hobbes's table, as nested definitions</option><option value="misplaced">Sciences put under the wrong branch</option></select>
@@ -1439,12 +1482,15 @@
           <div class="kpi"><span>Insignificant</span><strong id="lrkEmpty">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Run the table preset. Geometry is mathematics, and since mathematics contains natural philosophy, geometry is natural philosophy; arithmetic is mathematics; astronomy is cosmography; navigation is mechanics; optics and music are physics; ethics is physics too, and the science of just and unjust is physics; politics is civil philosophy. All true, and each could be read off the table by following the brackets back. What the nesting adds is that you can ask a question that the table only answers by inspection. A reader looking at the ethics entry will notice, because the lab does, that it sits under natural philosophy and that <em>ethics is civil philosophy</em> comes out absurd, since it would put one science under natural and politic bodies at once.</p><p>That is worth a pause, since it is where Hobbes's table differs from the one he was taught. The schools divided philosophy into the theoretical sciences and the practical, ethics and politics among the practical. In Hobbes's table ethics comes from the passions of men, and justice from contracting by speech; they are consequences, like optics, from the qualities of bodies that are men. Civil philosophy is the other branch, derived from the making of a commonwealth. A defender of the older division would say that ethics has a different subject, the ends of human action, and that the table pulls it from its roots. And Francis Bacon had divided learning by the three faculties, memory, imagination and reason, into history, poesy and philosophy; Hobbes keeps history apart as knowledge of fact but puts poetry into physics, with the passions.</p><p>The misplaced preset is the exercise. It uses the same definitions and makes claims that put a science in the wrong place. Geometry is cosmography is false: geometry has no part of the great parts of the world. Astronomy is mechanics is false. Arithmetic is geometry is false, since the figure is missing, and navigation is mathematics is false, since it lacks the branch of figure and number that mathematics hangs from. But politics is natural philosophy, and politics is mechanics, are both absurd, since each puts a science of politic bodies under natural bodies. The lesson is that placing a science in the table is a claim about what it follows from, and can fail in two different ways, by missing a part or by clashing with one.</p><p>One caution. The lab's four verdicts, true, false, absurd and insignificant, are its own sorting, not Hobbes's. He counts a false general affirmation as absurd too, so 'false but not absurd' is a distinction of the lab's, made to show two ways a placement can fail.</p><p>There are two things the table does not say. It does not rank the sciences by worth, only by what they are consequences of. And it does not claim, when it puts politics under civil philosophy, that politics had already been demonstrated: that is the work of the book it sits in. The objection to the ambition is old, and strong: that an exact science of commonwealths, deduced from definitions, is not available, because the subject matter, men in societies, does not hold still the way a circle does. Hobbes's own answer, in the Introduction, is that the commonwealth is an artificial man, made by human art and not found in nature. Whether that makes it as knowable as a circle is what the lab cannot say.</p><p>With this table the first half of Part I is complete: sense, speech, reason and the passions, the machinery that Hobbes says every man carries in his head. The next course, <em>Power, Manners and Religion</em>, starts with what those passions, in company, seek: power, and what it is worth.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Placing a science in the table</h2></div><p>Four steps, working from the root down.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start at the root</h3><p>Every science in the table is consequences from the accidents of a kind of body: natural or politic. Decide which this one is.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the branches it hangs from</h3><p>List each branch name on the path from the root to the science, as the parts of its definition.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Test the claim</h3><p>A science falls under another when every branch of the other is among its own. If the two would put it on both sides of natural and politic, the claim is absurd.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what the science follows from</h3><p>A placement is a claim about what the science is a consequence of. If a branch is missing, it is false; if it clashes, it is absurd.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Placing a science in the table</h2>
+      <p class="lead-in">Four steps, working from the root down.</p>
+      <ol class="key-ideas method"><li><strong>Start at the root.</strong> Every science in the table is consequences from the accidents of a kind of body: natural or politic. Decide which this one is.</li><li><strong>Write the branches it hangs from.</strong> List each branch name on the path from the root to the science, as the parts of its definition.</li><li><strong>Test the claim.</strong> A science falls under another when every branch of the other is among its own. If the two would put it on both sides of natural and politic, the claim is absurd.</li><li><strong>Say what the science follows from.</strong> A placement is a claim about what the science is a consequence of. If a branch is missing, it is false; if it clashes, it is absurd.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1462,17 +1508,16 @@ ethics is civil philosophy: natural bodies and politic bodies clash
 so the claim is absurd, as the table is drawn</div><p>The test is on the definitions as written in the lab. Whether Hobbes was right to hang ethics from the passions, and so on the natural side, is what the schools he left behind would dispute.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting history as a science</strong><span>History is knowledge of fact, which is sense and memory, absolute and not conditional, and the registers of science are the books of philosophy. A learned history is still a record of what was seen. The table in Chapter 9 hangs only the sciences, and history is left out of it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming ethics must stand with politics</strong><span>The schools put them together as practical sciences. In the table as the lab writes it, ethics follows from the passions of men and so lies under natural philosophy, and politics follows from the institution of commonwealths and lies under civil philosophy. The lab shows the clash if you try to join them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the table as a ranking</strong><span>The brackets say what each science is a consequence of, not which is more worthy. A science is placed where it follows from what it follows from, and a misplacement is a mistake about derivation, false or absurd as the lab shows.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a science in the table and test a placement.</strong><p>Given a science written as the sum of the branches it hangs from, say which branch of natural or civil philosophy it falls under, and whether a claim that it falls under another is true, false or absurd.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's vocabulary is a flattening of part of Hobbes's table, written for this lesson from the printed table, with branch names shortened and some sciences left out. It shows what follows from the placements as written. It cannot say whether the table divides the sciences rightly, or whether a science of commonwealths of the kind he means is possible. Its verdicts true, false, absurd and insignificant are the lab's sorting, not Hobbes's, who counts a false general affirmation absurd as well.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting history as a science</strong><span>History is knowledge of fact, which is sense and memory, absolute and not conditional, and the registers of science are the books of philosophy. A learned history is still a record of what was seen. The table in Chapter 9 hangs only the sciences, and history is left out of it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming ethics must stand with politics</strong><span>The schools put them together as practical sciences. In the table as the lab writes it, ethics follows from the passions of men and so lies under natural philosophy, and politics follows from the institution of commonwealths and lies under civil philosophy. The lab shows the clash if you try to join them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the table as a ranking</strong><span>The brackets say what each science is a consequence of, not which is more worthy. A science is placed where it follows from what it follows from, and a misplacement is a mistake about derivation, false or absurd as the lab shows.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a science in the table and test a placement.</strong><p>Given a science written as the sum of the branches it hangs from, say which branch of natural or civil philosophy it falls under, and whether a claim that it falls under another is true, false or absurd.</p></div></div><div class="note"><strong>Note:</strong> The lab's vocabulary is a flattening of part of Hobbes's table, written for this lesson from the printed table, with branch names shortened and some sciences left out. It shows what follows from the placements as written. It cannot say whether the table divides the sciences rightly, or whether a science of commonwealths of the kind he means is possible. Its verdicts true, false, absurd and insignificant are the lab's sorting, not Hobbes's, who counts a false general affirmation absurd as well.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Knowledge of fact and of consequence</summary><p>Knowledge of fact is sense and memory and is absolute: it is what a witness is required to have. Knowledge of the consequence of one affirmation to another is science and is conditional: it is what a philosopher is required to have, of the kind that if a figure is a circle then any line through its centre halves it.</p></details><details class="recall"><summary>History and philosophy</summary><p>The register of knowledge of fact is history, natural, of effects of nature that do not depend on man's will, or civil, of the voluntary actions of men in commonwealths. The registers of science are books of philosophy, in as many sorts as there are kinds of matter.</p></details><details class="recall"><summary>The table</summary><p>Science, which is also called philosophy, is consequences from the accidents of natural bodies, which is natural philosophy, or from the accidents of politic bodies, which is politics and civil philosophy. Each branch splits again by what the consequences are from, down to the named sciences.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 9 is a page of text and a table. The text separates knowledge of fact, which a witness needs, from science, which a philosopher needs, and the table sorts the sciences by what they are consequences of. Write part of the table as nested definitions and compute which sciences fall under natural philosophy and which under civil, and what happens to one put in the wrong place.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Knowledge of fact and of consequence.</strong> Knowledge of fact is sense and memory and is absolute: it is what a witness is required to have. Knowledge of the consequence of one affirmation to another is science and is conditional: it is what a philosopher is required to have, of the kind that if a figure is a circle then any line through its centre halves it.</li><li><strong>History and philosophy.</strong> The register of knowledge of fact is history, natural, of effects of nature that do not depend on man's will, or civil, of the voluntary actions of men in commonwealths. The registers of science are books of philosophy, in as many sorts as there are kinds of matter.</li><li><strong>The table.</strong> Science, which is also called philosophy, is consequences from the accidents of natural bodies, which is natural philosophy, or from the accidents of politic bodies, which is politics and civil philosophy. Each branch splits again by what the consequences are from, down to the named sciences.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="fact, sense and memory, absolute. science, consequences, conditional. history registers fact, philosophy science. natural and civil philosophy are the two roots. a science sits under what it follows from" tabindex="0" role="region" aria-label="Mathematical notation">fact: sense and memory; absolute
 science: consequences; conditional
 history registers fact, philosophy science
@@ -2320,11 +2365,40 @@ a science sits under what it follows from</div><figcaption>Chapter 9 in five lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2392,7 +2466,7 @@ a science sits under what it follows from</div><figcaption>Chapter 9 in five lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

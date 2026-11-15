@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,47 +1478,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Code Improvements</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 23 · Debugging</p>
       <h1>Debugging as Science</h1>
       <p class="lesson-lede">Find a defect by experiment: state a hypothesis, run the test that decides it, and halve the suspects each time.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Debugging</li><li>A hypothesis and its experiment</li><li>Binary search for a defect</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s method, then the arithmetic of halving</h2>
-      <article class="prose reading"><p><strong>Code Complete, Chapter 23, p. 562.</strong> &ldquo;A systematic approach to finding and fixing errors is critical to success. Focus your debugging so that each test moves you a step forward. Use the Scientific Method of Debugging.&rdquo; Read Chapter 23, pages 535 to 562, in your own copy first.</p><p>A test that passed last month fails today, and a thousand changes have gone in since. You could read the code until the defect shows itself, or change things until the test passes. Chapter 23 opens (p. 535) by saying what is at stake. Debugging is identifying the root cause of an error and correcting it, and on some projects it takes a large share of the time. Programmers differ widely at it. The book reports a study by John Gould (1975) of experienced programmers, with at least four years of experience, debugging a program with 12 known defects: the three fastest took 5.0 minutes on average against the slowest three's 14.1, missed 0.7 defects against 1.7, and made 3.0 new defects while correcting against 7.7. That is one study, from 1975, and the book reads it two ways: not everyone knows how to debug, and, since the fastest were also the most accurate, quality and speed go together, the General Principle of Chapter 20 again.</p><p>The chapter's foil is &ldquo;The Devil’s Guide to Debugging&rdquo; (p. 539), McConnell's description of the circle of hell where programmers find defects by scattering print statements, change things until something seems to work, keep no record of what they changed, and fix a wrong result by special-casing the input that showed it. Against it, Section 23.2 (p. 540) sets the scientific method: gather data through repeatable experiments, form a hypothesis that accounts for it, design an experiment to prove or disprove the hypothesis, and repeat. For a defect that becomes five steps. Stabilise the error, so that it happens reliably, simplifying the test case until changing any part of it changes the error. Locate it, by gathering data, forming a hypothesis, choosing the test or the reading that would decide it, and deciding it. Fix it. Test the fix. Look for similar errors.</p><p>Most of Section 23.2 is tips for the locating. Use all the data, and when a fact does not fit the hypothesis, ask why rather than drop the fact. Refine the test cases that produce the error, varying them further. Reproduce the error several ways, to triangulate it. A test that disproves a hypothesis still tells you where the defect is not. And narrow the suspicious region (p. 546): remove about half the code, see which half the defect is in, and halve that, a binary search. Two more tips (p. 547) point at history: a new error is usually in code that changed recently, so run an old version, and if it works compare the two. Talk the problem through with someone, take a break, and when quick guessing has run past a time limit you set in advance, switch to a brute-force method that is sure to work, such as a full review or rewriting the code.</p><p>Watch the method on something small. <code>shippingLabel</code>, from “Structured Basis Testing”, is reported to return a label with no place name for some orders: an empty one, or one that reads only express. The data: it happens for a few zones, with <code>express</code> set or not. A hypothesis that accounts for it: the zone is one the <code>switch</code> does not name, so <code>label</code> keeps its starting empty string. The experiment that decides it: call with zone 4 and with zone 3, <code>express</code> false. Zone 4 should give an empty label and zone 3 should not; if zone 3 gives one too, the hypothesis is wrong and the cause lies elsewhere. One call each way settles it. The cause is the <code>switch</code> on lines 3 to 13, which has no default, and whether that is a defect is the specification's question: if every zone needs a label, the missing default is the fix. That is the whole method; at scale the only difference is how many suspects each test clears.</p><p>Section 23.3 (p. 550) is fixing, which the chapter calls the easy part and therefore the error-prone one. Understand the problem, and the program, before you fix it; confirm the diagnosis; save the original code; fix the problem rather than the symptom, because a special case that makes one wrong answer right leaves the cause in place; change one thing at a time; add a unit test that exposes the defect; and look for others like it. Section 23.4 (p. 554) is the psychology: you see what you expect to see, and two names that look alike are a defect waiting to happen. Section 23.5 (p. 556) surveys the tools, from file comparators and compiler warnings to debuggers.</p><div class="defbox"><span class="label">Definition &middot; Binary search among suspects</span><p>Order the suspects, test the one in the middle, and keep the half that still holds the defect. With n suspects the number of tests is at most the smallest whole number k for which 2 to the power k is at least n.</p></div><p>The chapter halves regions of code. The lab halves a history of changes, which is where the advice to check recent code and run an old version leads: if the build from a thousand changes ago passes and today's fails, test the build in the middle. The <code>commit-637</code> preset puts the defect in change 637 of 1,000. The lab's table lists the intervals as each test decides between halves: 1 to 1,000, 501 to 1,000, 501 to 750, 626 to 750, 626 to 688, 626 to 657, 626 to 641, 634 to 641, 634 to 637, 636 to 637. It prints Steps to find it 10 and Most steps any position takes 10.</p><p>The <code>commit-63</code> preset puts the defect at change 63: Steps to find it 9, since some positions are settled one test early, and Most steps any position takes still 10. The <code>sixty-four</code> preset has 64 suspects with the defect in the first: 6 steps either way, because 64 is exactly two to the sixth. On the lesson's illustration, ten tests settle a thousand changes, where reading them one by one would take up to a thousand.</p><p>Halving works only on the chapter's first step. Each test must decide cleanly between halves, so the failure has to be stable, and the defect has to lie in one place on the line. An intermittent failure makes a passing test mean nothing, and that is why stabilising comes first: the count of ten is what a stabilised error costs, not what any error does.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, double overtime pay of array of employee staff, int count. line 2, double pay is set to 0.0. line 3, int i is set to 0. line 4, while i is less than count and staff at index i is not equal to null. line 5, employee e is set to staff at index i. line 6, if e dot is exempt. line 7, comment, exempt staff earn no overtime. line 8, else if e dot hours is greater than 40. line 9, pay is set to pay plus, open bracket, e dot hours minus 40, close bracket, times e dot rate times 1.5. line 11, i is set to i plus 1. line 13, return pay" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double overtimePay(Employee[] staff, int count) {</span>
-<span class="cl">    double pay = 0.0;</span>
-<span class="cl">    int i = 0;</span>
-<span class="cl">    while (i &lt; count &amp;&amp; staff[i] != null) {</span>
-<span class="cl">        Employee e = staff[i];</span>
-<span class="cl">        if (e.isExempt()) {</span>
-<span class="cl">            // exempt staff earn no overtime</span>
-<span class="cl">        } else if (e.hours() &gt; 40) {</span>
-<span class="cl">            pay = pay + (e.hours() - 40) * e.rate() * 1.5;</span>
-<span class="cl">        }</span>
-<span class="cl">        i = i + 1;</span>
-<span class="cl">    }</span>
-<span class="cl">    return pay;</span>
-<span class="cl">}</span></code></pre><p>This is <code>overtimePay</code> from “Structured Basis Testing”. Called with an array of four employees, none of them null, and <code>count</code> 5, it throws <code>ArrayIndexOutOfBoundsException</code>. State a hypothesis that accounts for the failure, the test or pair of tests that would decide it, and the line where the exception is thrown with the value of <code>i</code> there. Then say whether the five basis tests of that lesson would have found it.</p><p>Fixing a defect changes code that works elsewhere. The next lesson, “Refactoring Safely”, is about changing working code on purpose without breaking it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting tests</h2></div><p>halving the search space</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s method, then the arithmetic of halving</h2><div class="prose reading"><p><strong>Code Complete, Chapter 23, p. 562.</strong> &ldquo;A systematic approach to finding and fixing errors is critical to success. Focus your debugging so that each test moves you a step forward. Use the Scientific Method of Debugging.&rdquo; Read Chapter 23, pages 535 to 562, in your own copy first.</p><p>A test that passed last month fails today, and a thousand changes have gone in since. You could read the code until the defect shows itself, or change things until the test passes. Chapter 23 opens (p. 535) by saying what is at stake. Debugging is identifying the root cause of an error and correcting it, and on some projects it takes a large share of the time. Programmers differ widely at it. The book reports a study by John Gould (1975) of experienced programmers, with at least four years of experience, debugging a program with 12 known defects: the three fastest took 5.0 minutes on average against the slowest three's 14.1, missed 0.7 defects against 1.7, and made 3.0 new defects while correcting against 7.7. That is one study, from 1975, and the book reads it two ways: not everyone knows how to debug, and, since the fastest were also the most accurate, quality and speed go together, the General Principle of Chapter 20 again.</p><p>The chapter's foil is &ldquo;The Devil’s Guide to Debugging&rdquo; (p. 539), McConnell's description of the circle of hell where programmers find defects by scattering print statements, change things until something seems to work, keep no record of what they changed, and fix a wrong result by special-casing the input that showed it. Against it, Section 23.2 (p. 540) sets the scientific method: gather data through repeatable experiments, form a hypothesis that accounts for it, design an experiment to prove or disprove the hypothesis, and repeat. For a defect that becomes five steps. Stabilise the error, so that it happens reliably, simplifying the test case until changing any part of it changes the error. Locate it, by gathering data, forming a hypothesis, choosing the test or the reading that would decide it, and deciding it. Fix it. Test the fix. Look for similar errors.</p><p>Most of Section 23.2 is tips for the locating. Use all the data, and when a fact does not fit the hypothesis, ask why rather than drop the fact. Refine the test cases that produce the error, varying them further. Reproduce the error several ways, to triangulate it. A test that disproves a hypothesis still tells you where the defect is not. And narrow the suspicious region (p. 546): remove about half the code, see which half the defect is in, and halve that, a binary search. Two more tips (p. 547) point at history: a new error is usually in code that changed recently, so run an old version, and if it works compare the two. Talk the problem through with someone, take a break, and when quick guessing has run past a time limit you set in advance, switch to a brute-force method that is sure to work, such as a full review or rewriting the code.</p><p>Watch the method on something small. <code>shippingLabel</code>, from “Structured Basis Testing”, is reported to return a label with no place name for some orders: an empty one, or one that reads only express. The data: it happens for a few zones, with <code>express</code> set or not. A hypothesis that accounts for it: the zone is one the <code>switch</code> does not name, so <code>label</code> keeps its starting empty string. The experiment that decides it: call with zone 4 and with zone 3, <code>express</code> false. Zone 4 should give an empty label and zone 3 should not; if zone 3 gives one too, the hypothesis is wrong and the cause lies elsewhere. One call each way settles it. The cause is the <code>switch</code> on lines 3 to 13, which has no default, and whether that is a defect is the specification's question: if every zone needs a label, the missing default is the fix. That is the whole method; at scale the only difference is how many suspects each test clears.</p><p>Section 23.3 (p. 550) is fixing, which the chapter calls the easy part and therefore the error-prone one. Understand the problem, and the program, before you fix it; confirm the diagnosis; save the original code; fix the problem rather than the symptom, because a special case that makes one wrong answer right leaves the cause in place; change one thing at a time; add a unit test that exposes the defect; and look for others like it. Section 23.4 (p. 554) is the psychology: you see what you expect to see, and two names that look alike are a defect waiting to happen. Section 23.5 (p. 556) surveys the tools, from file comparators and compiler warnings to debuggers.</p><div class="defbox"><span class="label">Definition &middot; Binary search among suspects</span><p>Order the suspects, test the one in the middle, and keep the half that still holds the defect. With n suspects the number of tests is at most the smallest whole number k for which 2 to the power k is at least n.</p></div><p>The chapter halves regions of code. The lab halves a history of changes, which is where the advice to check recent code and run an old version leads: if the build from a thousand changes ago passes and today's fails, test the build in the middle. The <code>commit-637</code> preset puts the defect in change 637 of 1,000. The lab's table lists the intervals as each test decides between halves: 1 to 1,000, 501 to 1,000, 501 to 750, 626 to 750, 626 to 688, 626 to 657, 626 to 641, 634 to 641, 634 to 637, 636 to 637. It prints Steps to find it 10 and Most steps any position takes 10.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting tests</h2></div><p>halving the search space</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting tests</strong><span>halving the search space</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="seTable"></table></div>
       <div class="status-banner" id="seStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Halving the suspects</h3>
-          <p>A count over the structure the lesson states. n suspects are numbered 1 to n, and the defect is in suspect k. Each test decides which half of the current interval holds it, and the table lists every interval. It assumes each test decides cleanly.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Halving the suspects</h3>
+            <p>A count over the structure the lesson states. n suspects are numbered 1 to n, and the defect is in suspect k. Each test decides which half of the current interval holds it, and the table lists every interval. It assumes each test decides cleanly.</p>
         <div class="field">
           <label for="sePreset">Worked example</label>
           <select id="sePreset"><option value="commit-637" selected>1,000 changes, the defect in change 637</option><option value="commit-63">1,000 changes, the defect in change 63</option><option value="sixty-four">64 suspects, the defect in the first</option></select>
@@ -1491,12 +1521,28 @@
           <div class="kpi"><span>Most steps any position takes</span><strong id="seWorst">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The <code>commit-63</code> preset puts the defect at change 63: Steps to find it 9, since some positions are settled one test early, and Most steps any position takes still 10. The <code>sixty-four</code> preset has 64 suspects with the defect in the first: 6 steps either way, because 64 is exactly two to the sixth. On the lesson's illustration, ten tests settle a thousand changes, where reading them one by one would take up to a thousand.</p><p>Halving works only on the chapter's first step. Each test must decide cleanly between halves, so the failure has to be stable, and the defect has to lie in one place on the line. An intermittent failure makes a passing test mean nothing, and that is why stabilising comes first: the count of ten is what a stabilised error costs, not what any error does.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, double overtime pay of array of employee staff, int count. line 2, double pay is set to 0.0. line 3, int i is set to 0. line 4, while i is less than count and staff at index i is not equal to null. line 5, employee e is set to staff at index i. line 6, if e dot is exempt. line 7, comment, exempt staff earn no overtime. line 8, else if e dot hours is greater than 40. line 9, pay is set to pay plus, open bracket, e dot hours minus 40, close bracket, times e dot rate times 1.5. line 11, i is set to i plus 1. line 13, return pay" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">double overtimePay(Employee[] staff, int count) {</span>
+<span class="cl">    double pay = 0.0;</span>
+<span class="cl">    int i = 0;</span>
+<span class="cl">    while (i &lt; count &amp;&amp; staff[i] != null) {</span>
+<span class="cl">        Employee e = staff[i];</span>
+<span class="cl">        if (e.isExempt()) {</span>
+<span class="cl">            // exempt staff earn no overtime</span>
+<span class="cl">        } else if (e.hours() &gt; 40) {</span>
+<span class="cl">            pay = pay + (e.hours() - 40) * e.rate() * 1.5;</span>
+<span class="cl">        }</span>
+<span class="cl">        i = i + 1;</span>
+<span class="cl">    }</span>
+<span class="cl">    return pay;</span>
+<span class="cl">}</span></code></pre><p>This is <code>overtimePay</code> from “Structured Basis Testing”. Called with an array of four employees, none of them null, and <code>count</code> 5, it throws <code>ArrayIndexOutOfBoundsException</code>. State a hypothesis that accounts for the failure, the test or pair of tests that would decide it, and the line where the exception is thrown with the value of <code>i</code> there. Then say whether the five basis tests of that lesson would have found it.</p><p>Fixing a defect changes code that works elsewhere. The next lesson, “Refactoring Safely”, is about changing working code on purpose without breaking it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding a defect by experiment</h2></div><p>Four steps from the chapter's method, and one from your own history.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Stabilise the error</h3><p>Find an input that makes the failure happen every time, and simplify it until changing any part of it changes the failure.</p></article><article class="card concept-card"><div class="icon">2</div><h3>State a hypothesis</h3><p>Write one sentence saying what causes the failure, and check that it accounts for every fact you have, including the cases that work.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose the test that decides it</h3><p>Pick the test whose result would prove or disprove the hypothesis; when the suspects are many, pick one that removes half of them.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Fix the cause, then look for its relatives</h3><p>Change one thing, rerun the deciding tests, add a test that exposes the defect, and search for the same mistake elsewhere.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Count your own last bisection</h3><p>Take the last time you searched for a defect by halving, among commits, inputs or lines of code. Note how many steps it took, and set that against the lab's count for the same number of suspects.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding a defect by experiment</h2>
+      <p class="lead-in">Four steps from the chapter's method, and one from your own history.</p>
+      <ol class="key-ideas method"><li><strong>Stabilise the error.</strong> Find an input that makes the failure happen every time, and simplify it until changing any part of it changes the failure.</li><li><strong>State a hypothesis.</strong> Write one sentence saying what causes the failure, and check that it accounts for every fact you have, including the cases that work.</li><li><strong>Choose the test that decides it.</strong> Pick the test whose result would prove or disprove the hypothesis; when the suspects are many, pick one that removes half of them.</li><li><strong>Fix the cause, then look for its relatives.</strong> Change one thing, rerun the deciding tests, add a test that exposes the defect, and search for the same mistake elsewhere.</li><li><strong>Count your own last bisection.</strong> Take the last time you searched for a defect by halving, among commits, inputs or lines of code. Note how many steps it took, and set that against the lab's count for the same number of suspects.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1514,17 +1560,16 @@ after 10 tests:  at most 1000 / 1024, under 1
 most tests any position needs:  10</div><p>Ten halvings are enough for any of the thousand positions; change 637 takes all ten, and change 63, the <code>commit-63</code> preset, takes nine.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking debugging is reading the code until the defect shows itself</strong><span>Reading feels like progress, and a small defect sometimes does show itself. The chapter's method is experiment instead: a hypothesis, a test or a reading of the code that would prove or disprove it, and another when it is disproved, each chosen to narrow the search. Reading the code is one of the ways it decides a hypothesis, not a substitute for having one. On the lesson's illustration, ten tests, each halving the suspects, settle a thousand changes, where reading them would take up to a thousand looks.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Fixing the symptom</strong><span>When one input gives a wrong answer, a special case for that input makes the answer right and leaves the cause in place. The chapter calls such fixes unmaintainable: the cause produces another wrong answer tomorrow, and the special cases pile up. Understand the problem first, then change the code that causes it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Changing two things at once</strong><span>Two changes made together can each look like the fix, or one can introduce a new defect that looks like the old one. The chapter's advice is one change at a time, with the deciding tests rerun after each.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state a hypothesis, the test that decides it, and the count of a binary search.</strong><p>For a failing input and a routine, state the hypothesis, the one test that decides it and the line; for 1,000 suspect commits and the defect at a given one, list the halving intervals and count the steps.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts halvings among numbered suspects, assuming each test decides cleanly which half holds the defect. Real bisection can fail that assumption: an intermittent failure, a defect that needs two changes together, a build that does not compile in the middle. Applying the chapter's binary search to a history of changes is the lesson's step; the chapter halves regions of code, and points to recent changes and old versions separately.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking debugging is reading the code until the defect shows itself</strong><span>Reading feels like progress, and a small defect sometimes does show itself. The chapter's method is experiment instead: a hypothesis, a test or a reading of the code that would prove or disprove it, and another when it is disproved, each chosen to narrow the search. Reading the code is one of the ways it decides a hypothesis, not a substitute for having one. On the lesson's illustration, ten tests, each halving the suspects, settle a thousand changes, where reading them would take up to a thousand looks.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Fixing the symptom</strong><span>When one input gives a wrong answer, a special case for that input makes the answer right and leaves the cause in place. The chapter calls such fixes unmaintainable: the cause produces another wrong answer tomorrow, and the special cases pile up. Understand the problem first, then change the code that causes it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Changing two things at once</strong><span>Two changes made together can each look like the fix, or one can introduce a new defect that looks like the old one. The chapter's advice is one change at a time, with the deciding tests rerun after each.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state a hypothesis, the test that decides it, and the count of a binary search.</strong><p>For a failing input and a routine, state the hypothesis, the one test that decides it and the line; for 1,000 suspect commits and the defect at a given one, list the halving intervals and count the steps.</p></div></div><div class="note"><strong>Note:</strong> The lab counts halvings among numbered suspects, assuming each test decides cleanly which half holds the defect. Real bisection can fail that assumption: an intermittent failure, a defect that needs two changes together, a build that does not compile in the middle. Applying the chapter's binary search to a history of changes is the lesson's step; the chapter halves regions of code, and points to recent changes and old versions separately.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Debugging</summary><p>Finding the root cause of an error that testing has detected, and correcting it. The chapter keeps it apart from testing, which only detects, and calls it a last resort for quality rather than a way to build it.</p></details><details class="recall"><summary>A hypothesis and its experiment</summary><p>A guess about the defect's cause that accounts for the data, and a test whose result would prove or disprove it. A disproved hypothesis still narrows the search.</p></details><details class="recall"><summary>Binary search for a defect</summary><p>Removing or skipping about half of the suspects, finding which half holds the defect, and repeating. Each test halves what is left, so a thousand suspects take about ten tests.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 23 sets debugging out as the scientific method: stabilise the error, form a hypothesis, design the experiment that proves or disproves it, and only then fix, test the fix and look for similar defects. State a hypothesis about a failure, name the test that decides it, and count the steps a binary search takes among a thousand suspect changes.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Debugging.</strong> Finding the root cause of an error that testing has detected, and correcting it. The chapter keeps it apart from testing, which only detects, and calls it a last resort for quality rather than a way to build it.</li><li><strong>A hypothesis and its experiment.</strong> A guess about the defect's cause that accounts for the data, and a test whose result would prove or disprove it. A disproved hypothesis still narrows the search.</li><li><strong>Binary search for a defect.</strong> Removing or skipping about half of the suspects, finding which half holds the defect, and repeating. Each test halves what is left, so a thousand suspects take about ten tests.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="stabilise, then hypothesise, then test. each test should halve the suspects. 1000 suspects, 10 halvings. understand the problem before the fix. one change at a time" tabindex="0" role="region" aria-label="Mathematical notation">stabilise, then hypothesise, then test
 each test should halve the suspects
 1000 suspects: 10 halvings
@@ -2218,11 +2263,40 @@ one change at a time</div><figcaption>The method in five lines</figcaption></fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2290,7 +2364,7 @@ one change at a time</div><figcaption>The method in five lines</figcaption></fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

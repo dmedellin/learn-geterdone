@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,46 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Replication and Consistency</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Quorums</p>
       <h1>Quorum Latency: the W-th Fastest</h1>
       <p class="lesson-lede">Compute a quorum write&#x27;s p99 as a binomial tail, and say which way it moves when <span class="math" data-say="N">N</span> grows.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The quorum waits for the W-th fastest, not for everyone</li><li>More replicas at fixed W is more chances to be early</li><li>Latency is not the only thing N moves</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The W-th fastest, and what the sweep in N really costs</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Quorum write, and its acknowledged-by distribution</span><p>A <strong>quorum write</strong> with parameters <span class="math" data-say="N, W">(N, W)</span> is sent to all <span class="math" data-say="N">N</span> replicas and acknowledged when <span class="math" data-say="W">W</span> of them have replied. If replies are independent with CDF <span class="math" data-say="F">F</span>, then <span class="math" data-say="P of acked by t equals the sum of N choose k F of t to the power k the quantity 1 minus F of t, to the power the quantity N minus k">P(acked by t) = Σ C(N,k) F(t)^k (1 − F(t))^(N−k)</span> summed over <span class="math" data-say="k equals W">k = W</span> to <span class="math" data-say="N">N</span> — the probability that at least <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> replies arrived by <span class="math" data-say="t">t</span>.</p></div><p>This is the same sum as a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> availability and the lab computes it with the same code, which is the point: “at least <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> replied by <span class="math" data-say="t">t</span>” and “at least <span class="math" data-say="k">k</span> of <span class="math" data-say="n">n</span> are up” are one question asked of two different Bernoulli trials.</p><div class="mathblock" data-say="per-replica reply time as in the synchronous-write lesson. F of 2 equals 0.6, F of 4 equals 0.9, F of 8 equals 0.97, F of 16 equals 0.992, F of 24 equals 0.998. W equals 2, sweeping N, p 99 of the quorum ack. N equals 2, wait for both, 24 milliseconds. N equals 3, 8 milliseconds. N equals 4, 4 milliseconds. N equals 5, 4 milliseconds. N equals 8, 2 milliseconds. and for comparison, waiting for everybody. N equals 3, W equals 3, 24 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">per-replica reply time as in the synchronous-write lesson
-F(2) = 0.6   F(4) = 0.9   F(8) = 0.97   F(16) = 0.992   F(24) = 0.998
-
-W = 2, sweeping N              p99 of the quorum ack
-  N = 2    wait for both                 24 ms
-  N = 3                                   8 ms
-  N = 4                                   4 ms
-  N = 5                                   4 ms
-  N = 8                                   2 ms
-
-and for comparison, waiting for everybody
-  N = 3, W = 3                           24 ms</div><p>Two of the rows are worth pausing on. <span class="math" data-say="W equals N">W = N</span> is the synchronous write of an earlier lesson and it costs <span class="math" data-say="24 milliseconds">24 ms</span>; relaxing the same three-node cluster to <span class="math" data-say="W equals 2">W = 2</span> costs <span class="math" data-say="8 milliseconds">8 ms</span>, a third as much, for a write that is still on two machines. And then adding a fourth replica — a change everybody describes as making writes more expensive — halves it again.</p><h3>Why a larger N is faster</h3><p>Because <span class="math" data-say="W">W</span> is a threshold and <span class="math" data-say="N">N</span> is the number of attempts at it. Each replica is an independent chance to be among the first two back; more chances means the second one arrives sooner. The write is not waiting for the extra replica, it is racing it, and a race with more entrants finishes its second place earlier.</p><div class="mathblock" data-say="at t equals 4 milliseconds a replica has replied with probability F of 4 equals 9 over 10. N equals 3, W equals 2, P equals 3 choose 2 times the quantity 9 over 10, squared 1 over 10 plus 3 choose 3 times the quantity 9 over 10, cubed. equals 3 times the quantity 81 over 100, times the quantity 1 over 10, plus 729 over 1000. equals 243 over 1000 plus 729 over 1000. equals 972 over 1000 equals 0.972, is less than 0.99. N equals 4, W equals 2, P equals 1 minus the quantity 1 over 10, to the power 4 minus 4 choose 1 times the quantity 9 over 10, times the quantity 1 over 10, cubed. equals 1 minus 1 over 10000 minus 36 over 10000. equals 9963 over 10000 equals 0.9963, is at least 0.99. so the p 99 falls from 8 milliseconds to 4 milliseconds when the fourth replica is added" tabindex="0" role="region" aria-label="Mathematical notation">at t = 4 ms a replica has replied with probability F(4) = 9/10
-
-N = 3, W = 2   P = C(3,2)(9/10)²(1/10) + C(3,3)(9/10)³
-                 = 3(81/100)(1/10) + 729/1000
-                 = 243/1000 + 729/1000
-                 = 972/1000 = 0.972          &lt; 0.99
-
-N = 4, W = 2   P = 1 − (1/10)⁴ − C(4,1)(9/10)(1/10)³
-                 = 1 − 1/10 000 − 36/10 000
-                 = 9963/10 000 = 0.9963      ≥ 0.99
-
-so the p99 falls from 8 ms to 4 ms when the fourth replica is added</div><p>Nothing about the fourth replica is faster than the first three. What changed is that the event “fewer than two replies by <span class="math" data-say="4 milliseconds">4 ms</span>” now requires three or four stragglers instead of two, and stragglers are rare enough that requiring one more of them pushes the probability below the <span class="math" data-say="1 percent">1%</span> the p99 is asking about.</p><div class="example"><span class="label">Example &middot; The fourth replica, and the read that stopped overlapping</span><p>The same cluster runs <span class="math" data-say="R equals 2, W equals 2">R = 2, W = 2</span> at <span class="math" data-say="N equals 3">N = 3</span>: <span class="math" data-say="R plus W equals 4 is greater than 3">R + W = 4 > 3</span>, so it overlaps and the minimum overlap is <span class="math" data-say="1">1</span>. Add the fourth replica for the latency and now <span class="math" data-say="R plus W equals 4 equals N">R + W = 4 = N</span>, which overlaps nothing — and “Sloppy Quorums and the Miss Probability” prices the damage as <span class="math" data-say="N minus W choose R over N choose R equals 2 choose 2 over 4 choose 2 equals 1 over 6">C(N−W, R)/C(N, R) = C(2,2)/C(4,2) = 1/6</span>. One read in six misses the write. Restoring the guarantee means <span class="math" data-say="R equals 3">R = 3</span>, which makes every read wait for the third fastest of four instead of the second of three. The write got faster by making the read slower, and no dashboard would have shown the trade.</p></div><p>So the useful rule is not “more replicas are slower” or “more replicas are faster”. It is that <span class="math" data-say="N">N</span> moves the latency of a fixed-<span class="math" data-say="W">W</span> quorum down and moves the overlap condition against you at the same time, and both effects have to be computed whenever <span class="math" data-say="N">N</span> changes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Quorum latency: the W-th fastest</h2></div><p>A binomial tail, and why more replicas make a fixed-W write faster</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The W-th fastest, and what the sweep in N really costs</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Quorum write, and its acknowledged-by distribution</span><p>A <strong>quorum write</strong> with parameters <span class="math" data-say="N, W">(N, W)</span> is sent to all <span class="math" data-say="N">N</span> replicas and acknowledged when <span class="math" data-say="W">W</span> of them have replied. If replies are independent with CDF <span class="math" data-say="F">F</span>, then <span class="math" data-say="P of acked by t equals the sum of N choose k F of t to the power k the quantity 1 minus F of t, to the power the quantity N minus k">P(acked by t) = Σ C(N,k) F(t)^k (1 − F(t))^(N−k)</span> summed over <span class="math" data-say="k equals W">k = W</span> to <span class="math" data-say="N">N</span> — the probability that at least <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> replies arrived by <span class="math" data-say="t">t</span>.</p></div><p>This is the same sum as a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> availability and the lab computes it with the same code, which is the point: “at least <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> replied by <span class="math" data-say="t">t</span>” and “at least <span class="math" data-say="k">k</span> of <span class="math" data-say="n">n</span> are up” are one question asked of two different Bernoulli trials.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Quorum latency: the W-th fastest</h2></div><p>A binomial tail, and why more replicas make a fixed-W write faster</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A quorum waits for the W-th fastest</strong><span>P(ack by t) = P(at least W of N replied by t) &mdash; a binomial tail</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>P(ack by t) at this N</span><span class="tone-muted"><i class="legend-swatch"></i>the other N</span><span class="tone-purple"><i class="legend-swatch"></i>the p99</span><span class="tone-green"><i class="legend-swatch"></i>larger N, sooner</span></div>
@@ -1427,10 +1448,10 @@ so the p99 falls from 8 ms to 4 ms when the fourth replica is added</div><p>Noth
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="qlTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="qlSweep"></table></div>
       <div class="status-banner" id="qlStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the quorum and the reply times</h3>
-          <p>The tail is summed exactly at every attainable time, and the sweep in <span class="math" data-say="N">N</span> is computed rather than extrapolated. Work the binomial tail at <span class="math" data-say="N equals 3">N = 3</span> and <span class="math" data-say="N equals 4">N = 4</span> by hand before you read the verdict — this is the one result on the course most readers refuse until they have done that.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the quorum and the reply times</h3>
+            <p>The tail is summed exactly at every attainable time, and the sweep in <span class="math" data-say="N">N</span> is computed rather than extrapolated. Work the binomial tail at <span class="math" data-say="N equals 3">N = 3</span> and <span class="math" data-say="N equals 4">N = 4</span> by hand before you read the verdict — this is the one result on the course most readers refuse until they have done that.</p>
         <div class="field">
           <label for="qlPmf">One replica&rsquo;s reply time, as ms:weight pairs</label>
           <input id="qlPmf" type="text" value="2:600, 4:300, 8:70, 16:22, 24:6, 40:2" inputmode="text" autocomplete="off">
@@ -1452,12 +1473,37 @@ so the p99 falls from 8 ms to 4 ms when the fourth replica is added</div><p>Noth
           <div class="kpi"><span>Binomial terms summed</span><strong id="qlTerms">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="qlHint" style="margin:0;">The tail is availKofN &mdash; the same sum Availability and Failure uses for a k-of-n availability, at success probability F(t). Watch the p99 column as N rises with W held still: more replicas give the quorum more chances to be met early, so the write gets faster.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="per-replica reply time as in the synchronous-write lesson. F of 2 equals 0.6, F of 4 equals 0.9, F of 8 equals 0.97, F of 16 equals 0.992, F of 24 equals 0.998. W equals 2, sweeping N, p 99 of the quorum ack. N equals 2, wait for both, 24 milliseconds. N equals 3, 8 milliseconds. N equals 4, 4 milliseconds. N equals 5, 4 milliseconds. N equals 8, 2 milliseconds. and for comparison, waiting for everybody. N equals 3, W equals 3, 24 milliseconds" tabindex="0" role="region" aria-label="Mathematical notation">per-replica reply time as in the synchronous-write lesson
+F(2) = 0.6   F(4) = 0.9   F(8) = 0.97   F(16) = 0.992   F(24) = 0.998
+
+W = 2, sweeping N              p99 of the quorum ack
+  N = 2    wait for both                 24 ms
+  N = 3                                   8 ms
+  N = 4                                   4 ms
+  N = 5                                   4 ms
+  N = 8                                   2 ms
+
+and for comparison, waiting for everybody
+  N = 3, W = 3                           24 ms</div><p>Two of the rows are worth pausing on. <span class="math" data-say="W equals N">W = N</span> is the synchronous write of an earlier lesson and it costs <span class="math" data-say="24 milliseconds">24 ms</span>; relaxing the same three-node cluster to <span class="math" data-say="W equals 2">W = 2</span> costs <span class="math" data-say="8 milliseconds">8 ms</span>, a third as much, for a write that is still on two machines. And then adding a fourth replica — a change everybody describes as making writes more expensive — halves it again.</p><h3>Why a larger N is faster</h3><p>Because <span class="math" data-say="W">W</span> is a threshold and <span class="math" data-say="N">N</span> is the number of attempts at it. Each replica is an independent chance to be among the first two back; more chances means the second one arrives sooner. The write is not waiting for the extra replica, it is racing it, and a race with more entrants finishes its second place earlier.</p><div class="mathblock" data-say="at t equals 4 milliseconds a replica has replied with probability F of 4 equals 9 over 10. N equals 3, W equals 2, P equals 3 choose 2 times the quantity 9 over 10, squared 1 over 10 plus 3 choose 3 times the quantity 9 over 10, cubed. equals 3 times the quantity 81 over 100, times the quantity 1 over 10, plus 729 over 1000. equals 243 over 1000 plus 729 over 1000. equals 972 over 1000 equals 0.972, is less than 0.99. N equals 4, W equals 2, P equals 1 minus the quantity 1 over 10, to the power 4 minus 4 choose 1 times the quantity 9 over 10, times the quantity 1 over 10, cubed. equals 1 minus 1 over 10000 minus 36 over 10000. equals 9963 over 10000 equals 0.9963, is at least 0.99. so the p 99 falls from 8 milliseconds to 4 milliseconds when the fourth replica is added" tabindex="0" role="region" aria-label="Mathematical notation">at t = 4 ms a replica has replied with probability F(4) = 9/10
+
+N = 3, W = 2   P = C(3,2)(9/10)²(1/10) + C(3,3)(9/10)³
+                 = 3(81/100)(1/10) + 729/1000
+                 = 243/1000 + 729/1000
+                 = 972/1000 = 0.972          &lt; 0.99
+
+N = 4, W = 2   P = 1 − (1/10)⁴ − C(4,1)(9/10)(1/10)³
+                 = 1 − 1/10 000 − 36/10 000
+                 = 9963/10 000 = 0.9963      ≥ 0.99
+
+so the p99 falls from 8 ms to 4 ms when the fourth replica is added</div><p>Nothing about the fourth replica is faster than the first three. What changed is that the event “fewer than two replies by <span class="math" data-say="4 milliseconds">4 ms</span>” now requires three or four stragglers instead of two, and stragglers are rare enough that requiring one more of them pushes the probability below the <span class="math" data-say="1 percent">1%</span> the p99 is asking about.</p><div class="example"><span class="label">Example &middot; The fourth replica, and the read that stopped overlapping</span><p>The same cluster runs <span class="math" data-say="R equals 2, W equals 2">R = 2, W = 2</span> at <span class="math" data-say="N equals 3">N = 3</span>: <span class="math" data-say="R plus W equals 4 is greater than 3">R + W = 4 > 3</span>, so it overlaps and the minimum overlap is <span class="math" data-say="1">1</span>. Add the fourth replica for the latency and now <span class="math" data-say="R plus W equals 4 equals N">R + W = 4 = N</span>, which overlaps nothing — and “Sloppy Quorums and the Miss Probability” prices the damage as <span class="math" data-say="N minus W choose R over N choose R equals 2 choose 2 over 4 choose 2 equals 1 over 6">C(N−W, R)/C(N, R) = C(2,2)/C(4,2) = 1/6</span>. One read in six misses the write. Restoring the guarantee means <span class="math" data-say="R equals 3">R = 3</span>, which makes every read wait for the third fastest of four instead of the second of three. The write got faster by making the read slower, and no dashboard would have shown the trade.</p></div><p>So the useful rule is not “more replicas are slower” or “more replicas are faster”. It is that <span class="math" data-say="N">N</span> moves the latency of a fixed-<span class="math" data-say="W">W</span> quorum down and moves the overlap condition against you at the same time, and both effects have to be computed whenever <span class="math" data-say="N">N</span> changes.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a quorum&#x27;s latency</h2></div><p>The arithmetic is a binomial tail. The discipline is remembering that <span class="math" data-say="N">N</span> appears in two places in your design and you have only changed one of them.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix <span class="math" data-say="W">W</span> and get the per-replica reply CDF</h3><p><span class="math" data-say="W">W</span> is the threshold the quorum is defined by. <span class="math" data-say="F">F</span> is a measurement, and as with any tail question you need the distribution rather than a mean.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Evaluate the binomial tail at each attainable time</h3><p><span class="math" data-say="P of at least W of N by t">P(at least W of N by t)</span> with success probability <span class="math" data-say="F of t">F(t)</span>. Sum from <span class="math" data-say="k equals W">k = W</span> to <span class="math" data-say="N">N</span>, or subtract the terms below <span class="math" data-say="W">W</span> from one, whichever is shorter — at small <span class="math" data-say="W">W</span> the second is much shorter.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the smallest <span class="math" data-say="t">t</span> where the tail reaches your percentile</h3><p>That is the quorum's p99. Compare it with the <span class="math" data-say="W equals N">W = N</span> case, which is the synchronous write, to see what the relaxation bought.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Re-check <span class="math" data-say="R plus W is greater than N">R + W &gt; N</span> before you accept the <span class="math" data-say="N">N</span> you chose</h3><p>Every increase in <span class="math" data-say="N">N</span> at fixed <span class="math" data-say="W">W</span> improves the latency and erodes the overlap. If the configuration no longer overlaps, either raise <span class="math" data-say="R">R</span> — and recompute the read's latency by this same method — or keep the smaller <span class="math" data-say="N">N</span>.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a quorum&#x27;s latency</h2>
+      <p class="lead-in">The arithmetic is a binomial tail. The discipline is remembering that <span class="math" data-say="N">N</span> appears in two places in your design and you have only changed one of them.</p>
+      <ol class="key-ideas method"><li><strong>Fix <span class="math" data-say="W">W</span> and get the per-replica reply CDF.</strong> <span class="math" data-say="W">W</span> is the threshold the quorum is defined by. <span class="math" data-say="F">F</span> is a measurement, and as with any tail question you need the distribution rather than a mean.</li><li><strong>Evaluate the binomial tail at each attainable time.</strong> <span class="math" data-say="P of at least W of N by t">P(at least W of N by t)</span> with success probability <span class="math" data-say="F of t">F(t)</span>. Sum from <span class="math" data-say="k equals W">k = W</span> to <span class="math" data-say="N">N</span>, or subtract the terms below <span class="math" data-say="W">W</span> from one, whichever is shorter — at small <span class="math" data-say="W">W</span> the second is much shorter.</li><li><strong>Take the smallest <span class="math" data-say="t">t</span> where the tail reaches your percentile.</strong> That is the quorum's p99. Compare it with the <span class="math" data-say="W equals N">W = N</span> case, which is the synchronous write, to see what the relaxation bought.</li><li><strong>Re-check <span class="math" data-say="R plus W is greater than N">R + W &gt; N</span> before you accept the <span class="math" data-say="N">N</span> you chose.</strong> Every increase in <span class="math" data-say="N">N</span> at fixed <span class="math" data-say="W">W</span> improves the latency and erodes the overlap. If the configuration no longer overlaps, either raise <span class="math" data-say="R">R</span> — and recompute the read's latency by this same method — or keep the smaller <span class="math" data-say="N">N</span>.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1488,17 +1534,16 @@ N = 2, W = 2   the proposal:  P = F(t)², p99 = 24 ms
 so removing a replica TRIPLES the p99, and adding one halves it</div><p>The proposal is exactly backwards and the binomial tail says why in one line: with <span class="math" data-say="W">W</span> fixed at two, each replica is another chance to be one of the first two back. At <span class="math" data-say="N equals 2">N = 2</span> there are no spare chances at all and the write waits for both, which is the <span class="math" data-say="24 milliseconds">24 ms</span> maximum of the synchronous lesson.</p><p>The second line of the lab's arithmetic is the one to keep. Between <span class="math" data-say="N equals 3">N = 3</span> and <span class="math" data-say="N equals 4">N = 4</span> the p99 halves, and between <span class="math" data-say="N equals 4">N = 4</span> and <span class="math" data-say="N equals 8">N = 8</span> it halves again to <span class="math" data-say="2 milliseconds">2 ms</span>, which is the floor of this distribution — no configuration can beat the fastest time any replica ever replies in.</p><p>For a faded rehearsal, the team accepts <span class="math" data-say="N equals 4">N = 4</span> for the write and now has <span class="math" data-say="R equals W equals 2">R = W = 2</span> on four nodes. The supplied first move is that <span class="math" data-say="R plus W equals 4">R + W = 4</span> is no longer greater than <span class="math" data-say="N equals 4">N = 4</span>. Work out what <span class="math" data-say="R">R</span> must become, compute the read's p99 at that <span class="math" data-say="R">R</span> by the same binomial tail, and state the net change to a read-then-write round trip before checking either figure.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming more replicas make a fixed-<span class="math" data-say="W">W</span> write slower</strong><span>This is the misconception the lesson exists for. The coordinator waits for <span class="math" data-say="W">W</span> replies and ignores the rest, so extra replicas are extra racers and not extra waits. The arithmetic that makes it obvious is the binomial tail: adding a trial without raising the threshold can only raise <span class="math" data-say="P of at least W by t">P(at least W by t)</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Raising <span class="math" data-say="N">N</span> without re-checking <span class="math" data-say="R plus W is greater than N">R + W &gt; N</span></strong><span>Latency work and correctness work touch the same parameter from opposite sides. Every time <span class="math" data-say="N">N</span> moves, both the quorum p99 and the overlap condition have to be recomputed, and the second one fails quietly: nothing gets slower, nothing logs an error, and a fraction of reads simply stop seeing recent writes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting the quorum&#x27;s p99 as though it were the slowest replica&#x27;s</strong><span><span class="math" data-say="W equals 2">W = 2</span> of three costs <span class="math" data-say="8 milliseconds">8 ms</span> here and <span class="math" data-say="W equals 3">W = 3</span> of three costs <span class="math" data-say="24 milliseconds">24 ms</span>. Those are different statistics of the same replicas — the second fastest and the slowest — and treating a quorum write as though it waited for everyone over-charges it by a factor of three on this distribution.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added a replica, so writes will be slower” prompts you to ask what W is.</strong><p>You should be able to write <span class="math" data-say="P of ack by t">P(ack by t)</span> as a binomial tail, evaluate it at a handful of times, read a p99 off it, sweep <span class="math" data-say="N">N</span> and predict the direction before computing, and state what the same sweep did to <span class="math" data-say="R plus W is greater than N">R + W > N</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The last example on this page left a configuration where <span class="math" data-say="R plus W equals N">R + W = N</span>, which is a guarantee you no longer have. “Sloppy Quorums and the Miss Probability” computes exactly what that costs — and the answer at three replicas with one read and one write is not a small number.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming more replicas make a fixed-<span class="math" data-say="W">W</span> write slower</strong><span>This is the misconception the lesson exists for. The coordinator waits for <span class="math" data-say="W">W</span> replies and ignores the rest, so extra replicas are extra racers and not extra waits. The arithmetic that makes it obvious is the binomial tail: adding a trial without raising the threshold can only raise <span class="math" data-say="P of at least W by t">P(at least W by t)</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Raising <span class="math" data-say="N">N</span> without re-checking <span class="math" data-say="R plus W is greater than N">R + W &gt; N</span></strong><span>Latency work and correctness work touch the same parameter from opposite sides. Every time <span class="math" data-say="N">N</span> moves, both the quorum p99 and the overlap condition have to be recomputed, and the second one fails quietly: nothing gets slower, nothing logs an error, and a fraction of reads simply stop seeing recent writes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting the quorum&#x27;s p99 as though it were the slowest replica&#x27;s</strong><span><span class="math" data-say="W equals 2">W = 2</span> of three costs <span class="math" data-say="8 milliseconds">8 ms</span> here and <span class="math" data-say="W equals 3">W = 3</span> of three costs <span class="math" data-say="24 milliseconds">24 ms</span>. Those are different statistics of the same replicas — the second fastest and the slowest — and treating a quorum write as though it waited for everyone over-charges it by a factor of three on this distribution.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added a replica, so writes will be slower” prompts you to ask what W is.</strong><p>You should be able to write <span class="math" data-say="P of ack by t">P(ack by t)</span> as a binomial tail, evaluate it at a handful of times, read a p99 off it, sweep <span class="math" data-say="N">N</span> and predict the direction before computing, and state what the same sweep did to <span class="math" data-say="R plus W is greater than N">R + W > N</span>.</p></div></div><div class="note"><strong>Note:</strong> The last example on this page left a configuration where <span class="math" data-say="R plus W equals N">R + W = N</span>, which is a guarantee you no longer have. “Sloppy Quorums and the Miss Probability” computes exactly what that costs — and the answer at three replicas with one read and one write is not a small number.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The quorum waits for the W-th fastest, not for everyone</summary><p>The coordinator sends to all <span class="math" data-say="N">N</span> and acknowledges as soon as <span class="math" data-say="W">W</span> have come back. The wait is therefore the <span class="math" data-say="W">W</span>-th smallest of <span class="math" data-say="N">N</span> reply times, and <span class="math" data-say="P of ack by t">P(ack by t)</span> is the probability that at least <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> independent replies landed by <span class="math" data-say="t">t</span> — exactly the binomial tail Availability and Failure used for <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span>, with success probability <span class="math" data-say="F of t">F(t)</span>.</p></details><details class="recall"><summary>More replicas at fixed W is more chances to be early</summary><p>At a fixed <span class="math" data-say="t">t</span>, each replica independently has probability <span class="math" data-say="F of t">F(t)</span> of having replied. Adding another replica adds another Bernoulli trial without raising the threshold <span class="math" data-say="W">W</span>, so the probability of reaching <span class="math" data-say="W">W</span> by <span class="math" data-say="t">t</span> goes up, and the p99 goes down or stays put. On the distribution here <span class="math" data-say="W equals 2">W = 2</span> costs <span class="math" data-say="8 milliseconds">8 ms</span> at <span class="math" data-say="N equals 3">N = 3</span>, <span class="math" data-say="4 milliseconds">4 ms</span> at <span class="math" data-say="N equals 4">N = 4</span> and <span class="math" data-say="2 milliseconds">2 ms</span> at <span class="math" data-say="N equals 8">N = 8</span>.</p></details><details class="recall"><summary>Latency is not the only thing N moves</summary><p>Raising <span class="math" data-say="N">N</span> with <span class="math" data-say="W">W</span> fixed is free latency and expensive correctness: the overlap condition <span class="math" data-say="R plus W is greater than N">R + W > N</span> has an <span class="math" data-say="N">N</span> on the wrong side of it. Going from three replicas to four with <span class="math" data-say="R equals W equals 2">R = W = 2</span> takes a configuration that overlapped to one that does not, and the read now misses the write one time in six. The fast answer and the correct answer are different answers.</p></details></div>
+      <h3>Summary</h3>
       <p>A quorum write is acknowledged when <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> replicas have replied, so it waits for an order statistic rather than for everyone: <span class="math" data-say="P of ack by t equals P of at least W of N replied by t">P(ack by t) = P(at least W of N replied by t)</span>, the same binomial tail that a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> availability is. Hold <span class="math" data-say="W">W</span> fixed and raise <span class="math" data-say="N">N</span> and the write gets <em>faster</em> — <span class="math" data-say="8 milliseconds">8 ms</span> at <span class="math" data-say="N equals 3">N = 3</span>, <span class="math" data-say="4 milliseconds">4 ms</span> at <span class="math" data-say="N equals 4">N = 4</span> — which is the opposite of what everyone expects, and it quietly breaks the overlap condition on the way.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The quorum waits for the W-th fastest, not for everyone.</strong> The coordinator sends to all <span class="math" data-say="N">N</span> and acknowledges as soon as <span class="math" data-say="W">W</span> have come back. The wait is therefore the <span class="math" data-say="W">W</span>-th smallest of <span class="math" data-say="N">N</span> reply times, and <span class="math" data-say="P of ack by t">P(ack by t)</span> is the probability that at least <span class="math" data-say="W">W</span> of <span class="math" data-say="N">N</span> independent replies landed by <span class="math" data-say="t">t</span> — exactly the binomial tail Availability and Failure used for <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span>, with success probability <span class="math" data-say="F of t">F(t)</span>.</li><li><strong>More replicas at fixed W is more chances to be early.</strong> At a fixed <span class="math" data-say="t">t</span>, each replica independently has probability <span class="math" data-say="F of t">F(t)</span> of having replied. Adding another replica adds another Bernoulli trial without raising the threshold <span class="math" data-say="W">W</span>, so the probability of reaching <span class="math" data-say="W">W</span> by <span class="math" data-say="t">t</span> goes up, and the p99 goes down or stays put. On the distribution here <span class="math" data-say="W equals 2">W = 2</span> costs <span class="math" data-say="8 milliseconds">8 ms</span> at <span class="math" data-say="N equals 3">N = 3</span>, <span class="math" data-say="4 milliseconds">4 ms</span> at <span class="math" data-say="N equals 4">N = 4</span> and <span class="math" data-say="2 milliseconds">2 ms</span> at <span class="math" data-say="N equals 8">N = 8</span>.</li><li><strong>Latency is not the only thing N moves.</strong> Raising <span class="math" data-say="N">N</span> with <span class="math" data-say="W">W</span> fixed is free latency and expensive correctness: the overlap condition <span class="math" data-say="R plus W is greater than N">R + W > N</span> has an <span class="math" data-say="N">N</span> on the wrong side of it. Going from three replicas to four with <span class="math" data-say="R equals W equals 2">R = W = 2</span> takes a configuration that overlapped to one that does not, and the read now misses the write one time in six. The fast answer and the correct answer are different answers.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="P of ack by t equals P of at least W of N replies is at most t, a binomial tail at p equals F of t. W equals 2, N equals 3, p 99 equals 8 milliseconds, W equals 2, N equals 4, p 99 equals 4 milliseconds. W equals 2, N equals 8, p 99 equals 2 milliseconds, W equals 3, N equals 3, p 99 equals 24 milliseconds. more replicas at fixed W is FASTER, not slower. and R plus W is greater than N is what a fixed W stops satisfying" tabindex="0" role="region" aria-label="Mathematical notation">P(ack by t) = P(at least W of N replies ≤ t),  a binomial tail at p = F(t)
 W = 2, N = 3   p99 = 8 ms        W = 2, N = 4   p99 = 4 ms
 W = 2, N = 8   p99 = 2 ms        W = 3, N = 3   p99 = 24 ms
@@ -2975,11 +3020,40 @@ and R + W &gt; N is what a fixed W stops satisfying</div><figcaption>A binomial 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3047,7 +3121,7 @@ and R + W &gt; N is what a fixed W stops satisfying</div><figcaption>A binomial 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

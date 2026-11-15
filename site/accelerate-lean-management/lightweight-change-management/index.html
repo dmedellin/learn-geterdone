@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Security, Lean Management and Product Development</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 7 · Management Practices for Software</p>
       <h1>A Lightweight Change Management Process</h1>
       <p class="lesson-lede">Approval by an external body slowed teams down and did not make production more stable; the authors recommend peer review and a deployment pipeline.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Change advisory board (CAB)</li><li>Peer review</li><li>Change fail rate</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s question, its results, then the count</h2>
-      <article class="prose reading"><p>Every organization has some process for changing production. In a startup it may be calling another developer over to look at your code before it goes live; in a large organization the authors often see processes that take days or weeks and send each change to a change advisory board, a CAB outside the team, as well as the team's own reviews. The section asks what that outside approval does to delivery performance.</p><p>They put four scenarios to respondents and asked which fits: an outside body such as a manager or CAB signs off every production change; sign-off is needed only for risky changes such as database ones; the team leans on peer review; or nothing needs approval. The results, they say, were surprising. Asking for approval of risky changes alone showed no correlation with delivery performance. Teams with peer review, or with no approval step, did better on it. And teams that sent every change to an outside body did worse.</p><p>They then asked whether external approval at least buys stability. They conclude that &ldquo;approval by an external body (such as a manager or CAB) simply doesn&rsquo;t work to increase the stability of production systems&rdquo;: it did not help time to restore service, it showed no correlation with change fail rate, and it slowed delivery down. In the authors' view it is worse than having no approval process at all. Note the strength of the claim: these are correlations in a survey of perception, and the book's wording is that outside approval is &ldquo;negatively correlated&rdquo; with lead time, how often teams deploy, and restore time.</p><p>Their recommendation is a light process built on review by peers, as in pair programming or a code review inside the team, with a deployment pipeline that catches and turns away faulty changes. They apply it to every kind of change: code, infrastructure and database. Chapters 4 and 5 describe the pipeline.</p><p>The box What About Segregation of Duties? answers the objection from regulated industries. Segregation of duties is required in some regulations, and by some auditors, and the authors say it does not require a CAB or a separate operations team. Two mechanisms satisfy both the letter and the spirit: somebody who did not write the change reviews it, before or just after commit, and logs the sign-off in a tool that keeps the record, a pull request for instance; and changes reach production only through a fully automated deployment pipeline, so that nothing is applied that was not committed, validated by the standard build and test, and deployed by the pipeline. The pipeline leaves auditors a complete record of what was applied where, from where, with which tests, and approved by whom.</p><p>The section closes with the authors' reasoning, which they offer as logic and not as a result. Software systems are complex, and an external body unfamiliar with the internals cannot accurately judge tens of thousands of changed lines from hundreds of engineers; they call the practice &ldquo;risk management theater&rdquo;, checking boxes so that one can say the process was followed. They see a place for people outside teams, in a governance role: watching how delivery is going and helping teams take up the practices the book describes, not inspecting changes.</p><p>Now the count, on twelve invented changes, six by peer review and six by a CAB. A change is a name, a route, the hours it waited for approval and whether it failed. The peer-reviewed waits are 1, 2, 1, 3, 2 and 1 hours: 10 in all, a mean of 1.67 and a median of 1.5. The CAB waits are 48, 72, 96, 24, 72 and 120: 432 in all, a mean of 72 hours and a median of 72. One change in each route failed, so each route's change fail rate on the preset <code>one-failure</code> is 1 in 6, 16.7 percent, and the difference between them is 0. That matches what the authors report about external approval and change fail rate, on a sample built to match it.</p><p>The preset <code>two-failures</code> changes one record: a second CAB change failed. The CAB's rate becomes 2 in 6, 33.3 percent, and the difference 16.7 percentage points. One change moved the rate by a sixth, and that is the lesson's second point: on a route with six changes a rate is too coarse to separate the routes, and a real comparison needs many changes. The authors' figure comes from a survey of many teams, not from a count of one team's changes.</p><h3>Exercise</h3><ul><li>Twelve changes as name, route, wait in hours, failed: <span class="math" data-say="x 1, none, 0, no, x 2, none, 0, yes, x 3, none, 0, no, x 4, none, 0, no">x1, none, 0, no; x2, none, 0, yes; x3, none, 0, no; x4, none, 0, no</span>.</li><li><span class="math" data-say="y 1, peer, 2, no, y 2, peer, 1, no, y 3, peer, 3, yes, y 4, peer, 1, no">y1, peer, 2, no; y2, peer, 1, no; y3, peer, 3, yes; y4, peer, 1, no</span>.</li><li><span class="math" data-say="z 1, cab, 24, no, z 2, cab, 48, no, z 3, cab, 72, yes, z 4, cab, 96, no">z1, cab, 24, no; z2, cab, 48, no; z3, cab, 72, yes; z4, cab, 96, no</span>.</li></ul><p>Find each route's change fail rate and the mean wait of the CAB route and of the peer route, and then the extra hours a CAB change waits on average over a peer-reviewed one. Enter the twelve to check. Then say what the sample does not show.</p><p>The authors' recommendation depends on the deployment pipeline that Chapters 4 and 5 describe. The next lesson, Lean Product Development Practices, turns from how changes are approved to how the work is cut up and what it is for.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Change approval</h2></div><p>what each approval route adds to lead time, and its fail rate</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s question, its results, then the count</h2><div class="prose reading"><p>Every organization has some process for changing production. In a startup it may be calling another developer over to look at your code before it goes live; in a large organization the authors often see processes that take days or weeks and send each change to a change advisory board, a CAB outside the team, as well as the team's own reviews. The section asks what that outside approval does to delivery performance.</p><p>They put four scenarios to respondents and asked which fits: an outside body such as a manager or CAB signs off every production change; sign-off is needed only for risky changes such as database ones; the team leans on peer review; or nothing needs approval. The results, they say, were surprising. Asking for approval of risky changes alone showed no correlation with delivery performance. Teams with peer review, or with no approval step, did better on it. And teams that sent every change to an outside body did worse.</p><p>They then asked whether external approval at least buys stability. They conclude that &ldquo;approval by an external body (such as a manager or CAB) simply doesn&rsquo;t work to increase the stability of production systems&rdquo;: it did not help time to restore service, it showed no correlation with change fail rate, and it slowed delivery down. In the authors' view it is worse than having no approval process at all. Note the strength of the claim: these are correlations in a survey of perception, and the book's wording is that outside approval is &ldquo;negatively correlated&rdquo; with lead time, how often teams deploy, and restore time.</p><p>Their recommendation is a light process built on review by peers, as in pair programming or a code review inside the team, with a deployment pipeline that catches and turns away faulty changes. They apply it to every kind of change: code, infrastructure and database. Chapters 4 and 5 describe the pipeline.</p><p>The box What About Segregation of Duties? answers the objection from regulated industries. Segregation of duties is required in some regulations, and by some auditors, and the authors say it does not require a CAB or a separate operations team. Two mechanisms satisfy both the letter and the spirit: somebody who did not write the change reviews it, before or just after commit, and logs the sign-off in a tool that keeps the record, a pull request for instance; and changes reach production only through a fully automated deployment pipeline, so that nothing is applied that was not committed, validated by the standard build and test, and deployed by the pipeline. The pipeline leaves auditors a complete record of what was applied where, from where, with which tests, and approved by whom.</p><p>The section closes with the authors' reasoning, which they offer as logic and not as a result. Software systems are complex, and an external body unfamiliar with the internals cannot accurately judge tens of thousands of changed lines from hundreds of engineers; they call the practice &ldquo;risk management theater&rdquo;, checking boxes so that one can say the process was followed. They see a place for people outside teams, in a governance role: watching how delivery is going and helping teams take up the practices the book describes, not inspecting changes.</p><p>Now the count, on twelve invented changes, six by peer review and six by a CAB. A change is a name, a route, the hours it waited for approval and whether it failed. The peer-reviewed waits are 1, 2, 1, 3, 2 and 1 hours: 10 in all, a mean of 1.67 and a median of 1.5. The CAB waits are 48, 72, 96, 24, 72 and 120: 432 in all, a mean of 72 hours and a median of 72. One change in each route failed, so each route's change fail rate on the preset <code>one-failure</code> is 1 in 6, 16.7 percent, and the difference between them is 0. That matches what the authors report about external approval and change fail rate, on a sample built to match it.</p><p>The preset <code>two-failures</code> changes one record: a second CAB change failed. The CAB's rate becomes 2 in 6, 33.3 percent, and the difference 16.7 percentage points. One change moved the rate by a sixth, and that is the lesson's second point: on a route with six changes a rate is too coarse to separate the routes, and a real comparison needs many changes. The authors' figure comes from a survey of many teams, not from a count of one team's changes.</p><h3>Exercise</h3><ul><li>Twelve changes as name, route, wait in hours, failed: <span class="math" data-say="x 1, none, 0, no, x 2, none, 0, yes, x 3, none, 0, no, x 4, none, 0, no">x1, none, 0, no; x2, none, 0, yes; x3, none, 0, no; x4, none, 0, no</span>.</li><li><span class="math" data-say="y 1, peer, 2, no, y 2, peer, 1, no, y 3, peer, 3, yes, y 4, peer, 1, no">y1, peer, 2, no; y2, peer, 1, no; y3, peer, 3, yes; y4, peer, 1, no</span>.</li><li><span class="math" data-say="z 1, cab, 24, no, z 2, cab, 48, no, z 3, cab, 72, yes, z 4, cab, 96, no">z1, cab, 24, no; z2, cab, 48, no; z3, cab, 72, yes; z4, cab, 96, no</span>.</li></ul><p>Find each route's change fail rate and the mean wait of the CAB route and of the peer route, and then the extra hours a CAB change waits on average over a peer-reviewed one. Enter the twelve to check. Then say what the sample does not show.</p><p>The authors' recommendation depends on the deployment pipeline that Chapters 4 and 5 describe. The next lesson, Lean Product Development Practices, turns from how changes are approved to how the work is cut up and what it is for.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Change approval</h2></div><p>what each approval route adds to lead time, and its fail rate</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Change approval</strong><span>what each approval route adds to lead time, and its fail rate</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="acmTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="acmTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each change went through one approval route (a name: none, peer, cab, …) and waited the hours given for it. Per route: the mean wait, the median wait (the middle value, or the mean of the two middle ones), and the change fail rate, failed over changes, exact. The difference is the first route's rate minus the second's, in percentage points, for the two routes named or else the first two met. Routes are listed in the order first met. A difference in this sample describes the sample; it is not evidence of what an approval step causes.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Wait and change fail rate by approval route</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Wait and change fail rate by approval route</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="acmPreset">Worked example</label>
           <select id="acmPreset"><option value="one-failure" selected>Six peer-reviewed and six CAB changes, one failure each</option><option value="two-failures">The same twelve with a second CAB change failing</option></select>
@@ -1430,12 +1473,14 @@
           <div class="kpi"><span>Difference in fail rate between two routes</span><strong id="acmDiff">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing approval routes</h2></div><p>Four steps, the last of them on changes of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Label each change with its route</h3><p>For each change in a period, write its name, the route it took (none, peer or CAB), the hours between asking for approval and getting it, and whether it failed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count and average by route</h3><p>For each route, count the changes, then compute the mean and median wait. The median is less moved by one very long wait.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute each route&#x27;s fail rate</h3><p>Divide each route's failed changes by its changes. Write down how many changes it is, because a rate on a handful of changes moves a long way when one more fails.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare, and say what the sample cannot show</h3><p>Take the difference in wait and in fail rate between two routes on your own changes. Then list what else differs between them: the kind of change, the risk, the team.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing approval routes</h2>
+      <p class="lead-in">Four steps, the last of them on changes of your own.</p>
+      <ol class="key-ideas method"><li><strong>Label each change with its route.</strong> For each change in a period, write its name, the route it took (none, peer or CAB), the hours between asking for approval and getting it, and whether it failed.</li><li><strong>Count and average by route.</strong> For each route, count the changes, then compute the mean and median wait. The median is less moved by one very long wait.</li><li><strong>Compute each route&#x27;s fail rate.</strong> Divide each route's failed changes by its changes. Write down how many changes it is, because a rate on a handful of changes moves a long way when one more fails.</li><li><strong>Compare, and say what the sample cannot show.</strong> Take the difference in wait and in fail rate between two routes on your own changes. Then list what else differs between them: the kind of change, the risk, the team.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1454,17 +1499,16 @@ Peer fail rate: 1/6 = 16.7 percent
 CAB fail rate: 1/6 = 16.7 percent, a difference of 0</div><p>Each route adds a wait and none of them shows a lower fail rate, which is the shape of the authors' finding on this sample. With a second CAB failure the rate would be 2/6, which is why six changes cannot carry a conclusion.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Concluding that the book says to have no review at all</strong><span>Teams with no approval process did well in the survey, but the authors' recommendation is a lightweight process: peer review, such as pair programming or code review inside the team, with a pipeline that catches faulty changes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a regulated industry has to keep its CAB</strong><span>The box on segregation of duties says the control can be met without a CAB or a separate operations team: by review from someone who did not write the change, recorded in a system of record, and by applying changes only through an automated pipeline that leaves a full record.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the lab&#x27;s sample as evidence about CABs</strong><span>The twelve changes are invented, and the equal fail rates were chosen to match what the authors report. With six changes a route, one failure moves a rate by about 17 points. The book's finding is a correlation across many teams in a survey, not a count of one team's changes.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare approval routes by wait and fail rate.</strong><p>Given changes with route, wait and outcome, compute each route's mean and median wait and change fail rate, and say how few changes it takes for one failure to move a rate.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts changes you give it by route. It cannot tell whether the routes were given comparable changes, whether a long wait was the approval or the queue, or whether the CAB was the cause; the book reports a correlation in its survey and reasons about the rest.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Concluding that the book says to have no review at all</strong><span>Teams with no approval process did well in the survey, but the authors' recommendation is a lightweight process: peer review, such as pair programming or code review inside the team, with a pipeline that catches faulty changes.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing a regulated industry has to keep its CAB</strong><span>The box on segregation of duties says the control can be met without a CAB or a separate operations team: by review from someone who did not write the change, recorded in a system of record, and by applying changes only through an automated pipeline that leaves a full record.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the lab&#x27;s sample as evidence about CABs</strong><span>The twelve changes are invented, and the equal fail rates were chosen to match what the authors report. With six changes a route, one failure moves a rate by about 17 points. The book's finding is a correlation across many teams in a survey, not a count of one team's changes.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare approval routes by wait and fail rate.</strong><p>Given changes with route, wait and outcome, compute each route's mean and median wait and change fail rate, and say how few changes it takes for one failure to move a rate.</p></div></div><div class="note"><strong>Note:</strong> The lab counts changes you give it by route. It cannot tell whether the routes were given comparable changes, whether a long wait was the approval or the queue, or whether the CAB was the cause; the book reports a correlation in its survey and reasons about the rest.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Change advisory board (CAB)</summary><p>A body outside the team that reviews each change to production before it goes live. The authors describe processes of this kind that take days or weeks, on top of the team's own reviews.</p></details><details class="recall"><summary>Peer review</summary><p>Review of a change by someone on the team who did not write it, such as through pair programming or an intrateam code review, paired in the authors' recommendation with a deployment pipeline that detects and rejects bad changes.</p></details><details class="recall"><summary>Change fail rate</summary><p>The share of changes that fail: that lead to degraded service or need remediation after release. It is one of the four delivery measures of Chapter 2, and the lab counts it for each route.</p></details></div>
+      <h3>Summary</h3>
       <p>The second half of Chapter 7 asks what change approval does. Read the four approval scenarios the authors asked about, what they found, their recommendation and their answer to regulated industries; then compute the wait and the change fail rate of each route in an invented sample, and see how little it takes to move a rate.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Change advisory board (CAB).</strong> A body outside the team that reviews each change to production before it goes live. The authors describe processes of this kind that take days or weeks, on top of the team's own reviews.</li><li><strong>Peer review.</strong> Review of a change by someone on the team who did not write it, such as through pair programming or an intrateam code review, paired in the authors' recommendation with a deployment pipeline that detects and rejects bad changes.</li><li><strong>Change fail rate.</strong> The share of changes that fail: that lead to degraded service or need remediation after release. It is one of the four delivery measures of Chapter 2, and the lab counts it for each route.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="four approval scenarios, one question. external approval, slower, not safer. approval only for high minus risk changes, no link. peer review plus a deployment pipeline. segregation of duties without A cab. outside teams govern, they do not inspect" tabindex="0" role="region" aria-label="Mathematical notation">four approval scenarios, one question
 external approval: slower, not safer
 approval only for high-risk changes: no link
@@ -2313,11 +2357,40 @@ outside teams govern, they do not inspect</div><figcaption>Lightweight change ma
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2385,7 +2458,7 @@ outside teams govern, they do not inspect</div><figcaption>Lightweight change ma
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

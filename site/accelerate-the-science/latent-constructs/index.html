@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Science Behind the Book</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Introduction to Psychometrics</p>
       <h1>Latent Constructs</h1>
       <p class="lesson-lede">A way to measure what cannot be read off a dial: several survey items, one definition, and an average.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Latent construct</li><li>Operationalizing a construct</li><li>Reverse-coding</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Why a survey can be trusted, and how a construct is built</h2>
-      <article class="prose reading"><p>&ldquo;A latent construct is a way of measuring something that can&rsquo;t be measured directly.&rdquo; That is the sentence Chapter 13, Introduction to Psychometrics, turns on. The chapter opens with the two questions the authors are asked most: why use surveys, which Chapter 14 answers, and whether data collected with them can be trusted at all, which this chapter does.</p><p>It starts by agreeing that the scepticism is fair. Much of it comes from the surveys most of us meet: push polls, built to make the respondent agree with the pollster, of which they give a political example; quick surveys; and surveys written by people without training. The usual faults are four. Leading questions steer the respondent. Loaded questions force an answer that may not be true for them. Multiple questions in one leave you not knowing which part was answered. Unclear language uses words the respondent may not share. A related weakness is to rest everything on one question. The authors do not dismiss single-question surveys; the Net Promoter Score, they say, is a careful and well-documented one and is easy to compare, though only narrow conclusions should be drawn from it.</p><p>Their own answer to the doubt is the latent construct. The room's temperature and a website's response time can be read from a dial. Organisational culture cannot; it has no temperature. It is measured through its component parts, the manifest variables, each of which is an item answered by a person. The items together stand for the construct. The authors write that this is appropriate because culture is the lived experience of the people on the team. It also means they must say what they mean.</p><p>That is the first benefit the chapter names. Before writing an item, define the construct. A question like &ldquo;is your culture good?&rdquo; leaves the team or organisation unclear, leaves culture undefined and leaves good undefined, so that no answer tells you anything. The culture the authors cared about optimised trust and the flow of information, and they took Ron Westrum's typology of 2004 as the definition: pathological, bureaucratic and generative organisations, told apart by six aspects, cooperation, how messengers are treated, who is responsible, bridging between teams, how failure is handled and how novelty is received. From those aspects they wrote several items, seven in the end, and asked them about a team, not the organisation, since people answer more accurately about their team and large organisations hold different cultures in different corners.</p><p>The score then is the average. Respondents rate each item from 1 for strongly disagree to 7 for strongly agree, and the average over the items is, in the authors' phrase, an organisational culture temperature of sorts. Chapter 13 says that statistical tests can then confirm that the items do measure the same underlying idea; the next lesson reads those tests, and Measuring and Changing Culture's lesson Measuring Culture scores the authors' own culture construct.</p><p>Now score a construct. The lab's sample is invented for the lesson: confidence in releasing, measured by four items. Three are worded so that agreeing means more confidence, <code>routine</code>, <code>unaided</code> and <code>clarity</code>. The third, <code>dread</code>, says how much releasing worries the person, so agreeing means less, and it is marked as reverse-coded. Six invented people, R1 to R6, answer on the seven-point scale. On the preset <code>four-items</code> the lab scores each person by turning round the dread answer, 8 minus the answer, and averaging the four. R1's answers 5, 4, 1, 5 become 5, 4, 7, 5 and a score of 5.25.</p><div class="mathblock" data-say="person routine unaided dread clarity. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">person  routine  unaided  dread  clarity
-R1      5        4        1      5
-R2      5        6        3      4
-R3      3        4        4      6
-R4      3        2        6      3
-R5      7        6        1      6
-R6      2        3        5      5</div><p>The six scores are 5.25, 5, 4.25, 2.5, 6.5 and 3.25, and the construct mean over the six, 107/24, is 4.458 to three places. With a line drawn at the scale's neutral point, 4, four people score above it and two below. The item means are printed too, as scored: the dread item averages 14/3, 4.667, after reversing, where its raw answers average 3.333. A last tile shows what happens when the reversal is forgotten: the construct mean falls to 4.125, and counted by hand three people would be above the line instead of four, because R1 drops below it.</p><p>The second preset drops one item. On <code>without-clarity</code> the lab scores the same six people from three items. The construct mean becomes 13/3, 4.333, and R3, who scored 4.25 on four items, scores 3.667 on three, so now three are above the line and three below. One item moved one person across it. This is the sense in which the chapter says to use several: a single item can carry a lot of a person's score, and more than one lets you see when it does.</p><h3>Exercise</h3><ul><li>Three items on the seven-point scale, the second reverse-coded: <span class="math" data-say="steady, calm, no, anxious, calm, yes, routine, calm, no">steady, calm, no; anxious, calm, yes; routine, calm, no</span>.</li><li>Four people's answers: <span class="math" data-say="A, 6, 2, 5, B, 3, 3, 3, C, 5, 1, 5, D, 2, 6, 3">A, 6, 2, 5; B, 3, 3, 3; C, 5, 1, 5; D, 2, 6, 3</span>.</li><li>Score each person, then the construct mean, with and without reversing the second item. Count the people above a line at 4 both ways.</li></ul><p>Do it by hand and then in the lab. Say what the two construct means are, and which person is above the line only when the item is reversed.</p><p>A score is only worth reporting if the items behave. The next lesson, Several Views, and a Safeguard Against Rogue Data, reads the tests that check it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Likert-type items</h2></div><p>a construct&#x27;s score from Likert-type items, reverse-coded where stated</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Why a survey can be trusted, and how a construct is built</h2><div class="prose reading"><p>&ldquo;A latent construct is a way of measuring something that can&rsquo;t be measured directly.&rdquo; That is the sentence Chapter 13, Introduction to Psychometrics, turns on. The chapter opens with the two questions the authors are asked most: why use surveys, which Chapter 14 answers, and whether data collected with them can be trusted at all, which this chapter does.</p><p>It starts by agreeing that the scepticism is fair. Much of it comes from the surveys most of us meet: push polls, built to make the respondent agree with the pollster, of which they give a political example; quick surveys; and surveys written by people without training. The usual faults are four. Leading questions steer the respondent. Loaded questions force an answer that may not be true for them. Multiple questions in one leave you not knowing which part was answered. Unclear language uses words the respondent may not share. A related weakness is to rest everything on one question. The authors do not dismiss single-question surveys; the Net Promoter Score, they say, is a careful and well-documented one and is easy to compare, though only narrow conclusions should be drawn from it.</p><p>Their own answer to the doubt is the latent construct. The room's temperature and a website's response time can be read from a dial. Organisational culture cannot; it has no temperature. It is measured through its component parts, the manifest variables, each of which is an item answered by a person. The items together stand for the construct. The authors write that this is appropriate because culture is the lived experience of the people on the team. It also means they must say what they mean.</p><p>That is the first benefit the chapter names. Before writing an item, define the construct. A question like &ldquo;is your culture good?&rdquo; leaves the team or organisation unclear, leaves culture undefined and leaves good undefined, so that no answer tells you anything. The culture the authors cared about optimised trust and the flow of information, and they took Ron Westrum's typology of 2004 as the definition: pathological, bureaucratic and generative organisations, told apart by six aspects, cooperation, how messengers are treated, who is responsible, bridging between teams, how failure is handled and how novelty is received. From those aspects they wrote several items, seven in the end, and asked them about a team, not the organisation, since people answer more accurately about their team and large organisations hold different cultures in different corners.</p><p>The score then is the average. Respondents rate each item from 1 for strongly disagree to 7 for strongly agree, and the average over the items is, in the authors' phrase, an organisational culture temperature of sorts. Chapter 13 says that statistical tests can then confirm that the items do measure the same underlying idea; the next lesson reads those tests, and Measuring and Changing Culture's lesson Measuring Culture scores the authors' own culture construct.</p><p>Now score a construct. The lab's sample is invented for the lesson: confidence in releasing, measured by four items. Three are worded so that agreeing means more confidence, <code>routine</code>, <code>unaided</code> and <code>clarity</code>. The third, <code>dread</code>, says how much releasing worries the person, so agreeing means less, and it is marked as reverse-coded. Six invented people, R1 to R6, answer on the seven-point scale. On the preset <code>four-items</code> the lab scores each person by turning round the dread answer, 8 minus the answer, and averaging the four. R1's answers 5, 4, 1, 5 become 5, 4, 7, 5 and a score of 5.25.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Likert-type items</h2></div><p>a construct&#x27;s score from Likert-type items, reverse-coded where stated</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Likert-type items</strong><span>a construct's score from Likert-type items, reverse-coded where stated</span></div>
       </div>
@@ -1410,10 +1447,10 @@ R6      2        3        5      5</div><p>The six scores are 5.25, 5, 4.25, 2.5
       <div class="table-wrap" id="alkTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alkTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each answer is a whole number from 1 to the scale's points, one per item in the items' order. A reverse-coded item is scored points + 1 − the answer (on 7 points a 2 scores 6). A respondent's score on a construct is the mean of their scored answers on its items; a construct's mean is the mean of those scores over the respondents; an item's mean is over the respondents too, as scored. A respondent is above the line when their score is greater than it, at it when equal. The last tile scores every item as answered, the mistake of forgetting to reverse. Constructs and items go in the order given; means are exact, shown to 3 places when they do not end.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Scoring a construct from its items</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Scoring a construct from its items</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="alkPreset">Worked example</label>
           <select id="alkPreset"><option value="four-items" selected>Six invented people, four items, one reverse-coded</option><option value="without-clarity">The same people scored on three of the items</option></select>
@@ -1443,12 +1480,21 @@ R6      2        3        5      5</div><p>The six scores are 5.25, 5, 4.25, 2.5
           <div class="kpi"><span>Construct means if nothing were reversed (the error)</span><strong id="alkUnreversed">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="person routine unaided dread clarity. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">person  routine  unaided  dread  clarity
+R1      5        4        1      5
+R2      5        6        3      4
+R3      3        4        4      6
+R4      3        2        6      3
+R5      7        6        1      6
+R6      2        3        5      5</div><p>The six scores are 5.25, 5, 4.25, 2.5, 6.5 and 3.25, and the construct mean over the six, 107/24, is 4.458 to three places. With a line drawn at the scale's neutral point, 4, four people score above it and two below. The item means are printed too, as scored: the dread item averages 14/3, 4.667, after reversing, where its raw answers average 3.333. A last tile shows what happens when the reversal is forgotten: the construct mean falls to 4.125, and counted by hand three people would be above the line instead of four, because R1 drops below it.</p><p>The second preset drops one item. On <code>without-clarity</code> the lab scores the same six people from three items. The construct mean becomes 13/3, 4.333, and R3, who scored 4.25 on four items, scores 3.667 on three, so now three are above the line and three below. One item moved one person across it. This is the sense in which the chapter says to use several: a single item can carry a lot of a person's score, and more than one lets you see when it does.</p><h3>Exercise</h3><ul><li>Three items on the seven-point scale, the second reverse-coded: <span class="math" data-say="steady, calm, no, anxious, calm, yes, routine, calm, no">steady, calm, no; anxious, calm, yes; routine, calm, no</span>.</li><li>Four people's answers: <span class="math" data-say="A, 6, 2, 5, B, 3, 3, 3, C, 5, 1, 5, D, 2, 6, 3">A, 6, 2, 5; B, 3, 3, 3; C, 5, 1, 5; D, 2, 6, 3</span>.</li><li>Score each person, then the construct mean, with and without reversing the second item. Count the people above a line at 4 both ways.</li></ul><p>Do it by hand and then in the lab. Say what the two construct means are, and which person is above the line only when the item is reversed.</p><p>A score is only worth reporting if the items behave. The next lesson, Several Views, and a Safeguard Against Rogue Data, reads the tests that check it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring a latent construct</h2></div><p>Five steps, the last of them on a short survey of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Define the construct in a sentence</h3><p>Write what you mean and for whom, such as a team's confidence in releasing. If the sentence leaves out an aspect you care about, add it before you write items.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write one item per aspect</h3><p>Each item is a statement about one thing. Note any item worded the opposite way round to the rest.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reverse the opposite items</h3><p>For an item marked reverse, replace each answer by 8 minus the answer on a seven-point scale.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Average each person&#x27;s items</h3><p>Add a person's scored answers and divide by the number of items, then average the people for the construct mean.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a short survey of your own</h3><p>Write four statements about one thing in your team's work, one of them reversed, get six people to rate them from 1 to 7, and type the answers into the lab. Note the construct mean with and without the reversal.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Scoring a latent construct</h2>
+      <p class="lead-in">Five steps, the last of them on a short survey of your own.</p>
+      <ol class="key-ideas method"><li><strong>Define the construct in a sentence.</strong> Write what you mean and for whom, such as a team's confidence in releasing. If the sentence leaves out an aspect you care about, add it before you write items.</li><li><strong>Write one item per aspect.</strong> Each item is a statement about one thing. Note any item worded the opposite way round to the rest.</li><li><strong>Reverse the opposite items.</strong> For an item marked reverse, replace each answer by 8 minus the answer on a seven-point scale.</li><li><strong>Average each person&#x27;s items.</strong> Add a person's scored answers and divide by the number of items, then average the people for the construct mean.</li><li><strong>Do it on a short survey of your own.</strong> Write four statements about one thing in your team's work, one of them reversed, get six people to rate them from 1 to 7, and type the answers into the lab. Note the construct mean with and without the reversal.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1467,17 +1513,16 @@ sum of the six quarters: 21+20+17+10+26+13 = 107
 construct mean = 107/24 ≈ 4.458</div><p>Without reversing the third item, R1's mean is 15/4 = 3.75, which is below the line, and the construct mean is 33/8 = 4.125. The scale's arithmetic, not the respondents, moved the answer.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Asking one broad question and calling it a measure</strong><span>The chapter's example is asking whether a culture is good, which leaves unclear whose culture, what culture means and what good means. A construct is built from a definition and one item for each aspect, so that each answer means something.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Averaging items without turning the reversed ones round</strong><span>A reverse-worded item answered consistently with the others will pull the average toward the middle. In the lab, forgetting the reversal changes the construct mean from 4.458 to 4.125 and moves R1 across the line. A score is only the mean of items that all point the same way.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a construct&#x27;s score for a fact about the team</strong><span>The score is a mean of perceptions the people reported on a scale. Chapter 13 itself says all measures are proxies and that the constructs still have to pass tests, which the next lesson reads. The lab's mean describes six invented people and nothing else.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a construct.</strong><p>Given items, a reverse flag and answers on the seven-point scale, score each person and the construct, and show what forgetting the reversal does.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab averages the items it is given. It cannot tell whether those items define the construct well, whether they measure one idea or two, or whether the six people answered honestly; the next lesson reads the tests the authors use for the first two.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Asking one broad question and calling it a measure</strong><span>The chapter's example is asking whether a culture is good, which leaves unclear whose culture, what culture means and what good means. A construct is built from a definition and one item for each aspect, so that each answer means something.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Averaging items without turning the reversed ones round</strong><span>A reverse-worded item answered consistently with the others will pull the average toward the middle. In the lab, forgetting the reversal changes the construct mean from 4.458 to 4.125 and moves R1 across the line. A score is only the mean of items that all point the same way.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a construct&#x27;s score for a fact about the team</strong><span>The score is a mean of perceptions the people reported on a scale. Chapter 13 itself says all measures are proxies and that the constructs still have to pass tests, which the next lesson reads. The lab's mean describes six invented people and nothing else.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score a construct.</strong><p>Given items, a reverse flag and answers on the seven-point scale, score each person and the construct, and show what forgetting the reversal does.</p></div></div><div class="note"><strong>Note:</strong> The lab averages the items it is given. It cannot tell whether those items define the construct well, whether they measure one idea or two, or whether the six people answered honestly; the next lesson reads the tests the authors use for the first two.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Latent construct</summary><p>Something that cannot be measured directly, such as the culture of a team. It is measured through several manifest variables, the survey items that can be answered, and the answers are combined into a single number. The authors' items are statements rather than questions.</p></details><details class="recall"><summary>Operationalizing a construct</summary><p>Deciding exactly what you mean, then writing one item for each aspect of it. Chapter 13 starts from a clear definition: for culture, Westrum's typology of pathological, bureaucratic and generative organisations, which the authors apply to the team rather than the whole organisation.</p></details><details class="recall"><summary>Reverse-coding</summary><p>An item worded the opposite way round to the others is turned round before averaging. On a seven-point scale the scored value is 8 minus the answer, so that a high score always means more of what the construct names. The lab prints the score with and without it.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 13 answers the doubt every reader of survey research has: how far can you trust what people say? Read what makes a bad survey, what a latent construct and a manifest variable are, why the authors began with Westrum's definition of culture, and how a construct is scored. Then score a four-item construct for six invented people, reverse-coding the item worded the other way.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Latent construct.</strong> Something that cannot be measured directly, such as the culture of a team. It is measured through several manifest variables, the survey items that can be answered, and the answers are combined into a single number. The authors' items are statements rather than questions.</li><li><strong>Operationalizing a construct.</strong> Deciding exactly what you mean, then writing one item for each aspect of it. Chapter 13 starts from a clear definition: for culture, Westrum's typology of pathological, bureaucratic and generative organisations, which the authors apply to the team rather than the whole organisation.</li><li><strong>Reverse-coding.</strong> An item worded the opposite way round to the others is turned round before averaging. On a seven-point scale the scored value is 8 minus the answer, so that a high score always means more of what the construct names. The lab prints the score with and without it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a latent construct, not measured directly. manifest variables, the items that are. define the construct before the items. one question per aspect, then average. reverse minus code items worded the other way. a score is a mean of scored items" tabindex="0" role="region" aria-label="Mathematical notation">a latent construct: not measured directly
 manifest variables: the items that are
 define the construct before the items
@@ -2357,11 +2402,40 @@ a score is a mean of scored items</div><figcaption>Latent constructs in six line
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2429,7 +2503,7 @@ a score is a mean of scored items</div><figcaption>Latent constructs in six line
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

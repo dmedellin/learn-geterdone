@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Wages and Profits</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Book I, Chapter 9 · Of the Profits of Stock</p>
       <h1>High Profits Raise Prices More Than High Wages</h1>
       <p class="lesson-lede">A rise of wages adds to a price like simple interest; a rise of profit, charged on the price at every stage, adds like compound interest.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Wages rise in arithmetical proportion</li><li>Profit rises in geometrical proportion</li><li>The merchants&#x27; complaint</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Simple interest and compound interest</h2>
-      <article class="prose reading"><p><strong>Book I, Chapter 9.</strong> &ldquo;In reality, high profits tend much more to raise the price of work than high wages.&rdquo;</p><p>Smith has just said that in countries fast advancing to riches the low rate of profit may, in the price of many commodities, &ldquo;compensate the high wages of labour, and enable those countries to sell as cheap as their less thriving neighbours, among whom the wages of labour may be lower.&rdquo; Now he gives the reason for the claim, in one example. Suppose, in the linen manufacture, that the wages of the flax-dressers, the spinners and the weavers should all be advanced twopence a day. &ldquo;it would be necessary to heighten the price of a piece of linen only by a number of twopences equal to the number of people that had been employed about it, multiplied by the number of days during which they had been so employed.&rdquo; In his words, the part of the price that resolved itself into wages would &ldquo;rise only in arithmetical proportion to this rise of wages&rdquo;.</p><p>Now raise the profits of all the employers by five per cent instead. &ldquo;The employer of the flax dressers would, in selling his flax, require an additional five per cent. upon the whole value of the materials and wages which he advanced to his workmen.&rdquo; The employer of the spinners would require it on the advanced price of the flax, which now includes the flax-dresser's extra, and on the spinners' wages. The weaver's employer would require it on the advanced price of the yarn and on the weavers' wages. So the part that resolves itself into profit would &ldquo;rise in geometrical proportion to this rise of profit&rdquo;. He puts the contrast as an image of debt: &ldquo;In raising the price of commodities, the rise of wages operates in the same manner as simple interest does in the accumulation of debt. The rise of profit operates like compound interest.&rdquo;</p><p>The lab runs the same sort of chain, with figures written for the lesson. It has four stages: a flax-grower, who pays £100 in wages and £40 in rent, then the flax-dresser at £30 in wages, the spinner at £60 and the weaver at £90, all at ten per cent profit. In the base preset the price after the weaver is about £416.50 (exactly £416.504), of which the wages are £280, the rent £40 and the profit about £96.50. The lab raises wages by a percentage and profit by a number of points, and it does not use Smith's twopence a day. A ten per cent rise in every wage, in the wages preset, adds £28 to the wages and makes the price about £452.30, a rise of about £35.79. A five-point rise in profit, in the profit preset, from ten to fifteen per cent, leaves the wages at £280 and makes the price about £473.34, a rise of about £56.83. Both together, in the both preset, make about £513.67, a rise of about £97.17. That the profit rise is the bigger here depends on the numbers chosen for the lesson: it is not what Smith claims. What he claims is the shape. The lab splits the profit rise in two. Charged on the old advances of the four stages, five points come to about £48.25. The other £8.58 or so is profit charged on the extra profits of the stages before, which is the compounding. The wage rise is added once; the profit rise is added at every stage on top of what came before, so the longer the chain, the more it compounds.</p><p>There is a wrinkle in the arithmetic that Smith does not stop on. In the lab, a rise in wages does more than add its own amount: in the wages preset the wages part rises by £28, from £280 to £308, and the price by about £35.79, because the employer also reckons his ordinary profit on the extra wages he has to advance. The difference, about £7.79, is that extra profit, and it belongs to the profit part of the price, not to the wages part. Smith's sentence about arithmetical proportion is about the wages part only, so it holds on the lab's own figures: £28 added once. But it leaves open what a wage rise does to the whole price.</p><p>He ends the chapter with the merchants. &ldquo;Our merchants and master manufacturers complain much of the bad effects of high wages in raising the price, and thereby lessening the sale of their goods, both at home and abroad. They say nothing concerning the bad effects of high profits; they are silent with regard to the pernicious effects of their own gains; they complain only of those of other people.&rdquo; It is one of the sentences in the book where Smith does not hide on which side his suspicion falls: the interest of the people who live by profit is not that of the public, as Book I will say again at the end of its last chapter. The lesson only says what it says. Whether the merchants of 1776 did or did not complain in the way he describes is a question the lab cannot answer.</p><p>Ricardo challenged the conclusion. He held, in 1817, that a general rise of wages does not raise the prices of commodities, since their values depend on the labour they cost, and falls instead on profit. The Capital lesson <em>Wage Changes and Prices of Production</em> works Marx's version of the question, in which a general wage rise lowers the general rate of profit and moves prices differently in different lines. Smith is not answering either, since he died in 1790, but the question they ask is the one his page leaves: whether a price can be a sum of parts that are free to move one at a time.</p><p>The next course, <em>Wages and Profit in Different Employments</em>, reads Chapter 10, which asks why wages and profits differ from one trade to another.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Price</h2></div><p>a price resolved into wages, profit and rent through the stages of production</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Simple interest and compound interest</h2><div class="prose reading"><p><strong>Book I, Chapter 9.</strong> &ldquo;In reality, high profits tend much more to raise the price of work than high wages.&rdquo;</p><p>Smith has just said that in countries fast advancing to riches the low rate of profit may, in the price of many commodities, &ldquo;compensate the high wages of labour, and enable those countries to sell as cheap as their less thriving neighbours, among whom the wages of labour may be lower.&rdquo; Now he gives the reason for the claim, in one example. Suppose, in the linen manufacture, that the wages of the flax-dressers, the spinners and the weavers should all be advanced twopence a day. &ldquo;it would be necessary to heighten the price of a piece of linen only by a number of twopences equal to the number of people that had been employed about it, multiplied by the number of days during which they had been so employed.&rdquo; In his words, the part of the price that resolved itself into wages would &ldquo;rise only in arithmetical proportion to this rise of wages&rdquo;.</p><p>Now raise the profits of all the employers by five per cent instead. &ldquo;The employer of the flax dressers would, in selling his flax, require an additional five per cent. upon the whole value of the materials and wages which he advanced to his workmen.&rdquo; The employer of the spinners would require it on the advanced price of the flax, which now includes the flax-dresser's extra, and on the spinners' wages. The weaver's employer would require it on the advanced price of the yarn and on the weavers' wages. So the part that resolves itself into profit would &ldquo;rise in geometrical proportion to this rise of profit&rdquo;. He puts the contrast as an image of debt: &ldquo;In raising the price of commodities, the rise of wages operates in the same manner as simple interest does in the accumulation of debt. The rise of profit operates like compound interest.&rdquo;</p><p>The lab runs the same sort of chain, with figures written for the lesson. It has four stages: a flax-grower, who pays £100 in wages and £40 in rent, then the flax-dresser at £30 in wages, the spinner at £60 and the weaver at £90, all at ten per cent profit. In the base preset the price after the weaver is about £416.50 (exactly £416.504), of which the wages are £280, the rent £40 and the profit about £96.50. The lab raises wages by a percentage and profit by a number of points, and it does not use Smith's twopence a day. A ten per cent rise in every wage, in the wages preset, adds £28 to the wages and makes the price about £452.30, a rise of about £35.79. A five-point rise in profit, in the profit preset, from ten to fifteen per cent, leaves the wages at £280 and makes the price about £473.34, a rise of about £56.83. Both together, in the both preset, make about £513.67, a rise of about £97.17. That the profit rise is the bigger here depends on the numbers chosen for the lesson: it is not what Smith claims. What he claims is the shape. The lab splits the profit rise in two. Charged on the old advances of the four stages, five points come to about £48.25. The other £8.58 or so is profit charged on the extra profits of the stages before, which is the compounding. The wage rise is added once; the profit rise is added at every stage on top of what came before, so the longer the chain, the more it compounds.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Price</h2></div><p>a price resolved into wages, profit and rent through the stages of production</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Price</strong><span>a price resolved into wages, profit and rent through the stages of production</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wprTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wprTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> At each stage the undertaker advances the price of what the last stage sold, the wages and the rent, and takes the profit rate on all of it: price after = (previous price + wages + rent) × (1 + rate/100), starting from nothing. The final price is then exactly the sum of all the wages, rents and profits paid at every stage (Smith, I.6: every price resolves into the three). A wage rise multiplies every stage's wages by (1 + rise/100); a profit rise adds its points to every stage's rate. Each is worked through all the stages again. A wage rise adds the extra wages and the profit charged on them; a profit rise is charged on prices that already carry profit, so it compounds: compare the price's rise with the profit on the old advances (Smith, I.9: like compound interest against simple). Stages run in the order given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A wage rise and a profit rise through the stages</h3>
-          <p>A figure computed from the quantities the lesson states. The stages of a price, as in the lesson Wages, Profit and Rent, here a linen chain written for this lesson, with a rise in wages (a percentage) and a rise in the rate of profit (points) applied to every stage. The lab prints the new price and the rise that each causes.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A wage rise and a profit rise through the stages</h3>
+            <p>A figure computed from the quantities the lesson states. The stages of a price, as in the lesson Wages, Profit and Rent, here a linen chain written for this lesson, with a rise in wages (a percentage) and a rise in the rate of profit (points) applied to every stage. The lab prints the new price and the rise that each causes.</p>
         <div class="field">
           <label for="wprPreset">Worked example</label>
           <select id="wprPreset"><option value="base" selected>A linen chain at ten per cent, written for this lesson</option><option value="wages">Every wage up ten per cent</option><option value="profit">Every rate of profit up five points</option><option value="both">Wages up ten per cent and profit up five points</option></select>
@@ -1434,12 +1477,15 @@
           <div class="kpi"><span>With both rises</span><strong id="wprBothRise">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>There is a wrinkle in the arithmetic that Smith does not stop on. In the lab, a rise in wages does more than add its own amount: in the wages preset the wages part rises by £28, from £280 to £308, and the price by about £35.79, because the employer also reckons his ordinary profit on the extra wages he has to advance. The difference, about £7.79, is that extra profit, and it belongs to the profit part of the price, not to the wages part. Smith's sentence about arithmetical proportion is about the wages part only, so it holds on the lab's own figures: £28 added once. But it leaves open what a wage rise does to the whole price.</p><p>He ends the chapter with the merchants. &ldquo;Our merchants and master manufacturers complain much of the bad effects of high wages in raising the price, and thereby lessening the sale of their goods, both at home and abroad. They say nothing concerning the bad effects of high profits; they are silent with regard to the pernicious effects of their own gains; they complain only of those of other people.&rdquo; It is one of the sentences in the book where Smith does not hide on which side his suspicion falls: the interest of the people who live by profit is not that of the public, as Book I will say again at the end of its last chapter. The lesson only says what it says. Whether the merchants of 1776 did or did not complain in the way he describes is a question the lab cannot answer.</p><p>Ricardo challenged the conclusion. He held, in 1817, that a general rise of wages does not raise the prices of commodities, since their values depend on the labour they cost, and falls instead on profit. The Capital lesson <em>Wage Changes and Prices of Production</em> works Marx's version of the question, in which a general wage rise lowers the general rate of profit and moves prices differently in different lines. Smith is not answering either, since he died in 1790, but the question they ask is the one his page leaves: whether a price can be a sum of parts that are free to move one at a time.</p><p>The next course, <em>Wages and Profit in Different Employments</em>, reads Chapter 10, which asks why wages and profits differ from one trade to another.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing a wage rise with a profit rise</h2></div><p>Four steps, on the same chain of stages.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Price the chain as it stands</h3><p>Stage price = (price bought + wages + rent) <span data-say="times 1 plus">· (1 +</span> rate), stage by stage, as in the lesson Wages, Profit and Rent.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Raise the wages</h3><p>Raise every stage's wages by the same percentage and price the chain again. The wages part rises by that percentage of the wage total.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Raise the rate of profit</h3><p>Add the same number of points to every stage's rate and price the chain again. Each stage charges the extra on everything it bought and advanced.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the rises</h3><p>Set the rise caused by each against the base price. The wage rise adds once; the profit rise adds at each stage on the stage before, so it grows with the number of stages.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Comparing a wage rise with a profit rise</h2>
+      <p class="lead-in">Four steps, on the same chain of stages.</p>
+      <ol class="key-ideas method"><li><strong>Price the chain as it stands.</strong> Stage price = (price bought + wages + rent) <span data-say="times 1 plus">· (1 +</span> rate), stage by stage, as in the lesson Wages, Profit and Rent.</li><li><strong>Raise the wages.</strong> Raise every stage's wages by the same percentage and price the chain again. The wages part rises by that percentage of the wage total.</li><li><strong>Raise the rate of profit.</strong> Add the same number of points to every stage's rate and price the chain again. Each stage charges the extra on everything it bought and advanced.</li><li><strong>Compare the rises.</strong> Set the rise caused by each against the base price. The wage rise adds once; the profit rise adds at each stage on the stage before, so it grows with the number of stages.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1457,17 +1503,16 @@ weaver:  (321.5975 + 90) · 1.15 = 473.337125
 rise:  473.337125 − 416.504 = 56.833125</div><p>Wages are still £280, and the whole rise is in the profit part, which goes from £96.504 to £153.337125. The extra five per cent is charged on a larger price at each stage.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying Smith denies that high wages raise prices</strong><span>He says they do, by increasing the part of price that resolves itself into wages; the same page says that high wages are compensated by low profit in a thriving country. His claim is that profit raises prices more, in the way each is added.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the lab&#x27;s comparison as a general result</strong><span>In the lab the profit rise is larger because of the figures: wages of £280 in a chain of four stages, and a rise of five points. Choose a short chain or a small profit rise and the comparison can reverse. The shape, adding against compounding, is what holds.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Equating the lab&#x27;s ten per cent with Smith&#x27;s twopence a day</strong><span>Smith's rise is a flat sum for every working person; the lab raises each wage by a percentage, so the stages with larger wages rise more. It illustrates the argument without reproducing the example.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price a chain of stages with a wage rise and with a profit rise.</strong><p>Given the wages, rent and rate of profit at each stage, compute the price with a rise of wages, with a rise of the rate of profit and with both, and say which part of the price rises in arithmetical and which in geometrical proportion.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The chain's figures are written for the lesson and the rises are the lab's. The lab cannot say whether a general rise of wages in fact raises prices or falls on profit, which is where Ricardo and Marx part from the page, nor what happened to the merchants' complaints. It shows only what the rule of the chapter does to a price built by it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Saying Smith denies that high wages raise prices</strong><span>He says they do, by increasing the part of price that resolves itself into wages; the same page says that high wages are compensated by low profit in a thriving country. His claim is that profit raises prices more, in the way each is added.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the lab&#x27;s comparison as a general result</strong><span>In the lab the profit rise is larger because of the figures: wages of £280 in a chain of four stages, and a rise of five points. Choose a short chain or a small profit rise and the comparison can reverse. The shape, adding against compounding, is what holds.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Equating the lab&#x27;s ten per cent with Smith&#x27;s twopence a day</strong><span>Smith's rise is a flat sum for every working person; the lab raises each wage by a percentage, so the stages with larger wages rise more. It illustrates the argument without reproducing the example.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can price a chain of stages with a wage rise and with a profit rise.</strong><p>Given the wages, rent and rate of profit at each stage, compute the price with a rise of wages, with a rise of the rate of profit and with both, and say which part of the price rises in arithmetical and which in geometrical proportion.</p></div></div><div class="note"><strong>Note:</strong> The chain's figures are written for the lesson and the rises are the lab's. The lab cannot say whether a general rise of wages in fact raises prices or falls on profit, which is where Ricardo and Marx part from the page, nor what happened to the merchants' complaints. It shows only what the rule of the chapter does to a price built by it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Wages rise in arithmetical proportion</summary><p>If every working person in the linen manufacture is paid twopence a day more, the price of a piece rises by the number of people who worked on it times the number of days. The part of price that is wages rises by that sum and no more.</p></details><details class="recall"><summary>Profit rises in geometrical proportion</summary><p>If every employer's profit is raised by five per cent, each requires the five per cent on the whole value of what he advanced, which already includes the profits of those before him. Each stage's rise sits on the last.</p></details><details class="recall"><summary>The merchants&#x27; complaint</summary><p>Masters complain that high wages raise prices and lessen sales. They are silent, Smith says, about the effect of high profits, which are their own.</p></details></div>
+      <h3>Summary</h3>
       <p>In the last page of Chapter 9 Smith answers the masters who blame high wages for dear goods. Through the stages of a linen manufacture a rise of wages raises the price by the sum of the rises, but a rise of profit is charged on everything advanced, including earlier profits, and so raises it faster. Run a four-stage chain with a wage rise, a profit rise and both.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Wages rise in arithmetical proportion.</strong> If every working person in the linen manufacture is paid twopence a day more, the price of a piece rises by the number of people who worked on it times the number of days. The part of price that is wages rises by that sum and no more.</li><li><strong>Profit rises in geometrical proportion.</strong> If every employer's profit is raised by five per cent, each requires the five per cent on the whole value of what he advanced, which already includes the profits of those before him. Each stage's rise sits on the last.</li><li><strong>The merchants&#x27; complaint.</strong> Masters complain that high wages raise prices and lessen sales. They are silent, Smith says, about the effect of high profits, which are their own.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="wage rise, adds, like simple interest. profit rise, compounds through the stages. profit is charged on the price advanced. merchants blame wages and not profit" tabindex="0" role="region" aria-label="Mathematical notation">wage rise: adds, like simple interest
 profit rise: compounds through the stages
 profit is charged on the price advanced
@@ -2338,11 +2383,40 @@ merchants blame wages and not profit</div><figcaption>A page in four lines</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2410,7 +2484,7 @@ merchants blame wages and not profit</div><figcaption>A page in four lines</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

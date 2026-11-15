@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Partitioning and Load Balancing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The maximum of N</p>
       <h1>The Power of Two Choices</h1>
       <p class="lesson-lede">Measure the maximum load under one random choice and under the lesser of two, from the same stream, and reseed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The rule: sample <span class="math" data-say="d">d</span> bins, take the lesser-loaded</li><li>The improvement is exponential in the wrong direction to be intuitive</li><li><span class="math" data-say="d equals 2">d = 2</span> gets essentially all of it</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One extra look, and what it is worth</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Maximum load</span><p>For a placement of <span class="math" data-say="m">m</span> keys into <span class="math" data-say="n">n</span> bins, the <strong>maximum load</strong> is the occupancy of the fullest bin. The case of interest here is <span class="math" data-say="m equals n">m = n</span>, where the mean occupancy is exactly 1 and the maximum is therefore entirely a statement about the spread. The <strong>d-choice</strong> rule places each key in the least loaded of <span class="math" data-say="d">d</span> bins chosen at random for that key.</p></div><p>At <span class="math" data-say="m equals n">m = n</span> the mean is one key a bin, so any maximum above 1 is imbalance and nothing else. That is what makes this the clean case to measure: there is no scale in the answer, and a maximum of 5 means the fullest bin holds five times what an even placement would give it.</p><div class="mathblock" data-say="1024 keys into 1024 bins, mean exactly 1 key a bin. seed, max, one choice, max, 2 choices, ratio. a table, shown on the page. bins left empty, seed 3, 377 under one choice, 243 under two" tabindex="0" role="region" aria-label="Mathematical notation">1 024 keys into 1 024 bins, mean exactly 1 key a bin
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One extra look, and what it is worth</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Maximum load</span><p>For a placement of <span class="math" data-say="m">m</span> keys into <span class="math" data-say="n">n</span> bins, the <strong>maximum load</strong> is the occupancy of the fullest bin. The case of interest here is <span class="math" data-say="m equals n">m = n</span>, where the mean occupancy is exactly 1 and the maximum is therefore entirely a statement about the spread. The <strong>d-choice</strong> rule places each key in the least loaded of <span class="math" data-say="d">d</span> bins chosen at random for that key.</p></div><p>At <span class="math" data-say="m equals n">m = n</span> the mean is one key a bin, so any maximum above 1 is imbalance and nothing else. That is what makes this the clean case to measure: there is no scale in the answer, and a maximum of 5 means the fullest bin holds five times what an even placement would give it.</p><div class="mathblock" data-say="1024 keys into 1024 bins, mean exactly 1 key a bin. seed, max, one choice, max, 2 choices, ratio. a table, shown on the page. bins left empty, seed 3, 377 under one choice, 243 under two" tabindex="0" role="region" aria-label="Mathematical notation">1 024 keys into 1 024 bins, mean exactly 1 key a bin
 
   seed      max, one choice    max, 2 choices    ratio
      3             5                  3          1.67×
@@ -1404,12 +1448,11 @@
     10             5                  3          1.67×
   mean          5.25               3.00
 
-  bins left empty, seed 3:   377 under one choice, 243 under two</div><p>The second column is the striking one: eight seeds, eight maxima, and every one of them is 3. One choice produced 5 or 6; two choices produced 3 every time. The rule does not merely lower the maximum, it makes it much less variable, which is the property a capacity plan actually wants.</p><p>The empty-bin counts are worth a glance too. Two choices left 243 bins empty where one choice left 377, because a key that would have piled onto a busy bin goes to a quieter one instead. The exact expectation for the one-choice case, <span class="math" data-say="m times the quantity 1 minus 1 over m, to the power n">m(1 − 1/m)ⁿ</span> with <span class="math" data-say="m">m</span> bins and <span class="math" data-say="n">n</span> keys, is computed on the Algorithms path in “Balls in Bins and the Birthday Bound”; this lesson counts rather than derives it.</p><h3>The standing of the two results</h3><p>The one-choice maximum load at <span class="math" data-say="m equals n">m = n</span> is <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span>, and sampling <span class="math" data-say="d">d</span> bins instead of one replaces it with a quantity growing like <span class="math" data-say="log log n">log log n</span> — this course states and measures the <span class="math" data-say="d equals 2">d = 2</span> case as <span class="math" data-say="the natural log of the natural log of n">ln ln n</span>, which is the figure the lab prints. Both of those results are <strong>stated, not proved</strong> — not in this lesson, not on the Algorithms path, not anywhere in this library. Their proofs need Chernoff bounds, which no subject here teaches, and the Algorithms path's scope explicitly excludes them.</p><p>So the numbers printed beside the measurements are quoted results rather than derived ones, and they are quoted as floating-point approximations: <span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.58">ln n / ln ln n = 3.58</span> and <span class="math" data-say="the natural log of the natural log of n equals 1.94">ln ln n = 1.94</span> at <span class="math" data-say="n equals 1024">n = 1 024</span> are rounded, and the lab labels them where it prints them. “Balls in Bins and the Birthday Bound” states the one-choice result with the same caveat and computes the exact collision and empty-bin expectations that this lesson does not; it points back here as the place where the maximum load is what a system actually pays for.</p><div class="example"><span class="label">Example &middot; What a stated rate can and cannot be used for</span><p>At <span class="math" data-say="n equals 1024">n = 1 024</span> the stated one-choice figure is <span class="math" data-say="3.58">3.58</span> and the measured maximum over eight seeds averaged <span class="math" data-say="5.25">5.25</span>. Those do not contradict each other: <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span> is a growth rate with constants suppressed, so it says how the maximum scales and not what it equals at a particular <span class="math" data-say="n">n</span>. Use the rate to answer “what happens when the fleet is ten times bigger”, and use the measurement to answer “what do I provision now”. Substituting one for the other is the error this example exists to prevent.</p></div><h3>Why not scan every bin</h3><p>Because the benefit is nearly all in the first extra look, and the cost of the search is not. A full least-loaded placement needs the load of every bin at the moment of placement, which in a distributed system means either a central allocator or a global view that is stale by the time it is used — and a stale global view herds new keys onto whichever bin looked emptiest, which is worse than either rule here. Two random probes need no global state at all.</p><p>The rule also has an obvious application outside key placement, and it is the reason the result is famous: the same arithmetic governs a load balancer choosing between backends. Sampling two backends and sending the request to the one with fewer outstanding requests gets most of the benefit of least-loaded balancing with none of its coordination, which is exactly the trade above with keys replaced by requests.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The power of two choices</h2></div><p>Sampling two bins and taking the lesser, measured against sampling one</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  bins left empty, seed 3:   377 under one choice, 243 under two</div><p>The second column is the striking one: eight seeds, eight maxima, and every one of them is 3. One choice produced 5 or 6; two choices produced 3 every time. The rule does not merely lower the maximum, it makes it much less variable, which is the property a capacity plan actually wants.</p><p>The empty-bin counts are worth a glance too. Two choices left 243 bins empty where one choice left 377, because a key that would have piled onto a busy bin goes to a quieter one instead. The exact expectation for the one-choice case, <span class="math" data-say="m times the quantity 1 minus 1 over m, to the power n">m(1 − 1/m)ⁿ</span> with <span class="math" data-say="m">m</span> bins and <span class="math" data-say="n">n</span> keys, is computed on the Algorithms path in “Balls in Bins and the Birthday Bound”; this lesson counts rather than derives it.</p><h3>The standing of the two results</h3><p>The one-choice maximum load at <span class="math" data-say="m equals n">m = n</span> is <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span>, and sampling <span class="math" data-say="d">d</span> bins instead of one replaces it with a quantity growing like <span class="math" data-say="log log n">log log n</span> — this course states and measures the <span class="math" data-say="d equals 2">d = 2</span> case as <span class="math" data-say="the natural log of the natural log of n">ln ln n</span>, which is the figure the lab prints. Both of those results are <strong>stated, not proved</strong> — not in this lesson, not on the Algorithms path, not anywhere in this library. Their proofs need Chernoff bounds, which no subject here teaches, and the Algorithms path's scope explicitly excludes them.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The power of two choices</h2></div><p>Sampling two bins and taking the lesser, measured against sampling one</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The power of two choices</strong><span>one stream, two policies: take the lesser-loaded of d bins and the maximum collapses</span></div>
         <div class="inline-legend"><span class="tone-red"><i class="legend-swatch"></i>one choice</span><span class="tone-green"><i class="legend-swatch"></i>d choices</span><span class="tone-muted"><i class="legend-swatch"></i>the mean, which is 1</span></div>
@@ -1417,10 +1460,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="stCols" viewBox="0 0 660 240" role="img" aria-label="Two occupancy profiles from the same seeded stream: one choice per ball above, the lesser of d choices below."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stTable"></table></div>
       <div class="status-banner" id="stStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Give each key a second look</h3>
-          <p>Both placements are run from the same stream of draws, so the difference you see is the rule and not the randomness. Step the seed through eight values and watch the two-choice maximum refuse to move, then take <span class="math" data-say="d">d</span> to 4 and notice how little the second improvement is worth.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Give each key a second look</h3>
+            <p>Both placements are run from the same stream of draws, so the difference you see is the rule and not the randomness. Step the seed through eight values and watch the two-choice maximum refuse to move, then take <span class="math" data-say="d">d</span> to 4 and notice how little the second improvement is worth.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="stBalls">Keys, into as many bins</label><span class="range-value" id="stBallsOut">1024</span></div>
           <input id="stBalls" type="range" min="64" max="4096" step="64" value="1024" />
@@ -1442,12 +1485,15 @@
           <div class="kpi"><span>Bins left empty, each way</span><strong id="stEmpty">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="stHint" style="margin:0;">Both placements are driven by the <strong>same</strong> draws: key <em>i</em> reads d values, the one-choice arm takes the first and discards the rest, so neither arm can be accused of better luck. The maximum-load results on this course &mdash; &Theta;(log n / log log n) for one choice and about ln ln n for two &mdash; are <strong>stated, not proved</strong>: their proofs need Chernoff bounds, which no subject in this library teaches. What this lab does is <strong>measure</strong> them. Algorithms <span class="tt">randomised-algorithms / balls-in-bins</span> states the one-choice result and computes the exact expected number of colliding pairs and of empty bins, which this page does not. The placement is drawn from an LCG with multiplier 16&nbsp;807, increment 0 and modulus 2&#179;&#185;&nbsp;&minus;&nbsp;1, which is prime &mdash; the generator the rest of this path uses has modulus 2&#179;&#185;, and the low bits of a power-of-two modulus are a cycle, so keys taken modulo 8 or 16 from it come out perfectly level. The seed is mixed before it becomes a state, so seed 4 is not seed 3 rescaled. The same seed draws the same placement every time this page is opened.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>So the numbers printed beside the measurements are quoted results rather than derived ones, and they are quoted as floating-point approximations: <span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.58">ln n / ln ln n = 3.58</span> and <span class="math" data-say="the natural log of the natural log of n equals 1.94">ln ln n = 1.94</span> at <span class="math" data-say="n equals 1024">n = 1 024</span> are rounded, and the lab labels them where it prints them. “Balls in Bins and the Birthday Bound” states the one-choice result with the same caveat and computes the exact collision and empty-bin expectations that this lesson does not; it points back here as the place where the maximum load is what a system actually pays for.</p><div class="example"><span class="label">Example &middot; What a stated rate can and cannot be used for</span><p>At <span class="math" data-say="n equals 1024">n = 1 024</span> the stated one-choice figure is <span class="math" data-say="3.58">3.58</span> and the measured maximum over eight seeds averaged <span class="math" data-say="5.25">5.25</span>. Those do not contradict each other: <span class="math" data-say="theta of the quantity log n over log log n">Θ(log n / log log n)</span> is a growth rate with constants suppressed, so it says how the maximum scales and not what it equals at a particular <span class="math" data-say="n">n</span>. Use the rate to answer “what happens when the fleet is ten times bigger”, and use the measurement to answer “what do I provision now”. Substituting one for the other is the error this example exists to prevent.</p></div><h3>Why not scan every bin</h3><p>Because the benefit is nearly all in the first extra look, and the cost of the search is not. A full least-loaded placement needs the load of every bin at the moment of placement, which in a distributed system means either a central allocator or a global view that is stale by the time it is used — and a stale global view herds new keys onto whichever bin looked emptiest, which is worse than either rule here. Two random probes need no global state at all.</p><p>The rule also has an obvious application outside key placement, and it is the reason the result is famous: the same arithmetic governs a load balancer choosing between backends. Sampling two backends and sending the request to the one with fewer outstanding requests gets most of the benefit of least-loaded balancing with none of its coordination, which is exactly the trade above with keys replaced by requests.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring a placement rule</h2></div><p>Two placements, one stream, several seeds — and a clear label on which numbers were measured and which were quoted.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix <span class="math" data-say="m equals n">m = n</span> so the mean is exactly 1</h3><p>With as many keys as bins the mean occupancy is one and the maximum is pure imbalance. Any other ratio mixes the spread with a scale and makes two rules harder to compare.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Run both rules from the same draws</h3><p>The comparison is between placement rules, so the stream must be shared. Running each rule from its own seed leaves you comparing two samples as well as two rules, and at these sizes the sampling difference is the same size as the effect.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reseed, and record the maxima separately</h3><p>One choice gave 5 or 6 across eight seeds; two choices gave 3 on all eight. The spread is part of the result — a rule with a stable maximum is worth more to a capacity plan than one with the same mean and a wider range.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Put the stated rate beside the measurement, labelled</h3><p>Write <span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.58 stated, rounded">ln n / ln ln n = 3.58 (stated, rounded)</span> next to <span class="math" data-say="5.25 measured, eight seeds">5.25 (measured, eight seeds)</span>. They are different kinds of claim, and keeping them in adjacent columns with their labels is what stops the asymptotic being quoted as a provisioning figure.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring a placement rule</h2>
+      <p class="lead-in">Two placements, one stream, several seeds — and a clear label on which numbers were measured and which were quoted.</p>
+      <ol class="key-ideas method"><li><strong>Fix <span class="math" data-say="m equals n">m = n</span> so the mean is exactly 1.</strong> With as many keys as bins the mean occupancy is one and the maximum is pure imbalance. Any other ratio mixes the spread with a scale and makes two rules harder to compare.</li><li><strong>Run both rules from the same draws.</strong> The comparison is between placement rules, so the stream must be shared. Running each rule from its own seed leaves you comparing two samples as well as two rules, and at these sizes the sampling difference is the same size as the effect.</li><li><strong>Reseed, and record the maxima separately.</strong> One choice gave 5 or 6 across eight seeds; two choices gave 3 on all eight. The spread is part of the result — a rule with a stable maximum is worth more to a capacity plan than one with the same mean and a wider range.</li><li><strong>Put the stated rate beside the measurement, labelled.</strong> Write <span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.58 stated, rounded">ln n / ln ln n = 3.58 (stated, rounded)</span> next to <span class="math" data-say="5.25 measured, eight seeds">5.25 (measured, eight seeds)</span>. They are different kinds of claim, and keeping them in adjacent columns with their labels is what stops the asymptotic being quoted as a provisioning figure.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1522,16 @@ measured improvement    5.25 → 3.00, a factor of 1.75
 cost                    one extra bin lookup per key</div><p>The stated rates are smaller than the measurements and that is expected: they are growth rates with their constants suppressed, and they are being evaluated at a single, fairly small <span class="math" data-say="n">n</span>. What they are for is the comparison between the two columns rather than the value of either.</p><p>For a faded rehearsal, take <span class="math" data-say="n">n</span> to 4 096 with <span class="math" data-say="d equals 2">d = 2</span> and reseed four times. The supplied first move is the two stated rates at that size — <span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.93">ln n / ln ln n = 3.93</span> and <span class="math" data-say="the natural log of the natural log of n equals 2.12">ln ln n = 2.12</span>. Record both measured maxima, say how much each moved relative to <span class="math" data-say="n equals 1024">n = 1 024</span>, and then state which of the two columns moved by roughly the amount its stated rate predicted. Label every figure you write down as measured or stated.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting an asymptotic as a capacity figure</strong><span><span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.58">ln n / ln ln n = 3.58</span> at <span class="math" data-say="n equals 1024">n = 1 024</span> is a rate with its constants dropped, and the measured maximum averaged <span class="math" data-say="5.25">5.25</span>. Provision from the measurement and reason about growth from the rate. A plan built on <span class="math" data-say="3.58">3.58</span> is short by a third and looks rigorous.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing the result must need a full least-loaded search</strong><span>The whole point is that two random probes get essentially all of it — eight seeds, a maximum of 3 every time — with no global state. Reaching for the full search costs coordination and, if the global view is stale, produces herding that is worse than one random choice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing the two rules on different seeds</strong><span>Run both from the same stream. At <span class="math" data-say="n equals 1024">n = 1 024</span> the seed-to-seed variation in the one-choice maximum is 5 to 6, which is the same order as the effect being measured, so a comparison across seeds can report almost anything.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state both results, say that neither is proved here, and still use them.</strong><p>You should be able to run and read both placements, quote the measured maxima with the number of seeds behind them, write the stated rates beside them with the word “stated”, and explain why <span class="math" data-say="d equals 2">d = 2</span> rather than <span class="math" data-say="d equals n">d = n</span> is the engineering answer.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the last of the placement lessons. What remains is the cost of queries and operations that cannot be routed to a single shard, and the first of them is the one that makes a fleet's request rate go up rather than down: “Scatter-Gather Cost” prices a query that has to ask every shard.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Quoting an asymptotic as a capacity figure</strong><span><span class="math" data-say="the natural log of n over the natural log of the natural log of n equals 3.58">ln n / ln ln n = 3.58</span> at <span class="math" data-say="n equals 1024">n = 1 024</span> is a rate with its constants dropped, and the measured maximum averaged <span class="math" data-say="5.25">5.25</span>. Provision from the measurement and reason about growth from the rate. A plan built on <span class="math" data-say="3.58">3.58</span> is short by a third and looks rigorous.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing the result must need a full least-loaded search</strong><span>The whole point is that two random probes get essentially all of it — eight seeds, a maximum of 3 every time — with no global state. Reaching for the full search costs coordination and, if the global view is stale, produces herding that is worse than one random choice.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing the two rules on different seeds</strong><span>Run both from the same stream. At <span class="math" data-say="n equals 1024">n = 1 024</span> the seed-to-seed variation in the one-choice maximum is 5 to 6, which is the same order as the effect being measured, so a comparison across seeds can report almost anything.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state both results, say that neither is proved here, and still use them.</strong><p>You should be able to run and read both placements, quote the measured maxima with the number of seeds behind them, write the stated rates beside them with the word “stated”, and explain why <span class="math" data-say="d equals 2">d = 2</span> rather than <span class="math" data-say="d equals n">d = n</span> is the engineering answer.</p></div></div><div class="note"><strong>Note:</strong> That is the last of the placement lessons. What remains is the cost of queries and operations that cannot be routed to a single shard, and the first of them is the one that makes a fleet's request rate go up rather than down: “Scatter-Gather Cost” prices a query that has to ask every shard.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The rule: sample <span class="math" data-say="d">d</span> bins, take the lesser-loaded</summary><p>Instead of hashing a key to one shard and placing it there, hash it to <span class="math" data-say="d">d</span> shards, look at how full each of them is, and put the key in the least full. At <span class="math" data-say="d equals 2">d = 2</span> that is one extra lookup per placement and no coordination between placements. The lab runs both rules from the same stream of draws, so the comparison is not confounded by the randomness.</p></details><details class="recall"><summary>The improvement is exponential in the wrong direction to be intuitive</summary><p>The one-choice maximum grows like <span class="math" data-say="the natural log of n over the natural log of the natural log of n">ln n / ln ln n</span>, which is <span class="math" data-say="3.58">3.58</span> at <span class="math" data-say="n equals 1024">n = 1 024</span> and <span class="math" data-say="5.27">5.27</span> at <span class="math" data-say="n equals 1048576">n = 1 048 576</span>. The two-choice maximum grows like <span class="math" data-say="the natural log of the natural log of n">ln ln n</span>, which is <span class="math" data-say="1.94">1.94</span> and <span class="math" data-say="2.63">2.63</span> at the same two sizes. Taking a logarithm of a quantity that was already a logarithm is why doubling <span class="math" data-say="n">n</span> barely moves the second column at all.</p></details><details class="recall"><summary><span class="math" data-say="d equals 2">d = 2</span> gets essentially all of it</summary><p>The obvious next thought is that scanning every bin would be better still. It is, marginally: the gain from one choice to two is the collapse, and the gain from two to a full least-loaded search is small. Over seeds 3 to 10 the lab's one-choice maximum averaged <span class="math" data-say="5.25">5.25</span> and the two-choice maximum was <span class="math" data-say="3">3</span> on every single seed. The expensive part of the rule is the first extra look.</p></details></div>
+      <h3>Summary</h3>
       <p>Placing each key in a single random shard leaves a maximum load of about <span class="math" data-say="the natural log of n over the natural log of the natural log of n">ln n / ln ln n</span>. Sampling two shards and taking the lesser-loaded one leaves about <span class="math" data-say="the natural log of the natural log of n">ln ln n</span> — a logarithm replaced by the logarithm of a logarithm, for the cost of one extra lookup. Both of those results are stated and not proved anywhere in this library, so what this lesson does is measure them on placements you can reproduce.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The rule: sample <span class="math" data-say="d">d</span> bins, take the lesser-loaded.</strong> Instead of hashing a key to one shard and placing it there, hash it to <span class="math" data-say="d">d</span> shards, look at how full each of them is, and put the key in the least full. At <span class="math" data-say="d equals 2">d = 2</span> that is one extra lookup per placement and no coordination between placements. The lab runs both rules from the same stream of draws, so the comparison is not confounded by the randomness.</li><li><strong>The improvement is exponential in the wrong direction to be intuitive.</strong> The one-choice maximum grows like <span class="math" data-say="the natural log of n over the natural log of the natural log of n">ln n / ln ln n</span>, which is <span class="math" data-say="3.58">3.58</span> at <span class="math" data-say="n equals 1024">n = 1 024</span> and <span class="math" data-say="5.27">5.27</span> at <span class="math" data-say="n equals 1048576">n = 1 048 576</span>. The two-choice maximum grows like <span class="math" data-say="the natural log of the natural log of n">ln ln n</span>, which is <span class="math" data-say="1.94">1.94</span> and <span class="math" data-say="2.63">2.63</span> at the same two sizes. Taking a logarithm of a quantity that was already a logarithm is why doubling <span class="math" data-say="n">n</span> barely moves the second column at all.</li><li><strong><span class="math" data-say="d equals 2">d = 2</span> gets essentially all of it.</strong> The obvious next thought is that scanning every bin would be better still. It is, marginally: the gain from one choice to two is the collapse, and the gain from two to a full least-loaded search is small. Over seeds 3 to 10 the lab's one-choice maximum averaged <span class="math" data-say="5.25">5.25</span> and the two-choice maximum was <span class="math" data-say="3">3</span> on every single seed. The expensive part of the rule is the first extra look.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="1024 keys into 1024 bins, one stream, seed 3. one choice, fullest bin 5, two choices, fullest bin 3. seeds 3 to 10, mean 5.25, seeds 3 to 10, mean 3.00. the natural log of n over the natural log of the natural log of n equals 3.58, the natural log of the natural log of n equals 1.94, at n equals 1024, rounded. both asymptotics are stated, not proved, anywhere in this library" tabindex="0" role="region" aria-label="Mathematical notation">1 024 keys into 1 024 bins, one stream, seed 3
   one choice    fullest bin 5        two choices   fullest bin 3
   seeds 3–10    mean 5.25            seeds 3–10    mean 3.00
@@ -2922,11 +2967,40 @@ both asymptotics are stated, not proved — anywhere in this library</div><figca
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2994,7 +3068,7 @@ both asymptotics are stated, not proved — anywhere in this library</div><figca
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

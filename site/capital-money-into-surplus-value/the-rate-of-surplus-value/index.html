@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">From Money to Surplus Value</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · The Rate of Surplus-Value</p>
       <h1>The Rate of Surplus Value</h1>
       <p class="lesson-lede">Surplus value is measured against the variable capital that produced it, s/v, which is the same ratio as surplus labour to necessary labour.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Value product</li><li>The rate of surplus value</li><li>The product in parts</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Marx&#x27;s definition, then the yarn in parts</h2>
-      <article class="prose reading"><p><strong>Volume I, Chapter 9, §1.</strong> &ldquo;The rate of surplus-value is therefore an exact expression for the degree of exploitation of labour-power by capital, or of the labourer by the capitalist.&rdquo;</p><p>Every company report gives its profit as a percentage of the capital employed, and that is the first way anyone would measure a surplus. Marx's point in this chapter is that, for the question he is asking, it is the wrong denominator. Take his figures. A capital of £500 is laid out as £410 of constant capital and £90 of variable. At the end the product is worth £410 + £90 + £90 = £590, and the surplus is £90.</p><p>Two steps follow. First, only what is consumed counts. If the machinery is worth £1,054 and wears £54 in the period, only £54 is in the £410; counting the other £1,000 on both sides would give £1,500 and £1,590, and the surplus would still be £90. Second, the constant capital only reappears. The value actually created is v + s, £180, not £590. So Marx sets c equal to zero, which is &ldquo;merely an application of a mathematical rule&rdquo; and what anyone does who reckons England's cotton profits after deducting what was paid for American and Indian cotton.</p><div class="defbox"><span class="label">Definition &middot; Rate of surplus value</span><p>The ratio s/v of surplus value to the variable capital advanced. On Marx's figures, 90/90 = 100%.</p></div><p>Now the second reading. The worker spends part of the day producing the value of his own labour-power, which Marx calls necessary labour-time, and the rest producing surplus value, surplus labour-time. Since v is the value of the labour-power and s is the product of the surplus part, s/v equals surplus labour over necessary labour. One ratio counts materialised labour, the other living labour. What distinguishes a slave society from a wage society, Marx adds, is &ldquo;the mode in which this surplus-labour is in each case extracted&rdquo;, not whether it is.</p><p>Hence the line that gives this lesson its misconception. Reckoned in the usual way, £90 on £500 is 18%, &ldquo;a rate so low as possibly to cause a pleasant surprise to Mr. Carey and other harmonisers&rdquo;: Henry Carey, the American economist who argued that the interests of capital and labour are in harmony. But the rate is &ldquo;not 90/500 but 90/90 or 100%&rdquo;. The 18% is a real ratio too, the rate of profit, and Volume III is built on it. It is not the measure of how the working day is divided.</p><p>The method, then, in Marx's summary: take the value of the product, set the constant part to zero, and what is left is the value created; split it into v and s; divide. He works two examples. A mill of 10,000 spindles in 1871 spends £378 a week on cotton, wear, rent, coal, gas and oil and £52 on wages, and sells its yarn for £510: s is £80, and s/v is 80/52, or 153 11/13%. And an English acre of wheat in 1815, from the economist William Jacob's figures, yields £3 11s of surplus against £3 10s of wages, a little over 100%.</p><p>Section 2 shows the same proportions in the product itself. Go back to the twelve-hour day of “The Labour Process and the Production of Surplus Value”: 20 lb of yarn worth 30s, of which 24s is constant capital, 3s variable, 3s surplus.</p><p><strong>Volume I, Chapter 9, §2.</strong> &ldquo;If the value of 30s. is contained in 20 lbs. of yarn, then 8/10ths of this value, or the 24s. that form its constant part, is contained in 8/10ths of the product or in 16 lbs. of yarn.&rdquo;</p><p>So 16 lb of the yarn carry the constant capital, 13 1/3 lb for the cotton and 2 2/3 lb for the wear; 2 lb carry the wages; 2 lb carry the surplus. Of course every pound was spun, and every pound contains cotton. The division is of value, not of fibre. Marx's image is that the spinner might as well have spun the last 4 lb &ldquo;out of air&rdquo;: all the value of the cotton and the wear is concentrated in the other 16.</p><p>The manufacturer reads the same division in time: in the first 8 hours the spinner produces yarn equal in value to the day's cotton, in the next hour and 36 minutes the wear, in the next hour and 12 minutes his wages, and in the last hour and 12 minutes the surplus. That is &ldquo;a perfectly correct method&rdquo;, Marx says, and an easy step from it to a very wrong belief, which is the next lesson. The 2 lb that carry the surplus he names surplus produce.</p><p>The word &ldquo;exploitation&rdquo; is where most readers stop and argue, and fairly. In Marx's sense it is a defined ratio, surplus labour to necessary labour, and it implies that the surplus is unpaid labour only if labour alone creates value. An economist who credits capital with a productive contribution reads the same 100% as a division of income between two factors and sees nothing that needs the word. The arithmetic is common ground; the name is the dispute.</p><p>The lab divides any c, v and s. Marx's yarn gives 100% and 16, 2 and 2 lb. The second preset makes the misreading concrete: all 27s advanced entered as if it were v, which gives 1/9, about 11%, the same number the status line prints as s over the whole capital for the yarn. The third is the six-hour day of the same mill, where s is zero and the 10 lb of yarn split 8 and 2.</p><p>Marx's spinner in the time-reckoning makes the surplus in the last hour and 12 minutes. The next lesson, on Senior's “last hour”, follows a professor who took that literally.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Surplus value</h2></div><p>c + v + s, computed from the figures Marx gives</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Marx&#x27;s definition, then the yarn in parts</h2><div class="prose reading"><p><strong>Volume I, Chapter 9, §1.</strong> &ldquo;The rate of surplus-value is therefore an exact expression for the degree of exploitation of labour-power by capital, or of the labourer by the capitalist.&rdquo;</p><p>Every company report gives its profit as a percentage of the capital employed, and that is the first way anyone would measure a surplus. Marx's point in this chapter is that, for the question he is asking, it is the wrong denominator. Take his figures. A capital of £500 is laid out as £410 of constant capital and £90 of variable. At the end the product is worth £410 + £90 + £90 = £590, and the surplus is £90.</p><p>Two steps follow. First, only what is consumed counts. If the machinery is worth £1,054 and wears £54 in the period, only £54 is in the £410; counting the other £1,000 on both sides would give £1,500 and £1,590, and the surplus would still be £90. Second, the constant capital only reappears. The value actually created is v + s, £180, not £590. So Marx sets c equal to zero, which is &ldquo;merely an application of a mathematical rule&rdquo; and what anyone does who reckons England's cotton profits after deducting what was paid for American and Indian cotton.</p><div class="defbox"><span class="label">Definition &middot; Rate of surplus value</span><p>The ratio s/v of surplus value to the variable capital advanced. On Marx's figures, 90/90 = 100%.</p></div><p>Now the second reading. The worker spends part of the day producing the value of his own labour-power, which Marx calls necessary labour-time, and the rest producing surplus value, surplus labour-time. Since v is the value of the labour-power and s is the product of the surplus part, s/v equals surplus labour over necessary labour. One ratio counts materialised labour, the other living labour. What distinguishes a slave society from a wage society, Marx adds, is &ldquo;the mode in which this surplus-labour is in each case extracted&rdquo;, not whether it is.</p><p>Hence the line that gives this lesson its misconception. Reckoned in the usual way, £90 on £500 is 18%, &ldquo;a rate so low as possibly to cause a pleasant surprise to Mr. Carey and other harmonisers&rdquo;: Henry Carey, the American economist who argued that the interests of capital and labour are in harmony. But the rate is &ldquo;not 90/500 but 90/90 or 100%&rdquo;. The 18% is a real ratio too, the rate of profit, and Volume III is built on it. It is not the measure of how the working day is divided.</p><p>The method, then, in Marx's summary: take the value of the product, set the constant part to zero, and what is left is the value created; split it into v and s; divide. He works two examples. A mill of 10,000 spindles in 1871 spends £378 a week on cotton, wear, rent, coal, gas and oil and £52 on wages, and sells its yarn for £510: s is £80, and s/v is 80/52, or 153 11/13%. And an English acre of wheat in 1815, from the economist William Jacob's figures, yields £3 11s of surplus against £3 10s of wages, a little over 100%.</p><p>Section 2 shows the same proportions in the product itself. Go back to the twelve-hour day of “The Labour Process and the Production of Surplus Value”: 20 lb of yarn worth 30s, of which 24s is constant capital, 3s variable, 3s surplus.</p><p><strong>Volume I, Chapter 9, §2.</strong> &ldquo;If the value of 30s. is contained in 20 lbs. of yarn, then 8/10ths of this value, or the 24s. that form its constant part, is contained in 8/10ths of the product or in 16 lbs. of yarn.&rdquo;</p><p>So 16 lb of the yarn carry the constant capital, 13 1/3 lb for the cotton and 2 2/3 lb for the wear; 2 lb carry the wages; 2 lb carry the surplus. Of course every pound was spun, and every pound contains cotton. The division is of value, not of fibre. Marx's image is that the spinner might as well have spun the last 4 lb &ldquo;out of air&rdquo;: all the value of the cotton and the wear is concentrated in the other 16.</p><p>The manufacturer reads the same division in time: in the first 8 hours the spinner produces yarn equal in value to the day's cotton, in the next hour and 36 minutes the wear, in the next hour and 12 minutes his wages, and in the last hour and 12 minutes the surplus. That is &ldquo;a perfectly correct method&rdquo;, Marx says, and an easy step from it to a very wrong belief, which is the next lesson. The 2 lb that carry the surplus he names surplus produce.</p><p>The word &ldquo;exploitation&rdquo; is where most readers stop and argue, and fairly. In Marx's sense it is a defined ratio, surplus labour to necessary labour, and it implies that the surplus is unpaid labour only if labour alone creates value. An economist who credits capital with a productive contribution reads the same 100% as a division of income between two factors and sees nothing that needs the word. The arithmetic is common ground; the name is the dispute.</p><p>The lab divides any c, v and s. Marx's yarn gives 100% and 16, 2 and 2 lb. The second preset makes the misreading concrete: all 27s advanced entered as if it were v, which gives 1/9, about 11%, the same number the status line prints as s over the whole capital for the yarn. The third is the six-hour day of the same mill, where s is zero and the 10 lb of yarn split 8 and 2.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Surplus value</h2></div><p>c + v + s, computed from the figures Marx gives</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Surplus value</strong><span>c + v + s, computed from the figures Marx gives</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="suTable"></table></div>
       <div class="status-banner" id="suStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The rate, and the product in parts</h3>
-          <p>Type c, v and s in shillings and the weight of the product. The lab divides s by v and splits the product in proportion to c, v and s. The status line also prints s over the whole capital, so you can see the two ratios side by side.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The rate, and the product in parts</h3>
+            <p>Type c, v and s in shillings and the weight of the product. The lab divides s by v and splits the product in proportion to c, v and s. The status line also prints s over the whole capital, so you can see the two ratios side by side.</p>
         <div class="field">
           <label for="suPreset">Worked example</label>
           <select id="suPreset"><option value="yarn" selected>Marx's 20 lb of yarn: 24s of c, 3s of v, 3s of s</option><option value="whole-capital">The misreading: all 27s advanced counted as v</option><option value="six">The six-hour day: 12s of c, 3s of v, no surplus</option></select>
@@ -1432,12 +1475,15 @@
           <div class="kpi"><span>The product in parts</span><strong id="suParts">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Marx's spinner in the time-reckoning makes the surplus in the last hour and 12 minutes. The next lesson, on Senior's “last hour”, follows a professor who took that literally.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing the rate of surplus value</h2></div><p>Marx's own method, in four steps.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take the value of the product</h3><p>Write it as c + v + s, counting in c only the means of production actually consumed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set c to zero</h3><p>What remains, v + s, is the value created in the process. If s is given, v is the remainder, and the other way round.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide s by v</h3><p>The quotient is the rate of surplus value. The same figure is surplus labour-time over necessary labour-time.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Split the product if asked</h3><p>Each part of the value is carried by the same share of the product: c/(c + v + s) of the weight for c, and so on.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing the rate of surplus value</h2>
+      <p class="lead-in">Marx's own method, in four steps.</p>
+      <ol class="key-ideas method"><li><strong>Take the value of the product.</strong> Write it as c + v + s, counting in c only the means of production actually consumed.</li><li><strong>Set c to zero.</strong> What remains, v + s, is the value created in the process. If s is given, v is the remainder, and the other way round.</li><li><strong>Divide s by v.</strong> The quotient is the rate of surplus value. The same figure is surplus labour-time over necessary labour-time.</li><li><strong>Split the product if asked.</strong> Each part of the value is carried by the same share of the product: c/(c + v + s) of the weight for c, and so on.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1455,17 +1501,16 @@ c:  20 · 24/30 = 16 lb
 v:  20 · 3/30 = 2 lb;  s:  20 · 3/30 = 2 lb</div><p>Both rates are 100%: the worker in each case works half the day for himself and half for the capitalist. The 18% is a different ratio, and it hides that half.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dividing the surplus by the whole capital</strong><span>It is the usual way to reckon a return, and it gives £90 on £500, 18%. Marx's point is that this mixes in the constant capital, which only reappears. The whole-capital preset shows the same error on the yarn: all 27s entered as v gives about 11%, against 100% for s/v. The working day is still divided half and half.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the value of the product for the value created</strong><span>The yarn is worth 30s, but only 6s was created in the twelve hours; the other 24s was already in the cotton and the spindle. In Marx's £ example the product is £590 and the value created £180.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the 16 lb as yarn the spinner did not spin</strong><span>Every pound of the 20 was spun and contains cotton. The 16 lb are the share of the product whose value equals the constant capital: a division of value, which Marx shows in weight to make it visible.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute s/v and split a product into its parts.</strong><p>Given c, v and s, compute the rate of surplus value and the value created, distinguish s/v from s over the whole capital, and compute the share of a product that carries each of c, v and s.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The chapter's examples assume, as Marx says of Jacob's acre, that the price of the product is the same as its value; the 1871 mill's s is read from its prices on that assumption. Whether s/v measures exploitation, rather than a division of income between labour and capital, depends on the labour theory of value. The yarn and the £410, £90 and £90 are Marx's figures; the money unit is lab-wide, so the lab carries the yarn and the £ example is done in the worked lines.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dividing the surplus by the whole capital</strong><span>It is the usual way to reckon a return, and it gives £90 on £500, 18%. Marx's point is that this mixes in the constant capital, which only reappears. The whole-capital preset shows the same error on the yarn: all 27s entered as v gives about 11%, against 100% for s/v. The working day is still divided half and half.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking the value of the product for the value created</strong><span>The yarn is worth 30s, but only 6s was created in the twelve hours; the other 24s was already in the cotton and the spindle. In Marx's £ example the product is £590 and the value created £180.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the 16 lb as yarn the spinner did not spin</strong><span>Every pound of the 20 was spun and contains cotton. The 16 lb are the share of the product whose value equals the constant capital: a division of value, which Marx shows in weight to make it visible.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute s/v and split a product into its parts.</strong><p>Given c, v and s, compute the rate of surplus value and the value created, distinguish s/v from s over the whole capital, and compute the share of a product that carries each of c, v and s.</p></div></div><div class="note"><strong>Note:</strong> The chapter's examples assume, as Marx says of Jacob's acre, that the price of the product is the same as its value; the 1871 mill's s is read from its prices on that assumption. Whether s/v measures exploitation, rather than a division of income between labour and capital, depends on the labour theory of value. The yarn and the £410, £90 and £90 are Marx's figures; the money unit is lab-wide, so the lab carries the yarn and the £ example is done in the worked lines.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Value product</summary><p>The product's value is c + v + s, but only v + s was created in the process; c reappears. So Marx puts c equal to zero, the way a cotton industry's profits are reckoned after deducting the cotton bought abroad.</p></details><details class="recall"><summary>The rate of surplus value</summary><p>s/v, the surplus measured against the part of capital whose change it is. The same ratio is surplus labour over necessary labour: the two halves of the working day.</p></details><details class="recall"><summary>The product in parts</summary><p>Because the whole value is in the product, each component can be shown as a share of it: so many pounds of yarn carry the constant capital, so many the wages, so many the surplus.</p></details></div>
+      <h3>Summary</h3>
       <p>Marx sets the constant capital to zero, keeps the value newly created, and divides the surplus by the variable capital: £90 on £90 is 100%, not 90/500. Compute s/v from c, v and s, divide Marx's 20 lb of yarn into the parts that carry c, v and s, and see what the rate becomes when the whole capital is wrongly counted as v.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Value product.</strong> The product's value is c + v + s, but only v + s was created in the process; c reappears. So Marx puts c equal to zero, the way a cotton industry's profits are reckoned after deducting the cotton bought abroad.</li><li><strong>The rate of surplus value.</strong> s/v, the surplus measured against the part of capital whose change it is. The same ratio is surplus labour over necessary labour: the two halves of the working day.</li><li><strong>The product in parts.</strong> Because the whole value is in the product, each component can be shown as a share of it: so many pounds of yarn carry the constant capital, so many the wages, so many the surplus.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="value of product equals c plus v plus s. value newly created equals v plus s. rate of surplus value equals s over v. s over v equals surplus labour over necessary labour. s over the quantity c plus v, is the rate of profit instead" tabindex="0" role="region" aria-label="Mathematical notation">value of product = c + v + s
 value newly created = v + s
 rate of surplus value = s / v
@@ -2235,11 +2280,40 @@ s / (c + v) is the rate of profit instead</div><figcaption>One ratio, two readin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2307,7 +2381,7 @@ s / (c + v) is the rate of profit instead</div><figcaption>One ratio, two readin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

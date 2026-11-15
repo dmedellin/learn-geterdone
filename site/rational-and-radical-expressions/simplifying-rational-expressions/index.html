@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,33 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rational and Radical Expressions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Rational expressions</p>
       <h1>Simplifying Rational Expressions</h1>
       <p class="lesson-lede">Factor both levels, cancel only shared factors, and retain every original exclusion.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Only a common factor cancels</li><li>So factoring is not optional</li><li>Cancelling changes the formula, not the domain</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Lowest terms, and the one rule that gets you there</h2>
-      <article class="prose reading"><div class="thm"><span class="label">Theorem &middot; The fundamental principle of fractions</span><p>For polynomials <span class="math" data-say="P">P</span>, <span class="math" data-say="Q">Q</span>, <span class="math" data-say="K">K</span> with <span class="math" data-say="Q is not equal to 0">Q ≠ 0</span> and <span class="math" data-say="K is not equal to 0">K ≠ 0</span>, <span class="math" data-say="PK over QK equals P over Q">(PK)/(QK) = P/Q</span>. It holds because <span class="math" data-say="K over K equals 1">K/K = 1</span> and multiplying by <span class="math" data-say="1">1</span> changes nothing &mdash; which is also why the condition <span class="math" data-say="K is not equal to 0">K ≠ 0</span> cannot be dropped: <span class="math" data-say="0 over 0">0/0</span> is not <span class="math" data-say="1">1</span>.</p></div><p>Read the statement carefully. <span class="math" data-say="K">K</span> multiplies <span class="math" data-say="P">P</span>, and <span class="math" data-say="K">K</span> multiplies <span class="math" data-say="Q">Q</span>. Nothing in the theorem lets you remove something that is <em>added</em> to <span class="math" data-say="P">P</span>, and there is no companion theorem that does.</p><div class="defbox"><span class="label">Definition &middot; Lowest terms</span><p>A rational expression is in <strong>lowest terms</strong> when its numerator and denominator have no common polynomial factor other than a constant.</p></div><p>The method follows from the theorem. Factor the numerator completely, factor the denominator completely, record the excluded values, then strike out the factors that appear in both.</p><div class="example"><span class="label">Example &middot; A cancellation that is legal</span><p><span class="math" data-say="the quantity x squared minus 9, over the quantity x squared plus x minus 12">(x² − 9)/(x² + x − 12)</span> factors as <span class="math" data-say="the quantity the quantity x minus 3, times the quantity x plus 3, over the quantity the quantity x plus 4, times the quantity x minus 3">((x − 3)(x + 3))/((x + 4)(x − 3))</span>. The denominator is zero at <span class="math" data-say="x equals 3">x = 3</span> and <span class="math" data-say="x equals negative 4">x = −4</span>, so both are excluded. The factor <span class="math" data-say="x minus 3">x − 3</span> is common, and removing it leaves <span class="math" data-say="the quantity x plus 3, over the quantity x plus 4">(x + 3)/(x + 4)</span>, valid for <span class="math" data-say="x is not equal to 3">x ≠ 3</span> and <span class="math" data-say="x is not equal to negative 4">x ≠ −4</span>.</p></div><p>Notice what happened to <span class="math" data-say="x equals 3">x = 3</span>. It is still excluded, because it was excluded from the expression we were given, but <span class="math" data-say="the quantity x plus 3, over the quantity x plus 4">(x + 3)/(x + 4)</span> is quite happy there, taking the value <span class="math" data-say="6 over 7">6/7</span>. The two expressions agree everywhere except at that single point, where one exists and the other does not.</p><div class="defbox"><span class="label">Definition &middot; Opposite factors</span><p><span class="math" data-say="A minus b">a − b</span> and <span class="math" data-say="b minus A">b − a</span> differ by a sign: <span class="math" data-say="A minus b equals negative the quantity b minus A">a − b = −(b − a)</span>. So a numerator and denominator that look like opposites do share a factor, and their quotient is <span class="math" data-say="negative 1">−1</span>.</p></div><div class="example"><span class="label">Example &middot; The sign case</span><p><span class="math" data-say="the quantity 3 minus x, over the quantity x minus 3">(3 − x)/(x − 3)</span>. Write the top as <span class="math" data-say="negative the quantity x minus 3">−(x − 3)</span>; the expression becomes <span class="math" data-say="the quantity negative the quantity x minus 3, over the quantity x minus 3, equals negative 1">(−(x − 3))/(x − 3) = −1</span>, for every <span class="math" data-say="x is not equal to 3">x ≠ 3</span>. Checking at <span class="math" data-say="x equals 0">x = 0</span> gives <span class="math" data-say="3 over the quantity negative 3, equals negative 1">3/(−3) = −1</span>, which agrees.</p></div><p>Finally, the error the whole lesson is aimed at. In <span class="math" data-say="the quantity x plus 3, over x">(x + 3)/x</span> the <span class="math" data-say="x">x</span> on the bottom is a factor of the denominator but only a <em>term</em> of the numerator, so nothing cancels and the expression is already in lowest terms.</p><div class="mathblock" data-say="at x equals 1, the quantity x plus 3, over x, equals, 4 over 1, equals, 4, 3 is not the answer. at x equals 3, the quantity x plus 3, over x, equals, 6 over 3, equals, 2, 3 is not the answer" tabindex="0" role="region" aria-label="Mathematical notation">at x = 1 :   (x + 3)/x  =  4/1  =  4        3 is not the answer
-at x = 3 :   (x + 3)/x  =  6/3  =  2        3 is not the answer</div><p>One numerical test would have caught it. That is worth remembering as a general habit: a proposed simplification is an identity, and an identity that fails at <span class="math" data-say="x equals 1">x = 1</span> is not an identity.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Cancelling factors</h2></div><p>The common factor found by Euclid, not by pattern-matching</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Lowest terms, and the one rule that gets you there</h2><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; The fundamental principle of fractions</span><p>For polynomials <span class="math" data-say="P">P</span>, <span class="math" data-say="Q">Q</span>, <span class="math" data-say="K">K</span> with <span class="math" data-say="Q is not equal to 0">Q ≠ 0</span> and <span class="math" data-say="K is not equal to 0">K ≠ 0</span>, <span class="math" data-say="PK over QK equals P over Q">(PK)/(QK) = P/Q</span>. It holds because <span class="math" data-say="K over K equals 1">K/K = 1</span> and multiplying by <span class="math" data-say="1">1</span> changes nothing &mdash; which is also why the condition <span class="math" data-say="K is not equal to 0">K ≠ 0</span> cannot be dropped: <span class="math" data-say="0 over 0">0/0</span> is not <span class="math" data-say="1">1</span>.</p></div><p>Read the statement carefully. <span class="math" data-say="K">K</span> multiplies <span class="math" data-say="P">P</span>, and <span class="math" data-say="K">K</span> multiplies <span class="math" data-say="Q">Q</span>. Nothing in the theorem lets you remove something that is <em>added</em> to <span class="math" data-say="P">P</span>, and there is no companion theorem that does.</p><div class="defbox"><span class="label">Definition &middot; Lowest terms</span><p>A rational expression is in <strong>lowest terms</strong> when its numerator and denominator have no common polynomial factor other than a constant.</p></div><p>The method follows from the theorem. Factor the numerator completely, factor the denominator completely, record the excluded values, then strike out the factors that appear in both.</p><div class="example"><span class="label">Example &middot; A cancellation that is legal</span><p><span class="math" data-say="the quantity x squared minus 9, over the quantity x squared plus x minus 12">(x² − 9)/(x² + x − 12)</span> factors as <span class="math" data-say="the quantity the quantity x minus 3, times the quantity x plus 3, over the quantity the quantity x plus 4, times the quantity x minus 3">((x − 3)(x + 3))/((x + 4)(x − 3))</span>. The denominator is zero at <span class="math" data-say="x equals 3">x = 3</span> and <span class="math" data-say="x equals negative 4">x = −4</span>, so both are excluded. The factor <span class="math" data-say="x minus 3">x − 3</span> is common, and removing it leaves <span class="math" data-say="the quantity x plus 3, over the quantity x plus 4">(x + 3)/(x + 4)</span>, valid for <span class="math" data-say="x is not equal to 3">x ≠ 3</span> and <span class="math" data-say="x is not equal to negative 4">x ≠ −4</span>.</p></div><p>Notice what happened to <span class="math" data-say="x equals 3">x = 3</span>. It is still excluded, because it was excluded from the expression we were given, but <span class="math" data-say="the quantity x plus 3, over the quantity x plus 4">(x + 3)/(x + 4)</span> is quite happy there, taking the value <span class="math" data-say="6 over 7">6/7</span>. The two expressions agree everywhere except at that single point, where one exists and the other does not.</p><div class="defbox"><span class="label">Definition &middot; Opposite factors</span><p><span class="math" data-say="A minus b">a − b</span> and <span class="math" data-say="b minus A">b − a</span> differ by a sign: <span class="math" data-say="A minus b equals negative the quantity b minus A">a − b = −(b − a)</span>. So a numerator and denominator that look like opposites do share a factor, and their quotient is <span class="math" data-say="negative 1">−1</span>.</p></div><div class="example"><span class="label">Example &middot; The sign case</span><p><span class="math" data-say="the quantity 3 minus x, over the quantity x minus 3">(3 − x)/(x − 3)</span>. Write the top as <span class="math" data-say="negative the quantity x minus 3">−(x − 3)</span>; the expression becomes <span class="math" data-say="the quantity negative the quantity x minus 3, over the quantity x minus 3, equals negative 1">(−(x − 3))/(x − 3) = −1</span>, for every <span class="math" data-say="x is not equal to 3">x ≠ 3</span>. Checking at <span class="math" data-say="x equals 0">x = 0</span> gives <span class="math" data-say="3 over the quantity negative 3, equals negative 1">3/(−3) = −1</span>, which agrees.</p></div><p>Finally, the error the whole lesson is aimed at. In <span class="math" data-say="the quantity x plus 3, over x">(x + 3)/x</span> the <span class="math" data-say="x">x</span> on the bottom is a factor of the denominator but only a <em>term</em> of the numerator, so nothing cancels and the expression is already in lowest terms.</p><div class="mathblock" data-say="at x equals 1, the quantity x plus 3, over x, equals, 4 over 1, equals, 4, 3 is not the answer. at x equals 3, the quantity x plus 3, over x, equals, 6 over 3, equals, 2, 3 is not the answer" tabindex="0" role="region" aria-label="Mathematical notation">at x = 1 :   (x + 3)/x  =  4/1  =  4        3 is not the answer
+at x = 3 :   (x + 3)/x  =  6/3  =  2        3 is not the answer</div><p>One numerical test would have caught it. That is worth remembering as a general habit: a proposed simplification is an identity, and an identity that fails at <span class="math" data-say="x equals 1">x = 1</span> is not an identity.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Cancelling factors</h2></div><p>The common factor found by Euclid, not by pattern-matching</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="rfTitle">Rational expression</strong><span id="rfSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>exact rational arithmetic</span><span class="tone-amber"><i class="legend-swatch"></i>what the answer hides</span></div>
       </div>
       <div id="rfWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="rfStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Factor, then cancel</h3>
-          <p>The lab factors both parts, marks the common factors, and keeps the original exclusions beside the reduced form so you can see what the answer no longer records.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Factor, then cancel</h3>
+            <p>The lab factors both parts, marks the common factors, and keeps the original exclusions beside the reduced form so you can see what the answer no longer records.</p>
         <div class="field" id="rfFieldPreset">
           <label for="rfPreset">Worked example</label>
           <select id="rfPreset"><option value="(x^2 - 4)/(x - 2)||mul">(x^2 - 4)/(x - 2)          cancels completely</option><option value="(x^2 - 9)/(x^2 + 6x + 9)||mul">(x^2 - 9)/(x^2 + 6x + 9)   cancels once, and once is not enough</option><option value="(2 - x)/(x^2 - 4)||mul">(2 - x)/(x^2 - 4)          the sign that goes missing</option><option value="(x^2 + 4)/(x^2 + 2x)||mul">(x^2 + 4)/(x^2 + 2x)       nothing cancels</option><option value="(x + 3)/(x^2 + 3x)||mul">(x + 3)/(x^2 + 3x)         the answer keeps none of the evidence</option><option value="(x^3 - x)/(x^2 - 2x + 1)||mul">(x^3 - x)/(x^2 - 2x + 1)   a repeated factor on the bottom</option></select>
@@ -1422,12 +1465,14 @@ at x = 3 :   (x + 3)/x  =  6/3  =  2        3 is not the answer</div><p>One nume
           <div class="kpi"><span id="rfK3Lab">&mdash;</span><strong id="rfK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="rfHint" style="margin:0;">Type any rational expression in <code>x</code>: <code>2x</code>, <code>(x+1)(x-2)</code> and <code>1/x + 1/2</code> all parse. Every coefficient below is an exact fraction, and every excluded value is found from the denominators as you wrote them.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reducing to lowest terms</h2></div><p>The order is fixed: exclusions are recorded before anything is struck out.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Factor the numerator and the denominator</h3><p>Completely, and separately. Greatest common factor first, then the patterns from Polynomials and Factoring &mdash; difference of squares, trinomials, grouping.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write down the excluded values</h3><p>From the factored denominator, before you cancel. This is the only moment at which they are visible.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Cancel the common factors</h3><p>One at a time, and only whole factors. If a factor pair differs by a sign, pull <span class="math" data-say="negative 1">−1</span> out of one of them first so the match is exact.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check at one convenient value</h3><p>Pick any <span class="math" data-say="x">x</span> in the domain, usually <span class="math" data-say="0">0</span> or <span class="math" data-say="1">1</span>, and evaluate both forms. They must agree. This catches a cancelled term in seconds.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reducing to lowest terms</h2>
+      <p class="lead-in">The order is fixed: exclusions are recorded before anything is struck out.</p>
+      <ol class="key-ideas method"><li><strong>Factor the numerator and the denominator.</strong> Completely, and separately. Greatest common factor first, then the patterns from Polynomials and Factoring &mdash; difference of squares, trinomials, grouping.</li><li><strong>Write down the excluded values.</strong> From the factored denominator, before you cancel. This is the only moment at which they are visible.</li><li><strong>Cancel the common factors.</strong> One at a time, and only whole factors. If a factor pair differs by a sign, pull <span class="math" data-say="negative 1">−1</span> out of one of them first so the match is exact.</li><li><strong>Check at one convenient value.</strong> Pick any <span class="math" data-say="x">x</span> in the domain, usually <span class="math" data-say="0">0</span> or <span class="math" data-say="1">1</span>, and evaluate both forms. They must agree. This catches a cancelled term in seconds.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1453,17 +1498,16 @@ check at x = 1 :   −8/−10  =  4/5      and   4/5      ✓
 at x = 3 :   original undefined,   (x + 3)/(x + 4) = 6/7</div><p>The final line is the reason the exclusion is written twice. The reduced form is defined at <span class="math" data-say="x equals 3">x = 3</span> and gives a perfectly reasonable number there, so nothing about <span class="math" data-say="6 over 7">6/7</span> announces that it should not exist. Only the condition you carried tells you.</p><p>For a faded cancellation, simplify <span class="math" data-say="the quantity x squared minus 16, over the quantity x squared plus x minus 20">(x² − 16)/(x² + x − 20)</span>. The supplied first move is to factor before cancelling and record the original denominator's zeros. Complete both factorisations, cancel one factor and check at <span class="math" data-say="x equals 0">x = 0</span>. Compare with <span class="math" data-say="the quantity x plus 4, over the quantity x plus 5">(x + 4)/(x + 5)</span>, <span class="math" data-say="x is not equal to 4, negative 5">x ≠ 4, −5</span>; if <span class="math" data-say="4">4</span> disappeared from your restrictions, you read the domain from the reduced formula.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Cancelling a term because it appears on both lines</strong><span><span class="math" data-say="the quantity x plus 3, over the quantity x plus 4">(x + 3)/(x + 4)</span> does not become <span class="math" data-say="3 over 4">3/4</span>. The <span class="math" data-say="x">x</span> is added, not multiplied, and one substitution &mdash; <span class="math" data-say="x equals 1">x = 1</span> gives <span class="math" data-say="4 over 5">4/5</span> &mdash; disposes of it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the exclusions on the way to the answer</strong><span><span class="math" data-say="the quantity x squared minus 4, over the quantity x minus 2, equals x plus 2">(x² − 4)/(x − 2) = x + 2</span> is only true for <span class="math" data-say="x is not equal to 2">x ≠ 2</span>. Without that condition the statement is false at exactly one point, and “Graphs and Asymptotes” draws the hole it leaves.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Missing an opposite pair</strong><span><span class="math" data-say="the quantity 4 minus x squared, over the quantity x minus 2">(4 − x²)/(x − 2)</span> looks unfactorable against its denominator until you write <span class="math" data-say="4 minus x squared equals negative the quantity x minus 2, times the quantity x plus 2">4 − x² = −(x − 2)(x + 2)</span>. The answer is <span class="math" data-say="negative the quantity x plus 2">−(x + 2)</span>, not "no common factor".</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can justify each cancellation by naming the factor.</strong><p>For any expression you reduce, you should be able to point at the polynomial you removed and say that it multiplied both the numerator and the denominator. If you cannot name it, you have not cancelled &mdash; you have invented a rule that happens to work on this example.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A numerical check is not a proof, and on this path it is never offered as one: an identity can survive a lucky value. But a single disagreement is conclusive in the other direction, and that is what makes the habit worth having &mdash; it cannot confirm your answer, and it will reliably refute a wrong one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Cancelling a term because it appears on both lines</strong><span><span class="math" data-say="the quantity x plus 3, over the quantity x plus 4">(x + 3)/(x + 4)</span> does not become <span class="math" data-say="3 over 4">3/4</span>. The <span class="math" data-say="x">x</span> is added, not multiplied, and one substitution &mdash; <span class="math" data-say="x equals 1">x = 1</span> gives <span class="math" data-say="4 over 5">4/5</span> &mdash; disposes of it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the exclusions on the way to the answer</strong><span><span class="math" data-say="the quantity x squared minus 4, over the quantity x minus 2, equals x plus 2">(x² − 4)/(x − 2) = x + 2</span> is only true for <span class="math" data-say="x is not equal to 2">x ≠ 2</span>. Without that condition the statement is false at exactly one point, and “Graphs and Asymptotes” draws the hole it leaves.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Missing an opposite pair</strong><span><span class="math" data-say="the quantity 4 minus x squared, over the quantity x minus 2">(4 − x²)/(x − 2)</span> looks unfactorable against its denominator until you write <span class="math" data-say="4 minus x squared equals negative the quantity x minus 2, times the quantity x plus 2">4 − x² = −(x − 2)(x + 2)</span>. The answer is <span class="math" data-say="negative the quantity x plus 2">−(x + 2)</span>, not "no common factor".</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can justify each cancellation by naming the factor.</strong><p>For any expression you reduce, you should be able to point at the polynomial you removed and say that it multiplied both the numerator and the denominator. If you cannot name it, you have not cancelled &mdash; you have invented a rule that happens to work on this example.</p></div></div><div class="note"><strong>Note:</strong> A numerical check is not a proof, and on this path it is never offered as one: an identity can survive a lucky value. But a single disagreement is conclusive in the other direction, and that is what makes the habit worth having &mdash; it cannot confirm your answer, and it will reliably refute a wrong one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Only a common factor cancels</summary><p>A <em>factor</em> is joined to the rest by multiplication; a <em>term</em> is joined by addition. <span class="math" data-say="2 x over 2 y">(2x)/(2y)</span> cancels to <span class="math" data-say="x over y">x/y</span>. <span class="math" data-say="the quantity 2 plus x, over the quantity 2 plus y">(2 + x)/(2 + y)</span> cancels to nothing at all.</p></details><details class="recall"><summary>So factoring is not optional</summary><p>The rule is stated in terms of factors, so an expression that is not factored cannot be simplified &mdash; you cannot see the common factor in <span class="math" data-say="the quantity x squared minus 9, over the quantity x squared plus x minus 12">(x² − 9)/(x² + x − 12)</span>, and it is there.</p></details><details class="recall"><summary>Cancelling changes the formula, not the domain</summary><p>The simplified form is equal to the original only where the original exists. Carry the exclusions across; they are part of the answer.</p></details></div>
+      <h3>Summary</h3>
       <p>One rule does all the work: a factor common to the top and the bottom may be removed. A term may not. The difference between those two words is the most expensive distinction in school algebra.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Only a common factor cancels.</strong> A <em>factor</em> is joined to the rest by multiplication; a <em>term</em> is joined by addition. <span class="math" data-say="2 x over 2 y">(2x)/(2y)</span> cancels to <span class="math" data-say="x over y">x/y</span>. <span class="math" data-say="the quantity 2 plus x, over the quantity 2 plus y">(2 + x)/(2 + y)</span> cancels to nothing at all.</li><li><strong>So factoring is not optional.</strong> The rule is stated in terms of factors, so an expression that is not factored cannot be simplified &mdash; you cannot see the common factor in <span class="math" data-say="the quantity x squared minus 9, over the quantity x squared plus x minus 12">(x² − 9)/(x² + x − 12)</span>, and it is there.</li><li><strong>Cancelling changes the formula, not the domain.</strong> The simplified form is equal to the original only where the original exists. Carry the exclusions across; they are part of the answer.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="PK over QK, equals, P over Q, provided K is not equal to 0. the quantity x squared minus 9, over the quantity x squared plus x minus 12, equals, the quantity x plus 3, over the quantity x plus 4, x is not equal to 3. the quantity 3 minus x, over the quantity x minus 3, equals, negative 1, since 3 minus x equals negative the quantity x minus 3. the quantity x plus 3, over x, is ALREADY lowest terms, 3 is a term" tabindex="0" role="region" aria-label="Mathematical notation">(PK)/(QK)  =  P/Q        provided K ≠ 0
 (x² − 9)/(x² + x − 12)  =  (x + 3)/(x + 4),   x ≠ 3
 (3 − x)/(x − 3)  =  −1          since 3 − x = −(x − 3)
@@ -3900,11 +3944,40 @@ at x = 3 :   original undefined,   (x + 3)/(x + 4) = 6/7</div><p>The final line 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3972,7 +4045,7 @@ at x = 3 :   original undefined,   (x + 3)/(x + 4) = 6/7</div><p>The final line 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

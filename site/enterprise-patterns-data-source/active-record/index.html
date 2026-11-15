@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Talking to the Database</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Data Source Architectural Patterns</p>
       <h1>Active Record</h1>
       <p class="lesson-lede">An Active Record is a row object that also carries the domain logic on its data; a Row Data Gateway is the same shape with none.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Active Record</li><li>Isomorphic schema</li><li>Database access and domain logic</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, its neighbour, then the count</h2>
-      <article class="prose reading"><p>&ldquo;A Row Data Gateway should contain only database access logic and no domain logic.&rdquo; Chapter 10 says it is often hard to tell a Row Data Gateway from an Active Record, and this sentence is its test. This lesson reads Active Record as a tool, with that test beside it. Read the pattern in your own copy first.</p><p>Active Record puts data access in the domain object, so that each object knows how to read and write its own data. Its fields mirror the table's columns, with no conversion yet. The pattern's own list of what such a class does runs from building itself out of a result row, through finders, inserts, updates and accessors, to one last item: some of the business logic. That last item is the difference.</p><p>Fowler puts the difference plainly in both places: a Row Data Gateway holds only database access, an Active Record both database access and domain logic, and he calls the line between them blurred, and still worth drawing. Chapter 3 gives the same relation as a route: start with a Row Data Gateway and add domain logic to it, particularly when you see the same code repeated in several Transaction Scripts. Row Data Gateway's own pages say that moving such logic in gradually turns the gateway into an Active Record, and that this is often good, since it reduces duplication.</p><p>Chapter 10 recommends Active Record for logic that stays close to one record: the ordinary create, read, update and delete work, and rules computed from a single row. Its appeal is that it is simple. It stops working once the classes and the tables part ways, because collections, inheritance and links between objects do not fit it, and that is when a Data Mapper is needed. And because it ties the class design to the table design, neither can be refactored without the other. Chapter 8 puts a size on simple: a Domain Model of a couple of dozen classes close to the database, the book's illustration, is where an Active Record makes sense.</p><p>The lesson's two classes cover one <span class="math" data-say="account">account</span> row with three fields. Each routine that talks to the database shows its SQL as a comment, so you can see what it would run; the bodies are left out because the lesson is about which routines are which. The first, <span class="math" data-say="account">Account</span>, is an Active Record.</p><pre class="codeblock" data-say="line 1, comment, An Active Record a row&#x27;s data, its SQL and its domain logic.. line 2, class account. line 3, private long id. line 4, private long balance. line 5, private long overdraft. line 7, static account find of connection db, long id throws SQL exception. line 8, comment, SELECT balance, overdraft FROM account WHERE id ?. line 9, return new account. line 12, void update of connection db throws SQL exception. line 13, comment, UPDATE account SET balance ? WHERE id ?. line 16, public boolean can withdraw of long cents. line 17, return balance plus overdraft is at least cents" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// An Active Record: a row&#x27;s data, its SQL and its domain logic.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, its neighbour, then the count</h2><div class="prose reading"><p>&ldquo;A Row Data Gateway should contain only database access logic and no domain logic.&rdquo; Chapter 10 says it is often hard to tell a Row Data Gateway from an Active Record, and this sentence is its test. This lesson reads Active Record as a tool, with that test beside it. Read the pattern in your own copy first.</p><p>Active Record puts data access in the domain object, so that each object knows how to read and write its own data. Its fields mirror the table's columns, with no conversion yet. The pattern's own list of what such a class does runs from building itself out of a result row, through finders, inserts, updates and accessors, to one last item: some of the business logic. That last item is the difference.</p><p>Fowler puts the difference plainly in both places: a Row Data Gateway holds only database access, an Active Record both database access and domain logic, and he calls the line between them blurred, and still worth drawing. Chapter 3 gives the same relation as a route: start with a Row Data Gateway and add domain logic to it, particularly when you see the same code repeated in several Transaction Scripts. Row Data Gateway's own pages say that moving such logic in gradually turns the gateway into an Active Record, and that this is often good, since it reduces duplication.</p><p>Chapter 10 recommends Active Record for logic that stays close to one record: the ordinary create, read, update and delete work, and rules computed from a single row. Its appeal is that it is simple. It stops working once the classes and the tables part ways, because collections, inheritance and links between objects do not fit it, and that is when a Data Mapper is needed. And because it ties the class design to the table design, neither can be refactored without the other. Chapter 8 puts a size on simple: a Domain Model of a couple of dozen classes close to the database, the book's illustration, is where an Active Record makes sense.</p><p>The lesson's two classes cover one <span class="math" data-say="account">account</span> row with three fields. Each routine that talks to the database shows its SQL as a comment, so you can see what it would run; the bodies are left out because the lesson is about which routines are which. The first, <span class="math" data-say="account">Account</span>, is an Active Record.</p><pre class="codeblock" data-say="line 1, comment, An Active Record a row&#x27;s data, its SQL and its domain logic.. line 2, class account. line 3, private long id. line 4, private long balance. line 5, private long overdraft. line 7, static account find of connection db, long id throws SQL exception. line 8, comment, SELECT balance, overdraft FROM account WHERE id ?. line 9, return new account. line 12, void update of connection db throws SQL exception. line 13, comment, UPDATE account SET balance ? WHERE id ?. line 16, public boolean can withdraw of long cents. line 17, return balance plus overdraft is at least cents" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// An Active Record: a row&#x27;s data, its SQL and its domain logic.</span>
 <span class="cl">class Account {</span>
 <span class="cl">    private long id;</span>
 <span class="cl">    private long balance;</span>
@@ -1477,29 +1521,11 @@
 <span class="cl">    void update(Connection db) throws SQLException {</span>
 <span class="cl">        // UPDATE account SET balance = ? WHERE id = ?</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab reads a class and prints four tiles: its fields, its public fields that are not final, its routines with constructors included, and its public routines. On <code>active-record</code> it prints 3 fields, 0 public, 3 routines and 1 public; on <code>row-gateway</code>, 3, 0, 2 and 0. The kit counts routines and cannot tell database access from domain logic, so the sorting is yours: <span class="math" data-say="find">find</span> and <span class="math" data-say="update">update</span> run SQL in both classes, and the one routine the second class lacks, <span class="math" data-say="can withdraw">canWithdraw</span>, decides whether the balance and the overdraft cover a sum. That rule of the business is what makes the first class an Active Record.</p><p>The same sorting shows where the database coupling sits. <span class="math" data-say="can withdraw">canWithdraw</span> reads two fields and touches no connection, so it can be tested on an <span class="math" data-say="account">Account</span> built in memory. The coupling is in <span class="math" data-say="find">find</span> and <span class="math" data-say="update">update</span>. Chapter 10 notes that static finders are more common with this pattern because of its closeness to the database, and that moving them to a separate class, as with Row Data Gateway, is better for testing.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, class member. line 2, private long id. line 3, public string email. line 4, private int points. line 6, static member find of connection db, long id throws SQL exception. line 7, comment, SELECT email, points FROM member WHERE id ?. line 8, return new member. line 11, public void insert of connection db throws SQL exception. line 12, comment, INSERT INTO member email, points VALUES ?, ?. line 15, public int level. line 16, return points divided by 1000" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">class Member {</span>
-<span class="cl">    private long id;</span>
-<span class="cl">    public String email;</span>
-<span class="cl">    private int points;</span>
-<span class="cl"></span>
-<span class="cl">    static Member find(Connection db, long id) throws SQLException {</span>
-<span class="cl">        // SELECT email, points FROM member WHERE id = ?</span>
-<span class="cl">        return new Member();</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    public void insert(Connection db) throws SQLException {</span>
-<span class="cl">        // INSERT INTO member (email, points) VALUES (?, ?)</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    public int level() {</span>
-<span class="cl">        return points / 1000;</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>For this <span class="math" data-say="member">Member</span>, list the routines and sort them into database access and domain logic, then say which of the two patterns the class is. Paste it into the lab afterwards to check the routine count; the sorting is yours.</p><p>Active Record breaks down as the domain gets richer. The next lesson, Data Mapper, reads the pattern Fowler turns to then, and counts what it changes about who depends on whom.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>fields and routines, and how many are public</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The lab reads a class and prints four tiles: its fields, its public fields that are not final, its routines with constructors included, and its public routines. On <code>active-record</code> it prints 3 fields, 0 public, 3 routines and 1 public; on <code>row-gateway</code>, 3, 0, 2 and 0. The kit counts routines and cannot tell database access from domain logic, so the sorting is yours: <span class="math" data-say="find">find</span> and <span class="math" data-say="update">update</span> run SQL in both classes, and the one routine the second class lacks, <span class="math" data-say="can withdraw">canWithdraw</span>, decides whether the balance and the overdraft cover a sum. That rule of the business is what makes the first class an Active Record.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>fields and routines, and how many are public</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Reading the code</strong><span>fields and routines, and how many are public</span></div>
       </div>
@@ -1519,10 +1545,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
       <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Count a row object&#x27;s routines</h3>
-          <p>A count over code, by the rules stated below the listing. Paste a Java class. The lab counts its fields, its public fields that are not final, its routines with constructors included, and its public routines. It cannot tell a routine that reaches the database from one that applies a business rule: that sorting is yours, and it decides the pattern.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Count a row object&#x27;s routines</h3>
+            <p>A count over code, by the rules stated below the listing. Paste a Java class. The lab counts its fields, its public fields that are not final, its routines with constructors included, and its public routines. It cannot tell a routine that reaches the database from one that applies a business rule: that sorting is yours, and it decides the pattern.</p>
         <div class="field">
           <label for="coPreset">Worked example</label>
           <select id="coPreset"><option value="active-record" selected>Account: a row's data, its SQL and a business rule</option><option value="row-gateway">AccountRow: the same row with no domain logic</option></select>
@@ -1534,12 +1560,32 @@
           <div class="kpi"><span>Public routines</span><strong id="coPublicRoutines">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The same sorting shows where the database coupling sits. <span class="math" data-say="can withdraw">canWithdraw</span> reads two fields and touches no connection, so it can be tested on an <span class="math" data-say="account">Account</span> built in memory. The coupling is in <span class="math" data-say="find">find</span> and <span class="math" data-say="update">update</span>. Chapter 10 notes that static finders are more common with this pattern because of its closeness to the database, and that moving them to a separate class, as with Row Data Gateway, is better for testing.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, class member. line 2, private long id. line 3, public string email. line 4, private int points. line 6, static member find of connection db, long id throws SQL exception. line 7, comment, SELECT email, points FROM member WHERE id ?. line 8, return new member. line 11, public void insert of connection db throws SQL exception. line 12, comment, INSERT INTO member email, points VALUES ?, ?. line 15, public int level. line 16, return points divided by 1000" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">class Member {</span>
+<span class="cl">    private long id;</span>
+<span class="cl">    public String email;</span>
+<span class="cl">    private int points;</span>
+<span class="cl"></span>
+<span class="cl">    static Member find(Connection db, long id) throws SQLException {</span>
+<span class="cl">        // SELECT email, points FROM member WHERE id = ?</span>
+<span class="cl">        return new Member();</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    public void insert(Connection db) throws SQLException {</span>
+<span class="cl">        // INSERT INTO member (email, points) VALUES (?, ?)</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    public int level() {</span>
+<span class="cl">        return points / 1000;</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>For this <span class="math" data-say="member">Member</span>, list the routines and sort them into database access and domain logic, then say which of the two patterns the class is. Paste it into the lab afterwards to check the routine count; the sorting is yours.</p><p>Active Record breaks down as the domain gets richer. The next lesson, Data Mapper, reads the pattern Fowler turns to then, and counts what it changes about who depends on whom.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Telling an Active Record from a gateway</h2></div><p>Four steps, the last of them on a class of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the routines</h3><p>List every routine of the class over one row, constructors included.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the database access</h3><p>Mark each routine that reads or writes the database: finds, inserts, updates, deletes, and the code that builds the object from a result row.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Mark the domain logic</h3><p>Mark each routine that applies a rule of the business to the row's data: a derivation, a validation, a decision. If any is marked, the class is an Active Record; if none, a Row Data Gateway.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Sort a class you know</h3><p>Take one class in a system you know that both saves itself and carries a business rule. List its methods in two columns, database access and domain logic, and write how many fall in each.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Telling an Active Record from a gateway</h2>
+      <p class="lead-in">Four steps, the last of them on a class of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the routines.</strong> List every routine of the class over one row, constructors included.</li><li><strong>Mark the database access.</strong> Mark each routine that reads or writes the database: finds, inserts, updates, deletes, and the code that builds the object from a result row.</li><li><strong>Mark the domain logic.</strong> Mark each routine that applies a rule of the business to the row's data: a derivation, a validation, a decision. If any is marked, the class is an Active Record; if none, a Row Data Gateway.</li><li><strong>Sort a class you know.</strong> Take one class in a system you know that both saves itself and carries a business rule. List its methods in two columns, database access and domain logic, and write how many fall in each.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1558,17 +1604,16 @@ canWithdraw: a rule, domain logic
 domain logic present: Active Record</div><p>Take <span class="math" data-say="can withdraw">canWithdraw</span> away and the class is <code>row-gateway</code>: three fields, two routines, both database access, and no domain logic.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Active Record and Row Data Gateway are two names for one pattern</strong><span>They have the same shape, one object a row holding its own SQL, and Chapter 10 grants they are often hard to tell apart. Its test is the quotation: a Row Data Gateway holds only database access, and any domain logic makes the class an Active Record. On the lesson's illustration the two classes differ by one routine, <span class="math" data-say="can withdraw">canWithdraw</span>, and that routine is the difference.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking an Active Record cannot be tested without a database</strong><span>Its domain methods can be, when they do not call the SQL: <span class="math" data-say="can withdraw">canWithdraw</span> reads two fields and can be tested on an <span class="math" data-say="account">Account</span> built in memory. The coupling is in the find and save routines, and Chapter 10 adds that moving the finders into a class of their own is better for testing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Placing Active Record outside the Domain Model</strong><span>It is tempting to read the four patterns as gateways on one side and the Domain Model on the other. Chapter 10 describes an Active Record as, at heart, a Domain Model shaped like its tables. It is one way to build a simple Domain Model, and Data Mapper the way for a rich one.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name a row object&#x27;s pattern from its routines.</strong><p>Given a class over one row, sort its routines into database access and domain logic, and say whether it is a Row Data Gateway or an Active Record.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts fields and routines by the rules beside its listing. It cannot tell a routine that runs SQL from one that applies a rule, and that is the pattern's whole test, so the sorting is yours. The SQL in the snippets is in comments so that the routines stay short.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Active Record and Row Data Gateway are two names for one pattern</strong><span>They have the same shape, one object a row holding its own SQL, and Chapter 10 grants they are often hard to tell apart. Its test is the quotation: a Row Data Gateway holds only database access, and any domain logic makes the class an Active Record. On the lesson's illustration the two classes differ by one routine, <span class="math" data-say="can withdraw">canWithdraw</span>, and that routine is the difference.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking an Active Record cannot be tested without a database</strong><span>Its domain methods can be, when they do not call the SQL: <span class="math" data-say="can withdraw">canWithdraw</span> reads two fields and can be tested on an <span class="math" data-say="account">Account</span> built in memory. The coupling is in the find and save routines, and Chapter 10 adds that moving the finders into a class of their own is better for testing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Placing Active Record outside the Domain Model</strong><span>It is tempting to read the four patterns as gateways on one side and the Domain Model on the other. Chapter 10 describes an Active Record as, at heart, a Domain Model shaped like its tables. It is one way to build a simple Domain Model, and Data Mapper the way for a rich one.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can name a row object&#x27;s pattern from its routines.</strong><p>Given a class over one row, sort its routines into database access and domain logic, and say whether it is a Row Data Gateway or an Active Record.</p></div></div><div class="note"><strong>Note:</strong> The lab counts fields and routines by the rules beside its listing. It cannot tell a routine that runs SQL from one that applies a rule, and that is the pattern's whole test, so the sorting is yours. The SQL in the snippets is in comments so that the routines stay short.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Active Record</summary><p>A domain object for one row that reads and writes that row itself and also holds the rules of the business about it. Chapter 10 describes it as, at heart, a Domain Model shaped like its tables.</p></details><details class="recall"><summary>Isomorphic schema</summary><p>A schema with the same shape as the classes: one class for each table, one field for each column. Active Record works well only on such a schema, the pattern says.</p></details><details class="recall"><summary>Database access and domain logic</summary><p>Database access reads and writes rows: finds, inserts, updates. Domain logic is a rule of the business, such as whether an account may pay a sum. A row object with any of the second kind is an Active Record.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 10's Active Record is a row object that saves and loads itself and also carries the business rules about its own fields. It has the shape of a Row Data Gateway, and Chapter 10 tells the two apart by one thing. Count the routines of two classes over one account row, sort them into database access and domain logic, and name each pattern.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Active Record.</strong> A domain object for one row that reads and writes that row itself and also holds the rules of the business about it. Chapter 10 describes it as, at heart, a Domain Model shaped like its tables.</li><li><strong>Isomorphic schema.</strong> A schema with the same shape as the classes: one class for each table, one field for each column. Active Record works well only on such a schema, the pattern says.</li><li><strong>Database access and domain logic.</strong> Database access reads and writes rows: finds, inserts, updates. Domain logic is a rule of the business, such as whether an account may pay a sum. A row object with any of the second kind is an Active Record.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="an active record, row, sql, domain logic. a row data gateway, row and sql only. tables match classes, isomorphic. simple logic, close tables, active record. the kit counts routines, you sort them" tabindex="0" role="region" aria-label="Mathematical notation">an Active Record: row, SQL, domain logic
 a row data gateway: row and SQL only
 tables match classes: isomorphic
@@ -2574,11 +2619,40 @@ the kit counts routines; you sort them</div><figcaption>Active Record in five li
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2646,7 +2720,7 @@ the kit counts routines; you sort them</div><figcaption>Active Record in five li
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

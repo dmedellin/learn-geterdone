@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,38 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Ethics and the Arithmetic of Welfare</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Deontology</p>
       <h1>Kant and the Universalisability Test</h1>
       <p class="lesson-lede">Treating a maxim as the defecting choice in a many-player game, and asking whether its point survives everyone adopting it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A maxim is the rule behind an act</li><li>The defector’s gain is borrowed</li><li>A collapse is not the same as a worse outcome</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>A maxim among ten players</h2>
-      <article class="prose reading"><p>The consequentialist lessons ended with a forbidden list typed by hand: “The Trolley Problem as a Decision Matrix” struck an act from the table and did not say why it belonged there. The deontological theories are attempts to say why. This lesson and the two after it each give one such account a checkable structure: a maxim tested at universal adoption, a harm tested for whether the good depends on it, and an omission tested as a cause.</p><p>Kant’s first formulation of the categorical imperative says to act only on a maxim you can at the same time will to be a universal law. The usual gloss, “what if everyone did that?”, is where the trouble starts, because it sounds like a forecast of consequences. The lab lets the two readings be told apart, and this lesson takes the first of Kant’s two failures: the contradiction in conception.</p><div class="defbox"><span class="label">Definition &middot; Maxim</span><p>A <strong>maxim</strong> is the rule an agent acts on, stated with the act, the circumstance and the aim. Here it is: when I need money, I will promise to repay it, knowing I will not, in order to be given it.</p></div><p>Model the practice of promising as a game with ten players. Each player either keeps promises (cooperates) or makes false ones (defects). Let <span class="math" data-say="k">k</span> be the number of the other nine who keep their word. An honest promiser gets 2 whatever the others do. A liar gets <span class="math" data-say="5 k over the quantity n minus 1">5k/(n − 1)</span> with <span class="math" data-say="n equals 10">n = 10</span>: nothing when no one else is honest, because no promise is believed, and 5 when everyone else is, because every promise is.</p><div class="mathblock" data-say="k, honest C of k, liar D of k. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">k     honest C(k)     liar D(k)
-0     2               0
-3     2               5/3
-6     2               10/3
-9     2               5</div><p>The test reads two numbers from this table. The first is the liar’s gain when alone: every one of the other nine is honest, so the liar gets 5 where an honest promiser gets 2, a gain of 3. The second is what the same choice is worth when everyone makes it: with no one honest the liar gets 0, against the 2 that honesty yields among honest people, a difference of −2. The lab prints the pair as one line. Its equilibrium and replicator tiles are the ones Games and the Social Contract read, and the test leaves them alone.</p><div class="defbox"><span class="label">Definition &middot; Contradiction in conception</span><p>A maxim has a <strong>contradiction in conception</strong> when, adopted by everyone, the practice its act depends on could not exist and so the act could not achieve its aim. A promise is believed only where promises are usually kept; where everyone lies, there is nothing to exploit.</p></div><p>That is what the figure of 0 records, and it is why the test is not the forecast it sounds like. A forecast would ask whether the world of universal lying is worse. The test asks whether the liar can still do what the lie was for. The lab’s social-optimum tile makes the difference visible: total welfare among the ten is highest not when everyone is honest but with seven honest and three liars, because in this table an honest promiser loses nothing to a liar, and a liar among the honest collects 5 where honesty pays 2. That stipulation is generous to the liar. A table in which the deceived lose would move the optimum; it would not move the two figures the test reads, which are taken where all nine others are honest and where none is. A sum-of-welfare view therefore does not condemn the maxim as stated, and Kant’s test does.</p><div class="example"><span class="label">Example &middot; Queue-jumping</span><p>Cutting in line pays only where others wait. Let a waiting person get <span class="math" data-say="2 plus 2 k over 9">2 + 2k/9</span> and a jumper <span class="math" data-say="1 plus 5 k over 9">1 + 5k/9</span>, where <span class="math" data-say="k">k</span> counts the others who wait. Alone, the jumper gains 2. When all jump, the jumper gets 1 where the orderly queue gave 4: the advantage was being ahead of people who waited, and nobody is left to be ahead of.</p></div><p>The tax preset shows where the test is less clean. Evading a tax that funds something everyone uses pays whatever the others do, and when all evade nothing is funded. Nothing in that is a contradiction in conception, because a world without the tax is perfectly conceivable. Kant’s second failure, the contradiction in the will, fits better: the evader cannot coherently will a world without the public good, since the evader wants it. The lab prints the same two numbers for both failures, and which one a number means is your reading, not its output.</p><p>The limit belongs here. Kant did not compute anything, and the lab does so only by treating the maxim’s point as a payoff you supply. It also cannot choose how general the maxim should be: “I will lie to this person on this day” passes any such test, and most of the test’s critics begin there.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The many-player dilemma</h2></div><p>payoffs as exact expressions in k, and what follows from them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>A maxim among ten players</h2><div class="prose reading"><p>The consequentialist lessons ended with a forbidden list typed by hand: “The Trolley Problem as a Decision Matrix” struck an act from the table and did not say why it belonged there. The deontological theories are attempts to say why. This lesson and the two after it each give one such account a checkable structure: a maxim tested at universal adoption, a harm tested for whether the good depends on it, and an omission tested as a cause.</p><p>Kant’s first formulation of the categorical imperative says to act only on a maxim you can at the same time will to be a universal law. The usual gloss, “what if everyone did that?”, is where the trouble starts, because it sounds like a forecast of consequences. The lab lets the two readings be told apart, and this lesson takes the first of Kant’s two failures: the contradiction in conception.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The many-player dilemma</h2></div><p>payoffs as exact expressions in k, and what follows from them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>One choice, n players</strong><span>C(k) and D(k): a player's payoff when k of the others cooperate</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cmTable"></table></div>
       <div class="status-banner" id="cmStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change the payoffs, the number of players or the starting share</h3>
-          <p>Payoffs are expressions in k and n, such as 3k/(n - 1) + 1, evaluated as fractions.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change the payoffs, the number of players or the starting share</h3>
+            <p>Payoffs are expressions in k and n, such as 3k/(n - 1) + 1, evaluated as fractions.</p>
         <div class="field">
           <label for="cmPreset">Worked example</label>
           <select id="cmPreset"><option value="false-promise" selected>The false promise among ten</option><option value="tax">Evading a tax that funds a shared good</option><option value="queue-jumping">Cutting in line</option></select>
@@ -1443,12 +1482,19 @@
           <div class="kpi"><span>Cooperators after the generations</span><strong id="cmShare">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Maxim</span><p>A <strong>maxim</strong> is the rule an agent acts on, stated with the act, the circumstance and the aim. Here it is: when I need money, I will promise to repay it, knowing I will not, in order to be given it.</p></div><p>Model the practice of promising as a game with ten players. Each player either keeps promises (cooperates) or makes false ones (defects). Let <span class="math" data-say="k">k</span> be the number of the other nine who keep their word. An honest promiser gets 2 whatever the others do. A liar gets <span class="math" data-say="5 k over the quantity n minus 1">5k/(n − 1)</span> with <span class="math" data-say="n equals 10">n = 10</span>: nothing when no one else is honest, because no promise is believed, and 5 when everyone else is, because every promise is.</p><div class="mathblock" data-say="k, honest C of k, liar D of k. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">k     honest C(k)     liar D(k)
+0     2               0
+3     2               5/3
+6     2               10/3
+9     2               5</div><p>The test reads two numbers from this table. The first is the liar’s gain when alone: every one of the other nine is honest, so the liar gets 5 where an honest promiser gets 2, a gain of 3. The second is what the same choice is worth when everyone makes it: with no one honest the liar gets 0, against the 2 that honesty yields among honest people, a difference of −2. The lab prints the pair as one line. Its equilibrium and replicator tiles are the ones Games and the Social Contract read, and the test leaves them alone.</p><div class="defbox"><span class="label">Definition &middot; Contradiction in conception</span><p>A maxim has a <strong>contradiction in conception</strong> when, adopted by everyone, the practice its act depends on could not exist and so the act could not achieve its aim. A promise is believed only where promises are usually kept; where everyone lies, there is nothing to exploit.</p></div><p>That is what the figure of 0 records, and it is why the test is not the forecast it sounds like. A forecast would ask whether the world of universal lying is worse. The test asks whether the liar can still do what the lie was for. The lab’s social-optimum tile makes the difference visible: total welfare among the ten is highest not when everyone is honest but with seven honest and three liars, because in this table an honest promiser loses nothing to a liar, and a liar among the honest collects 5 where honesty pays 2. That stipulation is generous to the liar. A table in which the deceived lose would move the optimum; it would not move the two figures the test reads, which are taken where all nine others are honest and where none is. A sum-of-welfare view therefore does not condemn the maxim as stated, and Kant’s test does.</p><div class="example"><span class="label">Example &middot; Queue-jumping</span><p>Cutting in line pays only where others wait. Let a waiting person get <span class="math" data-say="2 plus 2 k over 9">2 + 2k/9</span> and a jumper <span class="math" data-say="1 plus 5 k over 9">1 + 5k/9</span>, where <span class="math" data-say="k">k</span> counts the others who wait. Alone, the jumper gains 2. When all jump, the jumper gets 1 where the orderly queue gave 4: the advantage was being ahead of people who waited, and nobody is left to be ahead of.</p></div><p>The tax preset shows where the test is less clean. Evading a tax that funds something everyone uses pays whatever the others do, and when all evade nothing is funded. Nothing in that is a contradiction in conception, because a world without the tax is perfectly conceivable. Kant’s second failure, the contradiction in the will, fits better: the evader cannot coherently will a world without the public good, since the evader wants it. The lab prints the same two numbers for both failures, and which one a number means is your reading, not its output.</p><p>The limit belongs here. Kant did not compute anything, and the lab does so only by treating the maxim’s point as a payoff you supply. It also cannot choose how general the maxim should be: “I will lie to this person on this day” passes any such test, and most of the test’s critics begin there.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a maxim at universal adoption</h2></div><p>Five steps. The third is where a story becomes a table, and every later step reads from that table.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the maxim in full</h3><p>Write the act, the circumstance and the aim: “when I need money I will make a promise I do not mean, in order to be given it”. A maxim without its aim cannot be tested for whether the aim survives.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Name the practice it exploits</h3><p>Find what must be going on for the act to work. A false promise works because promises are usually kept. The cooperating choice is that practice.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the two payoffs</h3><p>Give the honest player’s payoff and the defector’s as functions of how many of the others keep the practice. Be explicit that these are numbers you chose.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the two figures</h3><p>The first is the defector’s gain when alone. The second is the defector’s payoff when no one keeps the practice, set against the honest payoff.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what the second figure means</h3><p>If the defector’s point vanishes, the maxim defeats itself in conception. If the world is merely worse, or the agent wants the practice, say which of the other failures it is.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a maxim at universal adoption</h2>
+      <p class="lead-in">Five steps. The third is where a story becomes a table, and every later step reads from that table.</p>
+      <ol class="key-ideas method"><li><strong>State the maxim in full.</strong> Write the act, the circumstance and the aim: “when I need money I will make a promise I do not mean, in order to be given it”. A maxim without its aim cannot be tested for whether the aim survives.</li><li><strong>Name the practice it exploits.</strong> Find what must be going on for the act to work. A false promise works because promises are usually kept. The cooperating choice is that practice.</li><li><strong>Write the two payoffs.</strong> Give the honest player’s payoff and the defector’s as functions of how many of the others keep the practice. Be explicit that these are numbers you chose.</li><li><strong>Read the two figures.</strong> The first is the defector’s gain when alone. The second is the defector’s payoff when no one keeps the practice, set against the honest payoff.</li><li><strong>Say what the second figure means.</strong> If the defector’s point vanishes, the maxim defeats itself in conception. If the world is merely worse, or the agent wants the practice, say which of the other failures it is.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1466,17 +1512,16 @@ when no one is honest:  liar 0, honest 2, gain minus 2
 no promise is believed, so the lie buys nothing</div><p>The first figure is why a rule like this is tempting, and the second is why it cannot be a universal law. The lie gains only against a background of honesty that the lie, adopted generally, removes.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the test as a forecast of consequences</strong><span>If the test were “is the world of universal lying worse?”, the answer would come from the total, and the lab’s social-optimum tile shows the total is highest with a few liars in it. A sum of welfare does not condemn the maxim. The test condemns it for a different reason: when all adopt the rule, the lie buys nothing, so the rule cannot be what any agent is acting on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the two figures as a verdict</strong><span>The lab prints a gain when alone and a difference at universal adoption. Which failure that is, a contradiction in conception or in the will, depends on why the second figure matters, and the tax preset prints the same kind of number for a case that is not a contradiction in conception.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the maxim fixes the verdict</strong><span>State the maxim more narrowly and it passes, because a rule that mentions this person on this day is not one anyone could adopt widely enough to spoil. The lab tests the payoffs you give it; it cannot say how general to make the maxim.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the defector’s two figures and say which one the test reads.</strong><p>Given a maxim, you should be able to write it as a defecting choice with payoffs, compute the gain when alone and the payoff when everyone adopts it, and state whether the practice the act depends on survives.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The numbers here are stipulations, as every payoff in this course is. Kant would reject the idea that the test is a calculation at all. The lab shows the structure he describes, a rule that undermines the practice it feeds on, and leaves the question of whether that structure is what makes an act wrong to the reader.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the test as a forecast of consequences</strong><span>If the test were “is the world of universal lying worse?”, the answer would come from the total, and the lab’s social-optimum tile shows the total is highest with a few liars in it. A sum of welfare does not condemn the maxim. The test condemns it for a different reason: when all adopt the rule, the lie buys nothing, so the rule cannot be what any agent is acting on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the two figures as a verdict</strong><span>The lab prints a gain when alone and a difference at universal adoption. Which failure that is, a contradiction in conception or in the will, depends on why the second figure matters, and the tax preset prints the same kind of number for a case that is not a contradiction in conception.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting that the maxim fixes the verdict</strong><span>State the maxim more narrowly and it passes, because a rule that mentions this person on this day is not one anyone could adopt widely enough to spoil. The lab tests the payoffs you give it; it cannot say how general to make the maxim.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute the defector’s two figures and say which one the test reads.</strong><p>Given a maxim, you should be able to write it as a defecting choice with payoffs, compute the gain when alone and the payoff when everyone adopts it, and state whether the practice the act depends on survives.</p></div></div><div class="note"><strong>Note:</strong> The numbers here are stipulations, as every payoff in this course is. Kant would reject the idea that the test is a calculation at all. The lab shows the structure he describes, a rule that undermines the practice it feeds on, and leaves the question of whether that structure is what makes an act wrong to the reader.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A maxim is the rule behind an act</summary><p>The test is applied to the rule an agent acts on, stated with the act, the circumstance and the aim, and not to a single deed. In the lab the rule is the defecting choice and the practice it exploits is the cooperating one.</p></details><details class="recall"><summary>The defector’s gain is borrowed</summary><p>A liar is paid only because other people believe promises. That is why the payoff of lying rises with the number of others who keep their word, and why it can fall to nothing when none does.</p></details><details class="recall"><summary>A collapse is not the same as a worse outcome</summary><p>A maxim fails the first test when it defeats its own aim at universal adoption. Whether the world would be worse for everyone is a different question, and the lab’s other tiles answer it separately.</p></details></div>
+      <h3>Summary</h3>
       <p>Kant’s first test asks whether the rule behind an act could be adopted by everyone. The lab models the rule as the defecting choice among ten players and computes what the defector gains when alone, and what the choice is worth once all have made it. When the gain disappears at universal adoption, the practice the act depends on has collapsed.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A maxim is the rule behind an act.</strong> The test is applied to the rule an agent acts on, stated with the act, the circumstance and the aim, and not to a single deed. In the lab the rule is the defecting choice and the practice it exploits is the cooperating one.</li><li><strong>The defector’s gain is borrowed.</strong> A liar is paid only because other people believe promises. That is why the payoff of lying rises with the number of others who keep their word, and why it can fall to nothing when none does.</li><li><strong>A collapse is not the same as a worse outcome.</strong> A maxim fails the first test when it defeats its own aim at universal adoption. Whether the world would be worse for everyone is a different question, and the lab’s other tiles answer it separately.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a maxim, the rule behind the act. alone, the defector gains over the honest. if all adopt it, does the gain survive ?. no, its own point collapses" tabindex="0" role="region" aria-label="Mathematical notation">a maxim: the rule behind the act
 alone, the defector gains over the honest
 if all adopt it, does the gain survive?
@@ -2252,11 +2297,40 @@ no: its own point collapses</div><figcaption>A maxim tested at universal adoptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2324,7 +2398,7 @@ no: its own point collapses</div><figcaption>A maxim tested at universal adoptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

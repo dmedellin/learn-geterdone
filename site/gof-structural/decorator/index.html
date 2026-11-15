@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Structural Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Structural Patterns</p>
       <h1>Decorator</h1>
       <p class="lesson-lede">An object that wraps another of the same interface, forwards to it and adds one responsibility, so that options are stacked at run time instead of subclassed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Component, ConcreteComponent and Decorator</li><li>Transparent enclosure</li><li>Skin and guts</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, section by section, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Decorators provide a flexible alternative to subclassing for extending functionality.&rdquo; That is the second sentence of the pattern's intent; the first says it attaches responsibilities to an object at run time. Like Adapter, it is also called Wrapper. You met it in the case study's lesson Embellishing the User Interface, where it puts borders round the page; here it is the catalog entry.</p><p>The Motivation asks how to give one user interface component a border, or scrolling, without giving it to every object of the class. Inheriting a border decides statically, for every instance, and the client has no say. The pattern instead encloses the component in another object, the decorator, that adds the border. Because the decorator has the component's interface, its clients do not see it, and because they do not see it, decorators can be nested: the book's example wraps a text view in a scrolling decorator and that in a border. A decorator may also offer operations of its own, for clients that know it is there. Applicability names three cases: adding responsibilities to individual objects without affecting others; responsibilities that can be withdrawn; and extension by subclassing that is impractical, because the independent options would need a subclass for every combination, or because the class cannot be subclassed.</p><p>The authors count two benefits and two liabilities. It is more flexible than static inheritance: responsibilities are attached and detached at run time, they mix and match, and the same one can be added twice (a double border is two border decorators), where inheritance would need a class for each combination. It avoids classes high in the hierarchy loaded with every feature anyone might want: you pay for the features you attach. Against that, a decorator and its component are not the same object, so code that relies on object identity will be surprised. And a design built this way consists of lots of little objects that look alike and differ only in how they are connected; easy to customise for whoever understands it, hard to learn and to debug.</p><pre class="codeblock" data-say="line 1, interface price, comment, the Component. line 2, big decimal amount. line 4, final class seat price implements price, comment, the ConcreteComponent. line 5, private final big decimal base. line 6, seat price of big decimal base this dot base is set to base. line 7, public big decimal amount return base. line 9, abstract class price decorator implements price, comment, the Decorator. line 10, protected final price inner. line 11, price decorator of price inner this dot inner is set to inner. line 13, final class member discount extends price decorator. line 14, member discount of price inner super of inner. line 15, public big decimal amount. line 16, return inner dot amount dot multiply of new big decimal of the string 0 point 9. line 19, comment, new Insurance new MemberDiscount new BookingFee new SeatPrice stalls" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface Price {                                    // the Component</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, section by section, then the count</h2><div class="prose reading"><p>&ldquo;Decorators provide a flexible alternative to subclassing for extending functionality.&rdquo; That is the second sentence of the pattern's intent; the first says it attaches responsibilities to an object at run time. Like Adapter, it is also called Wrapper. You met it in the case study's lesson Embellishing the User Interface, where it puts borders round the page; here it is the catalog entry.</p><p>The Motivation asks how to give one user interface component a border, or scrolling, without giving it to every object of the class. Inheriting a border decides statically, for every instance, and the client has no say. The pattern instead encloses the component in another object, the decorator, that adds the border. Because the decorator has the component's interface, its clients do not see it, and because they do not see it, decorators can be nested: the book's example wraps a text view in a scrolling decorator and that in a border. A decorator may also offer operations of its own, for clients that know it is there. Applicability names three cases: adding responsibilities to individual objects without affecting others; responsibilities that can be withdrawn; and extension by subclassing that is impractical, because the independent options would need a subclass for every combination, or because the class cannot be subclassed.</p><p>The authors count two benefits and two liabilities. It is more flexible than static inheritance: responsibilities are attached and detached at run time, they mix and match, and the same one can be added twice (a double border is two border decorators), where inheritance would need a class for each combination. It avoids classes high in the hierarchy loaded with every feature anyone might want: you pay for the features you attach. Against that, a decorator and its component are not the same object, so code that relies on object identity will be surprised. And a design built this way consists of lots of little objects that look alike and differ only in how they are connected; easy to customise for whoever understands it, hard to learn and to debug.</p><pre class="codeblock" data-say="line 1, interface price, comment, the Component. line 2, big decimal amount. line 4, final class seat price implements price, comment, the ConcreteComponent. line 5, private final big decimal base. line 6, seat price of big decimal base this dot base is set to base. line 7, public big decimal amount return base. line 9, abstract class price decorator implements price, comment, the Decorator. line 10, protected final price inner. line 11, price decorator of price inner this dot inner is set to inner. line 13, final class member discount extends price decorator. line 14, member discount of price inner super of inner. line 15, public big decimal amount. line 16, return inner dot amount dot multiply of new big decimal of the string 0 point 9. line 19, comment, new Insurance new MemberDiscount new BookingFee new SeatPrice stalls" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface Price {                                    // the Component</span>
 <span class="cl">    BigDecimal amount();</span>
 <span class="cl">}</span>
 <span class="cl">final class SeatPrice implements Price {             // the ConcreteComponent</span>
@@ -1463,13 +1507,11 @@
 <span class="cl">        return inner.amount().multiply(new BigDecimal(&quot;0.9&quot;));</span>
 <span class="cl">    }</span>
 <span class="cl">}</span>
-<span class="cl">// new Insurance(new MemberDiscount(new BookingFee(new SeatPrice(stalls))))</span></code></pre><p>The Implementation section has four issues. Every decorator must conform to the component's interface, so in C++ they share a base class. With only one responsibility to add, the abstract Decorator can be dropped and its forwarding merged into the one concrete decorator. The common Component class must stay light, an interface rather than a store of data, or the decorators become too heavy to use in numbers. And, the skin against the guts: when the component is heavyweight, give it a list of strategy objects instead, as MacApp and Bedrock did with their &ldquo;adorners&rdquo; on views. Then the component knows about its extensions, which a decorated component never does, but each strategy can have a small interface of its own. Known Uses include toolkit embellishments, a debugging wrapper that logs layout requests, and the ET++ streams, where compression and conversion to seven-bit ASCII are decorators on a file stream.</p><p>Now the lab, on a theatre box office's prices. The component is a stalls seat at 32. Three decorators wrap it, innermost first: a booking fee that adds 2.50, a member discount that multiplies by 0.9, and insurance that adds 1.75. Each record is decorator, operation, amount. On the preset <code>fee-member-insurance</code> the call order is the stack's shape: the request goes in through insurance, the member discount and the fee, reaches the seat, and the answers come back out the other way. The result is <span data-say="the quantity 32 plus 2.50, times 0.9 plus 1.75 equals 32.8">((32 + 2.50) × 0.9) + 1.75 = 32.8</span>. With the decorators in the reverse order the lab gives 32.875, so here the order changes the result: a discount applied after the fee discounts the fee too.</p><p>The last three tiles count classes. Three on-or-off options as subclasses need a class for every combination: <span data-say="2 cubed equals 8">2³ = 8</span>, the plain seat and seven decorated versions of it. With Decorator the design has 3 + 3 = 6: the interface, the concrete component, the abstract decorator and three decorators. A fourth option doubles the first count, adding 8, and adds 1 to the second. The preset <code>two-adds</code> keeps only the fee and insurance: 36.25 in either order, because two additions commute, and 4 classes against 5, so with two options the subclasses are actually fewer. The subclass count assumes each combination is wanted; it is the combinations, not the options, that make the explosion.</p><p>What the count leaves out is the cost on the other side. Three decorators on one seat are four objects where a subclass would be one, a debugger shows all four, and a check that this price is that seat's price by identity fails. Those are the authors' two liabilities, and they grow with the stack.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, core, circle, 24. line 2, layers, fee, add, 2.50, member, times, 0.9" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">core:   circle, 24</span>
-<span class="cl">layers: fee, add, 2.50; member, times, 0.9</span></code></pre><p>A circle seat at 24 with a fee and a member discount. By hand, give the result with the decorators in the order given and in the reverse order, and the classes as subclasses and with Decorator. Then type the records into the lab to check.</p><p>Decorator keeps an object's interface and adds to it. The next lesson, Facade, does the opposite for a whole subsystem: a new, smaller interface in front of many classes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Requests in motion</h2></div><p>a component in a stack of decorators</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">// new Insurance(new MemberDiscount(new BookingFee(new SeatPrice(stalls))))</span></code></pre><p>The Implementation section has four issues. Every decorator must conform to the component's interface, so in C++ they share a base class. With only one responsibility to add, the abstract Decorator can be dropped and its forwarding merged into the one concrete decorator. The common Component class must stay light, an interface rather than a store of data, or the decorators become too heavy to use in numbers. And, the skin against the guts: when the component is heavyweight, give it a list of strategy objects instead, as MacApp and Bedrock did with their &ldquo;adorners&rdquo; on views. Then the component knows about its extensions, which a decorated component never does, but each strategy can have a small interface of its own. Known Uses include toolkit embellishments, a debugging wrapper that logs layout requests, and the ET++ streams, where compression and conversion to seven-bit ASCII are decorators on a file stream.</p><p>Now the lab, on a theatre box office's prices. The component is a stalls seat at 32. Three decorators wrap it, innermost first: a booking fee that adds 2.50, a member discount that multiplies by 0.9, and insurance that adds 1.75. Each record is decorator, operation, amount. On the preset <code>fee-member-insurance</code> the call order is the stack's shape: the request goes in through insurance, the member discount and the fee, reaches the seat, and the answers come back out the other way. The result is <span data-say="the quantity 32 plus 2.50, times 0.9 plus 1.75 equals 32.8">((32 + 2.50) × 0.9) + 1.75 = 32.8</span>. With the decorators in the reverse order the lab gives 32.875, so here the order changes the result: a discount applied after the fee discounts the fee too.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Requests in motion</h2></div><p>a component in a stack of decorators</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Requests in motion</strong><span>a component in a stack of decorators</span></div>
       </div>
@@ -1477,10 +1519,10 @@
       <div class="table-wrap" id="grtTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="grtTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A call enters the outermost decorator first and is passed inward to the component; the value comes back out through the decorators innermost first, each applying its op: add adds its amount, times multiplies by it (exact), then appends its word. A number takes add and times, a word takes only then. The other order is the one given, or else the reverse. Classes are counted for n options that may each be on or off: one subclass per combination is the component plus one class for every non-empty set of options, 2ⁿ in all; Decorator is the component interface, the concrete component, the abstract decorator and one class per option, n + 3. One more option doubles the first (+2ⁿ) and adds 1 to the second. The combination count ignores order and repetition, which decorators can also vary.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A component in a stack of decorators</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A component in a stack of decorators</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="grtPreset">Worked example</label>
           <select id="grtPreset"><option value="fee-member-insurance" selected>A stalls seat with a booking fee, a member discount and insurance</option><option value="two-adds">The same seat with only the fee and insurance</option></select>
@@ -1508,12 +1550,16 @@
           <div class="kpi"><span>Classes one more option adds</span><strong id="grtAddOne">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The last three tiles count classes. Three on-or-off options as subclasses need a class for every combination: <span data-say="2 cubed equals 8">2³ = 8</span>, the plain seat and seven decorated versions of it. With Decorator the design has 3 + 3 = 6: the interface, the concrete component, the abstract decorator and three decorators. A fourth option doubles the first count, adding 8, and adds 1 to the second. The preset <code>two-adds</code> keeps only the fee and insurance: 36.25 in either order, because two additions commute, and 4 classes against 5, so with two options the subclasses are actually fewer. The subclass count assumes each combination is wanted; it is the combinations, not the options, that make the explosion.</p><p>What the count leaves out is the cost on the other side. Three decorators on one seat are four objects where a subclass would be one, a debugger shows all four, and a check that this price is that seat's price by identity fails. Those are the authors' two liabilities, and they grow with the stack.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, core, circle, 24. line 2, layers, fee, add, 2.50, member, times, 0.9" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">core:   circle, 24</span>
+<span class="cl">layers: fee, add, 2.50; member, times, 0.9</span></code></pre><p>A circle seat at 24 with a fee and a member discount. By hand, give the result with the decorators in the order given and in the reverse order, and the classes as subclasses and with Decorator. Then type the records into the lab to check.</p><p>Decorator keeps an object's interface and adds to it. The next lesson, Facade, does the opposite for a whole subsystem: a new, smaller interface in front of many classes.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a stack of decorators</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the stack innermost first</h3><p>Start from the component and list each decorator in the order it was wrapped round the last. The outermost is the one the client holds.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Trace the call in and out</h3><p>The request enters through the outermost decorator and reaches the component last; each decorator's own work happens on the way in or the way out.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the result both ways</h3><p>Apply the operations from the inside out, then in the reverse order. If the results differ, the order of wrapping is part of the design.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Take a class in your code with optional features (logging, caching, retries, formatting) and write them as decorators over one component. Count the classes as subclasses and as decorators, and say whether any feature depends on running before another.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a stack of decorators</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the stack innermost first.</strong> Start from the component and list each decorator in the order it was wrapped round the last. The outermost is the one the client holds.</li><li><strong>Trace the call in and out.</strong> The request enters through the outermost decorator and reaches the component last; each decorator's own work happens on the way in or the way out.</li><li><strong>Compute the result both ways.</strong> Apply the operations from the inside out, then in the reverse order. If the results differ, the order of wrapping is part of the design.</li><li><strong>Do it on a design of your own.</strong> Take a class in your code with optional features (logging, caching, retries, formatting) and write them as decorators over one component. Count the classes as subclasses and as decorators, and say whether any feature depends on running before another.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1531,17 +1577,16 @@ insurance: 31.05 + 1.75 = 32.80
 reversed: (32 + 1.75) × 0.9 + 2.50 = 32.875</div><p>The client asked the insurance decorator for an amount, and the answer was built on the way back out. Swap the order and the discount no longer applies to the fee.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming the order of the decorators does not matter</strong><span>Each decorator works on what the one inside it returns, so any two that do not commute give different results in different orders. On the lesson's illustration, a discount wrapped outside the booking fee gives 32.8, and the reverse 32.875; two additions alone give the same either way.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting only the classes and not the objects</strong><span>Decorator trades classes for objects. Three options are six classes instead of eight, but every decorated seat is a chain of objects, and the authors name the result, lots of little objects, as a liability for anyone learning or debugging the system.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Decorating a heavyweight component</strong><span>Every decorator carries the component's whole interface. When that interface is large, the authors point to changing the guts instead: a strategy object the component delegates to, with a small interface of its own.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a stack of decorators and count its classes.</strong><p>Given a component and its decorators innermost first, state the call order, the result, whether the order changes it, and the classes as subclasses and with Decorator, and name the pattern's two liabilities.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes a stack's result and counts classes. It cannot count the cost of the objects themselves, the debugging and identity troubles the authors warn of, or tell whether your options are really independent; and it assumes every combination of options would otherwise need its own subclass.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming the order of the decorators does not matter</strong><span>Each decorator works on what the one inside it returns, so any two that do not commute give different results in different orders. On the lesson's illustration, a discount wrapped outside the booking fee gives 32.8, and the reverse 32.875; two additions alone give the same either way.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting only the classes and not the objects</strong><span>Decorator trades classes for objects. Three options are six classes instead of eight, but every decorated seat is a chain of objects, and the authors name the result, lots of little objects, as a liability for anyone learning or debugging the system.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Decorating a heavyweight component</strong><span>Every decorator carries the component's whole interface. When that interface is large, the authors point to changing the guts instead: a strategy object the component delegates to, with a small interface of its own.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a stack of decorators and count its classes.</strong><p>Given a component and its decorators innermost first, state the call order, the result, whether the order changes it, and the classes as subclasses and with Decorator, and name the pattern's two liabilities.</p></div></div><div class="note"><strong>Note:</strong> The lab computes a stack's result and counts classes. It cannot count the cost of the objects themselves, the debugging and identity troubles the authors warn of, or tell whether your options are really independent; and it assumes every combination of options would otherwise need its own subclass.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Component, ConcreteComponent and Decorator</summary><p>The Component is the interface; the ConcreteComponent is the object being decorated. A Decorator holds a component, conforms to the same interface, and forwards each request, doing its own work before or after; ConcreteDecorators are its subclasses, one per responsibility.</p></details><details class="recall"><summary>Transparent enclosure</summary><p>A wrapper whose interface matches what it wraps, so a client cannot tell a decorated object from a plain one. That is what lets decorators nest: a decorator can wrap another decorator, as many deep as needed.</p></details><details class="recall"><summary>Skin and guts</summary><p>The authors' contrast between changing an object from outside, with decorators (its skin), and changing it from inside, by giving it a strategy object to delegate to (its guts). The second suits a component too heavy to wrap in quantity.</p></details></div>
+      <h3>Summary</h3>
       <p>Decorator adds responsibilities to one object at a time by wrapping it in objects of the same interface. Read the pattern, its liabilities included, then stack a booking fee, a member discount and insurance on a theatre seat's price, read the order the wrappers run in and what the stack returns, and count the classes the same options need as subclasses.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Component, ConcreteComponent and Decorator.</strong> The Component is the interface; the ConcreteComponent is the object being decorated. A Decorator holds a component, conforms to the same interface, and forwards each request, doing its own work before or after; ConcreteDecorators are its subclasses, one per responsibility.</li><li><strong>Transparent enclosure.</strong> A wrapper whose interface matches what it wraps, so a client cannot tell a decorated object from a plain one. That is what lets decorators nest: a decorator can wrap another decorator, as many deep as needed.</li><li><strong>Skin and guts.</strong> The authors' contrast between changing an object from outside, with decorators (its skin), and changing it from inside, by giving it a strategy object to delegate to (its guts). The second suits a component too heavy to wrap in quantity.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="wrap, forward, and add one thing. same interface as the component. stacked at run time, per object. the outer wrapper runs first. the order can change the result. subclasses, 2 to the power n, decorators, n plus 3. a decorated object is not the original" tabindex="0" role="region" aria-label="Mathematical notation">wrap, forward, and add one thing
 same interface as the component
 stacked at run time, per object
@@ -2331,11 +2376,40 @@ a decorated object is not the original</div><figcaption>Decorator in seven lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2403,7 +2477,7 @@ a decorated object is not the original</div><figcaption>Decorator in seven lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

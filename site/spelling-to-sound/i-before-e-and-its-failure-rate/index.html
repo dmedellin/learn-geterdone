@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Spelling to Sound</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The famous rule</p>
       <h1>I Before E, and Its Failure Rate</h1>
       <p class="lesson-lede">The best known rule of English spelling is right on 36 of 58 common words.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A rule is a bet, and this one is a poor bet</li><li>The failures come in groups</li><li>The saying was made for one sound</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The 22 words that break it</h2>
-      <article class="prose reading"><p>Here is the most quoted spelling rule in English. <em>I before e, except after c.</em> Most people who have learned English have heard it, and many repeat it when they are not sure how to spell <em>believe</em> or <em>receive</em>.</p><p>The lab runs it on every <code>ie</code> and <code>ei</code> in the 2,800 words. There are 58. The rule says <code>ie</code> unless the letter before the pair is <em>c</em>, and then it says <code>ei</code>.</p><h3>The score</h3><p>The rule is right on 36 of the 58, which is 62.1%. Twenty-two words break it. In a list of the 2,800 commonest words, that is a saying that is wrong more often than it is worth.</p><p>Those 22 are not spread about at random. Sorted, they make three groups.</p><h3>The three kinds of miss</h3><p>The first group is <code>eigh</code>: <em>eight</em>, <em>eighteen</em>, <em>eighty</em>, <em>weigh</em>, <em>weight</em>, <em>neighbor</em>, <em>neighborhood</em> and <em>height</em>. That is eight words. In most of them the letters say <code>ay</code>, so they are not about <code>ee</code> at all. <em>Height</em> is said with the sound of the word <em>eye</em>, which is a different case again.</p><p>The second group is <code>cie</code>: <em>ancient</em>, <em>efficiency</em>, <em>efficient</em>, <em>science</em>, <em>scientific</em>, <em>scientist</em>, <em>society</em>, <em>species</em> and <em>sufficient</em>. That is nine words. They are the part of the saying that fails after <em>c</em>: the rule says <code>ei</code> there, and every one of them has <code>ie</code>.</p><p>The third group is five words that stand alone: <em>either</em>, <em>neither</em>, <em>foreign</em>, <em>protein</em> and <em>weird</em>. Each has <code>ei</code> with no <em>c</em> before it, and each is said its own way.</p><h3>A better question</h3><p>The saying was made to help with words said with <code>ee</code>. So the lab can ask a second question: how often is the rule right where the letters line up with the <dfn>parts</dfn> of the word, the beats it is said in, and the <dfn>dictionary</dfn>, a book that records how words are said, has <code>ee</code> at that place? That leaves 18 words, and the rule is right on 14, which is 77.8%.</p><p>Forty words were set aside. Fourteen do not line up, which means the letters and the parts of the word cannot be matched one to one, and 26 are said with something other than <code>ee</code> at that place. The four misses are <em>either</em>, <em>neither</em>, <em>protein</em> and <em>species</em>. The first three have <code>ei</code> with no <em>c</em>, and the last has <code>ie</code> after a <em>c</em>.</p><h3>What to keep</h3><p>Keep the first half of the saying for words said with <code>ee</code>. Learn <em>either</em>, <em>neither</em> and <em>protein</em> as three words. Learn that after <em>c</em> the saying is right only where the pair says <code>ee</code>, as in <em>receive</em>; in the nine <code>cie</code> words the <em>i</em> and the <em>e</em> are said apart, as in <em>science</em>, or the <em>c</em> is part of a <code>sh</code> sound, as in <em>efficient</em>. Learn that <code>eigh</code> is a group of its own. With those four facts, you have a better rule than the saying.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A spelling rule against the dictionary</h2></div><p>Each rule reads only the letters; the dictionary says what is actually said</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The 22 words that break it</h2><div class="prose reading"><p>Here is the most quoted spelling rule in English. <em>I before e, except after c.</em> Most people who have learned English have heard it, and many repeat it when they are not sure how to spell <em>believe</em> or <em>receive</em>.</p><p>The lab runs it on every <code>ie</code> and <code>ei</code> in the 2,800 words. There are 58. The rule says <code>ie</code> unless the letter before the pair is <em>c</em>, and then it says <code>ei</code>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A spelling rule against the dictionary</h2></div><p>Each rule reads only the letters; the dictionary says what is actually said</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>the rule</span><strong id="ltRule">&mdash;</strong></div><div class="kpi"><span>words scored</span><strong id="ltN">&mdash;</strong></div><div class="kpi"><span>the rule is right</span><strong id="ltHit">&mdash;</strong></div><div class="kpi"><span>share right</span><strong id="ltPct">&mdash;</strong></div><div class="kpi"><span>wrong</span><strong id="ltMiss">&mdash;</strong></div><div class="kpi"><span>the words it gets wrong</span><strong id="ltFirst">&mdash;</strong></div><div class="kpi"><span>set aside</span><strong id="ltAside">&mdash;</strong></div><div class="kpi"><span>different sounds</span><strong id="ltSounds">&mdash;</strong></div></div><p class="small-copy" id="ltLimit"></p><div class="table-wrap" style="max-height:22rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="ltTable"><thead><tr id="ltCols"></tr></thead><tbody id="ltBody"></tbody></table></div><details><summary>Where the sounds come from</summary><p class="small-copy">Every sound, part count and strong part here is read from the first pronunciation in CMUdict, the Carnegie Mellon University Pronouncing Dictionary, which records American speech. Its licence asks that this notice travel with anything made from it:</p><pre class="small-copy" style="white-space:pre-wrap;">Copyright (C) 1993-2015 Carnegie Mellon University. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -1430,17 +1473,20 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Score the famous rule, then narrow it</h3>
-          <p>Choose a rule. The first setting runs the rule on every <code>ie</code> and <code>ei</code> in the list. The second runs it only where the letters line up one to one with the parts of the word and the dictionary gives <code>ee</code> at that place. The page lists what was set aside and why. The dictionary is American and is read at its first entry.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Score the famous rule, then narrow it</h3>
+            <p>Choose a rule. The first setting runs the rule on every <code>ie</code> and <code>ei</code> in the list. The second runs it only where the letters line up one to one with the parts of the word and the dictionary gives <code>ee</code> at that place. The page lists what was set aside and why. The dictionary is American and is read at its first entry.</p>
 <label for="ltPreset">Rule</label> <select id="ltPreset"><option value="ie" selected="selected">i before e, except after c</option><option value="ie_ee">i before e, where it says ee</option></select> <label for="ltShow">List</label> <select id="ltShow"><option value="misses" selected="selected">the words the rule gets wrong</option><option value="all">every word scored</option><option value="aside">the words set aside, and why</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>The score</h3><p>The rule is right on 36 of the 58, which is 62.1%. Twenty-two words break it. In a list of the 2,800 commonest words, that is a saying that is wrong more often than it is worth.</p><p>Those 22 are not spread about at random. Sorted, they make three groups.</p><h3>The three kinds of miss</h3><p>The first group is <code>eigh</code>: <em>eight</em>, <em>eighteen</em>, <em>eighty</em>, <em>weigh</em>, <em>weight</em>, <em>neighbor</em>, <em>neighborhood</em> and <em>height</em>. That is eight words. In most of them the letters say <code>ay</code>, so they are not about <code>ee</code> at all. <em>Height</em> is said with the sound of the word <em>eye</em>, which is a different case again.</p><p>The second group is <code>cie</code>: <em>ancient</em>, <em>efficiency</em>, <em>efficient</em>, <em>science</em>, <em>scientific</em>, <em>scientist</em>, <em>society</em>, <em>species</em> and <em>sufficient</em>. That is nine words. They are the part of the saying that fails after <em>c</em>: the rule says <code>ei</code> there, and every one of them has <code>ie</code>.</p><p>The third group is five words that stand alone: <em>either</em>, <em>neither</em>, <em>foreign</em>, <em>protein</em> and <em>weird</em>. Each has <code>ei</code> with no <em>c</em> before it, and each is said its own way.</p><h3>A better question</h3><p>The saying was made to help with words said with <code>ee</code>. So the lab can ask a second question: how often is the rule right where the letters line up with the <dfn>parts</dfn> of the word, the beats it is said in, and the <dfn>dictionary</dfn>, a book that records how words are said, has <code>ee</code> at that place? That leaves 18 words, and the rule is right on 14, which is 77.8%.</p><p>Forty words were set aside. Fourteen do not line up, which means the letters and the parts of the word cannot be matched one to one, and 26 are said with something other than <code>ee</code> at that place. The four misses are <em>either</em>, <em>neither</em>, <em>protein</em> and <em>species</em>. The first three have <code>ei</code> with no <em>c</em>, and the last has <code>ie</code> after a <em>c</em>.</p><h3>What to keep</h3><p>Keep the first half of the saying for words said with <code>ee</code>. Learn <em>either</em>, <em>neither</em> and <em>protein</em> as three words. Learn that after <em>c</em> the saying is right only where the pair says <code>ee</code>, as in <em>receive</em>; in the nine <code>cie</code> words the <em>i</em> and the <em>e</em> are said apart, as in <em>science</em>, or the <em>c</em> is part of a <code>sh</code> sound, as in <em>efficient</em>. Learn that <code>eigh</code> is a group of its own. With those four facts, you have a better rule than the saying.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Using the rule, and knowing when not to</h2></div><p>Four steps.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the pair</h3><p>Look for <code>ie</code> or <code>ei</code> in the word. The rule has nothing to say about a word that has neither.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Say the sound</h3><p>If the pair says <code>ee</code>, as in <em>believe</em>, the rule applies. If it says <code>ay</code>, as in <em>weigh</em>, the letters are <code>eigh</code> and the rule does not apply.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Look at the letter before the pair</h3><p>After a <em>c</em>, write <code>ei</code>. After any other letter, write <code>ie</code>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Learn the nine words with c before ie</h3><p><em>Science</em>, <em>efficient</em> and <em>sufficient</em> break the rule and make up the largest group of misses.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Using the rule, and knowing when not to</h2>
+      <p class="lead-in">Four steps.</p>
+      <ol class="key-ideas method"><li><strong>Find the pair.</strong> Look for <code>ie</code> or <code>ei</code> in the word. The rule has nothing to say about a word that has neither.</li><li><strong>Say the sound.</strong> If the pair says <code>ee</code>, as in <em>believe</em>, the rule applies. If it says <code>ay</code>, as in <em>weigh</em>, the letters are <code>eigh</code> and the rule does not apply.</li><li><strong>Look at the letter before the pair.</strong> After a <em>c</em>, write <code>ei</code>. After any other letter, write <code>ie</code>.</li><li><strong>Learn the nine words with c before ie.</strong> <em>Science</em>, <em>efficient</em> and <em>sufficient</em> break the rule and make up the largest group of misses.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1457,17 +1503,16 @@ weight, eight     ei said ay           miss
 science           ie after c           miss</div><p><em>Friend</em> and <em>believe</em> follow the rule. <em>Receive</em> is the rule working the other way: after <em>c</em> it says <code>ei</code>, and <em>perceive</em> does the same. Those two are the only words in the table where the rule says <code>ei</code> and is right. <em>Weight</em> and <em>science</em> break it in different ways, and the difference is the point of the lesson.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a saying as a rule</strong><span>It is easy to remember, and that is why it has lasted. It is right 36 times in 58, which is 62.1%. A rule that fails nearly four times in ten is not one to trust without checking.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the c clause is the safe part</strong><span>After <em>c</em> the rule says <code>ei</code>. On the list, the words with a <em>c</em> before the pair are <em>receive</em> and <em>perceive</em>, which follow it, and nine words with <code>cie</code>, which do not.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Applying it to every pair of these letters</strong><span>The rule was made for words said with <code>ee</code>. In <em>weight</em> and <em>height</em> the letters say something else, and the rule was never about them. Count only the words said with <code>ee</code> and the score is 14 of 18.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can apply the saying about i before e to a word, say how often it is right, and sort the words where it fails into the groups that cause the failures.</strong><p>You should be able to find every <code>ie</code> and <code>ei</code> in a word, predict the spelling from the rule, read the score off the table, name the three kinds of miss, and explain why the same rule looks better when it is applied only where the letters say <code>ee</code>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The saying has two halves, and the second half, <em>except after c</em>, is the weaker. Of 11 words with a <em>c</em> before the pair, only two follow it. If you keep the first half and look up words with <code>cie</code>, you do better than with the whole saying.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a saying as a rule</strong><span>It is easy to remember, and that is why it has lasted. It is right 36 times in 58, which is 62.1%. A rule that fails nearly four times in ten is not one to trust without checking.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the c clause is the safe part</strong><span>After <em>c</em> the rule says <code>ei</code>. On the list, the words with a <em>c</em> before the pair are <em>receive</em> and <em>perceive</em>, which follow it, and nine words with <code>cie</code>, which do not.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Applying it to every pair of these letters</strong><span>The rule was made for words said with <code>ee</code>. In <em>weight</em> and <em>height</em> the letters say something else, and the rule was never about them. Count only the words said with <code>ee</code> and the score is 14 of 18.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can apply the saying about i before e to a word, say how often it is right, and sort the words where it fails into the groups that cause the failures.</strong><p>You should be able to find every <code>ie</code> and <code>ei</code> in a word, predict the spelling from the rule, read the score off the table, name the three kinds of miss, and explain why the same rule looks better when it is applied only where the letters say <code>ee</code>.</p></div></div><div class="note"><strong>Note:</strong> The saying has two halves, and the second half, <em>except after c</em>, is the weaker. Of 11 words with a <em>c</em> before the pair, only two follow it. If you keep the first half and look up words with <code>cie</code>, you do better than with the whole saying.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A rule is a bet, and this one is a poor bet</summary><p>The rule is right on 36 of 58 words. That is a little over six in ten. If you guess the order of the letters with this rule you will spell about four in ten of these words wrong. A student who knows this will check the dictionary; a student who does not will trust the saying.</p></details><details class="recall"><summary>The failures come in groups</summary><p>Of the 22 misses, eight have the letters <code>eigh</code>, as in <em>eight</em> and <em>weight</em>. Nine are the letters <code>cie</code>, as in <em>science</em> and <em>efficient</em>. Five are alone: <em>either</em>, <em>neither</em>, <em>foreign</em>, <em>protein</em> and <em>weird</em>. Three groups explain 22 words.</p></details><details class="recall"><summary>The saying was made for one sound</summary><p>The rule is about words said with <code>ee</code>, as in <em>believe</em> and <em>receive</em>. Where the letters say something else, the rule has no claim. Apply it only where the letters say <code>ee</code> and it is right on 14 of 18.</p></details></div>
+      <h3>Summary</h3>
       <p>Most students are given a saying: <em>i before e, except after c</em>. On the 58 places in the 2,800 words where <em>i</em> and <em>e</em> sit together, it is right 36 times. That is 62.1%. The 22 misses are not random, and narrowing the rule to words said with <code>ee</code> lifts it to 14 of 18.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A rule is a bet, and this one is a poor bet.</strong> The rule is right on 36 of 58 words. That is a little over six in ten. If you guess the order of the letters with this rule you will spell about four in ten of these words wrong. A student who knows this will check the dictionary; a student who does not will trust the saying.</li><li><strong>The failures come in groups.</strong> Of the 22 misses, eight have the letters <code>eigh</code>, as in <em>eight</em> and <em>weight</em>. Nine are the letters <code>cie</code>, as in <em>science</em> and <em>efficient</em>. Five are alone: <em>either</em>, <em>neither</em>, <em>foreign</em>, <em>protein</em> and <em>weird</em>. Three groups explain 22 words.</li><li><strong>The saying was made for one sound.</strong> The rule is about words said with <code>ee</code>, as in <em>believe</em> and <em>receive</em>. Where the letters say something else, the rule has no claim. Apply it only where the letters say <code>ee</code> and it is right on 14 of 18.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="eye before ee, except after see. right on 36 of 58, 62.1 percent. only where the letters say ee. right on 14 of 18, 77.8 percent" tabindex="0" role="region" aria-label="Mathematical notation">i before e, except after c
 right on 36 of 58       62.1%
 
@@ -2024,11 +2069,40 @@ var bSetText = function (id, text) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2096,7 +2170,7 @@ var bSetText = function (id, text) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Exponential and Logarithmic Functions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Solving</p>
       <h1>Solving Exponential Equations</h1>
       <p class="lesson-lede">Choose matching powers or logarithms, solve, and reject impossible exponential equations.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An exponential function is one-to-one</li><li>The power law is what moves the variable</li><li>Isolate the power before taking a logarithm</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Bringing the variable down</h2>
-      <article class="prose reading"><p>Every equation before this course put the unknown in the base: <span class="math" data-say="x squared equals 9">x² = 9</span>, <span class="math" data-say="x cubed minus x equals 0">x³ − x = 0</span>. <span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 81">3^(2x − 1) = 81</span> puts it in the exponent, and no amount of dividing, factoring or root-taking will move it. Two methods do.</p><div class="thm"><span class="label">Theorem &middot; Exponentials are one-to-one</span><p>For <span class="math" data-say="b is greater than 0">b &gt; 0</span> with <span class="math" data-say="b is not equal to 1">b ≠ 1</span>: <span class="math" data-say="b to the power u equals b to the power v">b^u = b^v</span> if and only if <span class="math" data-say="u equals v">u = v</span>.</p><p>The forward direction is what solves equations. The reverse direction is why substituting an answer back in works. Both statements fail for <span class="math" data-say="b equals 1">b = 1</span>, which is why that base is excluded everywhere in this course.</p></div><div class="example"><span class="label">Example &middot; Matching powers</span><p><span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 81">3^(2x − 1) = 81</span>. Since <span class="math" data-say="81 equals 3 to the power 4">81 = 3^4</span>, both sides are powers of <span class="math" data-say="3">3</span>: <span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 3 to the power 4">3^(2x − 1) = 3^4</span>. One-to-one gives <span class="math" data-say="2 x minus 1 equals 4">2x − 1 = 4</span>, so <span class="math" data-say="x equals 5 over 2">x = 5/2</span>. The answer is exact and no logarithm was needed. Check: <span class="math" data-say="2 times the quantity 5 over 2, minus 1 equals 4">2 · (5/2) − 1 = 4</span> and <span class="math" data-say="3 to the power 4 equals 81">3^4 = 81</span>.</p></div><p>That method needs both sides to be recognisable powers of one base. <span class="math" data-say="5 to the power x equals 17">5^x = 17</span> is not such an equation. <span class="math" data-say="17">17</span> lies between <span class="math" data-say="5 to the power 1 equals 5">5^1 = 5</span> and <span class="math" data-say="5 squared equals 25">5^2 = 25</span>, and it is not a rational power of <span class="math" data-say="5">5</span> at all: <span class="math" data-say="5 to the power the quantity p over q, equals 17">5^(p/q) = 17</span> would mean <span class="math" data-say="5 to the power p equals 17 to the power q">5^p = 17^q</span>, which no positive integers satisfy, since one side is divisible by <span class="math" data-say="5">5</span> and the other is not.</p><div class="thm"><span class="label">Theorem &middot; Taking a logarithm of both sides</span><p>If <span class="math" data-say="M equals N">M = N</span> and both are positive, then <span class="math" data-say="log base c of M equals log base c of N">log_c(M) = log_c(N)</span> for every legal base <span class="math" data-say="c">c</span>; and conversely, <span class="math" data-say="log base c of M equals log base c of N">log_c(M) = log_c(N)</span> forces <span class="math" data-say="M equals N">M = N</span>.</p><p>So a logarithm may be applied to both sides of an equation exactly as <span class="math" data-say="5">5</span> may be added to both sides. The two-way statement matters: it is what guarantees the new equation has the same solutions as the old one, so nothing is gained or lost by the step.</p></div><div class="mathblock" data-say="5 to the power x equals 17. the natural log of 5 to the power x equals the natural log of 17, take the natural log of of both sides, both sides are positive. x times the natural log of 5 equals the natural log of 17, power law, the exponent comes down in front. x equals the natural log of 17 over the natural log of 5, divide by the natural log of 5, which is not 0. x is approximately 1.760374, rounded to six places. check, 5 to the power 1 equals 5 is less than 17 is less than 25 equals 5 squared, so x lies between 1 and 2, check" tabindex="0" role="region" aria-label="Mathematical notation">5^x = 17
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Bringing the variable down</h2><div class="prose reading"><p>Every equation before this course put the unknown in the base: <span class="math" data-say="x squared equals 9">x² = 9</span>, <span class="math" data-say="x cubed minus x equals 0">x³ − x = 0</span>. <span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 81">3^(2x − 1) = 81</span> puts it in the exponent, and no amount of dividing, factoring or root-taking will move it. Two methods do.</p><div class="thm"><span class="label">Theorem &middot; Exponentials are one-to-one</span><p>For <span class="math" data-say="b is greater than 0">b &gt; 0</span> with <span class="math" data-say="b is not equal to 1">b ≠ 1</span>: <span class="math" data-say="b to the power u equals b to the power v">b^u = b^v</span> if and only if <span class="math" data-say="u equals v">u = v</span>.</p><p>The forward direction is what solves equations. The reverse direction is why substituting an answer back in works. Both statements fail for <span class="math" data-say="b equals 1">b = 1</span>, which is why that base is excluded everywhere in this course.</p></div><div class="example"><span class="label">Example &middot; Matching powers</span><p><span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 81">3^(2x − 1) = 81</span>. Since <span class="math" data-say="81 equals 3 to the power 4">81 = 3^4</span>, both sides are powers of <span class="math" data-say="3">3</span>: <span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 3 to the power 4">3^(2x − 1) = 3^4</span>. One-to-one gives <span class="math" data-say="2 x minus 1 equals 4">2x − 1 = 4</span>, so <span class="math" data-say="x equals 5 over 2">x = 5/2</span>. The answer is exact and no logarithm was needed. Check: <span class="math" data-say="2 times the quantity 5 over 2, minus 1 equals 4">2 · (5/2) − 1 = 4</span> and <span class="math" data-say="3 to the power 4 equals 81">3^4 = 81</span>.</p></div><p>That method needs both sides to be recognisable powers of one base. <span class="math" data-say="5 to the power x equals 17">5^x = 17</span> is not such an equation. <span class="math" data-say="17">17</span> lies between <span class="math" data-say="5 to the power 1 equals 5">5^1 = 5</span> and <span class="math" data-say="5 squared equals 25">5^2 = 25</span>, and it is not a rational power of <span class="math" data-say="5">5</span> at all: <span class="math" data-say="5 to the power the quantity p over q, equals 17">5^(p/q) = 17</span> would mean <span class="math" data-say="5 to the power p equals 17 to the power q">5^p = 17^q</span>, which no positive integers satisfy, since one side is divisible by <span class="math" data-say="5">5</span> and the other is not.</p><div class="thm"><span class="label">Theorem &middot; Taking a logarithm of both sides</span><p>If <span class="math" data-say="M equals N">M = N</span> and both are positive, then <span class="math" data-say="log base c of M equals log base c of N">log_c(M) = log_c(N)</span> for every legal base <span class="math" data-say="c">c</span>; and conversely, <span class="math" data-say="log base c of M equals log base c of N">log_c(M) = log_c(N)</span> forces <span class="math" data-say="M equals N">M = N</span>.</p><p>So a logarithm may be applied to both sides of an equation exactly as <span class="math" data-say="5">5</span> may be added to both sides. The two-way statement matters: it is what guarantees the new equation has the same solutions as the old one, so nothing is gained or lost by the step.</p></div><div class="mathblock" data-say="5 to the power x equals 17. the natural log of 5 to the power x equals the natural log of 17, take the natural log of of both sides, both sides are positive. x times the natural log of 5 equals the natural log of 17, power law, the exponent comes down in front. x equals the natural log of 17 over the natural log of 5, divide by the natural log of 5, which is not 0. x is approximately 1.760374, rounded to six places. check, 5 to the power 1 equals 5 is less than 17 is less than 25 equals 5 squared, so x lies between 1 and 2, check" tabindex="0" role="region" aria-label="Mathematical notation">5^x = 17
 ln(5^x) = ln 17          take ln of both sides; both sides are positive
 x · ln 5 = ln 17         power law: the exponent comes down in front
 x = ln 17 / ln 5         divide by ln 5, which is not 0
@@ -1404,12 +1448,11 @@ ln 4 = 2x · ln 3 − x · ln 4     collect the x terms on one side
 ln 4 = x · (2 · ln 3 − ln 4)    factor out x
 x = ln 4 / (2 · ln 3 − ln 4)
   = ln 4 / ln(9/4)              since 2 ln 3 − ln 4 = ln(9/4)
-  ≈ 1.709511</div><h3>Equations that hide a quadratic</h3><p><span class="math" data-say="e to the power 2 x minus e to the power x minus 6 equals 0">e^(2x) − e^x − 6 = 0</span> contains only one exponential, twice: <span class="math" data-say="e to the power 2 x equals e to the power x squared">e^(2x) = (e^x)²</span>. Substituting <span class="math" data-say="u equals e to the power x">u = e^x</span> turns it into <span class="math" data-say="u squared minus u minus 6 equals 0">u² − u − 6 = 0</span>, which factors as <span class="math" data-say="the quantity u minus 3, times the quantity u plus 2, equals 0">(u − 3)(u + 2) = 0</span>. So <span class="math" data-say="u equals 3">u = 3</span> or <span class="math" data-say="u equals negative 2">u = −2</span>.</p><p>Now undo the substitution, and one candidate dies. <span class="math" data-say="u equals e to the power x">u = e^x</span> is positive for every real <span class="math" data-say="x">x</span>, so <span class="math" data-say="u equals negative 2">u = −2</span> is impossible &mdash; not because of a domain restriction on a logarithm, but because the range of the exponential is <span class="math" data-say="0, infinity">(0, ∞)</span>. From <span class="math" data-say="u equals 3">u = 3</span>, <span class="math" data-say="x equals the natural log of 3 is approximately 1.098612">x = ln 3 ≈ 1.098612</span>, and that is the whole solution set.</p><p>The same range fact settles two shapes on sight. <span class="math" data-say="b to the power x equals 0">b^x = 0</span> has no solution: the horizontal asymptote <span class="math" data-say="y equals 0">y = 0</span> from “Exponential Functions” is approached and never reached. <span class="math" data-say="b to the power x equals k">b^x = k</span> with <span class="math" data-say="k is less than 0">k &lt; 0</span> has no solution either. In both cases the algebra will not object &mdash; <span class="math" data-say="the natural log of the quantity negative 8">ln(−8)</span> simply does not exist &mdash; so the check has to be made before the logarithm, not after.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Solving b^(cx+d) = k</h2></div><p>Match the powers when you can; take logs when you cannot</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  ≈ 1.709511</div><h3>Equations that hide a quadratic</h3><p><span class="math" data-say="e to the power 2 x minus e to the power x minus 6 equals 0">e^(2x) − e^x − 6 = 0</span> contains only one exponential, twice: <span class="math" data-say="e to the power 2 x equals e to the power x squared">e^(2x) = (e^x)²</span>. Substituting <span class="math" data-say="u equals e to the power x">u = e^x</span> turns it into <span class="math" data-say="u squared minus u minus 6 equals 0">u² − u − 6 = 0</span>, which factors as <span class="math" data-say="the quantity u minus 3, times the quantity u plus 2, equals 0">(u − 3)(u + 2) = 0</span>. So <span class="math" data-say="u equals 3">u = 3</span> or <span class="math" data-say="u equals negative 2">u = −2</span>.</p><p>Now undo the substitution, and one candidate dies. <span class="math" data-say="u equals e to the power x">u = e^x</span> is positive for every real <span class="math" data-say="x">x</span>, so <span class="math" data-say="u equals negative 2">u = −2</span> is impossible &mdash; not because of a domain restriction on a logarithm, but because the range of the exponential is <span class="math" data-say="0, infinity">(0, ∞)</span>. From <span class="math" data-say="u equals 3">u = 3</span>, <span class="math" data-say="x equals the natural log of 3 is approximately 1.098612">x = ln 3 ≈ 1.098612</span>, and that is the whole solution set.</p><p>The same range fact settles two shapes on sight. <span class="math" data-say="b to the power x equals 0">b^x = 0</span> has no solution: the horizontal asymptote <span class="math" data-say="y equals 0">y = 0</span> from “Exponential Functions” is approached and never reached. <span class="math" data-say="b to the power x equals k">b^x = k</span> with <span class="math" data-say="k is less than 0">k &lt; 0</span> has no solution either. In both cases the algebra will not object &mdash; <span class="math" data-say="the natural log of the quantity negative 8">ln(−8)</span> simply does not exist &mdash; so the check has to be made before the logarithm, not after.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Solving b^(cx+d) = k</h2></div><p>Match the powers when you can; take logs when you cannot</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="lgTitle">Logarithm</strong><span id="lgSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the left side</span><span class="tone-red"><i class="legend-swatch"></i>y = k</span><span class="tone-green"><i class="legend-swatch"></i>the solution</span></div>
@@ -1417,10 +1460,10 @@ x = ln 4 / (2 · ln 3 − ln 4)
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="lgPlot"></svg></div>
       <div id="lgWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="lgStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Match powers, or take a logarithm</h3>
-          <p>Each equation is attempted both ways: the lab searches for a common base and reports the exact exponent when one exists, and falls back to logarithms when it does not. The equations with no solution are in the list on purpose.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Match powers, or take a logarithm</h3>
+            <p>Each equation is attempted both ways: the lab searches for a common base and reports the exact exponent when one exists, and falls back to logarithms when it does not. The equations with no solution are in the list on purpose.</p>
         <div class="field">
           <label for="lgPreset">Example</label>
           <select id="lgPreset"><option value="1|2|1|0|32">2^x = 32</option><option value="1|3|2|-1|27">3^(2x - 1) = 27</option><option value="1|4|1|0|8">4^x = 8 &mdash; one base underneath both</option><option value="5|2|1|0|160">5 &middot; 2^x = 160</option><option value="1|2|1|0|10">2^x = 10 &mdash; only logs will do it</option><option value="3|2|1|0|-12">3 &middot; 2^x = -12 &mdash; no solution at all</option></select>
@@ -1448,12 +1491,14 @@ x = ln 4 / (2 · ln 3 − ln 4)
         <div class="kpi-grid"><div class="kpi"><span>x</span><strong id="lgKpi1">&mdash;</strong></div><div class="kpi"><span>Method</span><strong id="lgKpi2">&mdash;</strong></div><div class="kpi"><span>Check</span><strong id="lgKpi3">&mdash;</strong></div></div>
         <p class="small-copy" id="lgHint" style="margin:0;">The equation is a&middot;b^(cx + d) = k. Set a = 1 and d = 0 for the plain case.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving an exponential equation</h2></div><p>Four steps. The decision in step two is the one that determines whether the answer is exact.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Isolate the exponential</h3><p>Get the power alone on one side. Constants added to it move first, then coefficients multiplying it &mdash; the same order as in a linear equation, and for the same reason.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask whether the other side is a power of the same base</h3><p>If it is, rewrite both sides over that base and set the exponents equal. The answer is exact, and no rounding enters the problem.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Otherwise take a logarithm of both sides</h3><p>Any base works; use <span class="math" data-say="ln">ln</span> or <span class="math" data-say="log">log</span> because they can be evaluated. The power law brings the whole exponent down in front as a factor, so bracket it before you write it: <span class="math" data-say="the quantity 2 x minus 1, times the natural log of 3">(2x − 1) · ln 3</span>, never <span class="math" data-say="2 x minus 1 times the natural log of 3">2x − 1 · ln 3</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve what is left, and check the sign of the isolated power</h3><p>After the logarithm the equation is linear in <span class="math" data-say="x">x</span> with numeric coefficients. If the isolated exponential equalled <span class="math" data-say="0">0</span> or a negative number, stop earlier: there is no real solution to find.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving an exponential equation</h2>
+      <p class="lead-in">Four steps. The decision in step two is the one that determines whether the answer is exact.</p>
+      <ol class="key-ideas method"><li><strong>Isolate the exponential.</strong> Get the power alone on one side. Constants added to it move first, then coefficients multiplying it &mdash; the same order as in a linear equation, and for the same reason.</li><li><strong>Ask whether the other side is a power of the same base.</strong> If it is, rewrite both sides over that base and set the exponents equal. The answer is exact, and no rounding enters the problem.</li><li><strong>Otherwise take a logarithm of both sides.</strong> Any base works; use <span class="math" data-say="ln">ln</span> or <span class="math" data-say="log">log</span> because they can be evaluated. The power law brings the whole exponent down in front as a factor, so bracket it before you write it: <span class="math" data-say="the quantity 2 x minus 1, times the natural log of 3">(2x − 1) · ln 3</span>, never <span class="math" data-say="2 x minus 1 times the natural log of 3">2x − 1 · ln 3</span>.</li><li><strong>Solve what is left, and check the sign of the isolated power.</strong> After the logarithm the equation is linear in <span class="math" data-say="x">x</span> with numeric coefficients. If the isolated exponential equalled <span class="math" data-say="0">0</span> or a negative number, stop earlier: there is no real solution to find.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1483,17 +1528,16 @@ x = ln 4 / (2 · ln 3 − ln 4)
      check   7^1 = 7 &lt; 30 &lt; 49 = 7^2,  so x is between 1 and 2  ✓</div><p>Equation (2) is the one worth studying. Two isolating steps happen before anything logarithmic is considered, and once the power stands alone the right side turns out to be <span class="math" data-say="2 cubed">2^3</span>, so no logarithm is needed at all. Taking <span class="math" data-say="log">log</span> of <span class="math" data-say="5 times 2 to the power x plus 3 equals 43">5 · 2^x + 3 = 43</span> as a first move is legal and leads nowhere useful, because <span class="math" data-say="log of the quantity 5 times 2 to the power x plus 3">log(5 · 2^x + 3)</span> cannot be expanded: there is no law for the logarithm of a sum.</p><p>In equation (3) the answer is <span class="math" data-say="the natural log of 30 over the natural log of 7">ln 30 / ln 7</span>. The decimal is a rounding of that quotient to six places, and it is not the answer &mdash; if the value feeds into anything else, carry the quotient and round once, at the end.</p><p>For a faded solve, use <span class="math" data-say="4 times 3 to the power the quantity 2 x minus 1, minus 1 equals 35">4·3^(2x − 1) − 1 = 35</span>. The isolation is supplied: <span class="math" data-say="3 to the power the quantity 2 x minus 1, equals 9">3^(2x − 1) = 9</span>. Decide whether a logarithm is still needed, finish the exact solution, and substitute it into the original equation including the coefficient and subtraction. Name the feature of <span class="math" data-say="9">9</span> that makes your chosen method the shorter one.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the base as a coefficient</strong><span>From <span class="math" data-say="3 to the power 2 x equals 9">3^(2x) = 9</span>, dividing both sides by <span class="math" data-say="3">3</span> does not give <span class="math" data-say="2 x equals 3">2x = 3</span>. <span class="math" data-say="3 to the power 2 x">3^(2x)</span> is not <span class="math" data-say="3 times 2 x">3 · 2x</span>; the <span class="math" data-say="3">3</span> is not multiplying anything, so there is nothing to divide out. Either match powers or take a logarithm.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Solving for the substitution and stopping</strong><span>In <span class="math" data-say="e to the power 2 x minus e to the power x minus 6 equals 0">e^(2x) − e^x − 6 = 0</span> the quadratic gives <span class="math" data-say="u equals 3">u = 3</span>. That is <span class="math" data-say="e to the power x">e^x</span>, not <span class="math" data-say="x">x</span>. The answer is <span class="math" data-say="x equals the natural log of 3">x = ln 3</span>, and a solution reported as <span class="math" data-say="3">3</span> answers a question nobody asked. Write down what the letter stands for when you introduce it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expanding the logarithm of a product wrongly</strong><span><span class="math" data-say="log of the quantity 5 times 2 to the power x">log(5 · 2^x)</span> is <span class="math" data-say="log 5 plus x times log 2">log 5 + x · log 2</span>. It is not <span class="math" data-say="log 5 times x times log 2">log 5 · x log 2</span> and it is not <span class="math" data-say="5 times log of 2 to the power x">5 · log(2^x)</span>. Isolating the power before taking any logarithm removes the chance to make this one.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you decide between the two methods before writing anything down.</strong><p>Given ten equations you should be able to sort them without solving any: these have both sides as powers of one base and give exact answers, these need a logarithm, and these have no solution because the isolated exponential is not positive. The sorting is the skill. The algebra after it is one or two lines.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every equation here had the unknown in an exponent and nowhere else. “Solving Logarithmic Equations” turns the situation around &mdash; the unknown inside a logarithm &mdash; and its second move is this lesson run backwards: make both sides exponents of the same base.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the base as a coefficient</strong><span>From <span class="math" data-say="3 to the power 2 x equals 9">3^(2x) = 9</span>, dividing both sides by <span class="math" data-say="3">3</span> does not give <span class="math" data-say="2 x equals 3">2x = 3</span>. <span class="math" data-say="3 to the power 2 x">3^(2x)</span> is not <span class="math" data-say="3 times 2 x">3 · 2x</span>; the <span class="math" data-say="3">3</span> is not multiplying anything, so there is nothing to divide out. Either match powers or take a logarithm.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Solving for the substitution and stopping</strong><span>In <span class="math" data-say="e to the power 2 x minus e to the power x minus 6 equals 0">e^(2x) − e^x − 6 = 0</span> the quadratic gives <span class="math" data-say="u equals 3">u = 3</span>. That is <span class="math" data-say="e to the power x">e^x</span>, not <span class="math" data-say="x">x</span>. The answer is <span class="math" data-say="x equals the natural log of 3">x = ln 3</span>, and a solution reported as <span class="math" data-say="3">3</span> answers a question nobody asked. Write down what the letter stands for when you introduce it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expanding the logarithm of a product wrongly</strong><span><span class="math" data-say="log of the quantity 5 times 2 to the power x">log(5 · 2^x)</span> is <span class="math" data-say="log 5 plus x times log 2">log 5 + x · log 2</span>. It is not <span class="math" data-say="log 5 times x times log 2">log 5 · x log 2</span> and it is not <span class="math" data-say="5 times log of 2 to the power x">5 · log(2^x)</span>. Isolating the power before taking any logarithm removes the chance to make this one.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you decide between the two methods before writing anything down.</strong><p>Given ten equations you should be able to sort them without solving any: these have both sides as powers of one base and give exact answers, these need a logarithm, and these have no solution because the isolated exponential is not positive. The sorting is the skill. The algebra after it is one or two lines.</p></div></div><div class="note"><strong>Note:</strong> Every equation here had the unknown in an exponent and nowhere else. “Solving Logarithmic Equations” turns the situation around &mdash; the unknown inside a logarithm &mdash; and its second move is this lesson run backwards: make both sides exponents of the same base.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An exponential function is one-to-one</summary><p>For <span class="math" data-say="b is greater than 0">b &gt; 0</span> with <span class="math" data-say="b is not equal to 1">b ≠ 1</span>, <span class="math" data-say="b to the power u equals b to the power v">b^u = b^v</span> forces <span class="math" data-say="u equals v">u = v</span>. That is what licenses cancelling the base and comparing exponents. It is the same property that gave the exponential an inverse in “Logarithmic Functions and Their Graphs”, and it fails at <span class="math" data-say="b equals 1">b = 1</span>, where <span class="math" data-say="1 to the power u equals 1 to the power v">1^u = 1^v</span> for every pair of exponents.</p></details><details class="recall"><summary>The power law is what moves the variable</summary><p><span class="math" data-say="log of M to the power p equals p times log M">log(M^p) = p · log M</span> takes the exponent and writes it in front. Nothing else in algebra does this: dividing, factoring and squaring all leave <span class="math" data-say="x">x</span> exactly where it was. When the same-base method fails, this law is the only route left.</p></details><details class="recall"><summary>Isolate the power before taking a logarithm</summary><p>Taking <span class="math" data-say="log">log</span> of both sides of <span class="math" data-say="5 times 2 to the power x equals 40">5 · 2^x = 40</span> is legal and gives <span class="math" data-say="log 5 plus x times log 2 equals log 40">log 5 + x · log 2 = log 40</span>, which does solve. It is also the line where <span class="math" data-say="log of the quantity 5 times 2 to the power x">log(5 · 2^x)</span> gets expanded wrongly. Dividing by <span class="math" data-say="5">5</span> first leaves <span class="math" data-say="2 to the power x equals 8">2^x = 8</span>, where the power law has a clean target and there is nothing to invent.</p></details></div>
+      <h3>Summary</h3>
       <p>Two methods and one decision. If both sides can be written as powers of the same base, match the exponents and the answer is exact. If they cannot, take a logarithm of both sides: the power law is the only tool in this course that moves a variable out of an exponent.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An exponential function is one-to-one.</strong> For <span class="math" data-say="b is greater than 0">b &gt; 0</span> with <span class="math" data-say="b is not equal to 1">b ≠ 1</span>, <span class="math" data-say="b to the power u equals b to the power v">b^u = b^v</span> forces <span class="math" data-say="u equals v">u = v</span>. That is what licenses cancelling the base and comparing exponents. It is the same property that gave the exponential an inverse in “Logarithmic Functions and Their Graphs”, and it fails at <span class="math" data-say="b equals 1">b = 1</span>, where <span class="math" data-say="1 to the power u equals 1 to the power v">1^u = 1^v</span> for every pair of exponents.</li><li><strong>The power law is what moves the variable.</strong> <span class="math" data-say="log of M to the power p equals p times log M">log(M^p) = p · log M</span> takes the exponent and writes it in front. Nothing else in algebra does this: dividing, factoring and squaring all leave <span class="math" data-say="x">x</span> exactly where it was. When the same-base method fails, this law is the only route left.</li><li><strong>Isolate the power before taking a logarithm.</strong> Taking <span class="math" data-say="log">log</span> of both sides of <span class="math" data-say="5 times 2 to the power x equals 40">5 · 2^x = 40</span> is legal and gives <span class="math" data-say="log 5 plus x times log 2 equals log 40">log 5 + x · log 2 = log 40</span>, which does solve. It is also the line where <span class="math" data-say="log of the quantity 5 times 2 to the power x">log(5 · 2^x)</span> gets expanded wrongly. Dividing by <span class="math" data-say="5">5</span> first leaves <span class="math" data-say="2 to the power x equals 8">2^x = 8</span>, where the power law has a clean target and there is nothing to invent.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="b to the power u equals b to the power v, implies, u equals v, for b is greater than 0, b is not equal to 1. b to the power x equals k, implies, x equals log base b of k equals the natural log of k over the natural log of b, needs k is greater than 0. 5 times 2 to the power x equals 40, goes to, 2 to the power x equals 8, goes to, x equals 3, isolate first. 2 to the power x equals negative 8, no solution, 2 to the power x is greater than 0 for every real x" tabindex="0" role="region" aria-label="Mathematical notation">b^u = b^v   ⟹   u = v            for b &gt; 0, b ≠ 1
 b^x = k     ⟹   x = log_b(k) = ln k / ln b      needs k &gt; 0
 5 · 2^x = 40   →   2^x = 8   →   x = 3          isolate first
@@ -3939,11 +3983,40 @@ b^x = k     ⟹   x = log_b(k) = ln k / ln b      needs k &gt; 0
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4011,7 +4084,7 @@ b^x = k     ⟹   x = log_b(k) = ln k / ln b      needs k &gt; 0
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

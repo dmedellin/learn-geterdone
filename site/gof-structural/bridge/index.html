@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Structural Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 4 · Structural Patterns</p>
       <h1>Bridge</h1>
       <p class="lesson-lede">An abstraction and its implementation kept in two class hierarchies joined by a reference, so that each can grow without multiplying the other.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Abstraction and RefinedAbstraction</li><li>Implementor and ConcreteImplementor</li><li>Proliferation of classes</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, section by section, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Decouple an abstraction from its implementation so that the two can vary independently.&rdquo; That is Bridge's intent, as the book states it, and the pattern is also known as Handle/Body. The usual way to give an abstraction several implementations is inheritance: an abstract class for the interface, a concrete subclass for each way of carrying it out. The authors' objection is that inheritance fixes the pairing for good, so abstraction and implementation can no longer be changed, extended or reused apart.</p><p>The Motivation section makes the point with a portable window class in a user interface toolkit, implemented for two window systems. Add a specialised kind of window and you need a subclass of it for each system; add a third system and every kind of window needs one more subclass. Worse, a client that creates a window must name a system-specific class, so the client is tied to the platform too. The pattern's answer is two hierarchies, one for the kinds of window and one for the platform implementations, with every window operation written in terms of the implementation's interface. The reference from one to the other is the bridge.</p><p>Applicability lists six cases: you want no permanent binding between abstraction and implementation, perhaps because the implementation is chosen at run time; both sides should be extensible by subclassing; a change of implementation should leave client code untouched, not even rebuilt; in C++, clients should see nothing of the representation; the class hierarchy is already proliferating; or several objects should share one implementation, invisibly to their clients, as in Coplien's string class sharing its representation. The participants are the Abstraction, RefinedAbstraction, Implementor and ConcreteImplementor, and they collaborate in one way: whatever a client asks of the abstraction, the abstraction passes on to the implementor it holds.</p><pre class="codeblock" data-say="line 1, comment, The Abstraction what a guide does, in terms of a player&#x27;s primitives.. line 2, abstract class guide. line 3, protected final player player, comment, the bridge. line 4, guide of player player this dot player is set to player. line 5, abstract void arrive at of stop stop. line 7, final class highlights guide extends guide. line 8, highlights guide of player player super of player. line 9, void arrive at of stop stop. line 10, if stop dot is highlight. line 11, player dot show title of stop dot title. line 12, player dot play clip of stop dot short clip. line 16, comment, The Implementor a few primitives every device supplies.. line 17, interface player. line 18, void play clip of string clip id. line 19, void show title of string text" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The Abstraction: what a guide does, in terms of a player&#x27;s primitives.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, section by section, then the count</h2><div class="prose reading"><p>&ldquo;Decouple an abstraction from its implementation so that the two can vary independently.&rdquo; That is Bridge's intent, as the book states it, and the pattern is also known as Handle/Body. The usual way to give an abstraction several implementations is inheritance: an abstract class for the interface, a concrete subclass for each way of carrying it out. The authors' objection is that inheritance fixes the pairing for good, so abstraction and implementation can no longer be changed, extended or reused apart.</p><p>The Motivation section makes the point with a portable window class in a user interface toolkit, implemented for two window systems. Add a specialised kind of window and you need a subclass of it for each system; add a third system and every kind of window needs one more subclass. Worse, a client that creates a window must name a system-specific class, so the client is tied to the platform too. The pattern's answer is two hierarchies, one for the kinds of window and one for the platform implementations, with every window operation written in terms of the implementation's interface. The reference from one to the other is the bridge.</p><p>Applicability lists six cases: you want no permanent binding between abstraction and implementation, perhaps because the implementation is chosen at run time; both sides should be extensible by subclassing; a change of implementation should leave client code untouched, not even rebuilt; in C++, clients should see nothing of the representation; the class hierarchy is already proliferating; or several objects should share one implementation, invisibly to their clients, as in Coplien's string class sharing its representation. The participants are the Abstraction, RefinedAbstraction, Implementor and ConcreteImplementor, and they collaborate in one way: whatever a client asks of the abstraction, the abstraction passes on to the implementor it holds.</p><pre class="codeblock" data-say="line 1, comment, The Abstraction what a guide does, in terms of a player&#x27;s primitives.. line 2, abstract class guide. line 3, protected final player player, comment, the bridge. line 4, guide of player player this dot player is set to player. line 5, abstract void arrive at of stop stop. line 7, final class highlights guide extends guide. line 8, highlights guide of player player super of player. line 9, void arrive at of stop stop. line 10, if stop dot is highlight. line 11, player dot show title of stop dot title. line 12, player dot play clip of stop dot short clip. line 16, comment, The Implementor a few primitives every device supplies.. line 17, interface player. line 18, void play clip of string clip id. line 19, void show title of string text" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The Abstraction: what a guide does, in terms of a player&#x27;s primitives.</span>
 <span class="cl">abstract class Guide {</span>
 <span class="cl">    protected final Player player;            // the bridge</span>
 <span class="cl">    Guide(Player player) { this.player = player; }</span>
@@ -1464,13 +1508,11 @@
 <span class="cl">interface Player {</span>
 <span class="cl">    void playClip(String clipId);</span>
 <span class="cl">    void showTitle(String text);</span>
-<span class="cl">}</span></code></pre><p>The Consequences are three. Interface and implementation are decoupled: an implementation can be chosen while the program runs, even swapped, and changing an implementation class no longer forces the abstraction and its clients to be recompiled, which matters for binary compatibility between library versions and encourages layering. Each hierarchy can be extended on its own. And details such as shared implementor objects and their reference counts can be hidden from clients.</p><p>The Implementation section takes up four issues. With only one implementation an abstract Implementor is unnecessary, though the separation still protects clients from changes; Carolan's name for it is the Cheshire Cat. Someone must create the right implementor: the abstraction can choose from its constructor's arguments (a collection might pick a linked list when small and a hash table when large), start with a default and switch as usage grows, or ask another object, such as an Abstract Factory, which keeps it from knowing any implementor class at all. Implementors can be shared, with Coplien's Handle/Body reference counting. And multiple inheritance cannot make a true Bridge in C++, because inheritance binds the pair statically. The Known Uses are ET++'s window ports, libg++'s set classes (a degenerate bridge with no abstract implementor) and NeXT's image classes, whose image can hold several representations at once.</p><p>Now the lab, on a museum audio guide, not the book's windows. Three kinds of guide (a full tour, the highlights, a family trail) run on three players (a rental handset, the visitor's phone, a gallery kiosk). Each record is one aspect that varies, then its variants. On the preset <code>three-by-three</code> there are <span data-say="3 times 3 equals 9">3 × 3 = 9</span> pairings. One subclass per pairing, under one abstract guide, is 9 + 1 = 10 classes. The bridge is (3 + 1) + (3 + 1) = 8: an abstract class and three concrete ones on each side, and the lab's ratio of the two counts is 10/8, which it prints as 5/4, about 1.3. Each guide holds 1 reference, to its player.</p><p>The difference that matters is in the last two tiles. A fourth player, a web page say, adds 3 classes under subclassing <span data-say="10 goes to 13">(10 → 13)</span>, one for each kind of guide, and 1 class under the bridge <span data-say="8 goes to 9">(8 → 9)</span>; neither design edits an existing class for it. The preset <code>five-players</code> grows the player side to five, and asks what one new kind of guide costs: <span data-say="3 times 5 equals 15">3 × 5 = 15</span> pairings, 16 classes against (3 + 1) + (5 + 1) = 10, a ratio of 1.6, and a new guide adds 5 subclasses <span data-say="16 goes to 21">(16 → 21)</span> against <span data-say="1 10 goes to 11">1 (10 → 11)</span>. The subclass count is the product of the variant counts and the bridge's is their sum, so the gap widens as either side grows. The lab counts the flattest possible single hierarchy; the book's own picture of the proliferation has intermediate classes too, which only adds to it.</p><p>None of that says the museum should build a bridge. With one player planned and no second in sight, the separate Implementor is the degenerate case the authors describe, worth it only if clients must be shielded from changes. The count shows what happens if both sides grow; whether they will is the design question.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, notice, ready, reminder, returned, overdue. line 2, channel, sms, email, app" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">notice, ready, reminder, returned, overdue;</span>
-<span class="cl">channel, sms, email, app</span></code></pre><p>A parcel locker sends four kinds of notice through three channels. By hand, give the classes under one subclass per pairing and under a bridge of notices holding a channel, and the classes a fourth channel adds to each. Type the records into the lab, with the channel as the aspect that gains a variant, to check.</p><p>Bridge and Adapter both forward to another object; the Discussion of Structural Patterns, at the end of this course, sets them side by side. The next lesson, Composite, turns from two hierarchies to one recursive structure.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The Consequences are three. Interface and implementation are decoupled: an implementation can be chosen while the program runs, even swapped, and changing an implementation class no longer forces the abstraction and its clients to be recompiled, which matters for binary compatibility between library versions and encourages layering. Each hierarchy can be extended on its own. And details such as shared implementor objects and their reference counts can be hidden from clients.</p><p>The Implementation section takes up four issues. With only one implementation an abstract Implementor is unnecessary, though the separation still protects clients from changes; Carolan's name for it is the Cheshire Cat. Someone must create the right implementor: the abstraction can choose from its constructor's arguments (a collection might pick a linked list when small and a hash table when large), start with a default and switch as usage grows, or ask another object, such as an Abstract Factory, which keeps it from knowing any implementor class at all. Implementors can be shared, with Coplien's Handle/Body reference counting. And multiple inheritance cannot make a true Bridge in C++, because inheritance binds the pair statically. The Known Uses are ET++'s window ports, libg++'s set classes (a degenerate bridge with no abstract implementor) and NeXT's image classes, whose image can hold several representations at once.</p><p>Now the lab, on a museum audio guide, not the book's windows. Three kinds of guide (a full tour, the highlights, a family trail) run on three players (a rental handset, the visitor's phone, a gallery kiosk). Each record is one aspect that varies, then its variants. On the preset <code>three-by-three</code> there are <span data-say="3 times 3 equals 9">3 × 3 = 9</span> pairings. One subclass per pairing, under one abstract guide, is 9 + 1 = 10 classes. The bridge is (3 + 1) + (3 + 1) = 8: an abstract class and three concrete ones on each side, and the lab's ratio of the two counts is 10/8, which it prints as 5/4, about 1.3. Each guide holds 1 reference, to its player.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>every combination a subclass, or one hierarchy per aspect</span></div>
       </div>
@@ -1478,10 +1520,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one aspect that varies, then its variants (2 to 4 aspects, 1 to 8 variants each); every name is a class and is used once. Combinations = the product of the variant counts. With one subclass per combination the design has that product + 1 classes (one abstract base). With one hierarchy per aspect, joined by composition, each aspect has 1 abstract class + 1 concrete class per variant, so the design has the sum of the variant counts + the number of aspects; the client holds the first aspect's abstract class, and each of its objects holds one reference per other aspect. The ratio is the first count over the second. One new variant of the added aspect adds the product of the other aspects' counts under subclassing and 1 class under composition; neither design edits an existing class for it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Classes with one subclass per pairing, and with a bridge</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Classes with one subclass per pairing, and with a bridge</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="three-by-three" selected>Three kinds of guide on three players; a fourth player arrives</option><option value="five-players">The same guides on five players; a fourth kind of guide arrives</option></select>
@@ -1504,12 +1546,16 @@
           <div class="kpi"><span>A new variant: classes added by composition</span><strong id="gclAddCompose">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The difference that matters is in the last two tiles. A fourth player, a web page say, adds 3 classes under subclassing <span data-say="10 goes to 13">(10 → 13)</span>, one for each kind of guide, and 1 class under the bridge <span data-say="8 goes to 9">(8 → 9)</span>; neither design edits an existing class for it. The preset <code>five-players</code> grows the player side to five, and asks what one new kind of guide costs: <span data-say="3 times 5 equals 15">3 × 5 = 15</span> pairings, 16 classes against (3 + 1) + (5 + 1) = 10, a ratio of 1.6, and a new guide adds 5 subclasses <span data-say="16 goes to 21">(16 → 21)</span> against <span data-say="1 10 goes to 11">1 (10 → 11)</span>. The subclass count is the product of the variant counts and the bridge's is their sum, so the gap widens as either side grows. The lab counts the flattest possible single hierarchy; the book's own picture of the proliferation has intermediate classes too, which only adds to it.</p><p>None of that says the museum should build a bridge. With one player planned and no second in sight, the separate Implementor is the degenerate case the authors describe, worth it only if clients must be shielded from changes. The count shows what happens if both sides grow; whether they will is the design question.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, notice, ready, reminder, returned, overdue. line 2, channel, sms, email, app" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">notice, ready, reminder, returned, overdue;</span>
+<span class="cl">channel, sms, email, app</span></code></pre><p>A parcel locker sends four kinds of notice through three channels. By hand, give the classes under one subclass per pairing and under a bridge of notices holding a channel, and the classes a fourth channel adds to each. Type the records into the lab, with the channel as the aspect that gains a variant, to check.</p><p>Bridge and Adapter both forward to another object; the Discussion of Structural Patterns, at the end of this course, sets them side by side. The next lesson, Composite, turns from two hierarchies to one recursive structure.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether a hierarchy wants a bridge</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the two ways the class varies</h3><p>Write down what clients see varying (the kinds of abstraction) and what the platform or mechanism varies (the implementations). If only one of them varies, there is nothing to bridge.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count both designs</h3><p>Multiply the variant counts and add one for the subclass-per-pairing design; add the variant counts and one abstract class per side for the bridge.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the implementor&#x27;s primitives</h3><p>List the few operations every implementation must supply, and check that each abstraction's operations can be written from them alone.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Take a class in your code that has grown subclasses for two concerns at once and write its aspects as records. Count the classes now and after one new variant on each side, and say which side you expect to grow.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding whether a hierarchy wants a bridge</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>Find the two ways the class varies.</strong> Write down what clients see varying (the kinds of abstraction) and what the platform or mechanism varies (the implementations). If only one of them varies, there is nothing to bridge.</li><li><strong>Count both designs.</strong> Multiply the variant counts and add one for the subclass-per-pairing design; add the variant counts and one abstract class per side for the bridge.</li><li><strong>Write the implementor&#x27;s primitives.</strong> List the few operations every implementation must supply, and check that each abstraction's operations can be written from them alone.</li><li><strong>Do it on a design of your own.</strong> Take a class in your code that has grown subclasses for two concerns at once and write its aspects as records. Count the classes now and after one new variant on each side, and say which side you expect to grow.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1527,17 +1573,16 @@ new player, subclassing: 3 guides, 10 → 13
 new player, bridge: 1 class, 8 → 9</div><p>Under subclassing the new player is paid for once per kind of guide; under the bridge it is one ConcreteImplementor, and every guide can use it at once.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading Bridge as Adapter under another name</strong><span>Both put a reference to another object behind an interface, and the Related Patterns section says the structures are similar. Bridge is designed in up front so that an abstraction and its implementations can both grow; Adapter is fitted later to make two existing interfaces meet. On the lesson's illustration the lab counts what a bridge buys when both sides grow; an adapter answers a different question.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making the implementor mirror the abstraction</strong><span>The Implementor's interface need not match the Abstraction's, and the authors expect it to be smaller: primitives that every platform can supply, from which the abstraction builds its higher-level operations. Copying the abstraction's operations into it pushes the abstraction's logic into every implementation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Building a bridge for a hierarchy that varies one way</strong><span>If there is one implementation and none in prospect, the separation buys only insulation from recompiling, which the authors grant as the degenerate case. The lab's counts are equal or worse for a bridge when one side has a single variant; it is growth on both sides that the pattern pays for.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a hierarchy&#x27;s classes with and without a bridge.</strong><p>Given the variants on each side, state the classes under one subclass per pairing and under two hierarchies, what one new variant on either side adds, and the consequences the authors claim for the separation.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts classes as products and sums. It cannot tell you whether both sides of your design will grow, or whether the implementation must be chosen at run time; those are the questions Applicability asks, and they decide whether the second hierarchy is worth having.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading Bridge as Adapter under another name</strong><span>Both put a reference to another object behind an interface, and the Related Patterns section says the structures are similar. Bridge is designed in up front so that an abstraction and its implementations can both grow; Adapter is fitted later to make two existing interfaces meet. On the lesson's illustration the lab counts what a bridge buys when both sides grow; an adapter answers a different question.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making the implementor mirror the abstraction</strong><span>The Implementor's interface need not match the Abstraction's, and the authors expect it to be smaller: primitives that every platform can supply, from which the abstraction builds its higher-level operations. Copying the abstraction's operations into it pushes the abstraction's logic into every implementation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Building a bridge for a hierarchy that varies one way</strong><span>If there is one implementation and none in prospect, the separation buys only insulation from recompiling, which the authors grant as the degenerate case. The lab's counts are equal or worse for a bridge when one side has a single variant; it is growth on both sides that the pattern pays for.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count a hierarchy&#x27;s classes with and without a bridge.</strong><p>Given the variants on each side, state the classes under one subclass per pairing and under two hierarchies, what one new variant on either side adds, and the consequences the authors claim for the separation.</p></div></div><div class="note"><strong>Note:</strong> The lab counts classes as products and sums. It cannot tell you whether both sides of your design will grow, or whether the implementation must be chosen at run time; those are the questions Applicability asks, and they decide whether the second hierarchy is worth having.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Abstraction and RefinedAbstraction</summary><p>The interface clients use, which holds a reference to an implementor and carries out its operations through it; refined abstractions are its subclasses, extending what it offers. Here, the kinds of guide.</p></details><details class="recall"><summary>Implementor and ConcreteImplementor</summary><p>The interface for the implementation classes, usually a few primitive operations that the abstraction builds its higher-level ones from; it need not match the abstraction's interface. Its concrete classes are one per platform. Here, the players.</p></details><details class="recall"><summary>Proliferation of classes</summary><p>What a single hierarchy produces when a class varies in two ways: one subclass for every pairing, so every new kind on one side means a class for each variant on the other. Rumbaugh's name for such a hierarchy, which the book cites, is nested generalizations.</p></details></div>
+      <h3>Summary</h3>
       <p>Bridge separates what an object offers its clients from the platform-specific code that carries it out, so that the two can be extended on their own. Read the pattern, then count the classes a museum audio guide needs with one subclass for every kind of guide on every player, and with a guide hierarchy holding a player, and what one new player adds to each.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Abstraction and RefinedAbstraction.</strong> The interface clients use, which holds a reference to an implementor and carries out its operations through it; refined abstractions are its subclasses, extending what it offers. Here, the kinds of guide.</li><li><strong>Implementor and ConcreteImplementor.</strong> The interface for the implementation classes, usually a few primitive operations that the abstraction builds its higher-level ones from; it need not match the abstraction's interface. Its concrete classes are one per platform. Here, the players.</li><li><strong>Proliferation of classes.</strong> What a single hierarchy produces when a class varies in two ways: one subclass for every pairing, so every new kind on one side means a class for each variant on the other. Rumbaugh's name for such a hierarchy, which the book cites, is nested generalizations.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="abstraction and implementation, apart. two hierarchies joined by a reference. subclass per pair, a product of counts. two hierarchies, a sum of counts. A new player, one class, not one per guide. the implementor offers primitives. designed in up front, not fitted later" tabindex="0" role="region" aria-label="Mathematical notation">abstraction and implementation, apart
 two hierarchies joined by a reference
 subclass per pair: a product of counts
@@ -2314,11 +2359,40 @@ designed in up front, not fitted later</div><figcaption>Bridge in seven lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2386,7 +2460,7 @@ designed in up front, not fitted later</div><figcaption>Bridge in seven lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

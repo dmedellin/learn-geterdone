@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns I: Requests, Languages and Traversal</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Chain of Responsibility</h1>
       <p class="lesson-lede">A request passed along a line of candidate handlers until one takes it, so the sender never needs to know which object will.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Behavioral pattern</li><li>Implicit receiver</li><li>Successor</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s opening, then the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request.&rdquo; That is the first sentence of Chain of Responsibility's Intent, the pattern that opens the catalog's Chapter 5, Behavioral Patterns. This lesson reads the chapter's short introduction and then the pattern, section by section. Read both in your own copy first; the book's own samples, here as everywhere, are in C++ and Smalltalk, and the sketches below are Java written for the lesson.</p><p>The introduction says what the chapter's eleven patterns share. They are about algorithms and the division of responsibility between objects, and so about the way objects talk to each other: control flow that is hard to follow when the program runs is described instead as a pattern of connections. Two of them are class patterns, which use inheritance: Template Method, an algorithm written once with steps a subclass fills in, and Interpreter, which turns the rules of a language into classes. The rest are object patterns. Mediator puts one object between peers that would otherwise know each other; Chain of Responsibility loosens the coupling further; Observer keeps dependents informed of a change; and Strategy, Command, State, Visitor and Iterator each wrap a piece of behaviour in an object and delegate to it. The chapter runs in alphabetical order, and this course reads its first six patterns.</p><p>The pattern's motivating example is context-sensitive help in a user interface. A user clicks on some part of a window for help; if that part has none of its own, the help should come from whatever encloses it, and so on outwards to the application. The button that receives the click cannot know which object will answer. So every candidate shares one interface for handling the request and knows its successor, and the request moves outwards from the most specific candidate until one of them deals with it.</p><p>Stated as you would apply it: a Handler declares the operation that handles a request and, usually, holds the link to the next handler; each ConcreteHandler takes the requests it is responsible for and passes every other one to its successor; the Client sends the request to a handler on the chain, normally the first, and knows no more than that. The default implementation in the Handler simply forwards, so a subclass with no interest in a request need not mention it.</p><pre class="codeblock" data-say="line 1, abstract class desk handler. line 2, private final desk handler next, comment, null at the end of the chain. line 3, desk handler of desk handler next this dot next is set to next. line 4, comment, The default passes the request on a subclass overrides it.. line 5, string handle of request r. line 6, if next is not equal to null. line 7, return next dot handle of r. line 9, return unhandled plus r dot topic, comment, fell off the end. line 12, final class kiosk extends desk handler. line 13, kiosk of desk handler next super of next. line 14, at override string handle of request r. line 15, if r dot topic dot equals of renew. line 16, return kiosk renewed plus r dot item id. line 18, return super dot handle of r" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">abstract class DeskHandler {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s opening, then the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request.&rdquo; That is the first sentence of Chain of Responsibility's Intent, the pattern that opens the catalog's Chapter 5, Behavioral Patterns. This lesson reads the chapter's short introduction and then the pattern, section by section. Read both in your own copy first; the book's own samples, here as everywhere, are in C++ and Smalltalk, and the sketches below are Java written for the lesson.</p><p>The introduction says what the chapter's eleven patterns share. They are about algorithms and the division of responsibility between objects, and so about the way objects talk to each other: control flow that is hard to follow when the program runs is described instead as a pattern of connections. Two of them are class patterns, which use inheritance: Template Method, an algorithm written once with steps a subclass fills in, and Interpreter, which turns the rules of a language into classes. The rest are object patterns. Mediator puts one object between peers that would otherwise know each other; Chain of Responsibility loosens the coupling further; Observer keeps dependents informed of a change; and Strategy, Command, State, Visitor and Iterator each wrap a piece of behaviour in an object and delegate to it. The chapter runs in alphabetical order, and this course reads its first six patterns.</p><p>The pattern's motivating example is context-sensitive help in a user interface. A user clicks on some part of a window for help; if that part has none of its own, the help should come from whatever encloses it, and so on outwards to the application. The button that receives the click cannot know which object will answer. So every candidate shares one interface for handling the request and knows its successor, and the request moves outwards from the most specific candidate until one of them deals with it.</p><p>Stated as you would apply it: a Handler declares the operation that handles a request and, usually, holds the link to the next handler; each ConcreteHandler takes the requests it is responsible for and passes every other one to its successor; the Client sends the request to a handler on the chain, normally the first, and knows no more than that. The default implementation in the Handler simply forwards, so a subclass with no interest in a request need not mention it.</p><pre class="codeblock" data-say="line 1, abstract class desk handler. line 2, private final desk handler next, comment, null at the end of the chain. line 3, desk handler of desk handler next this dot next is set to next. line 4, comment, The default passes the request on a subclass overrides it.. line 5, string handle of request r. line 6, if next is not equal to null. line 7, return next dot handle of r. line 9, return unhandled plus r dot topic, comment, fell off the end. line 12, final class kiosk extends desk handler. line 13, kiosk of desk handler next super of next. line 14, at override string handle of request r. line 15, if r dot topic dot equals of renew. line 16, return kiosk renewed plus r dot item id. line 18, return super dot handle of r" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">abstract class DeskHandler {</span>
 <span class="cl">    private final DeskHandler next;     // null at the end of the chain</span>
 <span class="cl">    DeskHandler(DeskHandler next) { this.next = next; }</span>
 <span class="cl">    // The default passes the request on; a subclass overrides it.</span>
@@ -1469,17 +1513,11 @@
 <span class="cl">DeskHandler desk = new Desk(librarian);</span>
 <span class="cl">DeskHandler head = new Kiosk(desk);</span>
 <span class="cl"></span>
-<span class="cl">String reply = head.handle(new Request(&quot;hold&quot;, &quot;B-2291&quot;));</span></code></pre><p>The consequences cut both ways, and the book states both. Coupling is reduced: the sender and the receiver know nothing of each other, and a handler keeps one reference, to its successor, instead of references to every candidate. Responsibilities can be added or moved by changing the chain while the program runs. The liability is that receipt is not guaranteed: with no explicit receiver, a request can reach the end of the chain unhandled, and a chain built wrongly drops requests it was meant to serve.</p><p>Among the implementation issues, two matter most here. The successor links can be new fields, as in the sketch, or existing references, such as a part's parent in a Composite, which saves space when the existing structure is the chain you want. And requests can be represented three ways: as a fixed operation per kind of request, which is safe but closed; as one operation taking a request code, which is open-ended but needs conditional dispatch and parameters packed by hand; or as request objects, one class per kind, that carry their own parameters. The book's Sample Code builds the help example with a help-topic handler class; its Known Uses are the event handlers of several 1990s class libraries (NeXT's AppKit calls the class Responder) and graphical update in ET++. Its Related Patterns section names Composite, whose parent links often form the chain.</p><p>Now the lab, on a public library's help desk. The preset <code>library</code> has three handlers in chain order: a self-service kiosk that renews loans; the desk, which renews, places holds and takes fines; and a librarian, who places holds, arranges inter-library loans (<code>ill</code>) and deals with lost items. Nine requests are sent to the kiosk. The lab reports 7 of 9 handled: the kiosk takes 2, the desk 3 and the librarian 2, so the desk is the busiest handler. Requests are passed on 11 times in all, a request taken by the k-th handler having been passed k − 1 times. Two requests, the donations at positions 6 and 9, are taken by nobody: each is passed on twice and falls off the end. That is the liability in a number.</p><p>The preset <code>library-manager</code> adds a manager who takes everything (<code>all</code>) at the end of the chain. Now 9 of 9 are handled and nothing is unhandled; the two donations each travel three hops to reach the manager, so the hops rise to 13. A catch-all handler is one answer to the guarantee the pattern does not give. The preset <code>library-desk-first</code> keeps the first three handlers and puts the desk ahead of the kiosk. The kiosk now takes nothing, because every renewal stops at the desk, which takes 5; the hops fall to 8. The order of the chain decides who does the work, and the sender cannot see it.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, handlers, in chain order. line 2, counter, small. line 3, baker, small, custom, large. line 4, owner, custom, wholesale. line 5, comment, requests, in the order sent. line 6, large custom wholesale small refund custom" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// handlers, in chain order</span>
-<span class="cl">counter, small;</span>
-<span class="cl">baker, small, custom, large;</span>
-<span class="cl">owner, custom, wholesale</span>
-<span class="cl">// requests, in the order sent</span>
-<span class="cl">large custom wholesale small refund custom</span></code></pre><p>A bakery's order line, in the lab's form. By hand, trace each of the six requests from the counter onwards: who takes it and how many times it was passed on. Give the total hops, the handled count and the unhandled requests, then type the records into the lab to check. Then move the owner to the front and say which handler loses work.</p><p>A request here is only a topic word. The next lesson, Command, makes the request itself an object that can be stored, queued and undone.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Requests in motion</h2></div><p>which handler takes each request, and how far it travels</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">String reply = head.handle(new Request(&quot;hold&quot;, &quot;B-2291&quot;));</span></code></pre><p>The consequences cut both ways, and the book states both. Coupling is reduced: the sender and the receiver know nothing of each other, and a handler keeps one reference, to its successor, instead of references to every candidate. Responsibilities can be added or moved by changing the chain while the program runs. The liability is that receipt is not guaranteed: with no explicit receiver, a request can reach the end of the chain unhandled, and a chain built wrongly drops requests it was meant to serve.</p><p>Among the implementation issues, two matter most here. The successor links can be new fields, as in the sketch, or existing references, such as a part's parent in a Composite, which saves space when the existing structure is the chain you want. And requests can be represented three ways: as a fixed operation per kind of request, which is safe but closed; as one operation taking a request code, which is open-ended but needs conditional dispatch and parameters packed by hand; or as request objects, one class per kind, that carry their own parameters. The book's Sample Code builds the help example with a help-topic handler class; its Known Uses are the event handlers of several 1990s class libraries (NeXT's AppKit calls the class Responder) and graphical update in ET++. Its Related Patterns section names Composite, whose parent links often form the chain.</p><p>Now the lab, on a public library's help desk. The preset <code>library</code> has three handlers in chain order: a self-service kiosk that renews loans; the desk, which renews, places holds and takes fines; and a librarian, who places holds, arranges inter-library loans (<code>ill</code>) and deals with lost items. Nine requests are sent to the kiosk. The lab reports 7 of 9 handled: the kiosk takes 2, the desk 3 and the librarian 2, so the desk is the busiest handler. Requests are passed on 11 times in all, a request taken by the k-th handler having been passed k − 1 times. Two requests, the donations at positions 6 and 9, are taken by nobody: each is passed on twice and falls off the end. That is the liability in a number.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Requests in motion</h2></div><p>which handler takes each request, and how far it travels</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Requests in motion</strong><span>which handler takes each request, and how far it travels</span></div>
       </div>
@@ -1487,10 +1525,10 @@
       <div class="table-wrap" id="grtTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="grtTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Every request goes to the head of the chain, and each handler in turn either takes it, if its topic is one the handler lists (a handler listing all takes every request, one listing - takes none), or passes it to the next. A request taken by the k-th handler is passed on k − 1 times; one no handler takes is passed along the whole chain, n − 1 times for n handlers, and falls off the end. Unhandled requests are listed in the order sent, with their position. The busiest handler takes the most requests; a tie goes to the one first in the chain, and the status line names the others.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Requests down a chain of handlers</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Requests down a chain of handlers</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="grtPreset">Worked example</label>
           <select id="grtPreset"><option value="library" selected>A library help desk: kiosk, desk, librarian</option><option value="library-manager">The same chain with a manager who takes everything</option><option value="library-desk-first">The desk moved ahead of the kiosk</option></select>
@@ -1512,12 +1550,20 @@
           <div class="kpi"><span>The busiest handler</span><strong id="grtBusiest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>library-manager</code> adds a manager who takes everything (<code>all</code>) at the end of the chain. Now 9 of 9 are handled and nothing is unhandled; the two donations each travel three hops to reach the manager, so the hops rise to 13. A catch-all handler is one answer to the guarantee the pattern does not give. The preset <code>library-desk-first</code> keeps the first three handlers and puts the desk ahead of the kiosk. The kiosk now takes nothing, because every renewal stops at the desk, which takes 5; the hops fall to 8. The order of the chain decides who does the work, and the sender cannot see it.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, handlers, in chain order. line 2, counter, small. line 3, baker, small, custom, large. line 4, owner, custom, wholesale. line 5, comment, requests, in the order sent. line 6, large custom wholesale small refund custom" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// handlers, in chain order</span>
+<span class="cl">counter, small;</span>
+<span class="cl">baker, small, custom, large;</span>
+<span class="cl">owner, custom, wholesale</span>
+<span class="cl">// requests, in the order sent</span>
+<span class="cl">large custom wholesale small refund custom</span></code></pre><p>A bakery's order line, in the lab's form. By hand, trace each of the six requests from the counter onwards: who takes it and how many times it was passed on. Give the total hops, the handled count and the unhandled requests, then type the records into the lab to check. Then move the owner to the front and say which handler loses work.</p><p>A request here is only a topic word. The next lesson, Command, makes the request itself an object that can be stored, queued and undone.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Tracing a chain by hand</h2></div><p>Four steps, the last of them on a chain of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the chain in order</h3><p>List the handlers from the head of the chain to its end, each with the kinds of request it takes. A handler that takes everything goes last, or nothing after it is ever reached.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Walk each request</h3><p>Start every request at the head. At each handler, ask whether it takes that kind; if not, pass it on and count one hop. A request taken by the k-th handler has made k − 1 hops.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Mark what falls off the end</h3><p>A request no handler takes has been passed on by every handler but the last and is then dropped. List each one with its position; that list is what the pattern does not guarantee.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a chain of your own</h3><p>Take a chain you know: servlet filters, middleware in a web framework, an escalation rota, a logger hierarchy. Write its handlers in order with what each takes, send it five requests, and say which request reaches the end and what the system does then.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Tracing a chain by hand</h2>
+      <p class="lead-in">Four steps, the last of them on a chain of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the chain in order.</strong> List the handlers from the head of the chain to its end, each with the kinds of request it takes. A handler that takes everything goes last, or nothing after it is ever reached.</li><li><strong>Walk each request.</strong> Start every request at the head. At each handler, ask whether it takes that kind; if not, pass it on and count one hop. A request taken by the k-th handler has made k − 1 hops.</li><li><strong>Mark what falls off the end.</strong> A request no handler takes has been passed on by every handler but the last and is then dropped. List each one with its position; that list is what the pattern does not guarantee.</li><li><strong>Do it on a chain of your own.</strong> Take a chain you know: servlet filters, middleware in a web framework, an escalation rota, a logger hierarchy. Write its handlers in order with what each takes, send it five requests, and say which request reaches the end and what the system does then.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1538,17 +1584,16 @@ hops: 0 + 0 + 1 + 1 + 1 + 2 + 2 + 2 + 2, so 11
 handled 7 of 9; the desk takes 3</div><p>The lab's figures are these. A catch-all at the end turns the two donations into two handled requests of three hops each, which is the preset <code>library-manager</code>'s 13.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming every request sent down a chain gets handled</strong><span>The authors list it as a liability: the request has no explicit receiver, so nothing guarantees one takes it, and a misconfigured chain drops requests silently. On the lesson's illustration two donations are passed on twice and then lost; a handler that takes everything at the end is one way to make receipt certain, and deciding what it should do is a design question the count does not answer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the catch-all handler anywhere but last</strong><span>A handler that takes every request stops every request, so any handler after it is never reached. Put a general handler at the end of the chain, the way the book's help example ends with the application.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the chain as the sender&#x27;s choice</strong><span>The sender picks only where the request starts. Which handler takes it depends on the order of the chain, which can change at run time: moving the desk ahead of the kiosk takes all the renewals from the kiosk, with no change to any sender.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace requests down a chain and say what it costs.</strong><p>Given a chain and a stream of requests, name the handler that takes each, total the hops, list the unhandled requests, and state the pattern's two benefits and its liability in the authors' terms.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts hops and handlers on the chain stated. It cannot tell whether a request should have a known receiver after all, what an unhandled request ought to do, or whether a chain is the right shape for your handlers; those are the judgements the pattern's Applicability asks you to make.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming every request sent down a chain gets handled</strong><span>The authors list it as a liability: the request has no explicit receiver, so nothing guarantees one takes it, and a misconfigured chain drops requests silently. On the lesson's illustration two donations are passed on twice and then lost; a handler that takes everything at the end is one way to make receipt certain, and deciding what it should do is a design question the count does not answer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting the catch-all handler anywhere but last</strong><span>A handler that takes every request stops every request, so any handler after it is never reached. Put a general handler at the end of the chain, the way the book's help example ends with the application.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the chain as the sender&#x27;s choice</strong><span>The sender picks only where the request starts. Which handler takes it depends on the order of the chain, which can change at run time: moving the desk ahead of the kiosk takes all the renewals from the kiosk, with no change to any sender.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace requests down a chain and say what it costs.</strong><p>Given a chain and a stream of requests, name the handler that takes each, total the hops, list the unhandled requests, and state the pattern's two benefits and its liability in the authors' terms.</p></div></div><div class="note"><strong>Note:</strong> The lab counts hops and handlers on the chain stated. It cannot tell whether a request should have a known receiver after all, what an unhandled request ought to do, or whether a chain is the right shape for your handlers; those are the judgements the pattern's Applicability asks you to make.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Behavioral pattern</summary><p>A pattern about algorithms and about which object is responsible for what, and so about how objects communicate. Class patterns of this kind spread behaviour over a hierarchy by inheritance (Template Method, Interpreter); object patterns spread it over objects joined by composition (the other nine).</p></details><details class="recall"><summary>Implicit receiver</summary><p>The object that will in the end deal with a request, unknown to the object that sends it. The sender holds a reference to the first handler only, and which handler takes the request is settled as it travels.</p></details><details class="recall"><summary>Successor</summary><p>The next handler on the chain, the one a handler passes a request to when it does not take it itself. The link may be a field added for the purpose or a reference the design already has, such as a part's parent.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 5 opens with what behavioral patterns are, and its first pattern sends a request along a chain of objects that might handle it. Read how the chain decouples the sender from the receiver and what it costs, then send a library help desk's requests down a chain of handlers and count who takes each, how often each is passed on, and which fall off the end.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Behavioral pattern.</strong> A pattern about algorithms and about which object is responsible for what, and so about how objects communicate. Class patterns of this kind spread behaviour over a hierarchy by inheritance (Template Method, Interpreter); object patterns spread it over objects joined by composition (the other nine).</li><li><strong>Implicit receiver.</strong> The object that will in the end deal with a request, unknown to the object that sends it. The sender holds a reference to the first handler only, and which handler takes the request is settled as it travels.</li><li><strong>Successor.</strong> The next handler on the chain, the one a handler passes a request to when it does not take it itself. The link may be a field added for the purpose or a reference the design already has, such as a part's parent.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the sender knows only the head of the chain. each handler takes it or passes it on. a request has an implicit receiver. order decides who takes a request. receipt is not guaranteed. a last handler that takes all guarantees it" tabindex="0" role="region" aria-label="Mathematical notation">the sender knows only the head of the chain
 each handler takes it or passes it on
 a request has an implicit receiver
@@ -2327,11 +2372,40 @@ a last handler that takes all guarantees it</div><figcaption>Chain of Responsibi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2399,7 +2473,7 @@ a last handler that takes all guarantees it</div><figcaption>Chain of Responsibi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

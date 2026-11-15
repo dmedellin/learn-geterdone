@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Concurrency and Session State</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 16 · Offline Concurrency Patterns</p>
       <h1>Optimistic Offline Lock</h1>
       <p class="lesson-lede">A version number in every row, checked and moved on by the update itself, turns a lost update into a failed save the caller can see.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Business transaction across system transactions</li><li>Version number</li><li>Checking a read</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the replay</h2>
-      <article class="prose reading"><p>&ldquo;Optimistic concurrency management is appropriate when the chance of conflict between any two business transactions is low.&rdquo; The words are David Rice's, from When to Use It in his Optimistic Offline Lock, the first pattern of Chapter 16 in Fowler's book. A pattern is a tool to look up rather than an argument to follow, and this lesson reads it that way: the problem, how it works, and when to use it. Read it in your own copy first.</p><p>You have probably written a save that writes whatever the form sent back: an <span class="math" data-say="update">UPDATE</span> that sets the new total on the row with the invoice's id. Two clerks open the invoice, both change it, and the second save wins without anyone learning that the first one happened. That is Chapter 5's lost update, now spread across requests. Rice's opening states the problem: once a business transaction runs across a series of system transactions, the database alone cannot keep the record data consistent, and lost updates and inconsistent reads become likely.</p><p>The pattern validates, before committing, that a session's changes do not conflict with another session's. Rice likens a check that passes to obtaining a lock, one that holds only within the system transaction that makes the changes. The usual way is a version number in each record. The session keeps the version it loaded with the rest of its state, and at commit compares it with the version in the database; if they match, the changes and an increment of the version are committed together, and any session still holding the old number can no longer get the lock.</p><p>With a relational database the comparison goes into the criteria of every <span class="math" data-say="update">UPDATE</span> and <span class="math" data-say="delete">DELETE</span>, so one statement both takes the lock and changes the row. The session then reads the row count: 1 means success, 0 means someone changed or deleted the record first, so the session rolls back its system transaction and then gives up or resolves the conflict and tries again. Rice also suggests recording who changed a record and when, so that the user can be told; but he warns against checking with the modification time instead of a version count, since the clocks of different machines cannot be trusted to agree. A <span class="math" data-say="where">WHERE</span> that compares every field is an alternative where no version column can be added.</p><p>Most implementations stop at the version in <span class="math" data-say="update">UPDATE</span> and <span class="math" data-say="delete">DELETE</span>, Rice says, and that misses the inconsistent read. His illustration is a session that computes a charge from a value held in another record while a second session changes that record; the first session wrote nothing there, so no check fires. The remedy is to check the version of what was read as well, by adding it to the change set or keeping a separate list of records to check. Rereading a version works only at repeatable read or stronger; below that the version must be incremented. Sometimes checking a condition rather than a version is enough, and sometimes a Coarse-Grained Lock or a long transaction is the simpler answer.</p><p>Two further points close How It Works. Whether a changed record really is a conflict is a business question as much as a technical one, and two sessions adding to one collection may break a rule that the usual version check does not see. And a good merge makes the pattern far stronger, as source code control shows, though a business system may need hundreds of kinds of merge. When to Use It then gives the quotation's condition: when conflicts are likely, announcing one only as the user finishes drives users away, and Pessimistic Offline Lock suits. Rice still makes the optimistic lock the default, and asks you to look for where it alone is not enough.</p><p>The snippet is a save with the check built in. The <span class="math" data-say="update">UPDATE</span> on lines 5 and 6 sets the new total and moves the version on, but only for the row whose id and version both match. The three <span class="math" data-say="set">set</span> calls fill the three question marks in order, and <span class="math" data-say="execute update">executeUpdate</span> returns the number of rows changed. Line 10 turns that count into the answer: true for one row, false for none, and false is the caller's signal to reload the invoice and let the user try again. The snippet leaves the system transaction around it, closing the statement and moving its own copy of the version on after a save, to its caller.</p><pre class="codeblock" data-say="line 1, comment, Saves only if nobody has changed the row since it was read false. line 2, comment, tells the caller to reload the invoice and let the user try again.. line 3, boolean try save of connection db, invoice inv throws SQL exception. line 4, prepared statement s is set to db dot prepare statement. line 5, string, update invoice set total equals placeholder, version equals version plus 1. line 6, plus the string, where id equals placeholder and version equals placeholder. line 7, s dot set long of 1, inv dot total. line 8, s dot set long of 2, inv dot id. line 9, s dot set int of 3, inv dot version. line 10, return s dot execute update equals 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Saves only if nobody has changed the row since it was read; false</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the replay</h2><div class="prose reading"><p>&ldquo;Optimistic concurrency management is appropriate when the chance of conflict between any two business transactions is low.&rdquo; The words are David Rice's, from When to Use It in his Optimistic Offline Lock, the first pattern of Chapter 16 in Fowler's book. A pattern is a tool to look up rather than an argument to follow, and this lesson reads it that way: the problem, how it works, and when to use it. Read it in your own copy first.</p><p>You have probably written a save that writes whatever the form sent back: an <span class="math" data-say="update">UPDATE</span> that sets the new total on the row with the invoice's id. Two clerks open the invoice, both change it, and the second save wins without anyone learning that the first one happened. That is Chapter 5's lost update, now spread across requests. Rice's opening states the problem: once a business transaction runs across a series of system transactions, the database alone cannot keep the record data consistent, and lost updates and inconsistent reads become likely.</p><p>The pattern validates, before committing, that a session's changes do not conflict with another session's. Rice likens a check that passes to obtaining a lock, one that holds only within the system transaction that makes the changes. The usual way is a version number in each record. The session keeps the version it loaded with the rest of its state, and at commit compares it with the version in the database; if they match, the changes and an increment of the version are committed together, and any session still holding the old number can no longer get the lock.</p><p>With a relational database the comparison goes into the criteria of every <span class="math" data-say="update">UPDATE</span> and <span class="math" data-say="delete">DELETE</span>, so one statement both takes the lock and changes the row. The session then reads the row count: 1 means success, 0 means someone changed or deleted the record first, so the session rolls back its system transaction and then gives up or resolves the conflict and tries again. Rice also suggests recording who changed a record and when, so that the user can be told; but he warns against checking with the modification time instead of a version count, since the clocks of different machines cannot be trusted to agree. A <span class="math" data-say="where">WHERE</span> that compares every field is an alternative where no version column can be added.</p><p>Most implementations stop at the version in <span class="math" data-say="update">UPDATE</span> and <span class="math" data-say="delete">DELETE</span>, Rice says, and that misses the inconsistent read. His illustration is a session that computes a charge from a value held in another record while a second session changes that record; the first session wrote nothing there, so no check fires. The remedy is to check the version of what was read as well, by adding it to the change set or keeping a separate list of records to check. Rereading a version works only at repeatable read or stronger; below that the version must be incremented. Sometimes checking a condition rather than a version is enough, and sometimes a Coarse-Grained Lock or a long transaction is the simpler answer.</p><p>Two further points close How It Works. Whether a changed record really is a conflict is a business question as much as a technical one, and two sessions adding to one collection may break a rule that the usual version check does not see. And a good merge makes the pattern far stronger, as source code control shows, though a business system may need hundreds of kinds of merge. When to Use It then gives the quotation's condition: when conflicts are likely, announcing one only as the user finishes drives users away, and Pessimistic Offline Lock suits. Rice still makes the optimistic lock the default, and asks you to look for where it alone is not enough.</p><p>The snippet is a save with the check built in. The <span class="math" data-say="update">UPDATE</span> on lines 5 and 6 sets the new total and moves the version on, but only for the row whose id and version both match. The three <span class="math" data-say="set">set</span> calls fill the three question marks in order, and <span class="math" data-say="execute update">executeUpdate</span> returns the number of rows changed. Line 10 turns that count into the answer: true for one row, false for none, and false is the caller's signal to reload the invoice and let the user try again. The snippet leaves the system transaction around it, closing the statement and moving its own copy of the version on after a save, to its caller.</p><pre class="codeblock" data-say="line 1, comment, Saves only if nobody has changed the row since it was read false. line 2, comment, tells the caller to reload the invoice and let the user try again.. line 3, boolean try save of connection db, invoice inv throws SQL exception. line 4, prepared statement s is set to db dot prepare statement. line 5, string, update invoice set total equals placeholder, version equals version plus 1. line 6, plus the string, where id equals placeholder and version equals placeholder. line 7, s dot set long of 1, inv dot total. line 8, s dot set long of 2, inv dot id. line 9, s dot set int of 3, inv dot version. line 10, return s dot execute update equals 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Saves only if nobody has changed the row since it was read; false</span>
 <span class="cl">// tells the caller to reload the invoice and let the user try again.</span>
 <span class="cl">boolean trySave(Connection db, Invoice inv) throws SQLException {</span>
 <span class="cl">    PreparedStatement s = db.prepareStatement(</span>
@@ -1455,20 +1499,11 @@
 <span class="cl">    s.setLong(2, inv.id());</span>
 <span class="cl">    s.setInt(3, inv.version());</span>
 <span class="cl">    return s.executeUpdate() == 1;</span>
-<span class="cl">}</span></code></pre><p>The lab is the timeline of Optimistic and Pessimistic Control with the scheme set to optimistic. In <code>two-clerks</code> Kim reads the invoice at minute 0, at version 0. Lee reads it at 1, edits at 2 and commits at 3, moving it to version 1. Kim edits at 4 and saves at 20, and her update matches no row. The lab prints &ldquo;1: lee&rdquo; committed, &ldquo;1: kim&rdquo; in conflict, and 20 minutes redone, from her read at minute 0 to the failed save. The table's version on each read or edit row is the record's version at that minute; what the session holds is the version at its first read or edit, which is why Kim's edit row shows 1 while she still holds the 0 she read.</p><p>The other two presets share a timeline: Kim reads a discount and edits a quote computed from it at minute 0, Lee edits the discount at 1 and commits at 2, and Kim commits at 6. The last control, which checks the records only read, makes the difference. In <code>inconsistent-read</code> it is set to no: the lab prints &ldquo;2: lee, kim&rdquo; committed, &ldquo;0: none&rdquo; in conflict and 0 minutes redone. Both saves succeed, and Kim's quote is built on a discount that no longer exists. In <code>check-the-read</code> it is set to yes: &ldquo;1: lee&rdquo; committed, &ldquo;1: kim&rdquo; in conflict, 6 minutes redone.</p><p>Both of the pattern's limits are in those figures. A version check on what a session writes catches the clerks' collision and misses the discount, which only a check on reads finds. And the check finds a conflict at the last possible moment: on the lesson's illustration Kim loses twenty minutes in one case and six in the other. The pattern is cheap to build and costs nothing while conflicts are rare; each conflict is paid for in someone's lost work, which is why Rice makes the chance of conflict the condition for using it.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, ana, read, budget. line 2, 1, ben, read, budget. line 3, 2, ana, edit, budget. line 4, 5, ana, commit, no record. line 5, 6, ben, edit, budget. line 6, 30, ben, commit, no record. line 7, 31, cy, read, budget. line 8, 32, cy, edit, budget. line 9, 40, cy, commit, no record" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, ana, read, budget;</span>
-<span class="cl">1, ben, read, budget;</span>
-<span class="cl">2, ana, edit, budget;</span>
-<span class="cl">5, ana, commit, -;</span>
-<span class="cl">6, ben, edit, budget;</span>
-<span class="cl">30, ben, commit, -;</span>
-<span class="cl">31, cy, read, budget;</span>
-<span class="cl">32, cy, edit, budget;</span>
-<span class="cl">40, cy, commit, -</span></code></pre><p>Three users edit one budget, and the scheme is optimistic. Replay it by hand: for each user, write the version seen and the version at commit, say who commits and whose save fails, and how many minutes of work the failure discards.</p><p>Rice's other answer finds out early instead of late, by refusing the second session at the start. The next lesson, Pessimistic and Coarse-Grained Locks, reads it with the lock that covers a group of records at once.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Concurrency</h2></div><p>sessions under no control, optimistic and pessimistic locking</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The lab is the timeline of Optimistic and Pessimistic Control with the scheme set to optimistic. In <code>two-clerks</code> Kim reads the invoice at minute 0, at version 0. Lee reads it at 1, edits at 2 and commits at 3, moving it to version 1. Kim edits at 4 and saves at 20, and her update matches no row. The lab prints &ldquo;1: lee&rdquo; committed, &ldquo;1: kim&rdquo; in conflict, and 20 minutes redone, from her read at minute 0 to the failed save. The table's version on each read or edit row is the record's version at that minute; what the session holds is the version at its first read or edit, which is why Kim's edit row shows 1 while she still holds the 0 she read.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Concurrency</h2></div><p>sessions under no control, optimistic and pessimistic locking</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Concurrency</strong><span>sessions under no control, optimistic and pessimistic locking</span></div>
       </div>
@@ -1476,10 +1511,10 @@
       <div class="table-wrap" id="olTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="olTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Every group has a version, 0 at the start, and a successful commit adds one to each group the session edited; a record not given a group is its own. A session's first read or edit of a group records the version it saw. None: every commit succeeds, and a lost update is counted for each edited group whose version changed since the session saw it. Optimistic: a commit fails (a conflict) when an edited group has changed since the session saw it; with reads checked, the groups it only read too. Pessimistic: the lock is taken when the record is first loaded for editing, not when the edit begins: at the session's first read or edit of a group it edits anywhere in the timeline (a read of a group it never edits takes none); this is the exclusive write lock, the first of Pessimistic Offline Lock's three. Taking a lock another session holds is refused and ends the session, releasing its locks; a commit releases them. A failed session's later events are skipped. Redo is the minutes from a failed session's first event to its failure.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Version checks at commit</h3>
-          <p>A count over the situation the lesson states. Each event is a minute, a session, an action and a record. Every record has a version from 0, and each commit moves on the versions of what it edited. A commit conflicts when something it edited has moved since the session saw it, and, with reads checked, something it only read. The timelines are illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Version checks at commit</h3>
+            <p>A count over the situation the lesson states. Each event is a minute, a session, an action and a record. Every record has a version from 0, and each commit moves on the versions of what it edited. A commit conflicts when something it edited has moved since the session saw it, and, with reads checked, something it only read. The timelines are illustrative.</p>
         <div class="field">
           <label for="olPreset">Worked example</label>
           <select id="olPreset"><option value="two-clerks" selected>Two clerks save one invoice</option><option value="inconsistent-read">A quote built from a discount Lee changes, reads not checked</option><option value="check-the-read">The same, with the discount's version checked at commit</option></select>
@@ -1509,12 +1544,23 @@
           <div class="kpi"><span>Most locks held at once</span><strong id="olPeakLocks">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The other two presets share a timeline: Kim reads a discount and edits a quote computed from it at minute 0, Lee edits the discount at 1 and commits at 2, and Kim commits at 6. The last control, which checks the records only read, makes the difference. In <code>inconsistent-read</code> it is set to no: the lab prints &ldquo;2: lee, kim&rdquo; committed, &ldquo;0: none&rdquo; in conflict and 0 minutes redone. Both saves succeed, and Kim's quote is built on a discount that no longer exists. In <code>check-the-read</code> it is set to yes: &ldquo;1: lee&rdquo; committed, &ldquo;1: kim&rdquo; in conflict, 6 minutes redone.</p><p>Both of the pattern's limits are in those figures. A version check on what a session writes catches the clerks' collision and misses the discount, which only a check on reads finds. And the check finds a conflict at the last possible moment: on the lesson's illustration Kim loses twenty minutes in one case and six in the other. The pattern is cheap to build and costs nothing while conflicts are rare; each conflict is paid for in someone's lost work, which is why Rice makes the chance of conflict the condition for using it.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, 0, ana, read, budget. line 2, 1, ben, read, budget. line 3, 2, ana, edit, budget. line 4, 5, ana, commit, no record. line 5, 6, ben, edit, budget. line 6, 30, ben, commit, no record. line 7, 31, cy, read, budget. line 8, 32, cy, edit, budget. line 9, 40, cy, commit, no record" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">0, ana, read, budget;</span>
+<span class="cl">1, ben, read, budget;</span>
+<span class="cl">2, ana, edit, budget;</span>
+<span class="cl">5, ana, commit, -;</span>
+<span class="cl">6, ben, edit, budget;</span>
+<span class="cl">30, ben, commit, -;</span>
+<span class="cl">31, cy, read, budget;</span>
+<span class="cl">32, cy, edit, budget;</span>
+<span class="cl">40, cy, commit, -</span></code></pre><p>Three users edit one budget, and the scheme is optimistic. Replay it by hand: for each user, write the version seen and the version at commit, say who commits and whose save fails, and how many minutes of work the failure discards.</p><p>Rice's other answer finds out early instead of late, by refusing the second session at the start. The next lesson, Pessimistic and Coarse-Grained Locks, reads it with the lock that covers a group of records at once.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Replaying an optimistic lock</h2></div><p>Four steps, the last of them on a table of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Record the version at first sight</h3><p>For each session, write the version of each record at its first read or edit. Every record starts at 0.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Move the version on at each commit</h3><p>When a commit succeeds, add one to the version of every record the session edited. A failed commit moves nothing.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check each commit</h3><p>A commit fails if a record it edited, or with reads checked a record it read, is no longer at the version the session saw. Its redo is the minutes from the session's first event to the failed commit.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a table of your own</h3><p>Pick one table in a system you know that two users update. Check whether it has a version column and whether its update's WHERE uses it, and write down what the second of two simultaneous saves does.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Replaying an optimistic lock</h2>
+      <p class="lead-in">Four steps, the last of them on a table of your own.</p>
+      <ol class="key-ideas method"><li><strong>Record the version at first sight.</strong> For each session, write the version of each record at its first read or edit. Every record starts at 0.</li><li><strong>Move the version on at each commit.</strong> When a commit succeeds, add one to the version of every record the session edited. A failed commit moves nothing.</li><li><strong>Check each commit.</strong> A commit fails if a record it edited, or with reads checked a record it read, is no longer at the version the session saw. Its redo is the minutes from the session's first event to the failed commit.</li><li><strong>Do it on a table of your own.</strong> Pick one table in a system you know that two users update. Check whether it has a version column and whether its update's WHERE uses it, and write down what the second of two simultaneous saves does.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1534,17 +1580,16 @@ no row has version 0: zero rows
 Kim redoes 20 − 0, which is 20 minutes</div><p>In the snippet's terms, Lee's executeUpdate returned 1 and Kim's returned 0, so trySave told Kim's caller false. What the caller does next, reload and let Kim redo the work, is the twenty minutes.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a version check catches every conflict</strong><span>It catches a conflict on what the session writes. Rice's point is that most implementations stop there and miss the inconsistent read: a session whose result depends on a record it only read. On the lesson's illustration Kim's quote is computed from a discount Lee changed, and the check passes unless the discount's version is checked too; with the read checked, Kim's save fails.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking optimistic locking costs nothing</strong><span>It costs nothing while nobody conflicts, and then it costs the whole of the failed session's work, discovered at the end. On two-clerks Kim loses twenty minutes. That is why Rice makes a low chance of conflict the condition for the pattern, and points to Pessimistic Offline Lock when a conflict is likely or too expensive.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a zero row count as a database error</strong><span>An update that changes no rows looks like a failure to log and move past. In this pattern it is the lock refusing: another session committed first, and the business transaction must roll back its system transaction and then abort or resolve the conflict and retry. Code that ignores the count has a version column and still loses updates.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can replay an optimistic lock by hand.</strong><p>Given a timeline, state which commits fail their version check, how many minutes of work each failure discards, and what checking the records only read would change.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab checks whole records, as a version column does, and it cannot see a conflict that is only a business rule, such as two sessions each adding to one collection, which Rice notes the usual version check does not prevent. It does not model merging, which would turn a conflict into less lost work. Whether a changed record is a real conflict is a question about your domain.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a version check catches every conflict</strong><span>It catches a conflict on what the session writes. Rice's point is that most implementations stop there and miss the inconsistent read: a session whose result depends on a record it only read. On the lesson's illustration Kim's quote is computed from a discount Lee changed, and the check passes unless the discount's version is checked too; with the read checked, Kim's save fails.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking optimistic locking costs nothing</strong><span>It costs nothing while nobody conflicts, and then it costs the whole of the failed session's work, discovered at the end. On two-clerks Kim loses twenty minutes. That is why Rice makes a low chance of conflict the condition for the pattern, and points to Pessimistic Offline Lock when a conflict is likely or too expensive.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a zero row count as a database error</strong><span>An update that changes no rows looks like a failure to log and move past. In this pattern it is the lock refusing: another session committed first, and the business transaction must roll back its system transaction and then abort or resolve the conflict and retry. Code that ignores the count has a version column and still loses updates.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can replay an optimistic lock by hand.</strong><p>Given a timeline, state which commits fail their version check, how many minutes of work each failure discards, and what checking the records only read would change.</p></div></div><div class="note"><strong>Note:</strong> The lab checks whole records, as a version column does, and it cannot see a conflict that is only a business rule, such as two sessions each adding to one collection, which Rice notes the usual version check does not prevent. It does not model merging, which would turn a conflict into less lost work. Whether a changed record is a real conflict is a question about your domain.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Business transaction across system transactions</summary><p>A user's piece of work, such as editing an invoice over several screens, runs as several short database transactions. Between them the database cannot keep one session from overwriting another's work, so the application has to.</p></details><details class="recall"><summary>Version number</summary><p>A counter in each row, read with the row and kept in the session. The save updates the row only if the counter still has the value read, and adds one to it in the same statement.</p></details><details class="recall"><summary>Checking a read</summary><p>A session whose result depends on a record it only read can check that record's version at commit too. Without that, a change to the record it read goes unnoticed: an inconsistent read.</p></details></div>
+      <h3>Summary</h3>
       <p>David Rice's Optimistic Offline Lock, in Fowler's book: a version in each row, checked in the update's WHERE and incremented by it, so that a row count of zero means someone else committed first. Replay two clerks on one invoice, then a quote built from a discount someone else changed, and count the conflicts and the minutes of work each one discards.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Business transaction across system transactions.</strong> A user's piece of work, such as editing an invoice over several screens, runs as several short database transactions. Between them the database cannot keep one session from overwriting another's work, so the application has to.</li><li><strong>Version number.</strong> A counter in each row, read with the row and kept in the session. The save updates the row only if the counter still has the value read, and adds one to it in the same statement.</li><li><strong>Checking a read.</strong> A session whose result depends on a record it only read can check that record's version at commit too. Without that, a change to the record it read goes unnoticed: an inconsistent read.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a version in every row. update only where the version still matches. one row, committed, zero, someone was first. check what was read, not only what was written. suits a low chance of conflict. failure is late, so the work is lost" tabindex="0" role="region" aria-label="Mathematical notation">a version in every row
 UPDATE only where the version still matches
 one row: committed; zero: someone was first
@@ -2275,11 +2320,40 @@ failure is late, so the work is lost</div><figcaption>The pattern in six lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2347,7 +2421,7 @@ failure is late, so the work is lost</div><figcaption>The pattern in six lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

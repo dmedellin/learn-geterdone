@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Lines, Functions and Graphs</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Lines</p>
       <h1>Slope-Intercept Form</h1>
       <p class="lesson-lede">y = mx + b, and reading a line straight off its equation.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The form exposes what you need</li><li>Getting there is one goal: isolate y</li><li>Every non-vertical line has one such equation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Solving for y, and what that buys</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Slope-intercept form</span><p>A non-vertical line written <span class="math" data-say="y equals m x plus b">y = mx + b</span>, where <span class="math" data-say="m">m</span> is the slope and <span class="math" data-say="0, b">(0, b)</span> is the y-intercept.</p></div><p>Why <span class="math" data-say="b">b</span> is the y-intercept takes one substitution rather than memory: the y-intercept is where <span class="math" data-say="x equals 0">x = 0</span>, and putting <span class="math" data-say="x equals 0">x = 0</span> into <span class="math" data-say="y equals m x plus b">y = mx + b</span> gives <span class="math" data-say="y equals b">y = b</span>. Why <span class="math" data-say="m">m</span> is the slope takes two: at <span class="math" data-say="x equals 0">x = 0</span> the height is <span class="math" data-say="b">b</span>, at <span class="math" data-say="x equals 1">x = 1</span> it is <span class="math" data-say="m plus b">m + b</span>, so a run of 1 produces a rise of <span class="math" data-say="m">m</span>.</p><h3>Rearranging into the form</h3><p>The work is Linear Equations and Inequalities's, applied to an equation that keeps <span class="math" data-say="x">x</span> around as a passenger. Move every term that is not <span class="math" data-say="y">y</span> to the other side, then divide by whatever multiplies <span class="math" data-say="y">y</span> &mdash; dividing the <em>whole</em> side, every term:</p><div class="mathblock" data-say="2 x plus 3 y equals 12. 3 y equals negative 2 x plus 12, subtract 2 x from both sides. y equals the quantity negative 2 x plus 12, over 3, divide both sides by 3. y equals negative the quantity 2 over 3, times x plus 4, divide EACH term. m equals negative 2 over 3, b equals 4" tabindex="0" role="region" aria-label="Mathematical notation">2x + 3y = 12
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Solving for y, and what that buys</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Slope-intercept form</span><p>A non-vertical line written <span class="math" data-say="y equals m x plus b">y = mx + b</span>, where <span class="math" data-say="m">m</span> is the slope and <span class="math" data-say="0, b">(0, b)</span> is the y-intercept.</p></div><p>Why <span class="math" data-say="b">b</span> is the y-intercept takes one substitution rather than memory: the y-intercept is where <span class="math" data-say="x equals 0">x = 0</span>, and putting <span class="math" data-say="x equals 0">x = 0</span> into <span class="math" data-say="y equals m x plus b">y = mx + b</span> gives <span class="math" data-say="y equals b">y = b</span>. Why <span class="math" data-say="m">m</span> is the slope takes two: at <span class="math" data-say="x equals 0">x = 0</span> the height is <span class="math" data-say="b">b</span>, at <span class="math" data-say="x equals 1">x = 1</span> it is <span class="math" data-say="m plus b">m + b</span>, so a run of 1 produces a rise of <span class="math" data-say="m">m</span>.</p><h3>Rearranging into the form</h3><p>The work is Linear Equations and Inequalities's, applied to an equation that keeps <span class="math" data-say="x">x</span> around as a passenger. Move every term that is not <span class="math" data-say="y">y</span> to the other side, then divide by whatever multiplies <span class="math" data-say="y">y</span> &mdash; dividing the <em>whole</em> side, every term:</p><div class="mathblock" data-say="2 x plus 3 y equals 12. 3 y equals negative 2 x plus 12, subtract 2 x from both sides. y equals the quantity negative 2 x plus 12, over 3, divide both sides by 3. y equals negative the quantity 2 over 3, times x plus 4, divide EACH term. m equals negative 2 over 3, b equals 4" tabindex="0" role="region" aria-label="Mathematical notation">2x + 3y = 12
      3y = -2x + 12          subtract 2x from both sides
       y = (-2x + 12)/3      divide both sides by 3
       y = -(2/3)x + 4       divide EACH term
 
-                  m = -2/3        b = 4</div><p>The last step is where a term gets dropped. <span class="math" data-say="the quantity negative 2 x plus 12, over 3">(-2x + 12)/3</span> is <span class="math" data-say="negative the quantity 2 over 3, times x plus 4">-(2/3)x + 4</span>, not <span class="math" data-say="negative the quantity 2 over 3, times x plus 12">-(2/3)x + 12</span>: the divisor applies to every term of the numerator. Checking against “Graphing a Linear Equation” settles it &mdash; the intercepts there were <span class="math" data-say="0, 4">(0, 4)</span> and <span class="math" data-say="6, 0">(6, 0)</span>, and <span class="math" data-say="negative the quantity 2 over 3, times 6 plus 4 equals 0">-(2/3)(6) + 4 = 0</span> confirms both.</p><div class="example"><span class="label">Example &middot; 4x − 2y = 10</span><p><span class="math" data-say="negative 2 y equals negative 4 x plus 10">−2y = −4x + 10</span>, then dividing by <span class="math" data-say="negative 2">−2</span> gives <span class="math" data-say="y equals 2 x minus 5">y = 2x − 5</span>. Both signs change, because both terms are divided by a negative. Check with <span class="math" data-say="3, 1">(3, 1)</span>: the original gives <span class="math" data-say="12 minus 2 equals 10">12 − 2 = 10</span>, and the new form gives <span class="math" data-say="2 times 3 minus 5 equals 1">2(3) − 5 = 1</span>.</p></div><p>Dividing by a negative is the reliable source of errors in this lesson. It changes the sign of every term it touches, and changing only the first is a mistake that leaves a plausible-looking equation behind. The check by substitution costs a few seconds and catches it.</p><h3>Graphing from the form</h3><p>Plot <span class="math" data-say="0, b">(0, b)</span>. Then use the slope as a set of instructions: write it as a fraction rise/run, move that run to the right and that rise up (down, if the slope is negative), and mark the point you land on. Two points, and the line is drawn.</p><div class="example"><span class="label">Example &middot; Graphing y = −(3/4)x + 2</span><p>Start at <span class="math" data-say="0, 2">(0, 2)</span>. The slope <span class="math" data-say="negative 3 over 4">−3/4</span> says: run 4 right, rise <span class="math" data-say="negative 3">−3</span>, meaning 3 down. That lands on <span class="math" data-say="4, negative 1">(4, −1)</span>, and indeed <span class="math" data-say="negative the quantity 3 over 4, times 4 plus 2 equals negative 3 plus 2 equals negative 1">−(3/4)(4) + 2 = −3 + 2 = −1</span>.</p></div><p>A whole-number slope is a fraction too: <span class="math" data-say="m equals 2">m = 2</span> is <span class="math" data-say="2 over 1">2/1</span>, so the instruction is 1 right and 2 up. Forgetting the invisible denominator is what turns a slope of 2 into a step of 2 right and 2 up, which is a line of slope 1.</p><p>The form also makes comparison trivial, and that is what “Parallel and Perpendicular Lines” will use: two lines written this way can be checked for parallelism by looking at two coefficients, with no computation at all.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Three forms of one line</h2></div><p>Slope-intercept, point-slope and standard, derived separately</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                  m = -2/3        b = 4</div><p>The last step is where a term gets dropped. <span class="math" data-say="the quantity negative 2 x plus 12, over 3">(-2x + 12)/3</span> is <span class="math" data-say="negative the quantity 2 over 3, times x plus 4">-(2/3)x + 4</span>, not <span class="math" data-say="negative the quantity 2 over 3, times x plus 12">-(2/3)x + 12</span>: the divisor applies to every term of the numerator. Checking against “Graphing a Linear Equation” settles it &mdash; the intercepts there were <span class="math" data-say="0, 4">(0, 4)</span> and <span class="math" data-say="6, 0">(6, 0)</span>, and <span class="math" data-say="negative the quantity 2 over 3, times 6 plus 4 equals 0">-(2/3)(6) + 4 = 0</span> confirms both.</p><div class="example"><span class="label">Example &middot; 4x − 2y = 10</span><p><span class="math" data-say="negative 2 y equals negative 4 x plus 10">−2y = −4x + 10</span>, then dividing by <span class="math" data-say="negative 2">−2</span> gives <span class="math" data-say="y equals 2 x minus 5">y = 2x − 5</span>. Both signs change, because both terms are divided by a negative. Check with <span class="math" data-say="3, 1">(3, 1)</span>: the original gives <span class="math" data-say="12 minus 2 equals 10">12 − 2 = 10</span>, and the new form gives <span class="math" data-say="2 times 3 minus 5 equals 1">2(3) − 5 = 1</span>.</p></div><p>Dividing by a negative is the reliable source of errors in this lesson. It changes the sign of every term it touches, and changing only the first is a mistake that leaves a plausible-looking equation behind. The check by substitution costs a few seconds and catches it.</p><h3>Graphing from the form</h3><p>Plot <span class="math" data-say="0, b">(0, b)</span>. Then use the slope as a set of instructions: write it as a fraction rise/run, move that run to the right and that rise up (down, if the slope is negative), and mark the point you land on. Two points, and the line is drawn.</p><div class="example"><span class="label">Example &middot; Graphing y = −(3/4)x + 2</span><p>Start at <span class="math" data-say="0, 2">(0, 2)</span>. The slope <span class="math" data-say="negative 3 over 4">−3/4</span> says: run 4 right, rise <span class="math" data-say="negative 3">−3</span>, meaning 3 down. That lands on <span class="math" data-say="4, negative 1">(4, −1)</span>, and indeed <span class="math" data-say="negative the quantity 3 over 4, times 4 plus 2 equals negative 3 plus 2 equals negative 1">−(3/4)(4) + 2 = −3 + 2 = −1</span>.</p></div><p>A whole-number slope is a fraction too: <span class="math" data-say="m equals 2">m = 2</span> is <span class="math" data-say="2 over 1">2/1</span>, so the instruction is 1 right and 2 up. Forgetting the invisible denominator is what turns a slope of 2 into a step of 2 right and 2 up, which is a line of slope 1.</p><p>The form also makes comparison trivial, and that is what “Parallel and Perpendicular Lines” will use: two lines written this way can be checked for parallelism by looking at two coefficients, with no computation at all.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Three forms of one line</h2></div><p>Slope-intercept, point-slope and standard, derived separately</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="lnTitle">A line</strong><span id="lnSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the line</span><span class="tone-amber"><i class="legend-swatch"></i>your two points</span><span class="tone-green"><i class="legend-swatch"></i>intercepts</span><span class="tone-purple"><i class="legend-swatch"></i>second line</span></div>
@@ -1409,10 +1452,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="lnPlot"></svg></div>
       <div id="lnWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="lnStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Slope-intercept, beside the alternatives</h3>
-          <p>Each form is derived from your two points independently and then checked by substituting both points back in. Watch the slope and the y-intercept appear in <span class="math" data-say="y equals m x plus b">y = mx + b</span> as the two numbers you can simply read, and nowhere else so plainly.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Slope-intercept, beside the alternatives</h3>
+            <p>Each form is derived from your two points independently and then checked by substituting both points back in. Watch the slope and the y-intercept appear in <span class="math" data-say="y equals m x plus b">y = mx + b</span> as the two numbers you can simply read, and nowhere else so plainly.</p>
         <div class="field">
           <label for="lnPreset">Example</label>
           <select id="lnPreset"><option value="0|3|4|5|2|-3">(0, 3) and (4, 5)</option><option value="1|-2|5|6|2|-3">(1, -2) and (5, 6): slope 2</option><option value="-2|1|3|-4|2|-3">(-2, 1) and (3, -4): slope -1</option><option value="1|2|4|3|2|-3">(1, 2) and (4, 3): fractions cleared</option><option value="-5|2|4|2|2|-3">(-5, 2) and (4, 2): horizontal</option><option value="3|-1|3|5|2|-3">(3, -1) and (3, 5): no slope-intercept form</option></select>
@@ -1440,12 +1483,14 @@
         </div>
         <p class="small-copy" id="lnHint" style="margin:0;">Every number below is recomputed from the two points as exact fractions &mdash; nothing is rounded, and nothing is stored.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Putting a line into y = mx + b</h2></div><p>Isolate <span class="math" data-say="y">y</span>, then read the two numbers off.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that it can be done</h3><p>If the equation has no <span class="math" data-say="y">y</span> at all it is vertical, and this form does not exist for it. Say so rather than forcing it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Move everything but the y-term across</h3><p>Add or subtract from both sides. The <span class="math" data-say="x">x</span>-term goes to the right; the constant that was with <span class="math" data-say="y">y</span> goes with it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Divide every term by the coefficient of y</h3><p>Every term, not just the first. If that coefficient is negative, expect every sign on the right to change.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read m and b, then check one point</h3><p>The coefficient of <span class="math" data-say="x">x</span> is <span class="math" data-say="m">m</span>; the constant is <span class="math" data-say="b">b</span>. Substitute any convenient <span class="math" data-say="x">x</span> into both the original and the new equation and confirm the same <span class="math" data-say="y">y</span> comes out.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Putting a line into y = mx + b</h2>
+      <p class="lead-in">Isolate <span class="math" data-say="y">y</span>, then read the two numbers off.</p>
+      <ol class="key-ideas method"><li><strong>Check that it can be done.</strong> If the equation has no <span class="math" data-say="y">y</span> at all it is vertical, and this form does not exist for it. Say so rather than forcing it.</li><li><strong>Move everything but the y-term across.</strong> Add or subtract from both sides. The <span class="math" data-say="x">x</span>-term goes to the right; the constant that was with <span class="math" data-say="y">y</span> goes with it.</li><li><strong>Divide every term by the coefficient of y.</strong> Every term, not just the first. If that coefficient is negative, expect every sign on the right to change.</li><li><strong>Read m and b, then check one point.</strong> The coefficient of <span class="math" data-say="x">x</span> is <span class="math" data-say="m">m</span>; the constant is <span class="math" data-say="b">b</span>. Substitute any convenient <span class="math" data-say="x">x</span> into both the original and the new equation and confirm the same <span class="math" data-say="y">y</span> comes out.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1469,17 +1514,16 @@ check x = 3:      new form   y = 2(3) - 5 = 1
 graph:  from (0, -5), slope 2 = 2/1, so 1 right and 2 up  -&gt;  (1, -3)</div><p>Dividing <span class="math" data-say="negative 2 y equals negative 4 x plus 10">−2y = −4x + 10</span> by <span class="math" data-say="negative 2">−2</span> changes both signs on the right: <span class="math" data-say="negative 4 x">−4x</span> becomes <span class="math" data-say="plus 2 x">+2x</span> and <span class="math" data-say="plus 10">+10</span> becomes <span class="math" data-say="negative 5">−5</span>. Changing one and not the other gives <span class="math" data-say="y equals 2 x plus 5">y = 2x + 5</span>, which passes no substitution check at all.</p><p>The two verifications are different in kind. The first confirms the intercept is a genuine solution; the second confirms the two equations have the same solutions, which is what rearranging is supposed to preserve.</p><p>For a faded rearrangement, start <span class="math" data-say="negative 3 x plus 6 y equals 18">−3x + 6y = 18</span> from the supplied line <span class="math" data-say="6 y equals 3 x plus 18">6y = 3x + 18</span>. Divide every term, identify <span class="math" data-say="m">m</span> and <span class="math" data-say="b">b</span>, make one slope step from the intercept, and verify that new point in the original equation.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dividing only the first term</strong><span><span class="math" data-say="the quantity negative 2 x plus 12, over 3">(−2x + 12)/3</span> is <span class="math" data-say="negative the quantity 2 over 3, times x plus 4">−(2/3)x + 4</span>. Leaving the constant undivided is the commonest slip in the rearrangement, and it moves the line without changing its slope, so the graph looks reasonable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing a sign when dividing by a negative</strong><span>Dividing by <span class="math" data-say="negative 2">−2</span> flips the sign of every term on the other side. Flipping one of them produces an equation that is wrong at every point except where the two lines happen to cross.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math" data-say="m">m</span> off before solving for y</strong><span>In <span class="math" data-say="2 x plus 3 y equals 12">2x + 3y = 12</span> the slope is not 2. The coefficient of <span class="math" data-say="x">x</span> is only the slope once <span class="math" data-say="y">y</span> stands alone with coefficient 1; here the slope is <span class="math" data-say="negative 2 over 3">−2/3</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert any non-vertical line to <span class="math" data-say="y equals m x plus b">y = mx + b</span> and graph it from the two numbers without a table.</strong><p>Given five equations in mixed arrangements, including one with a negative <span class="math" data-say="y">y</span>-coefficient and one horizontal, you should produce correct slope-intercept forms and sketch each from <span class="math" data-say="0, b">(0, b)</span> and a slope step. “Parallel and Perpendicular Lines” compares lines in this form, so fluency here is what makes parallel and perpendicular a matter of looking.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This form is the one to reach for when the question is "what does the line look like" or "how do two lines compare". When the question instead hands you a point and a slope, “Point-Slope and Standard Form”'s point-slope form gets there with less algebra &mdash; the forms are tools, and part of the skill is picking one.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dividing only the first term</strong><span><span class="math" data-say="the quantity negative 2 x plus 12, over 3">(−2x + 12)/3</span> is <span class="math" data-say="negative the quantity 2 over 3, times x plus 4">−(2/3)x + 4</span>. Leaving the constant undivided is the commonest slip in the rearrangement, and it moves the line without changing its slope, so the graph looks reasonable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing a sign when dividing by a negative</strong><span>Dividing by <span class="math" data-say="negative 2">−2</span> flips the sign of every term on the other side. Flipping one of them produces an equation that is wrong at every point except where the two lines happen to cross.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math" data-say="m">m</span> off before solving for y</strong><span>In <span class="math" data-say="2 x plus 3 y equals 12">2x + 3y = 12</span> the slope is not 2. The coefficient of <span class="math" data-say="x">x</span> is only the slope once <span class="math" data-say="y">y</span> stands alone with coefficient 1; here the slope is <span class="math" data-say="negative 2 over 3">−2/3</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert any non-vertical line to <span class="math" data-say="y equals m x plus b">y = mx + b</span> and graph it from the two numbers without a table.</strong><p>Given five equations in mixed arrangements, including one with a negative <span class="math" data-say="y">y</span>-coefficient and one horizontal, you should produce correct slope-intercept forms and sketch each from <span class="math" data-say="0, b">(0, b)</span> and a slope step. “Parallel and Perpendicular Lines” compares lines in this form, so fluency here is what makes parallel and perpendicular a matter of looking.</p></div></div><div class="note"><strong>Note:</strong> This form is the one to reach for when the question is "what does the line look like" or "how do two lines compare". When the question instead hands you a point and a slope, “Point-Slope and Standard Form”'s point-slope form gets there with less algebra &mdash; the forms are tools, and part of the skill is picking one.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The form exposes what you need</summary><p>In <span class="math" data-say="y equals m x plus b">y = mx + b</span>, the coefficient of <span class="math" data-say="x">x</span> is the slope and the constant is the y-intercept. No work is required to extract them &mdash; which is the entire reason for rearranging into this shape.</p></details><details class="recall"><summary>Getting there is one goal: isolate y</summary><p>Whatever the equation looks like, the procedure is Linear Equations and Inequalities's: undo the additions, then undo the multiplication. The only new demand is finishing in exactly the shape <span class="math" data-say="m x plus b">mx + b</span>.</p></details><details class="recall"><summary>Every non-vertical line has one such equation</summary><p>Vertical lines are the sole exception, since they cannot be solved for <span class="math" data-say="y">y</span> at all. That exception is not an inconvenience; it is a signal, and “What a Function Is” explains what it signals.</p></details></div>
+      <h3>Summary</h3>
       <p>Solving a linear equation for <span class="math" data-say="y">y</span> puts the slope and the y-intercept in plain sight, which makes graphing immediate and comparison between two lines a matter of looking.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The form exposes what you need.</strong> In <span class="math" data-say="y equals m x plus b">y = mx + b</span>, the coefficient of <span class="math" data-say="x">x</span> is the slope and the constant is the y-intercept. No work is required to extract them &mdash; which is the entire reason for rearranging into this shape.</li><li><strong>Getting there is one goal: isolate y.</strong> Whatever the equation looks like, the procedure is Linear Equations and Inequalities's: undo the additions, then undo the multiplication. The only new demand is finishing in exactly the shape <span class="math" data-say="m x plus b">mx + b</span>.</li><li><strong>Every non-vertical line has one such equation.</strong> Vertical lines are the sole exception, since they cannot be solved for <span class="math" data-say="y">y</span> at all. That exception is not an inconvenience; it is a signal, and “What a Function Is” explains what it signals.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="y equals m x plus b, m equals slope, b equals y-intercept. to get there, solve for y. graph, plot 0, b, then step by the slope. y equals 4, m equals 0, a horizontal line" tabindex="0" role="region" aria-label="Mathematical notation">y = mx + b        m = slope,  b = y-intercept
 to get there:  solve for y
 graph:  plot (0, b), then step by the slope
@@ -3480,11 +3524,40 @@ y = 4        m = 0        a horizontal line</div><figcaption>The form you graph 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3552,7 +3625,7 @@ y = 4        m = 0        a horizontal line</div><figcaption>The form you graph 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

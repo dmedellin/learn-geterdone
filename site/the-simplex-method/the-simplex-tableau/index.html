@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Simplex Method</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; One pivot</p>
       <h1>The Simplex Tableau</h1>
       <p class="lesson-lede">Build the initial tableau from standard form, read its basic feasible solution off it, and carry out one named pivot exactly.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The tableau is a system, not a table of workings</li><li>A basic feasible solution is read, not computed</li><li>A pivot is one Gauss-Jordan step on every row</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Building the tableau, reading it, and pivoting it once</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Simplex tableau</span><p>For a standard-form programme <span class="math" data-say="maximise c transpose x">maximise cᵀx</span> subject to <span class="math" data-say="A x equals b">Ax = b</span>, <span class="math" data-say="x is at least 0">x ≥ 0</span> with <span class="math" data-say="A">A</span> of size <span class="math" data-say="m times n">m × n</span>, the <strong>tableau</strong> at a basis <span class="math" data-say="B">B</span> is the <span class="math" data-say="m">m</span> constraint rows together with an <strong>objective row</strong> representing <span class="math" data-say="z minus c transpose x equals 0">z - cᵀx = 0</span>. It is held so that each basic column is an identity column and the objective row has a zero in every basic column.</p></div><p>“Standard Form, Slack and Surplus” already did the work of turning inequalities into equations. Take <span class="math" data-say="maximise 3 x sub 1 plus 5 x sub 2">maximise 3x₁ + 5x₂</span> subject to <span class="math" data-say="x sub 1 is at most 4">x₁ ≤ 4</span>, <span class="math" data-say="2 x sub 2 is at most 12">2x₂ ≤ 12</span>, <span class="math" data-say="3 x sub 1 plus 2 x sub 2 is at most 18">3x₁ + 2x₂ ≤ 18</span>; add one slack per row and the three slacks are already an identity, so the first tableau needs no work beyond writing <span class="math" data-say="negative 3">-3</span> and <span class="math" data-say="negative 5">-5</span> in the objective row.</p><div class="mathblock" data-say="x 1, x 2, s 1, s 2, s 3, rhs. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">              x1    x2    s1    s2    s3   |   rhs
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Building the tableau, reading it, and pivoting it once</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Simplex tableau</span><p>For a standard-form programme <span class="math" data-say="maximise c transpose x">maximise cᵀx</span> subject to <span class="math" data-say="A x equals b">Ax = b</span>, <span class="math" data-say="x is at least 0">x ≥ 0</span> with <span class="math" data-say="A">A</span> of size <span class="math" data-say="m times n">m × n</span>, the <strong>tableau</strong> at a basis <span class="math" data-say="B">B</span> is the <span class="math" data-say="m">m</span> constraint rows together with an <strong>objective row</strong> representing <span class="math" data-say="z minus c transpose x equals 0">z - cᵀx = 0</span>. It is held so that each basic column is an identity column and the objective row has a zero in every basic column.</p></div><p>“Standard Form, Slack and Surplus” already did the work of turning inequalities into equations. Take <span class="math" data-say="maximise 3 x sub 1 plus 5 x sub 2">maximise 3x₁ + 5x₂</span> subject to <span class="math" data-say="x sub 1 is at most 4">x₁ ≤ 4</span>, <span class="math" data-say="2 x sub 2 is at most 12">2x₂ ≤ 12</span>, <span class="math" data-say="3 x sub 1 plus 2 x sub 2 is at most 18">3x₁ + 2x₂ ≤ 18</span>; add one slack per row and the three slacks are already an identity, so the first tableau needs no work beyond writing <span class="math" data-say="negative 3">-3</span> and <span class="math" data-say="negative 5">-5</span> in the objective row.</p><div class="mathblock" data-say="x 1, x 2, s 1, s 2, s 3, rhs. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">              x1    x2    s1    s2    s3   |   rhs
    s1          1     0     1     0     0   |     4
    s2          0     2     0     1     0   |    12
    s3          3     2     0     0     1   |    18
@@ -1404,12 +1448,11 @@
    s1          1     0     1     0     0   |     4
    x2          0     1     0    1/2    0   |     6
    s3          3     0     0    -1     1   |     6
-   z          -3     0     0    5/2    0   |    30</div><p>The basis is now <span class="math" data-say="the set s sub 1, x sub 2, s sub 3">{s₁, x₂, s₃}</span>. Reading again: <span class="math" data-say="x sub 2 equals 6">x₂ = 6</span>, <span class="math" data-say="s sub 1 equals 4">s₁ = 4</span>, <span class="math" data-say="s sub 3 equals 6">s₃ = 6</span>, <span class="math" data-say="x sub 1 equals 0">x₁ = 0</span>, <span class="math" data-say="z equals 30">z = 30</span>. That is the corner <span class="math" data-say="0, 6">(0, 6)</span> and the objective value listed for it in “Adjacent Corners and the Simplex Idea”. One pivot, one edge, and the new reading is free for the same reason the old one was.</p><h3>Why the objective row goes through the pivot</h3><p>Because it is an equation. <span class="math" data-say="z minus 3 x sub 1 minus 5 x sub 2 equals 0">z - 3x₁ - 5x₂ = 0</span> is as true as the three constraint rows, and a row operation that keeps a system equivalent has to be applied to all of it. Carry the objective row along and the bottom-right entry is always the objective value at the current basis, with no separate arithmetic to get wrong.</p><p>Leave it out and the tableau still looks finished: the constraint rows are right, the reading of <span class="math" data-say="x">x</span> is right, and only <span class="math" data-say="z">z</span> and the objective row entries are stale. This is the same error as dropping the constant column part-way through an elimination, which “Gaussian Elimination” named on the Algebra path, and it fails the same way &mdash; silently, with a plausible answer at the end.</p><h3>A pivot you are allowed to do and should not</h3><p>Any non-zero entry is a legal row operation, and the arithmetic does not care whether the result is a corner. Pivot the same tableau on row <span class="math" data-say="3">3</span> and column <span class="math" data-say="x sub 2">x₂</span> instead and you get <span class="math" data-say="x sub 2 equals 9">x₂ = 9</span>, <span class="math" data-say="s sub 2 equals negative 6">s₂ = -6</span>, a bottom-right entry of <span class="math" data-say="45">45</span> &mdash; higher than the true optimum of <span class="math" data-say="36">36</span> &mdash; and a point, <span class="math" data-say="0, 9">(0, 9)</span>, that is outside the region because it uses <span class="math" data-say="18">18</span> of plant B's <span class="math" data-say="12">12</span> hours. The tableau is a correct system throughout; what it has stopped describing is a feasible point.</p><p>Choosing the row so that this cannot happen is “The Ratio Test”, and choosing the column so that the objective actually improves is “Reduced Costs and the Optimality Test”. Until then, pivot by hand and check the right-hand column for a negative entry every time.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The tableau, and one pivot carried out on it</h2></div><p>A Gauss-Jordan step on a chosen column, with the objective row carried through like any other</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+   z          -3     0     0    5/2    0   |    30</div><p>The basis is now <span class="math" data-say="the set s sub 1, x sub 2, s sub 3">{s₁, x₂, s₃}</span>. Reading again: <span class="math" data-say="x sub 2 equals 6">x₂ = 6</span>, <span class="math" data-say="s sub 1 equals 4">s₁ = 4</span>, <span class="math" data-say="s sub 3 equals 6">s₃ = 6</span>, <span class="math" data-say="x sub 1 equals 0">x₁ = 0</span>, <span class="math" data-say="z equals 30">z = 30</span>. That is the corner <span class="math" data-say="0, 6">(0, 6)</span> and the objective value listed for it in “Adjacent Corners and the Simplex Idea”. One pivot, one edge, and the new reading is free for the same reason the old one was.</p><h3>Why the objective row goes through the pivot</h3><p>Because it is an equation. <span class="math" data-say="z minus 3 x sub 1 minus 5 x sub 2 equals 0">z - 3x₁ - 5x₂ = 0</span> is as true as the three constraint rows, and a row operation that keeps a system equivalent has to be applied to all of it. Carry the objective row along and the bottom-right entry is always the objective value at the current basis, with no separate arithmetic to get wrong.</p><p>Leave it out and the tableau still looks finished: the constraint rows are right, the reading of <span class="math" data-say="x">x</span> is right, and only <span class="math" data-say="z">z</span> and the objective row entries are stale. This is the same error as dropping the constant column part-way through an elimination, which “Gaussian Elimination” named on the Algebra path, and it fails the same way &mdash; silently, with a plausible answer at the end.</p><h3>A pivot you are allowed to do and should not</h3><p>Any non-zero entry is a legal row operation, and the arithmetic does not care whether the result is a corner. Pivot the same tableau on row <span class="math" data-say="3">3</span> and column <span class="math" data-say="x sub 2">x₂</span> instead and you get <span class="math" data-say="x sub 2 equals 9">x₂ = 9</span>, <span class="math" data-say="s sub 2 equals negative 6">s₂ = -6</span>, a bottom-right entry of <span class="math" data-say="45">45</span> &mdash; higher than the true optimum of <span class="math" data-say="36">36</span> &mdash; and a point, <span class="math" data-say="0, 9">(0, 9)</span>, that is outside the region because it uses <span class="math" data-say="18">18</span> of plant B's <span class="math" data-say="12">12</span> hours. The tableau is a correct system throughout; what it has stopped describing is a feasible point.</p><p>Choosing the row so that this cannot happen is “The Ratio Test”, and choosing the column so that the objective actually improves is “Reduced Costs and the Optimality Test”. Until then, pivot by hand and check the right-hand column for a negative entry every time.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The tableau, and one pivot carried out on it</h2></div><p>A Gauss-Jordan step on a chosen column, with the objective row carried through like any other</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>One pivot, every row operation</strong><span>a Gauss-Jordan step on the chosen column, applied to the objective row too</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the starting tableau</span><span class="tone-green"><i class="legend-swatch"></i>the pivot entry</span><span class="tone-amber"><i class="legend-swatch"></i>the row operations</span><span class="tone-red"><i class="legend-swatch"></i>a right-hand side below zero</span></div>
@@ -1418,10 +1461,10 @@
       <div id="pvTrace" style="margin-top:12px;"></div>
       <div id="pvAfter" style="margin-top:12px;"></div>
       <div class="status-banner" id="pvStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Name the row and the column yourself</h3>
-          <p>Every row operation is printed, the objective row beside the others, and an illegal pivot is carried out rather than blocked &mdash; the negative right-hand side it produces is the evidence.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Name the row and the column yourself</h3>
+            <p>Every row operation is printed, the objective row beside the others, and an illegal pivot is carried out rather than blocked &mdash; the negative right-hand side it produces is the evidence.</p>
         <div class="field">
           <label for="pvPreset">Worked example</label>
           <select id="pvPreset"><option value="0" selected>two products across three plants</option><option value="1">a pivot that turns the tableau into fractions</option><option value="2">a minimisation, where the sign convention bites</option></select>
@@ -1441,12 +1484,14 @@
           <div class="kpi"><span>Legal?</span><strong id="pvLegal">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="pvHint" style="margin:0;">The rules would choose this pivot for you. You do not have to let them: name any row and any column and the step is carried out exactly as written, including the one that leaves a basic variable negative.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building and pivoting a tableau by hand</h2></div><p>Two minutes of setup saves the error that is hardest to find later: a tableau that is arithmetically perfect and describes the wrong system.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Put the programme in standard form first</h3><p>One slack per <span class="math" data-say="less-than-or-equal">≤</span> row, and the objective rearranged to <span class="math" data-say="z minus c transpose x equals 0">z - cᵀx = 0</span>. Write the column names across the top and keep them; half the mistakes in a tableau are a column read in the wrong place.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the objective row as the negated coefficients</h3><p><span class="math" data-say="maximise 3 x sub 1 plus 5 x sub 2">maximise 3x₁ + 5x₂</span> gives <span class="math" data-say="negative 3">-3</span> and <span class="math" data-say="negative 5">-5</span>, not <span class="math" data-say="3">3</span> and <span class="math" data-say="5">5</span>. The row is the equation <span class="math" data-say="z minus 3 x sub 1 minus 5 x sub 2 equals 0">z - 3x₁ - 5x₂ = 0</span> with the <span class="math" data-say="z">z</span> column left implicit, and the sign is what makes an improving column show up as a negative entry.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Read the solution before doing anything to it</h3><p>Name the basic variable of each row, copy the right-hand entry as its value, set the rest to zero, and read <span class="math" data-say="z">z</span> from the bottom right. If any basic value is negative, stop: this tableau is not at a corner.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Pivot: divide the row, then clear the column everywhere</h3><p>New row <span class="math" data-say="r">r</span> is the old one over <span class="math" data-say="A sub rj">a_rj</span>. Then every other row, objective row included, loses its column-<span class="math" data-say="j">j</span> entry times the new row <span class="math" data-say="r">r</span>. Column <span class="math" data-say="j">j</span> should end as an identity column with a zero in the objective row.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Read the new solution and sanity-check the objective</h3><p>Name the new basis, read the values and <span class="math" data-say="z">z</span>, and check the change in <span class="math" data-say="z">z</span> against the pivot: for a maximisation it should not have gone down. A negative right-hand entry means the leaving row was chosen badly, and choosing it well is the subject of “The Ratio Test”.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building and pivoting a tableau by hand</h2>
+      <p class="lead-in">Two minutes of setup saves the error that is hardest to find later: a tableau that is arithmetically perfect and describes the wrong system.</p>
+      <ol class="key-ideas method"><li><strong>Put the programme in standard form first.</strong> One slack per <span class="math" data-say="less-than-or-equal">≤</span> row, and the objective rearranged to <span class="math" data-say="z minus c transpose x equals 0">z - cᵀx = 0</span>. Write the column names across the top and keep them; half the mistakes in a tableau are a column read in the wrong place.</li><li><strong>Write the objective row as the negated coefficients.</strong> <span class="math" data-say="maximise 3 x sub 1 plus 5 x sub 2">maximise 3x₁ + 5x₂</span> gives <span class="math" data-say="negative 3">-3</span> and <span class="math" data-say="negative 5">-5</span>, not <span class="math" data-say="3">3</span> and <span class="math" data-say="5">5</span>. The row is the equation <span class="math" data-say="z minus 3 x sub 1 minus 5 x sub 2 equals 0">z - 3x₁ - 5x₂ = 0</span> with the <span class="math" data-say="z">z</span> column left implicit, and the sign is what makes an improving column show up as a negative entry.</li><li><strong>Read the solution before doing anything to it.</strong> Name the basic variable of each row, copy the right-hand entry as its value, set the rest to zero, and read <span class="math" data-say="z">z</span> from the bottom right. If any basic value is negative, stop: this tableau is not at a corner.</li><li><strong>Pivot: divide the row, then clear the column everywhere.</strong> New row <span class="math" data-say="r">r</span> is the old one over <span class="math" data-say="A sub rj">a_rj</span>. Then every other row, objective row included, loses its column-<span class="math" data-say="j">j</span> entry times the new row <span class="math" data-say="r">r</span>. Column <span class="math" data-say="j">j</span> should end as an identity column with a zero in the objective row.</li><li><strong>Read the new solution and sanity-check the objective.</strong> Name the new basis, read the values and <span class="math" data-say="z">z</span>, and check the change in <span class="math" data-say="z">z</span> against the pivot: for a maximisation it should not have gone down. A negative right-hand entry means the leaving row was chosen badly, and choosing it well is the subject of “The Ratio Test”.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1483,17 +1528,16 @@ pivot on row 2, column x2.   pivot entry a_22 = 2
    z          -3     0     0    5/2    0   |    30      x = (0, 6),  z = 30</div><p>Three things to notice. Row <span class="math" data-say="1">1</span> did not change, because its entry in the pivot column was already zero &mdash; a row with a zero there is untouched by the pivot, which is worth knowing before “The Ratio Test” explains that such a row also imposes no limit. Column <span class="math" data-say="x sub 2">x₂</span> is now an identity column with a zero in the objective row, which is the signature of a basic column. And <span class="math" data-say="s sub 2">s₂</span> has left the basis: its column is <span class="math" data-say="0, 1 over 2, negative 1, 5 over 2">(0, 1/2, -1, 5/2)</span>, no longer an identity column.</p><p>The objective row also carries a fact about <span class="math" data-say="s sub 2">s₂</span>. Its entry is <span class="math" data-say="5 over 2">5/2</span>, meaning that pushing <span class="math" data-say="s sub 2">s₂</span> back up from zero &mdash; leaving plant B hours unused again &mdash; would cost <span class="math" data-say="5 over 2">5/2</span> per hour. That number is a reduced cost, and “Reduced Costs and the Optimality Test” is about reading the whole row that way.</p><p>For a faded rehearsal, pivot the same starting tableau on row <span class="math" data-say="1">1</span>, column <span class="math" data-say="x sub 1">x₁</span> instead. The supplied first move is that the pivot entry is <span class="math" data-say="1">1</span>, so no division is needed and the fractions never appear. Carry out the other three row operations, read the new basis, point and <span class="math" data-say="z">z</span>, and then say which column of the new tableau shows that the method is not finished. Check all four rows against the lab before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keeping the objective row out of the row operations</strong><span>It is an equation, not a running total. Skipping it leaves the constraint rows correct and the objective row stale, which is the hardest kind of error to notice: the tableau reads consistently, the point is right, and the entering-column decision and the stopping test are both being made from numbers that belong to an earlier basis.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a nonbasic variable&#x27;s value off the right-hand column</strong><span>The right-hand entry of row <span class="math" data-say="i">i</span> is the value of the variable that row is carrying, and of nothing else. A nonbasic variable is zero because it was set to zero; its column holds the rate at which the basic variables would have to move if it were raised, which is a different fact.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Pivoting on whatever entry looks convenient</strong><span>The row operations are legal on any non-zero entry, so nothing stops you, and the tableau stays a correct system. What can stop being true is feasibility: pivoting the plants tableau on row <span class="math" data-say="3">3</span> in column <span class="math" data-say="x sub 2">x₂</span> gives <span class="math" data-say="s sub 2 equals negative 6">s₂ = -6</span> and a bottom-right entry of <span class="math" data-say="45">45</span>, which is larger than the real optimum. Check the right-hand column for a negative entry after every pivot until the ratio test makes it unnecessary.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the first tableau, read its solution, and pivot once without looking anything up.</strong><p>You should be able to write the objective row from a maximisation, name the basic variable of every row, read the point and <span class="math" data-say="z">z</span> off the right-hand column, carry out a named pivot with the objective row inside it, and say what a negative right-hand entry afterwards means.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One choice has been made for you throughout: which row leaves. Pivot on the wrong row and the tableau is still a correct system describing a point outside the region, as the <span class="math" data-say="s sub 2 equals negative 6">s₂ = -6</span> above did. “The Ratio Test” is the rule that makes the choice, and it is a rule about staying inside the region rather than about the objective at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Keeping the objective row out of the row operations</strong><span>It is an equation, not a running total. Skipping it leaves the constraint rows correct and the objective row stale, which is the hardest kind of error to notice: the tableau reads consistently, the point is right, and the entering-column decision and the stopping test are both being made from numbers that belong to an earlier basis.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a nonbasic variable&#x27;s value off the right-hand column</strong><span>The right-hand entry of row <span class="math" data-say="i">i</span> is the value of the variable that row is carrying, and of nothing else. A nonbasic variable is zero because it was set to zero; its column holds the rate at which the basic variables would have to move if it were raised, which is a different fact.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Pivoting on whatever entry looks convenient</strong><span>The row operations are legal on any non-zero entry, so nothing stops you, and the tableau stays a correct system. What can stop being true is feasibility: pivoting the plants tableau on row <span class="math" data-say="3">3</span> in column <span class="math" data-say="x sub 2">x₂</span> gives <span class="math" data-say="s sub 2 equals negative 6">s₂ = -6</span> and a bottom-right entry of <span class="math" data-say="45">45</span>, which is larger than the real optimum. Check the right-hand column for a negative entry after every pivot until the ratio test makes it unnecessary.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build the first tableau, read its solution, and pivot once without looking anything up.</strong><p>You should be able to write the objective row from a maximisation, name the basic variable of every row, read the point and <span class="math" data-say="z">z</span> off the right-hand column, carry out a named pivot with the objective row inside it, and say what a negative right-hand entry afterwards means.</p></div></div><div class="note"><strong>Note:</strong> One choice has been made for you throughout: which row leaves. Pivot on the wrong row and the tableau is still a correct system describing a point outside the region, as the <span class="math" data-say="s sub 2 equals negative 6">s₂ = -6</span> above did. “The Ratio Test” is the rule that makes the choice, and it is a rule about staying inside the region rather than about the objective at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The tableau is a system, not a table of workings</summary><p>Every row is an equation that stays true. The top <span class="math" data-say="m">m</span> rows are the constraints in standard form, and the bottom row is the objective rearranged to <span class="math" data-say="z minus c sub 1 x sub 1 minus and so on minus c sub n x sub n equals 0">z - c₁x₁ - … - cₙxₙ = 0</span>, which is why it begins life holding the negated objective coefficients. Nothing in the tableau is a note to yourself; it is all the same system written in a different basis.</p></details><details class="recall"><summary>A basic feasible solution is read, not computed</summary><p>When the basic columns are identity columns, row <span class="math" data-say="i">i</span> says <span class="math" data-say="x sub B of i plus nonbasic terms equals b sub i">x_{B(i)} + (nonbasic terms) = b_i</span>, and the nonbasic terms are all zero. So the basic variable in row <span class="math" data-say="i">i</span> equals that row's right-hand entry, every other variable is zero, and the bottom-right entry is <span class="math" data-say="z">z</span>. That free reading is the entire reason for keeping the tableau in this shape.</p></details><details class="recall"><summary>A pivot is one Gauss-Jordan step on every row</summary><p>Choose an entry <span class="math" data-say="A sub rj">a_rj</span> that is not zero. Divide row <span class="math" data-say="r">r</span> by it so the entry becomes <span class="math" data-say="1">1</span>, then subtract multiples of that row from every other row until the rest of column <span class="math" data-say="j">j</span> is zero. Column <span class="math" data-say="j">j</span> is now an identity column and the column that used to carry row <span class="math" data-say="r">r</span>'s basic variable is not, so <span class="math" data-say="x sub j">x_j</span> has entered the basis and that variable has left.</p></details></div>
+      <h3>Summary</h3>
       <p>A tableau is the standard-form system <span class="math" data-say="A divides b">[A | b]</span> with one extra row for the objective, <span class="math" data-say="z minus c transpose x equals 0">z - cᵀx = 0</span>. When the basic columns are identity columns the basic feasible solution can be read straight out of the right-hand column with no solving at all, and one step of the method is a single Gauss-Jordan pivot applied to every row of the tableau &mdash; the objective row included, because it is one more equation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The tableau is a system, not a table of workings.</strong> Every row is an equation that stays true. The top <span class="math" data-say="m">m</span> rows are the constraints in standard form, and the bottom row is the objective rearranged to <span class="math" data-say="z minus c sub 1 x sub 1 minus and so on minus c sub n x sub n equals 0">z - c₁x₁ - … - cₙxₙ = 0</span>, which is why it begins life holding the negated objective coefficients. Nothing in the tableau is a note to yourself; it is all the same system written in a different basis.</li><li><strong>A basic feasible solution is read, not computed.</strong> When the basic columns are identity columns, row <span class="math" data-say="i">i</span> says <span class="math" data-say="x sub B of i plus nonbasic terms equals b sub i">x_{B(i)} + (nonbasic terms) = b_i</span>, and the nonbasic terms are all zero. So the basic variable in row <span class="math" data-say="i">i</span> equals that row's right-hand entry, every other variable is zero, and the bottom-right entry is <span class="math" data-say="z">z</span>. That free reading is the entire reason for keeping the tableau in this shape.</li><li><strong>A pivot is one Gauss-Jordan step on every row.</strong> Choose an entry <span class="math" data-say="A sub rj">a_rj</span> that is not zero. Divide row <span class="math" data-say="r">r</span> by it so the entry becomes <span class="math" data-say="1">1</span>, then subtract multiples of that row from every other row until the rest of column <span class="math" data-say="j">j</span> is zero. Column <span class="math" data-say="j">j</span> is now an identity column and the column that used to carry row <span class="math" data-say="r">r</span>'s basic variable is not, so <span class="math" data-say="x sub j">x_j</span> has entered the basis and that variable has left.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="tableau, at A divides b of standard form, with one more row underneath. z-r o w, z minus c transpose x equals 0, so the row starts out holding, negative c. basic col, an identity column, that row&#x27;s rhs IS the variable&#x27;s value. nonbasic, held at zero, which is what makes the reading free. pivot r, j divide row r by a sub rj, then clear column j in every other row. negative the z-row included, because it is one more equation" tabindex="0" role="region" aria-label="Mathematical notation">tableau     [A | b] of standard form, with one more row underneath
 z-row       z - cᵀx = 0,  so the row starts out holding  -c
 basic col   an identity column; that row&#x27;s rhs IS the variable&#x27;s value
@@ -4011,11 +4055,40 @@ pivot (r,j) divide row r by a_rj, then clear column j in every other row
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4083,7 +4156,7 @@ pivot (r,j) divide row r by a_rj, then clear column j in every other row
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

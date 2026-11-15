@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Life Cycle of a Domain Object</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 6 · The Life Cycle of a Domain Object</p>
       <h1>Aggregates</h1>
       <p class="lesson-lede">A cluster of objects changed as one unit, with one root that the outside world may hold and a boundary that says where the cluster stops.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Aggregate</li><li>Root</li><li>Boundary</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s problem, the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Put another way, how do we know where an object made up of other objects begins and ends?&rdquo; Evans asks it in the middle of the Aggregates pattern, the first of three in Chapter 6, The Life Cycle of a Domain Object. The chapter's opening sorts objects into the short-lived ones a constructor makes and the garbage collector takes, which need no help, and the long-lived ones that are stored, changed under rules and tied to many others. For those he names two dangers: losing integrity over the object's life, and burying the model under the machinery of managing that life. Aggregates answer the first; Factories and Repositories, the next two lessons' patterns, answer the second.</p><p>The problem is a web with no edges. After the moves of the previous course's Associations lesson, a typical model is still densely connected, and Evans's small case is a delete. Remove a person from the database and the name and birth date plainly go too; but the address may be shared with others in the same house. Delete it and their references dangle; keep it and stale addresses pile up. A garbage collector might tidy the second case, he grants, but that is a technical fix for what is really a gap in the model: nobody has said what the person owns.</p><p>Concurrency makes the gap expensive. Many users change many objects at once, and some rules apply to a group of objects rather than to one. Lock too little and two changes together can break such a rule; lock too much and users block each other for nothing. Database locks and tests can be arranged case by case, but Evans calls those ad hoc fixes a distraction from the model. His claim is that the scope of a change is a modelling question, and that a good answer often needs domain knowledge such as how often different kinds of object change.</p><p>The pattern is a discipline he credits, in a footnote, to David Siegel, who used it on projects in the 1990s without publishing it. An aggregate is a cluster with a root and a boundary. The root is a single entity, the only member outsiders may keep a reference to; members may refer to one another freely. His illustration is a repair shop's car, identified worldwide by its vehicle number, whose tires are tracked for wear but never looked up on their own: the car is the root and the tires sit inside its boundary. An engine block with its own serial number, tracked apart from any car, might instead be the root of an aggregate of its own.</p><p>Then the rules, in the book's order and the lesson's words:</p><ul><li>The root has identity across the system and is finally responsible for checking the aggregate's invariants. Other entities inside need identity only within the aggregate.</li><li>Nothing outside may keep a reference to an inner object. The root may lend one out for the length of an operation, and may hand out a copy of a value object, which then has no tie to the aggregate.</li><li>So only roots can be fetched straight from the database; everything else is reached by traversal from a root.</li><li>Objects inside may refer to the roots of other aggregates.</li><li>Deleting the root takes everything inside the boundary with it.</li><li>After any committed change inside, all of the aggregate's rules are true.</li></ul><p>An invariant, here, is a consistency rule that must be true whenever data changes. Evans divides them by the boundary. A rule inside an aggregate is enforced as each transaction completes. A rule that spans aggregates is allowed to be out of date for a while, and is brought back into line by events, a batch run or some other update within an agreed time. Choosing the boundary is choosing which rules get the first, strict treatment.</p><p>In code the rules show as what the root does and does not expose. The clinic's <span class="math" data-say="patient">Patient</span> below owns its allergies: a new one is recorded through <span class="math" data-say="record allergy">recordAllergy</span>, which checks the patient's own rule that a substance is recorded once, and the list goes out read-only, for the caller to read and let go. If <span class="math" data-say="allergy">Allergy</span> itself had setters, a caller could still change one behind the root's back; Evans's rule is about references held, and the code has to make it hard to break.</p><pre class="codeblock" data-say="line 1, comment, The patient is the root allergies are reached only through it.. line 2, public class patient. line 3, private final patient id id. line 4, private final list of allergy allergies is set to new array list. line 5, private emergency contact contact. line 7, public void record allergy of string substance, severity severity. line 8, if has allergy to of substance. line 9, throw new illegal state exception of already recorded. line 11, allergies dot add of new allergy of allergies dot size plus 1, substance, severity. line 14, public boolean has allergy to of string substance. line 15, return allergies dot stream dot any match of A goes to A dot is to of substance. line 18, public list of allergy allergies. line 19, return collections dot unmodifiable list of allergies" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The patient is the root: allergies are reached only through it.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s problem, the pattern, then the count</h2><div class="prose reading"><p>&ldquo;Put another way, how do we know where an object made up of other objects begins and ends?&rdquo; Evans asks it in the middle of the Aggregates pattern, the first of three in Chapter 6, The Life Cycle of a Domain Object. The chapter's opening sorts objects into the short-lived ones a constructor makes and the garbage collector takes, which need no help, and the long-lived ones that are stored, changed under rules and tied to many others. For those he names two dangers: losing integrity over the object's life, and burying the model under the machinery of managing that life. Aggregates answer the first; Factories and Repositories, the next two lessons' patterns, answer the second.</p><p>The problem is a web with no edges. After the moves of the previous course's Associations lesson, a typical model is still densely connected, and Evans's small case is a delete. Remove a person from the database and the name and birth date plainly go too; but the address may be shared with others in the same house. Delete it and their references dangle; keep it and stale addresses pile up. A garbage collector might tidy the second case, he grants, but that is a technical fix for what is really a gap in the model: nobody has said what the person owns.</p><p>Concurrency makes the gap expensive. Many users change many objects at once, and some rules apply to a group of objects rather than to one. Lock too little and two changes together can break such a rule; lock too much and users block each other for nothing. Database locks and tests can be arranged case by case, but Evans calls those ad hoc fixes a distraction from the model. His claim is that the scope of a change is a modelling question, and that a good answer often needs domain knowledge such as how often different kinds of object change.</p><p>The pattern is a discipline he credits, in a footnote, to David Siegel, who used it on projects in the 1990s without publishing it. An aggregate is a cluster with a root and a boundary. The root is a single entity, the only member outsiders may keep a reference to; members may refer to one another freely. His illustration is a repair shop's car, identified worldwide by its vehicle number, whose tires are tracked for wear but never looked up on their own: the car is the root and the tires sit inside its boundary. An engine block with its own serial number, tracked apart from any car, might instead be the root of an aggregate of its own.</p><p>Then the rules, in the book's order and the lesson's words:</p><ul><li>The root has identity across the system and is finally responsible for checking the aggregate's invariants. Other entities inside need identity only within the aggregate.</li><li>Nothing outside may keep a reference to an inner object. The root may lend one out for the length of an operation, and may hand out a copy of a value object, which then has no tie to the aggregate.</li><li>So only roots can be fetched straight from the database; everything else is reached by traversal from a root.</li><li>Objects inside may refer to the roots of other aggregates.</li><li>Deleting the root takes everything inside the boundary with it.</li><li>After any committed change inside, all of the aggregate's rules are true.</li></ul><p>An invariant, here, is a consistency rule that must be true whenever data changes. Evans divides them by the boundary. A rule inside an aggregate is enforced as each transaction completes. A rule that spans aggregates is allowed to be out of date for a while, and is brought back into line by events, a batch run or some other update within an agreed time. Choosing the boundary is choosing which rules get the first, strict treatment.</p><p>In code the rules show as what the root does and does not expose. The clinic's <span class="math" data-say="patient">Patient</span> below owns its allergies: a new one is recorded through <span class="math" data-say="record allergy">recordAllergy</span>, which checks the patient's own rule that a substance is recorded once, and the list goes out read-only, for the caller to read and let go. If <span class="math" data-say="allergy">Allergy</span> itself had setters, a caller could still change one behind the root's back; Evans's rule is about references held, and the code has to make it hard to break.</p><pre class="codeblock" data-say="line 1, comment, The patient is the root allergies are reached only through it.. line 2, public class patient. line 3, private final patient id id. line 4, private final list of allergy allergies is set to new array list. line 5, private emergency contact contact. line 7, public void record allergy of string substance, severity severity. line 8, if has allergy to of substance. line 9, throw new illegal state exception of already recorded. line 11, allergies dot add of new allergy of allergies dot size plus 1, substance, severity. line 14, public boolean has allergy to of string substance. line 15, return allergies dot stream dot any match of A goes to A dot is to of substance. line 18, public list of allergy allergies. line 19, return collections dot unmodifiable list of allergies" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The patient is the root: allergies are reached only through it.</span>
 <span class="cl">public class Patient {</span>
 <span class="cl">    private final PatientId id;</span>
 <span class="cl">    private final List&lt;Allergy&gt; allergies = new ArrayList&lt;&gt;();</span>
@@ -1465,12 +1509,11 @@
 <span class="cl">    public List&lt;Allergy&gt; allergies() {</span>
 <span class="cl">        return Collections.unmodifiableList(allergies);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count. The preset <code>clinic</code> states the clinic's model as three aggregates: a patient with an allergy list and an emergency contact, an appointment with its consultation note, and a doctor. Seven references are listed, one of them from the reception desk, an outside holder that is not an object of the model. The lab counts 3 aggregates and 6 objects, 4 references that cross a boundary (appointment to patient, appointment to doctor, note to doctor, reception to appointment) and 0 that reach a non-root. A note that names its doctor is allowed: an object inside may hold another aggregate's root.</p><p>The preset <code>shortcuts</code> adds two references a busy programmer might add: the pharmacy system keeps a list of the allergies it has checked, and the note points straight at the allergy it discusses. Now 6 references cross a boundary, and the lab lists 2 as violations, both into the patient's aggregate past its root. Each is a place where the allergy could change, or be removed, without the patient knowing, which is the blindsiding the pattern exists to prevent.</p><p>Deletes follow the boundary. On <code>delete-patient</code> the lab removes 3 objects, the patient, the allergy and the contact, and reports 1 reference left dangling: the appointment's reference to the patient. That is not a failure of the pattern; it is the rule that spans aggregates, which the model must handle in its own way, by refusing the delete while appointments exist or by closing them first. On <code>delete-allergy</code> the lab refuses: an allergy is not a root, and it is removed through the patient or not at all.</p><h3>Exercise</h3><ul><li>Objects (object, aggregate, root): Member, member, yes; Card, member, no; Hold, member, no; Loan, loan, yes; Renewal, loan, no; Copy, copy, yes.</li><li>References (from, to): Loan, Member; Loan, Copy; Loan, Renewal; Member, Card; Member, Hold; Hold, Copy; Desk, Card; Overdues, Renewal.</li></ul><p>A library's model, with two outside holders, the issue desk and the overdues report. Count the references that cross a boundary and the ones that reach a non-root, then say what deleting the member removes and how many references it would leave dangling. Type the model into the lab to check.</p><p>The rules say where a cluster stops; they do not yet show why a lock on the cluster matters. The next lesson, Aggregate Invariants and Concurrent Change, reads the chapter's own example of two users who each keep a rule and together break it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Aggregates</h2></div><p>who may hold a reference into an aggregate</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The preset <code>clinic</code> states the clinic's model as three aggregates: a patient with an allergy list and an emergency contact, an appointment with its consultation note, and a doctor. Seven references are listed, one of them from the reception desk, an outside holder that is not an object of the model. The lab counts 3 aggregates and 6 objects, 4 references that cross a boundary (appointment to patient, appointment to doctor, note to doctor, reception to appointment) and 0 that reach a non-root. A note that names its doctor is allowed: an object inside may hold another aggregate's root.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Aggregates</h2></div><p>who may hold a reference into an aggregate</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Aggregates</strong><span>who may hold a reference into an aggregate</span></div>
       </div>
@@ -1478,10 +1521,10 @@
       <div class="table-wrap" id="dgrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each object belongs to one aggregate, and each aggregate has exactly one root. A reference crosses a boundary when it comes from outside the aggregate it points into: from another aggregate's object, or from a name that is not an object (an outside holder). A crossing reference may hold only the root; one to any other object is a violation. Deleting a root removes its whole aggregate; deleting a non-root is refused, naming the root to go through. A reference left dangling runs from a surviving object or outside holder to a removed object. Lists follow the order of the records.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Roots, boundaries and the references that cross them</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Roots, boundaries and the references that cross them</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dgrPreset">Worked example</label>
           <select id="dgrPreset"><option value="clinic" selected>A clinic: patient, appointment and doctor</option><option value="shortcuts">The same model with two shortcuts to an allergy</option><option value="delete-patient">Delete a patient</option><option value="delete-allergy">Delete one allergy directly</option></select>
@@ -1507,12 +1550,15 @@
           <div class="kpi"><span>References left dangling</span><strong id="dgrDangling">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>shortcuts</code> adds two references a busy programmer might add: the pharmacy system keeps a list of the allergies it has checked, and the note points straight at the allergy it discusses. Now 6 references cross a boundary, and the lab lists 2 as violations, both into the patient's aggregate past its root. Each is a place where the allergy could change, or be removed, without the patient knowing, which is the blindsiding the pattern exists to prevent.</p><p>Deletes follow the boundary. On <code>delete-patient</code> the lab removes 3 objects, the patient, the allergy and the contact, and reports 1 reference left dangling: the appointment's reference to the patient. That is not a failure of the pattern; it is the rule that spans aggregates, which the model must handle in its own way, by refusing the delete while appointments exist or by closing them first. On <code>delete-allergy</code> the lab refuses: an allergy is not a root, and it is removed through the patient or not at all.</p><h3>Exercise</h3><ul><li>Objects (object, aggregate, root): Member, member, yes; Card, member, no; Hold, member, no; Loan, loan, yes; Renewal, loan, no; Copy, copy, yes.</li><li>References (from, to): Loan, Member; Loan, Copy; Loan, Renewal; Member, Card; Member, Hold; Hold, Copy; Desk, Card; Overdues, Renewal.</li></ul><p>A library's model, with two outside holders, the issue desk and the overdues report. Count the references that cross a boundary and the ones that reach a non-root, then say what deleting the member removes and how many references it would leave dangling. Type the model into the lab to check.</p><p>The rules say where a cluster stops; they do not yet show why a lock on the cluster matters. The next lesson, Aggregate Invariants and Concurrent Change, reads the chapter's own example of two users who each keep a rule and together break it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Drawing a boundary and checking it</h2></div><p>Four steps, the last of them on a model of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Group the objects</h3><p>Put together the objects that are created, changed and deleted with one another, and that share a rule which must hold after every change.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose the root</h3><p>In each group pick the one entity that the rest of the system needs to find and name. Everything else in the group is reached through it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check every reference</h3><p>For each reference that crosses a boundary, ask whether it lands on a root. One that lands inside is a violation: route it through the root, hold a copied value instead, or move the boundary.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own model</h3><p>Take five to eight classes from a system you know, write them as aggregates with roots, list their references, and count the ones that reach past a root. Write the count down with the one you would remove first.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Drawing a boundary and checking it</h2>
+      <p class="lead-in">Four steps, the last of them on a model of your own.</p>
+      <ol class="key-ideas method"><li><strong>Group the objects.</strong> Put together the objects that are created, changed and deleted with one another, and that share a rule which must hold after every change.</li><li><strong>Choose the root.</strong> In each group pick the one entity that the rest of the system needs to find and name. Everything else in the group is reached through it.</li><li><strong>Check every reference.</strong> For each reference that crosses a boundary, ask whether it lands on a root. One that lands inside is a violation: route it through the root, hold a copied value instead, or move the boundary.</li><li><strong>Do it on your own model.</strong> Take five to eight classes from a system you know, write them as aggregates with roots, list their references, and count the ones that reach past a root. Write the count down with the one you would remove first.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1533,17 +1579,16 @@ note to allergy: not a root
 6 crossings, 2 of them violations</div><p>Both violations land in the patient's aggregate. Removing them leaves the four crossings of <code>clinic</code>, every one on a root. What the pharmacy should hold instead, the patient or a copied list of substances, is a design choice the count does not make.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking an aggregate for a group of objects that are stored together</strong><span>Evans's aggregate is defined by change, not storage: a unit for data changes, with a root that guards its invariants and a boundary that outsiders may not reach past. Objects may be stored in one table or many either way. What makes the cluster an aggregate is that the rules inside it hold after every committed change and that the only way in is through the root.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that no object inside an aggregate may refer outward</strong><span>Inner objects may refer to the roots of other aggregates; the rule is only that nothing outside holds an inner object. On the lesson's illustration the note's reference to its doctor is allowed, and the lab does not count it as a violation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the boundary to make every rule hold at once</strong><span>Evans says plainly that rules spanning aggregates will not be current at all times, and are settled by events, batches or other updates. The dangling reference after a patient's delete is such a rule: the boundary tells you what the delete removes, and the model must still say what happens to the appointment.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a model&#x27;s references against its boundaries.</strong><p>Given objects grouped into aggregates and a list of references, count the crossings, name each that reaches past a root, and state what a delete of a root removes and leaves dangling.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab checks references against the boundaries you state. It cannot say where the boundaries should be: that, Evans argues, takes knowledge of the domain, such as which rules must hold together and which objects change often. Nor does it see a reference smuggled through a getter that a caller keeps; it sees only the references you list.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking an aggregate for a group of objects that are stored together</strong><span>Evans's aggregate is defined by change, not storage: a unit for data changes, with a root that guards its invariants and a boundary that outsiders may not reach past. Objects may be stored in one table or many either way. What makes the cluster an aggregate is that the rules inside it hold after every committed change and that the only way in is through the root.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that no object inside an aggregate may refer outward</strong><span>Inner objects may refer to the roots of other aggregates; the rule is only that nothing outside holds an inner object. On the lesson's illustration the note's reference to its doctor is allowed, and the lab does not count it as a violation.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the boundary to make every rule hold at once</strong><span>Evans says plainly that rules spanning aggregates will not be current at all times, and are settled by events, batches or other updates. The dangling reference after a patient's delete is such a rule: the boundary tells you what the delete removes, and the model must still say what happens to the appointment.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can check a model&#x27;s references against its boundaries.</strong><p>Given objects grouped into aggregates and a list of references, count the crossings, name each that reaches past a root, and state what a delete of a root removes and leaves dangling.</p></div></div><div class="note"><strong>Note:</strong> The lab checks references against the boundaries you state. It cannot say where the boundaries should be: that, Evans argues, takes knowledge of the domain, such as which rules must hold together and which objects change often. Nor does it see a reference smuggled through a getter that a caller keeps; it sees only the references you list.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Aggregate</summary><p>Objects bound together so that any change to their data is made to the group as a whole. It has a root and a boundary, and its rules are kept for the group, not object by object.</p></details><details class="recall"><summary>Root</summary><p>The one entity in an aggregate that has identity across the whole system and that objects outside may keep a reference to. Everything else inside is reached by starting at the root.</p></details><details class="recall"><summary>Boundary</summary><p>The line that says which objects belong to the aggregate. Entities inside it other than the root need identity only among their neighbours, because nothing outside can name them on their own.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 6 opens the life cycle of a domain object with the pattern the rest of the chapter stands on. Read Evans's case for drawing a boundary round a group of objects, the rules that make the boundary real, and then count, on a clinic's model, the references that cross a boundary, the ones that reach past a root, and what a delete takes with it.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Aggregate.</strong> Objects bound together so that any change to their data is made to the group as a whole. It has a root and a boundary, and its rules are kept for the group, not object by object.</li><li><strong>Root.</strong> The one entity in an aggregate that has identity across the whole system and that objects outside may keep a reference to. Everything else inside is reached by starting at the root.</li><li><strong>Boundary.</strong> The line that says which objects belong to the aggregate. Entities inside it other than the root need identity only among their neighbours, because nothing outside can name them on their own.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a cluster changed as one unit. one root entity, one boundary. outside objects hold only the root. insiders have local identity. a delete takes the whole cluster. rules across clusters may lag" tabindex="0" role="region" aria-label="Mathematical notation">a cluster changed as one unit
 one root entity, one boundary
 outside objects hold only the root
@@ -2321,11 +2366,40 @@ rules across clusters may lag</div><figcaption>Aggregates in six lines</figcapti
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2393,7 +2467,7 @@ rules across clusters may lag</div><figcaption>Aggregates in six lines</figcapti
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

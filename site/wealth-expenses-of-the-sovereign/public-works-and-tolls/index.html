@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Expenses of the Sovereign</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Book V, Chapter 1, Part 3, Article 1 · Of the Public Works Which Facilitate Commerce</p>
       <h1>Public Works and Tolls</h1>
       <p class="lesson-lede">A road, a bridge or a canal can be paid for by a toll in proportion to the weight carried, and Smith thinks it should be: the user pays, and still gains.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The works that pay for themselves</li><li>A toll by weight</li><li>Why not make it a general revenue</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then the section line by line</h2>
-      <article class="prose reading"><p><strong>Book V, Chapter 1, Part 3, Article 1.</strong> The third duty is to erect and maintain works &ldquo;which though they may be in the highest degree advantageous to a great society, are, however, of such a nature, that the profit could never repay the expense to any individual, or small number of individuals&rdquo;. Smith then names the two kinds that concern trade and instruction, and the Article opens with trade. &ldquo;The expense of making and maintaining the public roads of any country must evidently increase with the annual produce of the land and labour of that country.&rdquo;</p><p>His first suggestion is that most such works need not touch the general revenue: a highway, bridge or canal &ldquo;may, in most cases, be both made&rdquo; and kept by &ldquo;a small toll upon the carriages which make use of them&rdquo;. Compare a toll bridge that charges whoever crosses with a bridge paid out of everyone's rates, and notice that the toll bridge has a built-in test of whether anyone wants it.</p><p>Then the argument for weight. When carriages pay &ldquo;in proportion to their weight or their tonnage, they pay for the maintenance of those public works exactly in proportion to the wear and tear which they occasion of them&rdquo;. His conclusion is flat: &ldquo;It seems scarce possible to invent a more equitable way of maintaining such works.&rdquo; The toll ends up on the consumer, who has paid it in the price of the goods; and since carriage is cheaper, &ldquo;The person who finally pays this tax, therefore, gains by the application more than he loses by the payment of it.&rdquo;</p><p>Here is the turnpike preset, written for this lesson. A waggon of three tons makes 100 trips a year over a turnpike at a toll of a shilling a ton a trip, which is <span class="math" data-say="1 over 20">1/20</span> of a pound. It pays <span class="math" data-say="3 times 100 times 1 over 20">3 × 100 × 1/20</span> pounds, which is £15. A coach of one ton making 200 trips pays £10. The heavier vehicle pays per ton exactly as the lighter does, and that is what &ldquo;equitable&rdquo; means to Smith: each pays for what it wears. The waggon carries 300 ton-trips and the coach 200, so the waggon pays three fifths of the road's tolls and the coach two fifths, in proportion to tons carried and not to the number of vehicles. The total is £25 on 500 tons, which is £0.05 a ton, the toll itself: that is what a toll by weight means. In the doubled preset the toll is <span class="math" data-say="1 over 10">1/10</span> and the same traffic pays £20 and £30, £50 in all, and the waggon's share stays at 60 per cent.</p><p>The heavy-trade preset, also written for the lesson, shows the second of Smith's objections at work. A coach on 100 trips pays £5, a waggon of three tons on 100 trips pays £15, and a coal-cart of two tons on 400 trips pays £40, £60 in all on 1,200 tons carried. The lab's heaviest-carriage tile names the waggon, at 25 per cent. of the total, but the coal-cart pays two thirds of it. A toll by weight bears on whoever moves the most tons, and what moves the most tons is coarse, bulky stuff.</p><div class="defbox"><span class="label">Definition &middot; Toll</span><p>A payment for using a road, bridge or canal, charged by the weight or tonnage of the carriage, advanced by the carrier, and, Smith argues, paid in the end by the consumer in the price of what is carried.</p></div><p>Smith adds his tilt: when the toll on carriages of luxury, &ldquo;upon coaches, post-chaises, etc.&rdquo; is made somewhat higher in proportion to their weight than on carts and waggons, &ldquo;the indolence and vanity of the rich is made to contribute, in a very easy manner, to the relief of the poor&rdquo;. The lab charges one toll per ton, so it cannot show this tilt, and the lesson says so; a reader can try two tolls in two presets.</p><p>He also says who should hold the tolls. A canal's tolls can be a private property: the canal of Languedoc cost &ldquo;upwards of thirteen millions of livres&rdquo; and then the tolls were given to its engineer, Riquet, whose family had &ldquo;a great interest to keep the work in constant repair&rdquo;. A canal that decays stops carrying anything, so the owner's interest is plain. A road, though, &ldquo;though entirely neglected, does not become altogether impassable, though a canal does&rdquo;, so a road's tolls belong with trustees. He grants that British turnpike trustees had committed &ldquo;abuses&rdquo;, and calls the system new.</p><p>Then he takes up a proposal in the air. Ministers had thought that government, working the turnpikes itself and using soldiers for labour, could gain &ldquo;half a million, perhaps&rdquo;; in a note added after the first two editions, he writes that he has &ldquo;good reasons to believe that all the turnpike tolls levied in Great Britain do not produce a neat revenue that amounts to half a million&rdquo;. His three objections follow. First, a revenue is something to raise, and the tolls would go up with the state's needs until inland trade was choked. Second, &ldquo;as the turnpike toll raises the price of goods in proportion to their weight and not to their value&rdquo;, spent on anything but the road it falls &ldquo;at the expense of the poor, not of the rich&rdquo;. Third, a government rich enough from tolls would find it harder to be made to repair the road.</p><p>Two later criticisms of the toll bear on the first section. Jules Dupuit, the French engineer who wrote in the 1840s, pointed out that a toll keeps off people who would gain from the bridge by less than the toll, though the bridge costs almost nothing extra for them to cross. Road engineers in the twentieth century found that damage to a pavement rises much faster than weight, roughly with the fourth power of the load on an axle, so that a toll in proportion to weight undercharges the heaviest axle loads. Smith's reply is not in the chapter. A reader can note that his argument is about who ought to pay, and that the wear is a physical fact he took as proportional.</p><p>His comparison with France is about who holds the money. In France the highway funds were under the intendant, and the great post-roads between the principal towns were in good order while &ldquo;the far greater part of the roads in the country&rdquo;, the cross roads, were neglected, for a minister takes pleasure in &ldquo;a work of splendour and magnificence&rdquo; that the nobility will see. He also thinks the corvée, the forced days of labour on the roads, an instrument of tyranny in the intendant's hands. China, where he suspects the accounts were drawn up by &ldquo;weak and wondering travellers&rdquo;, is a case where he grants that the sovereign has a direct interest, since &ldquo;the revenue of the sovereign arises almost altogether from a land tax or land rent, which rises or falls with the rise and fall of the annual produce of the land&rdquo;; in Europe that link is weaker.</p><p>He ends the section with local works. Lighting and paving London from the treasury would not go as well as it does now, and the cost would fall on everyone, &ldquo;of whom the greater part derive no sort of benefit&rdquo; from it. The principle is the same as the toll's: let those who benefit pay, and let the money be managed near them. The Conclusion of the chapter will say it as a general rule.</p><p>Roads and canals are the works that help trade in general. The next lesson, <em>Regulated and Joint-Stock Companies</em>, takes the works that help particular trades, and the companies that tried to build the forts.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The expenses of the sovereign</h2></div><p>tolls by weight, paid by those who use the road</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then the section line by line</h2><div class="prose reading"><p><strong>Book V, Chapter 1, Part 3, Article 1.</strong> The third duty is to erect and maintain works &ldquo;which though they may be in the highest degree advantageous to a great society, are, however, of such a nature, that the profit could never repay the expense to any individual, or small number of individuals&rdquo;. Smith then names the two kinds that concern trade and instruction, and the Article opens with trade. &ldquo;The expense of making and maintaining the public roads of any country must evidently increase with the annual produce of the land and labour of that country.&rdquo;</p><p>His first suggestion is that most such works need not touch the general revenue: a highway, bridge or canal &ldquo;may, in most cases, be both made&rdquo; and kept by &ldquo;a small toll upon the carriages which make use of them&rdquo;. Compare a toll bridge that charges whoever crosses with a bridge paid out of everyone's rates, and notice that the toll bridge has a built-in test of whether anyone wants it.</p><p>Then the argument for weight. When carriages pay &ldquo;in proportion to their weight or their tonnage, they pay for the maintenance of those public works exactly in proportion to the wear and tear which they occasion of them&rdquo;. His conclusion is flat: &ldquo;It seems scarce possible to invent a more equitable way of maintaining such works.&rdquo; The toll ends up on the consumer, who has paid it in the price of the goods; and since carriage is cheaper, &ldquo;The person who finally pays this tax, therefore, gains by the application more than he loses by the payment of it.&rdquo;</p><p>Here is the turnpike preset, written for this lesson. A waggon of three tons makes 100 trips a year over a turnpike at a toll of a shilling a ton a trip, which is <span class="math" data-say="1 over 20">1/20</span> of a pound. It pays <span class="math" data-say="3 times 100 times 1 over 20">3 × 100 × 1/20</span> pounds, which is £15. A coach of one ton making 200 trips pays £10. The heavier vehicle pays per ton exactly as the lighter does, and that is what &ldquo;equitable&rdquo; means to Smith: each pays for what it wears. The waggon carries 300 ton-trips and the coach 200, so the waggon pays three fifths of the road's tolls and the coach two fifths, in proportion to tons carried and not to the number of vehicles. The total is £25 on 500 tons, which is £0.05 a ton, the toll itself: that is what a toll by weight means. In the doubled preset the toll is <span class="math" data-say="1 over 10">1/10</span> and the same traffic pays £20 and £30, £50 in all, and the waggon's share stays at 60 per cent.</p><p>The heavy-trade preset, also written for the lesson, shows the second of Smith's objections at work. A coach on 100 trips pays £5, a waggon of three tons on 100 trips pays £15, and a coal-cart of two tons on 400 trips pays £40, £60 in all on 1,200 tons carried. The lab's heaviest-carriage tile names the waggon, at 25 per cent. of the total, but the coal-cart pays two thirds of it. A toll by weight bears on whoever moves the most tons, and what moves the most tons is coarse, bulky stuff.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The expenses of the sovereign</h2></div><p>tolls by weight, paid by those who use the road</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The expenses of the sovereign</strong><span>tolls by weight, paid by those who use the road</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wpbTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wpbTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each carriage pays tons × trips × the toll a ton; the total adds them, and the toll a ton carried is the total ÷ the tons carried. The heaviest is the carriage carrying most tons on a trip, the first given when two are equal (the lab's rule). That a toll by weight makes those who wear the road most pay most is Smith's (Book V, chapter 1, part III). Amounts are in the lesson's money unit, typed as decimals (at most 6 places) or fractions such as 5/2, and computed exactly; one without a finite decimal is printed as its fraction and its value to 2 places after ≈. A percentage is exact when it has at most 2 decimal places and is otherwise rounded to 2 places on the exact value and marked ≈. </p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Who pays a toll by weight</h3>
-          <p>A figure computed from the quantities the lesson states. Enter a toll for a ton on one trip and, for each carriage, its weight in tons and its trips in a year. The lab prices each carriage and the whole road. Smith's tilt, a higher toll for coaches, is not in the lab; its figures are all written for this lesson.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Who pays a toll by weight</h3>
+            <p>A figure computed from the quantities the lesson states. Enter a toll for a ton on one trip and, for each carriage, its weight in tons and its trips in a year. The lab prices each carriage and the whole road. Smith's tilt, a higher toll for coaches, is not in the lab; its figures are all written for this lesson.</p>
         <div class="field">
           <label for="wpbPreset">Worked example</label>
           <select id="wpbPreset"><option value="turnpike" selected>A coach and a waggon at a shilling a ton a trip (all figures written for this lesson)</option><option value="doubled">The same traffic with the toll doubled, as Smith's ministers might have done (written for this lesson)</option><option value="heavy-trade">A road carrying mostly coarse goods (written for this lesson)</option></select>
@@ -1428,12 +1471,15 @@
           <div class="kpi"><span>Toll a ton carried</span><strong id="wpbPerTon">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Toll</span><p>A payment for using a road, bridge or canal, charged by the weight or tonnage of the carriage, advanced by the carrier, and, Smith argues, paid in the end by the consumer in the price of what is carried.</p></div><p>Smith adds his tilt: when the toll on carriages of luxury, &ldquo;upon coaches, post-chaises, etc.&rdquo; is made somewhat higher in proportion to their weight than on carts and waggons, &ldquo;the indolence and vanity of the rich is made to contribute, in a very easy manner, to the relief of the poor&rdquo;. The lab charges one toll per ton, so it cannot show this tilt, and the lesson says so; a reader can try two tolls in two presets.</p><p>He also says who should hold the tolls. A canal's tolls can be a private property: the canal of Languedoc cost &ldquo;upwards of thirteen millions of livres&rdquo; and then the tolls were given to its engineer, Riquet, whose family had &ldquo;a great interest to keep the work in constant repair&rdquo;. A canal that decays stops carrying anything, so the owner's interest is plain. A road, though, &ldquo;though entirely neglected, does not become altogether impassable, though a canal does&rdquo;, so a road's tolls belong with trustees. He grants that British turnpike trustees had committed &ldquo;abuses&rdquo;, and calls the system new.</p><p>Then he takes up a proposal in the air. Ministers had thought that government, working the turnpikes itself and using soldiers for labour, could gain &ldquo;half a million, perhaps&rdquo;; in a note added after the first two editions, he writes that he has &ldquo;good reasons to believe that all the turnpike tolls levied in Great Britain do not produce a neat revenue that amounts to half a million&rdquo;. His three objections follow. First, a revenue is something to raise, and the tolls would go up with the state's needs until inland trade was choked. Second, &ldquo;as the turnpike toll raises the price of goods in proportion to their weight and not to their value&rdquo;, spent on anything but the road it falls &ldquo;at the expense of the poor, not of the rich&rdquo;. Third, a government rich enough from tolls would find it harder to be made to repair the road.</p><p>Two later criticisms of the toll bear on the first section. Jules Dupuit, the French engineer who wrote in the 1840s, pointed out that a toll keeps off people who would gain from the bridge by less than the toll, though the bridge costs almost nothing extra for them to cross. Road engineers in the twentieth century found that damage to a pavement rises much faster than weight, roughly with the fourth power of the load on an axle, so that a toll in proportion to weight undercharges the heaviest axle loads. Smith's reply is not in the chapter. A reader can note that his argument is about who ought to pay, and that the wear is a physical fact he took as proportional.</p><p>His comparison with France is about who holds the money. In France the highway funds were under the intendant, and the great post-roads between the principal towns were in good order while &ldquo;the far greater part of the roads in the country&rdquo;, the cross roads, were neglected, for a minister takes pleasure in &ldquo;a work of splendour and magnificence&rdquo; that the nobility will see. He also thinks the corvée, the forced days of labour on the roads, an instrument of tyranny in the intendant's hands. China, where he suspects the accounts were drawn up by &ldquo;weak and wondering travellers&rdquo;, is a case where he grants that the sovereign has a direct interest, since &ldquo;the revenue of the sovereign arises almost altogether from a land tax or land rent, which rises or falls with the rise and fall of the annual produce of the land&rdquo;; in Europe that link is weaker.</p><p>He ends the section with local works. Lighting and paving London from the treasury would not go as well as it does now, and the cost would fall on everyone, &ldquo;of whom the greater part derive no sort of benefit&rdquo; from it. The principle is the same as the toll's: let those who benefit pay, and let the money be managed near them. The Conclusion of the chapter will say it as a general rule.</p><p>Roads and canals are the works that help trade in general. The next lesson, <em>Regulated and Joint-Stock Companies</em>, takes the works that help particular trades, and the companies that tried to build the forts.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a toll</h2></div><p>Four steps, for any set of carriages.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the toll per ton</h3><p>Choose a toll for one ton on one trip, as a fraction of a pound: a shilling is <span class="math" data-say="1 over 20">1/20</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Price each carriage</h3><p>Each carriage pays toll times its weight in tons times its trips in the year, so a three-ton waggon on 100 trips pays <span class="math" data-say="3 times 100 times 1 over 20">3 × 100 × 1/20</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add up the road</h3><p>The road's revenue is the sum over every carriage. Per ton it is always the toll, which is what a toll by weight means.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Find who bears most</h3><p>Divide each carriage's toll by the total: whoever moves the most tons pays the largest share. Smith's second objection is that this falls on bulky goods.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a toll</h2>
+      <p class="lead-in">Four steps, for any set of carriages.</p>
+      <ol class="key-ideas method"><li><strong>Fix the toll per ton.</strong> Choose a toll for one ton on one trip, as a fraction of a pound: a shilling is <span class="math" data-say="1 over 20">1/20</span>.</li><li><strong>Price each carriage.</strong> Each carriage pays toll times its weight in tons times its trips in the year, so a three-ton waggon on 100 trips pays <span class="math" data-say="3 times 100 times 1 over 20">3 × 100 × 1/20</span>.</li><li><strong>Add up the road.</strong> The road's revenue is the sum over every carriage. Per ton it is always the toll, which is what a toll by weight means.</li><li><strong>Find who bears most.</strong> Divide each carriage's toll by the total: whoever moves the most tons pays the largest share. Smith's second objection is that this falls on bulky goods.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1450,17 +1496,16 @@ road total:  10 + 15 = £25
 waggon&#x27;s share:  15 / 25 = 3/5</div><p>The waggon pays three fifths of a road it wears three fifths of, and the coach two fifths. Double the toll, as in the doubled preset, and every figure doubles and no one's share moves. Smith's first objection is that the revenue would then be raised again and again.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Smith wants a toll at every public work</strong><span>He lists the works that can pay their own way (highways, bridges, canals, harbours, the coinage and the post-office) and then, in the next breath, works whose benefit is local and which should be paid by a local revenue. The Conclusion adds that roads benefit the whole society and may &ldquo;without any injustice&rdquo; be paid from the general contributions, though the toll is better.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking a toll by weight for a toll by value</strong><span>A toll by weight charges a ton of coal and a ton of lace alike, so it bears most heavily on cheap bulk. This is the very reason Smith gives for not using it as a general revenue. The lab, like his scheme, has one toll for every ton.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the tolls Smith praises were well run</strong><span>He reports that turnpike tolls in some places were &ldquo;more than double of what is necessary&rdquo; and the work &ldquo;sometimes not executed at all&rdquo;. His claim is that the toll is the right principle and that trustees need courts of inspection and account, which in 1776 had not yet been set up.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what each carriage pays and say why Smith calls it equitable.</strong><p>Given a toll per ton and each carriage's weight and trips, compute each carriage's toll, the road's total and the heaviest user's share, and state Smith's three objections to making the tolls a general revenue.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab multiplies a toll by tons and trips. It cannot tell you whether a toll by weight matches the wear on a road, whether a toll keeps off people whose gain from the road is smaller than the toll, or what any turnpike trust actually collected: Smith himself changed his sums in a note. Every figure in the presets is written for the lesson, and the lab cannot show the higher toll for coaches.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Smith wants a toll at every public work</strong><span>He lists the works that can pay their own way (highways, bridges, canals, harbours, the coinage and the post-office) and then, in the next breath, works whose benefit is local and which should be paid by a local revenue. The Conclusion adds that roads benefit the whole society and may &ldquo;without any injustice&rdquo; be paid from the general contributions, though the toll is better.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking a toll by weight for a toll by value</strong><span>A toll by weight charges a ton of coal and a ton of lace alike, so it bears most heavily on cheap bulk. This is the very reason Smith gives for not using it as a general revenue. The lab, like his scheme, has one toll for every ton.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the tolls Smith praises were well run</strong><span>He reports that turnpike tolls in some places were &ldquo;more than double of what is necessary&rdquo; and the work &ldquo;sometimes not executed at all&rdquo;. His claim is that the toll is the right principle and that trustees need courts of inspection and account, which in 1776 had not yet been set up.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute what each carriage pays and say why Smith calls it equitable.</strong><p>Given a toll per ton and each carriage's weight and trips, compute each carriage's toll, the road's total and the heaviest user's share, and state Smith's three objections to making the tolls a general revenue.</p></div></div><div class="note"><strong>Note:</strong> The lab multiplies a toll by tons and trips. It cannot tell you whether a toll by weight matches the wear on a road, whether a toll keeps off people whose gain from the road is smaller than the toll, or what any turnpike trust actually collected: Smith himself changed his sums in a note. Every figure in the presets is written for the lesson, and the lab cannot show the higher toll for coaches.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The works that pay for themselves</summary><p>The third duty covers works so useful that no individual could be repaid for building them. Smith adds that the greater part of the ones that help commerce can be built and kept up by a small toll on the carriages that use them, a port duty on the shipping, or the seignorage on coin, and he says that works built this way can be made only where the commerce needs them.</p></details><details class="recall"><summary>A toll by weight</summary><p>A carriage that pays in proportion to its weight pays in proportion to the wear it causes. The toll is advanced by the carrier and paid in the end by the consumer, but the road lowers the price of carriage by more than the toll raises it, so the consumer gains. Smith adds a tilt: tax coaches somewhat higher than carts, and the vanity of the rich relieves the poor.</p></details><details class="recall"><summary>Why not make it a general revenue</summary><p>Some ministers saw the turnpike tolls as a source of half a million for the state. Smith has three objections: the tolls would be raised until they choked inland trade; a toll by weight falls on coarse and bulky goods, so the poor would pay; and a government with the money would care less about the road.</p></details></div>
+      <h3>Summary</h3>
       <p>The third duty is the works that no one could profitably build for himself. Smith holds that roads, bridges, canals and harbours can usually pay their own way through tolls in proportion to weight, argues that the consumer who pays them gains more than he loses, and objects to turning the tolls into a general revenue. Compute who pays a toll and how much.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The works that pay for themselves.</strong> The third duty covers works so useful that no individual could be repaid for building them. Smith adds that the greater part of the ones that help commerce can be built and kept up by a small toll on the carriages that use them, a port duty on the shipping, or the seignorage on coin, and he says that works built this way can be made only where the commerce needs them.</li><li><strong>A toll by weight.</strong> A carriage that pays in proportion to its weight pays in proportion to the wear it causes. The toll is advanced by the carrier and paid in the end by the consumer, but the road lowers the price of carriage by more than the toll raises it, so the consumer gains. Smith adds a tilt: tax coaches somewhat higher than carts, and the vanity of the rich relieves the poor.</li><li><strong>Why not make it a general revenue.</strong> Some ministers saw the turnpike tolls as a source of half a million for the state. Smith has three objections: the tolls would be raised until they choked inland trade; a toll by weight falls on coarse and bulky goods, so the poor would pay; and a government with the money would care less about the road.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a toll in proportion to weight. each carriage pays for the wear it makes. the consumer pays, and gains by the road. a toll on weight falls on coarse, bulky goods. local works, local revenue" tabindex="0" role="region" aria-label="Mathematical notation">a toll in proportion to weight
 each carriage pays for the wear it makes
 the consumer pays, and gains by the road
@@ -2332,11 +2377,40 @@ local works, local revenue</div><figcaption>Tolls in five lines</figcaption></fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2404,7 +2478,7 @@ local works, local revenue</div><figcaption>Tolls in five lines</figcaption></fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

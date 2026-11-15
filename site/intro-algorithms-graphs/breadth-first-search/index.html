@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graph Algorithms</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 22 · Elementary Graph Algorithms</p>
       <h1>Graph Representations and Breadth-First Search</h1>
       <p class="lesson-lede">Store a graph as adjacency lists, then search it from one source with a queue, and every vertex&#x27;s distance in edges falls out of the order it is discovered.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Adjacency lists and the adjacency matrix</li><li>The frontier and the queue</li><li>Shortest-path distance and the breadth-first tree</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The sections&#x27; argument first, then the search</h2>
-      <article class="prose reading"><p>&ldquo;Breadth-first search is one of the simplest algorithms for searching a graph and the archetype for many important graph algorithms.&rdquo; So CLRS introduce it in Section 22.2, and they name two of its descendants straight away: Prim's minimum-spanning-tree algorithm and Dijkstra's shortest paths, both later in this course. Part VI opens with Chapter 22's two plain tasks, storing a graph and searching it, because nearly every algorithm after them starts by doing both.</p><p>Section 22.1 compares two representations. Adjacency lists give each vertex a list of the vertices it has an edge to. In a directed graph the lists hold <span data-say="the size of E">|E|</span> entries in all, in an undirected graph <span data-say="2 times the size of E">2|E|</span>, since each edge appears in the lists of both its ends; either way the memory is <span data-say="theta of the quantity V plus E">Θ(V + E)</span>. An adjacency matrix is a <span data-say="the size of V, minus b y minus the size of V">|V|-by-|V|</span> table with a 1 where an edge exists, <span data-say="theta of V squared">Θ(V²)</span> memory regardless of how many edges there are. The authors prefer lists for sparse graphs, where E is much smaller than <span data-say="V squared">V²</span>, and the matrix for dense ones or when the question is whether one particular edge exists. Either form takes weights by storing a weight beside each entry.</p><p>Section 22.2's procedure BFS takes a graph and a source <span class="math" data-say="s">s</span>. It colours every vertex white, gives it distance infinity and no parent, then colours <span class="math" data-say="s">s</span> grey with distance 0 and puts it in a queue. While the queue is not empty it takes the vertex <span class="math" data-say="u">u</span> at the head, looks at every entry <span class="math" data-say="v">v</span> on <span class="math" data-say="u">u</span>'s list, and for each white <span class="math" data-say="v">v</span> sets its distance to <span class="math" data-say="u, d plus 1">u.d + 1</span>, its parent to <span class="math" data-say="u">u</span>, colours it grey and puts it at the tail. When <span class="math" data-say="u">u</span>'s list is done, <span class="math" data-say="u">u</span> turns black. The queue is why the search spreads evenly: every vertex at distance <span class="math" data-say="k">k</span> is discovered before any at distance <span class="math" data-say="k plus 1">k + 1</span>.</p><p>The running time is an aggregate count. No vertex is ever whitened again, so each is enqueued and dequeued at most once, O(V) for the queue. Each adjacency list is scanned once, when its vertex is dequeued, and the lists hold <span data-say="theta of E">Θ(E)</span> entries, so scanning is O(E). With <span data-say="theta of V">Θ(V)</span> to initialise, the total is O(V + E), linear in the size of the lists. It is O and not <span data-say="theta">Θ</span> because a vertex the source cannot reach is never enqueued and its list is never read.</p><p>The section then proves that the distances are right. Lemma 22.1 says that along any edge from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span>, <span data-say="delta of s and v">δ(s, v)</span> is at most <span data-say="delta of s and u plus 1">δ(s, u) + 1</span>. Lemma 22.2 says the search never sets a distance below the true one. Lemma 22.3 says the queue always holds distances in nondecreasing order from head to tail, with the tail at most one more than the head. Theorem 22.5 puts them together: every vertex reachable from <span class="math" data-say="s">s</span> is discovered, its recorded distance equals <span data-say="delta of s and v">δ(s, v)</span>, and following parents back from it gives a shortest path. Lemma 22.6 calls the parents' subgraph a breadth-first tree, and the procedure PRINT-PATH prints a path from it by recursion.</p><p>The lab runs the search in your browser on edges you type as records <code>from, to</code>, one per semicolon, with any names for the vertices. Adjacency lists follow the order of the edges, so you can see the order's effect. Its tiles are the distance of every vertex, the parent of every discovered vertex, the vertices by layer, how many vertices were enqueued, how many adjacency entries were examined out of the total in the lists, and which vertices were never reached.</p><p>This lesson's graph has ten vertices and eleven undirected edges: <code>s, a; s, b; a, c; b, c; b, d; c, e; d, e; d, f; e, g; f, g; h, i</code>. The preset <code>two-pieces</code> searches it from <span class="math" data-say="s">s</span>. The layers are 0: s; 1: a b; 2: c d; 3: e f; 4: g. The lab enqueues 8 of 10 vertices and examines 20 of the 22 adjacency entries; h and i are not reachable and keep distance <span data-say="infinity">∞</span>, which is why the bound is O(V + E) rather than a count of every entry. The parents are a <span data-say="gets s, b gets s, c gets">← s, b ← s, c ←</span> a, <span data-say="d gets b, e gets c, f gets d">d ← b, e ← c, f ← d</span> and <span data-say="g gets e">g ← e</span>, and the path back from <span data-say="g, g gets e gets c gets">g, g ← e ← c ←</span> a <span data-say="gets s">← s</span>, has 4 edges, its distance.</p><p>The preset <code>directed-from-s</code> reads the same eleven records as arcs pointing from the first name to the second. Every arc here points away from <span class="math" data-say="s">s</span>, so the distances are unchanged, but the lists now hold 11 entries, not 22, and the lab examines 10 of 11. The preset <code>directed-from-c</code> starts at <span class="math" data-say="c">c</span> instead: only e and g can be reached, at distances 1 and 2, the lab enqueues 3 of 10 vertices and examines 2 of 11 entries, and 7 vertices are not reachable. Undirected, from the same <span class="math" data-say="c">c</span>, every vertex but h and i would be found; direction decides what a search can see.</p><p>The preset <code>hexagon</code> is a cycle of six vertices searched from 1. The far vertex, 4, is at distance 3 by either way round, and the lab gives it the parent 3, because 3 is dequeued before 5: layers 0: 1; 1: 2 6; 2: 3 5; 3: 4. Type the edge <code>6, 1</code> first instead and 4's parent becomes 5. The distances cannot change, since Theorem 22.5 fixes them as <span data-say="delta of s and v">δ(s, v)</span>; the tree can, and the theorem promises only that it is a breadth-first tree.</p><p>Section 22.1's comparison, counted by hand on the lesson's graph: the adjacency lists hold <span data-say="2 times 11 equals 22">2 × 11 = 22</span> entries beside 10 list heads, while the matrix would have <span data-say="10 times 10 equals 100">10 × 10 = 100</span> cells, 22 of them 1. To find a vertex's neighbours the matrix scans a whole row of 10 cells; the list holds only the neighbours. That is the case for lists on a sparse graph, and the search's 20 examined entries are the lists' advantage made into a count.</p><h3>Exercise</h3><p>Take the undirected graph <code>p, q; p, r; q, s; r, s; s, t; t, u; r, u; v, w</code> and search it by hand from p, writing the queue after each dequeue, every distance and every parent. How many adjacency entries does the search examine, out of how many? Then type it into the lab, and try reading it as directed from p.</p><p>Breadth-first search spreads from one source a layer at a time. The next lesson, Depth-First Search, goes as deep as it can instead, and stamps every vertex with two times.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Breadth-first search</h2></div><p>BFS distances and the breadth-first tree</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The sections&#x27; argument first, then the search</h2><div class="prose reading"><p>&ldquo;Breadth-first search is one of the simplest algorithms for searching a graph and the archetype for many important graph algorithms.&rdquo; So CLRS introduce it in Section 22.2, and they name two of its descendants straight away: Prim's minimum-spanning-tree algorithm and Dijkstra's shortest paths, both later in this course. Part VI opens with Chapter 22's two plain tasks, storing a graph and searching it, because nearly every algorithm after them starts by doing both.</p><p>Section 22.1 compares two representations. Adjacency lists give each vertex a list of the vertices it has an edge to. In a directed graph the lists hold <span data-say="the size of E">|E|</span> entries in all, in an undirected graph <span data-say="2 times the size of E">2|E|</span>, since each edge appears in the lists of both its ends; either way the memory is <span data-say="theta of the quantity V plus E">Θ(V + E)</span>. An adjacency matrix is a <span data-say="the size of V, minus b y minus the size of V">|V|-by-|V|</span> table with a 1 where an edge exists, <span data-say="theta of V squared">Θ(V²)</span> memory regardless of how many edges there are. The authors prefer lists for sparse graphs, where E is much smaller than <span data-say="V squared">V²</span>, and the matrix for dense ones or when the question is whether one particular edge exists. Either form takes weights by storing a weight beside each entry.</p><p>Section 22.2's procedure BFS takes a graph and a source <span class="math" data-say="s">s</span>. It colours every vertex white, gives it distance infinity and no parent, then colours <span class="math" data-say="s">s</span> grey with distance 0 and puts it in a queue. While the queue is not empty it takes the vertex <span class="math" data-say="u">u</span> at the head, looks at every entry <span class="math" data-say="v">v</span> on <span class="math" data-say="u">u</span>'s list, and for each white <span class="math" data-say="v">v</span> sets its distance to <span class="math" data-say="u, d plus 1">u.d + 1</span>, its parent to <span class="math" data-say="u">u</span>, colours it grey and puts it at the tail. When <span class="math" data-say="u">u</span>'s list is done, <span class="math" data-say="u">u</span> turns black. The queue is why the search spreads evenly: every vertex at distance <span class="math" data-say="k">k</span> is discovered before any at distance <span class="math" data-say="k plus 1">k + 1</span>.</p><p>The running time is an aggregate count. No vertex is ever whitened again, so each is enqueued and dequeued at most once, O(V) for the queue. Each adjacency list is scanned once, when its vertex is dequeued, and the lists hold <span data-say="theta of E">Θ(E)</span> entries, so scanning is O(E). With <span data-say="theta of V">Θ(V)</span> to initialise, the total is O(V + E), linear in the size of the lists. It is O and not <span data-say="theta">Θ</span> because a vertex the source cannot reach is never enqueued and its list is never read.</p><p>The section then proves that the distances are right. Lemma 22.1 says that along any edge from <span class="math" data-say="u">u</span> to <span class="math" data-say="v">v</span>, <span data-say="delta of s and v">δ(s, v)</span> is at most <span data-say="delta of s and u plus 1">δ(s, u) + 1</span>. Lemma 22.2 says the search never sets a distance below the true one. Lemma 22.3 says the queue always holds distances in nondecreasing order from head to tail, with the tail at most one more than the head. Theorem 22.5 puts them together: every vertex reachable from <span class="math" data-say="s">s</span> is discovered, its recorded distance equals <span data-say="delta of s and v">δ(s, v)</span>, and following parents back from it gives a shortest path. Lemma 22.6 calls the parents' subgraph a breadth-first tree, and the procedure PRINT-PATH prints a path from it by recursion.</p><p>The lab runs the search in your browser on edges you type as records <code>from, to</code>, one per semicolon, with any names for the vertices. Adjacency lists follow the order of the edges, so you can see the order's effect. Its tiles are the distance of every vertex, the parent of every discovered vertex, the vertices by layer, how many vertices were enqueued, how many adjacency entries were examined out of the total in the lists, and which vertices were never reached.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Breadth-first search</h2></div><p>BFS distances and the breadth-first tree</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Breadth-first search</strong><span>BFS distances and the breadth-first tree</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="bfiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="bfiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Vertices are listed in the order given, then in the order the edges first name them. Adjacency lists follow the edges' order: an undirected edge u, v puts v on u's list and u on v's, a directed one v on u's only. BFS colors s gray at distance 0 and enqueues it; it dequeues u, examines every entry v of u's list in order, and a white v becomes gray with d = d[u] + 1 and π = u and is enqueued. An entry examined counts once, whatever its color; the lists hold 2E entries in an undirected graph and E in a directed one. A vertex never reached keeps d = ∞.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Search from one source, a layer at a time</h3>
-          <p>A count over the situation the lesson states. Type edges as from, to records separated by semicolons, choose undirected or directed and a source. The lab runs breadth-first search with the adjacency lists in the order you typed, and counts the vertices enqueued and the adjacency entries examined.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Search from one source, a layer at a time</h3>
+            <p>A count over the situation the lesson states. Type edges as from, to records separated by semicolons, choose undirected or directed and a source. The lab runs breadth-first search with the adjacency lists in the order you typed, and counts the vertices enqueued and the adjacency entries examined.</p>
         <div class="field">
           <label for="bfiPreset">Worked example</label>
           <select id="bfiPreset"><option value="two-pieces" selected>Ten vertices in two pieces, undirected, from s</option><option value="directed-from-s">The same records as arcs, from s</option><option value="directed-from-c">The same records as arcs, from c</option><option value="hexagon">A cycle of six vertices, from 1</option></select>
@@ -1437,12 +1480,15 @@
           <div class="kpi"><span>Not reachable</span><strong id="bfiUnreached">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>This lesson's graph has ten vertices and eleven undirected edges: <code>s, a; s, b; a, c; b, c; b, d; c, e; d, e; d, f; e, g; f, g; h, i</code>. The preset <code>two-pieces</code> searches it from <span class="math" data-say="s">s</span>. The layers are 0: s; 1: a b; 2: c d; 3: e f; 4: g. The lab enqueues 8 of 10 vertices and examines 20 of the 22 adjacency entries; h and i are not reachable and keep distance <span data-say="infinity">∞</span>, which is why the bound is O(V + E) rather than a count of every entry. The parents are a <span data-say="gets s, b gets s, c gets">← s, b ← s, c ←</span> a, <span data-say="d gets b, e gets c, f gets d">d ← b, e ← c, f ← d</span> and <span data-say="g gets e">g ← e</span>, and the path back from <span data-say="g, g gets e gets c gets">g, g ← e ← c ←</span> a <span data-say="gets s">← s</span>, has 4 edges, its distance.</p><p>The preset <code>directed-from-s</code> reads the same eleven records as arcs pointing from the first name to the second. Every arc here points away from <span class="math" data-say="s">s</span>, so the distances are unchanged, but the lists now hold 11 entries, not 22, and the lab examines 10 of 11. The preset <code>directed-from-c</code> starts at <span class="math" data-say="c">c</span> instead: only e and g can be reached, at distances 1 and 2, the lab enqueues 3 of 10 vertices and examines 2 of 11 entries, and 7 vertices are not reachable. Undirected, from the same <span class="math" data-say="c">c</span>, every vertex but h and i would be found; direction decides what a search can see.</p><p>The preset <code>hexagon</code> is a cycle of six vertices searched from 1. The far vertex, 4, is at distance 3 by either way round, and the lab gives it the parent 3, because 3 is dequeued before 5: layers 0: 1; 1: 2 6; 2: 3 5; 3: 4. Type the edge <code>6, 1</code> first instead and 4's parent becomes 5. The distances cannot change, since Theorem 22.5 fixes them as <span data-say="delta of s and v">δ(s, v)</span>; the tree can, and the theorem promises only that it is a breadth-first tree.</p><p>Section 22.1's comparison, counted by hand on the lesson's graph: the adjacency lists hold <span data-say="2 times 11 equals 22">2 × 11 = 22</span> entries beside 10 list heads, while the matrix would have <span data-say="10 times 10 equals 100">10 × 10 = 100</span> cells, 22 of them 1. To find a vertex's neighbours the matrix scans a whole row of 10 cells; the list holds only the neighbours. That is the case for lists on a sparse graph, and the search's 20 examined entries are the lists' advantage made into a count.</p><h3>Exercise</h3><p>Take the undirected graph <code>p, q; p, r; q, s; r, s; s, t; t, u; r, u; v, w</code> and search it by hand from p, writing the queue after each dequeue, every distance and every parent. How many adjacency entries does the search examine, out of how many? Then type it into the lab, and try reading it as directed from p.</p><p>Breadth-first search spreads from one source a layer at a time. The next lesson, Depth-First Search, goes as deep as it can instead, and stamps every vertex with two times.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running breadth-first search by hand</h2></div><p>Five steps, the last on a graph of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the adjacency lists</h3><p>For each edge, add each end to the other's list (or the head to the tail's list, if directed), in the order the edges are given.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Start the queue at the source</h3><p>Give the source distance 0 and put it in the queue. Every other vertex is white, at distance infinity, with no parent.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Dequeue and scan</h3><p>Take the vertex at the head and read its whole list. Each white neighbour gets distance one more, this vertex as parent, and goes to the tail.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the layers and the tree</h3><p>When the queue is empty, group vertices by distance, draw each parent edge, and list any vertex left at infinity.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a graph of your own</h3><p>Write a few friendships, station links or web links of your own as records and type them into the lab. Note each vertex's distance from one of them and how many adjacency entries the search examined.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running breadth-first search by hand</h2>
+      <p class="lead-in">Five steps, the last on a graph of your own.</p>
+      <ol class="key-ideas method"><li><strong>Write the adjacency lists.</strong> For each edge, add each end to the other's list (or the head to the tail's list, if directed), in the order the edges are given.</li><li><strong>Start the queue at the source.</strong> Give the source distance 0 and put it in the queue. Every other vertex is white, at distance infinity, with no parent.</li><li><strong>Dequeue and scan.</strong> Take the vertex at the head and read its whole list. Each white neighbour gets distance one more, this vertex as parent, and goes to the tail.</li><li><strong>Read the layers and the tree.</strong> When the queue is empty, group vertices by distance, draw each parent edge, and list any vertex left at infinity.</li><li><strong>Do it on a graph of your own.</strong> Write a few friendships, station links or web links of your own as records and type them into the lab. Note each vertex's distance from one of them and how many adjacency entries the search examined.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1463,17 +1509,16 @@ dequeue f, then g: nothing new
 8 enqueued, 20 entries read; h, i never</div><p>The queue held distances 1 and 2, then 2 and 3, then 3 and 4: never more than two values at once, as Lemma 22.3 says. Every distance is the number of edges on the path the parents give back to s.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the breadth-first tree is a property of the graph</strong><span>The distances are: Theorem 22.5 fixes each one as <span data-say="delta of s and v">δ(s, v)</span>. The tree is not. It depends on the order of the adjacency lists, because a vertex takes as parent whichever neighbour is dequeued first. On the lab's hexagon, vertex 4 is at distance 3 either way round and gets parent 3 with the edges in the order given; type the edge from 6 to 1 first and it gets 5.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting breadth-first search to find shortest weighted paths</strong><span>Its distance counts edges, with every edge worth 1. Give the edges weights and the path with fewest edges need not be the lightest. Weighted shortest paths need Chapter 24's algorithms, which the course reaches in two lessons' time; Dijkstra's algorithm is breadth-first search's descendant there.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the search visits every vertex</strong><span>Breadth-first search, as the book sets it up, explores from one source and finds only what that source can reach. On the lesson's graph h and i keep distance <span data-say="infinity">∞</span>, the lab enqueues 8 of 10 vertices, and their two adjacency entries are never read. Depth-first search, next, restarts from every vertex still white.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run breadth-first search by hand and say what it counts.</strong><p>For a graph of eight to ten vertices, write the adjacency lists, the queue after each dequeue, every distance and parent, and the numbers of vertices enqueued and entries examined.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab runs one search with the adjacency order you type and counts what it enqueues and examines on that graph; it does not build the adjacency matrix, whose cost the lesson counts by hand. That the distances are right on every graph is Theorem 22.5, not the run.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the breadth-first tree is a property of the graph</strong><span>The distances are: Theorem 22.5 fixes each one as <span data-say="delta of s and v">δ(s, v)</span>. The tree is not. It depends on the order of the adjacency lists, because a vertex takes as parent whichever neighbour is dequeued first. On the lab's hexagon, vertex 4 is at distance 3 either way round and gets parent 3 with the edges in the order given; type the edge from 6 to 1 first and it gets 5.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting breadth-first search to find shortest weighted paths</strong><span>Its distance counts edges, with every edge worth 1. Give the edges weights and the path with fewest edges need not be the lightest. Weighted shortest paths need Chapter 24's algorithms, which the course reaches in two lessons' time; Dijkstra's algorithm is breadth-first search's descendant there.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the search visits every vertex</strong><span>Breadth-first search, as the book sets it up, explores from one source and finds only what that source can reach. On the lesson's graph h and i keep distance <span data-say="infinity">∞</span>, the lab enqueues 8 of 10 vertices, and their two adjacency entries are never read. Depth-first search, next, restarts from every vertex still white.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run breadth-first search by hand and say what it counts.</strong><p>For a graph of eight to ten vertices, write the adjacency lists, the queue after each dequeue, every distance and parent, and the numbers of vertices enqueued and entries examined.</p></div></div><div class="note"><strong>Note:</strong> The lab runs one search with the adjacency order you type and counts what it enqueues and examines on that graph; it does not build the adjacency matrix, whose cost the lesson counts by hand. That the distances are right on every graph is Theorem 22.5, not the run.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Adjacency lists and the adjacency matrix</summary><p>Adjacency lists keep, for each vertex, a list of its neighbours: <span data-say="theta of the quantity V plus E">Θ(V + E)</span> memory, and the usual choice for a sparse graph. An adjacency matrix keeps a V-by-V table of 0s and <span data-say="1 s, theta of V squared">1s: Θ(V²)</span> memory whatever the number of edges, but it answers whether an edge exists in constant time.</p></details><details class="recall"><summary>The frontier and the queue</summary><p>Breadth-first search colours vertices white, grey and black. Grey vertices have been discovered but not yet scanned; they are the frontier between the found and the unfound, and a first-in, first-out queue holds them in the order discovered.</p></details><details class="recall"><summary>Shortest-path distance and the breadth-first tree</summary><p>The distance <span data-say="delta of s and v">δ(s, v)</span> is the fewest edges on any path from the source s to v, or infinity when there is none. Breadth-first search records a parent for each vertex it discovers, and the parents form a tree whose path from s to any vertex is a shortest one.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 22.1 and 22.2 choose a representation and run the first search on it. Adjacency lists take memory in proportion to V + E, an adjacency matrix <span data-say="V squared">V²</span>. Breadth-first search discovers vertices in layers by distance from the source, builds a breadth-first tree of shortest paths, and runs in O(V + E). Run it on a ten-vertex graph written for the lesson and count what it enqueues and examines.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Adjacency lists and the adjacency matrix.</strong> Adjacency lists keep, for each vertex, a list of its neighbours: <span data-say="theta of the quantity V plus E">Θ(V + E)</span> memory, and the usual choice for a sparse graph. An adjacency matrix keeps a V-by-V table of 0s and <span data-say="1 s, theta of V squared">1s: Θ(V²)</span> memory whatever the number of edges, but it answers whether an edge exists in constant time.</li><li><strong>The frontier and the queue.</strong> Breadth-first search colours vertices white, grey and black. Grey vertices have been discovered but not yet scanned; they are the frontier between the found and the unfound, and a first-in, first-out queue holds them in the order discovered.</li><li><strong>Shortest-path distance and the breadth-first tree.</strong> The distance <span data-say="delta of s and v">δ(s, v)</span> is the fewest edges on any path from the source s to v, or infinity when there is none. Breadth-first search records a parent for each vertex it discovers, and the parents form a tree whose path from s to any vertex is a shortest one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="lists, theta of the quantity V plus E, memory, matrix, theta of V squared. undirected lists hold 2 E entries. A FIFO queue holds the grey frontier. v, d equals u, d plus 1 when v is discovered. each list is scanned once, big O of the quantity V plus E. d ends equal to the fewest edges. parents form a breadth-first tree" tabindex="0" role="region" aria-label="Mathematical notation">lists: Θ(V + E) memory; matrix: Θ(V²)
 undirected lists hold 2E entries
 a FIFO queue holds the grey frontier
@@ -2215,11 +2260,40 @@ parents form a breadth-first tree</div><figcaption>Sections 22.1 and 22.2 in sev
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2287,7 +2361,7 @@ parents form a breadth-first tree</div><figcaption>Sections 22.1 and 22.2 in sev
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

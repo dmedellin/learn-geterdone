@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Stock, Money and Banks</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Book II, Chapter 1 · Of the Division of Stock</p>
       <h1>Fixed and Circulating Capital</h1>
       <p class="lesson-lede">A stock divides into what is kept for use, what earns by staying with its owner, and what earns by going from him and coming back.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Stock reserved for immediate consumption</li><li>Fixed capital</li><li>Circulating capital</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The test, then the farmer&#x27;s cattle, then the society</h2>
-      <article class="prose reading"><p><strong>Book II, Chapter 1.</strong> &ldquo;But when he possesses stock sufficient to maintain him for months or years, he naturally endeavours to derive a revenue from the greater part of it, reserving only so much for his immediate consumption as may maintain him till this revenue begins to come in. His whole stock, therefore, is distinguished into two parts. That part which he expects is to afford him this revenue is called his capital.&rdquo;</p><p>That is the first cut, and everything later in the chapter is the second cut made inside capital. A person with a week's food has no capital: he eats it. A person with a year's food can set some of it to work, and the part set to work is what Smith calls capital. The remainder supplies immediate consumption, whether it is what he first reserved, the revenue as it comes in, or &ldquo;such things as had been purchased by either of these in former years, and which are not yet entirely consumed&rdquo;.</p><p>Now the test that splits capital. A capital may be employed &ldquo;in raising, manufacturing, or purchasing goods, and selling them again with a profit&rdquo;. The merchant's goods earn nothing while they sit. &ldquo;His capital is continually going from him in one shape, and returning to him in another; and it is only by means of such circulation, or successive changes, that it can yield him any profit.&rdquo; That is circulating capital. The other way is to lay it out on &ldquo;such like things as yield a revenue or profit without changing masters, or circulating any further&rdquo;, which Smith calls fixed capital. A merchant's capital is almost all circulating. A tailor's fixed capital is a parcel of needles. An iron-work's is a furnace, a forge and a slit-mill, which &ldquo;cannot be erected without a very great expense&rdquo;.</p><p>The farmer is where the test earns its keep, and Smith is careful with him. &ldquo;He makes a profit of the one by keeping it in his own possession, and of the other by parting with it.&rdquo; His labouring cattle are fixed capital, like his plough, but their keep is circulating, like the wages of his servants. Cattle bought and fattened to sell are circulating throughout. A breeding flock that he keeps for wool and increase is fixed, and its keep circulating. Then the surprise: &ldquo;The whole value of the seed, too, is properly a fixed capital. Though it goes backwards and forwards between the ground and the granary, it never changes masters, and therefore does not properly circulate.&rdquo; The test asks about owners and sales, not about whether the thing moves. The farmer preset sorts a farm this way, with kinds from Smith and sums written for the lesson, and the farmer's capital comes to £340 of a £400 stock.</p><p>Then the society. &ldquo;The general stock of any country or society is the same with that of all its inhabitants or members&rdquo;, so it divides into the same three portions. The first, for immediate consumption, includes the whole stock of dwelling-houses. A house lived in by its owner is no capital to him: &ldquo;A dwelling-house, as such, contributes nothing to the revenue of its inhabitant&rdquo;. Let it to a tenant and it yields its owner a rent, but the tenant pays that from some other revenue, so it yields none to the public. Smith lists masquerade dresses let for the night and funeral furniture let by the day to show the same point at the smallest scale.</p><p>The second portion, fixed capital, has four parts. Machines and instruments of trade; the profitable buildings, shops, warehouses and farmhouses, which are &ldquo;very different from mere dwelling-houses&rdquo;; the improvements of land, such as clearing, draining and manuring; and a fourth that is easy to read past: &ldquo;the acquired and useful abilities of all the inhabitants and members of the society&rdquo;. The maintenance of a person while he learns, Smith says, &ldquo;always costs a real expense, which is a capital fixed and realized, as it were, in his person&rdquo;. Later writers gave this idea its own name, human capital, and it is in the book already.</p><p>The third portion, circulating capital, also has four: the money by which the others are circulated; the provisions in the hands of butchers, farmers and brewers; the materials not yet made up; and the finished work still in the shops of the smith and the cabinet-maker. The parish preset puts all ten of these holdings into one parish, with sums written for this lesson: £400 for immediate consumption, £600 fixed and £250 circulating, which makes the capital £850 of a £1,250 stock.</p><p>The two capitals lean on one another. &ldquo;No fixed capital can yield any revenue but by means of a circulating capital&rdquo;: the best machine produces nothing without materials to work on and maintenance for the workmen, and land, however improved, yields no revenue without a circulating capital to keep its labourers. And both exist for the first portion: to maintain and augment the stock for immediate consumption is, Smith says, &ldquo;the sole end and purpose both of the fixed and circulating capitals&rdquo;, and &ldquo;It is this stock which feeds, clothes, and lodges the people.&rdquo; Hold the three presets next to each other and you see the proportions vary by trade. The iron-work preset, with figures written for the lesson, is £600 fixed of £1,000, and the farmer's is under half.</p><p>The chapter ends with a remark whose first half is plain Smith. &ldquo;A man must be perfectly crazy, who, where there is a tolerable security, does not employ all the stock which he commands&rdquo; in one of the three ways. The second half is a warning about where security is missing, where men &ldquo;bury or conceal a great part of their stock&rdquo; to have it ready to carry off. The stock exists in either case; what differs is whether it works.</p><p>Two later arguments about the test are worth knowing. Smith's rule sorts by what the owner does with a thing, so a farmer's seed is fixed, and Ricardo sorted by how long a capital lasts, which puts seed with the circulating capital that is used up in a year; Capital's lessons <em>Ricardo on Fixed and Circulating Capital</em> and <em>The Physiocrats and Adam Smith on Fixed Capital</em> take up the objections, which this lesson does not repeat. The point for now is that the classes are drawn from the owner's side. A capital that is fixed to one person may be circulating for another: the loom is fixed to the weaver and circulating to the maker who sells it.</p><p>Chapter 2 asks what part of all this is money. It is the first of the circulating capitals, and it turns out to be the odd one out, which is the subject of the next lesson, <em>Gross and Net Revenue</em>.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Stock and its employments</h2></div><p>a stock divided into the part kept for consumption, fixed capital and circulating capital</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The test, then the farmer&#x27;s cattle, then the society</h2><div class="prose reading"><p><strong>Book II, Chapter 1.</strong> &ldquo;But when he possesses stock sufficient to maintain him for months or years, he naturally endeavours to derive a revenue from the greater part of it, reserving only so much for his immediate consumption as may maintain him till this revenue begins to come in. His whole stock, therefore, is distinguished into two parts. That part which he expects is to afford him this revenue is called his capital.&rdquo;</p><p>That is the first cut, and everything later in the chapter is the second cut made inside capital. A person with a week's food has no capital: he eats it. A person with a year's food can set some of it to work, and the part set to work is what Smith calls capital. The remainder supplies immediate consumption, whether it is what he first reserved, the revenue as it comes in, or &ldquo;such things as had been purchased by either of these in former years, and which are not yet entirely consumed&rdquo;.</p><p>Now the test that splits capital. A capital may be employed &ldquo;in raising, manufacturing, or purchasing goods, and selling them again with a profit&rdquo;. The merchant's goods earn nothing while they sit. &ldquo;His capital is continually going from him in one shape, and returning to him in another; and it is only by means of such circulation, or successive changes, that it can yield him any profit.&rdquo; That is circulating capital. The other way is to lay it out on &ldquo;such like things as yield a revenue or profit without changing masters, or circulating any further&rdquo;, which Smith calls fixed capital. A merchant's capital is almost all circulating. A tailor's fixed capital is a parcel of needles. An iron-work's is a furnace, a forge and a slit-mill, which &ldquo;cannot be erected without a very great expense&rdquo;.</p><p>The farmer is where the test earns its keep, and Smith is careful with him. &ldquo;He makes a profit of the one by keeping it in his own possession, and of the other by parting with it.&rdquo; His labouring cattle are fixed capital, like his plough, but their keep is circulating, like the wages of his servants. Cattle bought and fattened to sell are circulating throughout. A breeding flock that he keeps for wool and increase is fixed, and its keep circulating. Then the surprise: &ldquo;The whole value of the seed, too, is properly a fixed capital. Though it goes backwards and forwards between the ground and the granary, it never changes masters, and therefore does not properly circulate.&rdquo; The test asks about owners and sales, not about whether the thing moves. The farmer preset sorts a farm this way, with kinds from Smith and sums written for the lesson, and the farmer's capital comes to £340 of a £400 stock.</p><p>Then the society. &ldquo;The general stock of any country or society is the same with that of all its inhabitants or members&rdquo;, so it divides into the same three portions. The first, for immediate consumption, includes the whole stock of dwelling-houses. A house lived in by its owner is no capital to him: &ldquo;A dwelling-house, as such, contributes nothing to the revenue of its inhabitant&rdquo;. Let it to a tenant and it yields its owner a rent, but the tenant pays that from some other revenue, so it yields none to the public. Smith lists masquerade dresses let for the night and funeral furniture let by the day to show the same point at the smallest scale.</p><p>The second portion, fixed capital, has four parts. Machines and instruments of trade; the profitable buildings, shops, warehouses and farmhouses, which are &ldquo;very different from mere dwelling-houses&rdquo;; the improvements of land, such as clearing, draining and manuring; and a fourth that is easy to read past: &ldquo;the acquired and useful abilities of all the inhabitants and members of the society&rdquo;. The maintenance of a person while he learns, Smith says, &ldquo;always costs a real expense, which is a capital fixed and realized, as it were, in his person&rdquo;. Later writers gave this idea its own name, human capital, and it is in the book already.</p><p>The third portion, circulating capital, also has four: the money by which the others are circulated; the provisions in the hands of butchers, farmers and brewers; the materials not yet made up; and the finished work still in the shops of the smith and the cabinet-maker. The parish preset puts all ten of these holdings into one parish, with sums written for this lesson: £400 for immediate consumption, £600 fixed and £250 circulating, which makes the capital £850 of a £1,250 stock.</p><p>The two capitals lean on one another. &ldquo;No fixed capital can yield any revenue but by means of a circulating capital&rdquo;: the best machine produces nothing without materials to work on and maintenance for the workmen, and land, however improved, yields no revenue without a circulating capital to keep its labourers. And both exist for the first portion: to maintain and augment the stock for immediate consumption is, Smith says, &ldquo;the sole end and purpose both of the fixed and circulating capitals&rdquo;, and &ldquo;It is this stock which feeds, clothes, and lodges the people.&rdquo; Hold the three presets next to each other and you see the proportions vary by trade. The iron-work preset, with figures written for the lesson, is £600 fixed of £1,000, and the farmer's is under half.</p><p>The chapter ends with a remark whose first half is plain Smith. &ldquo;A man must be perfectly crazy, who, where there is a tolerable security, does not employ all the stock which he commands&rdquo; in one of the three ways. The second half is a warning about where security is missing, where men &ldquo;bury or conceal a great part of their stock&rdquo; to have it ready to carry off. The stock exists in either case; what differs is whether it works.</p><p>Two later arguments about the test are worth knowing. Smith's rule sorts by what the owner does with a thing, so a farmer's seed is fixed, and Ricardo sorted by how long a capital lasts, which puts seed with the circulating capital that is used up in a year; Capital's lessons <em>Ricardo on Fixed and Circulating Capital</em> and <em>The Physiocrats and Adam Smith on Fixed Capital</em> take up the objections, which this lesson does not repeat. The point for now is that the classes are drawn from the owner's side. A capital that is fixed to one person may be circulating for another: the loom is fixed to the weaver and circulating to the maker who sells it.</p><p>Chapter 2 asks what part of all this is money. It is the first of the circulating capitals, and it turns out to be the odd one out, which is the subject of the next lesson, <em>Gross and Net Revenue</em>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Stock and its employments</h2></div><p>a stock divided into the part kept for consumption, fixed capital and circulating capital</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Stock and its employments</strong><span>a stock divided into the part kept for consumption, fixed capital and circulating capital</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wstTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wstTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each part is put by the lesson into one of Smith's three portions of a stock (Book II, chapter 1): the part reserved for immediate consumption, which affords no revenue; fixed capital, which yields a revenue without changing masters; circulating capital, which yields one by parting with it. The lab sums each kind; a share is its sum over the whole stock. Capital is fixed plus circulating. The largest part of each kind is the first one given when two are equal (the lab's rule). Which kind a part belongs to is the lesson's assignment, not the lab's. Amounts are in the lesson's money unit, typed as decimals (at most 6 places) or fractions such as 5/2, and computed exactly; one without a finite decimal is printed as its fraction and its value to 2 places after ≈. A percentage is exact when it has at most 2 decimal places and is otherwise rounded to 2 places on the exact value and marked ≈. </p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Three portions of a stock</h3>
-          <p>A figure computed from the quantities the lesson states. Each holding is a name, a sum in pounds and a kind. The lab totals each kind, gives its share and the capital share, and names the largest part of each kind. The farm's kinds are Smith's; every sum is written for this lesson.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Three portions of a stock</h3>
+            <p>A figure computed from the quantities the lesson states. Each holding is a name, a sum in pounds and a kind. The lab totals each kind, gives its share and the capital share, and names the largest part of each kind. The farm's kinds are Smith's; every sum is written for this lesson.</p>
         <div class="field">
           <label for="wstPreset">Worked example</label>
           <select id="wstPreset"><option value="parish" selected>A parish's stock, written for this lesson</option><option value="farmer">A farmer's stock sorted as Smith sorts it (his kinds, sums written for this lesson)</option><option value="iron-work">An iron-work, written for this lesson</option></select>
@@ -1425,12 +1468,14 @@
           <div class="kpi"><span>Largest part of each kind</span><strong id="wstLargest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sorting a holding by Smith&#x27;s test</h2></div><p>Four steps, and the second is the only one that needs thought.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask whether it is meant to earn</h3><p>If it is kept for its owner's own use and spent in using, it belongs to the stock reserved for immediate consumption, whatever it is made of.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask whether it earns by staying or by going</h3><p>If the owner profits by keeping it, as with a loom, a drained field or a breeding flock, it is fixed. If he profits by selling it on and getting back more, as with a merchant's goods or a servant's wages, it is circulating.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the sums by kind</h3><p>Total consumption, fixed and circulating separately. Capital is the sum of the last two, and the whole stock is all three.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the dependence</h3><p>A fixed capital yields only with a circulating one beside it. If a list has machines and no materials or maintenance, something was left out.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sorting a holding by Smith&#x27;s test</h2>
+      <p class="lead-in">Four steps, and the second is the only one that needs thought.</p>
+      <ol class="key-ideas method"><li><strong>Ask whether it is meant to earn.</strong> If it is kept for its owner's own use and spent in using, it belongs to the stock reserved for immediate consumption, whatever it is made of.</li><li><strong>Ask whether it earns by staying or by going.</strong> If the owner profits by keeping it, as with a loom, a drained field or a breeding flock, it is fixed. If he profits by selling it on and getting back more, as with a merchant's goods or a servant's wages, it is circulating.</li><li><strong>Add the sums by kind.</strong> Total consumption, fixed and circulating separately. Capital is the sum of the last two, and the whole stock is all three.</li><li><strong>Check the dependence.</strong> A fixed capital yields only with a circulating one beside it. If a list has machines and no materials or maintenance, something was left out.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1448,17 +1493,16 @@ whole stock:  180 + 160 + 60 = 400
 capital:  180 + 160 = 340, and 340 / 400 = 17/20</div><p>The farmer's fixed capital is under half the whole, and his seed, a small part, is on the fixed side, which Smith insists on although the seed goes back and forth between ground and granary. In the iron-work the fixed share is three fifths, which is the difference Smith meant when he set a tailor's needles beside a furnace.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sorting by what a thing is made of, not by what it does for its owner</strong><span>Smith's test is the owner's: does he profit by keeping it or by parting with it? A farmer's seed moves between ground and granary and is fixed. His cattle are fixed if kept for labour or increase and circulating if bought to sell. In the farm preset the same herd appears on both sides for this reason: the price of the labouring cattle is fixed, and their keep circulating.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting an owner&#x27;s dwelling-house as capital</strong><span>It is the largest single item in the parish preset and it is not capital. Smith puts it with clothes and furniture, only longer-lived: a stock of houses &ldquo;may last many centuries&rdquo; but is &ldquo;still as really a stock reserved for immediate consumption&rdquo;. A rented house is capital to its landlord only.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking fixed capital means machinery</strong><span>Smith names four kinds: machines, profitable buildings, improvements of land, and acquired abilities. In the parish preset £250 of improved land and £100 of acquired abilities are fixed capital, and neither is a machine. An apprentice's years of keep are, in Smith's words, a capital &ldquo;fixed and realized, as it were, in his person&rdquo;.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a list of holdings by Smith&#x27;s test.</strong><p>Given a list of holdings, classify each as kept for immediate consumption, fixed capital or circulating capital by whether it yields a revenue and, if so, by staying or by going, and compute the share of each kind and the capital share.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The classification depends on the owner's point of view, and that is a strength and a limit of it. The lab applies the test to kinds that the lesson assigns, so it cannot show whether Smith's classes cut an economy at its joints, which later writers disputed. The sums in all three presets are written for this lesson; Smith lists the kinds and gives no amounts.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sorting by what a thing is made of, not by what it does for its owner</strong><span>Smith's test is the owner's: does he profit by keeping it or by parting with it? A farmer's seed moves between ground and granary and is fixed. His cattle are fixed if kept for labour or increase and circulating if bought to sell. In the farm preset the same herd appears on both sides for this reason: the price of the labouring cattle is fixed, and their keep circulating.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting an owner&#x27;s dwelling-house as capital</strong><span>It is the largest single item in the parish preset and it is not capital. Smith puts it with clothes and furniture, only longer-lived: a stock of houses &ldquo;may last many centuries&rdquo; but is &ldquo;still as really a stock reserved for immediate consumption&rdquo;. A rented house is capital to its landlord only.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking fixed capital means machinery</strong><span>Smith names four kinds: machines, profitable buildings, improvements of land, and acquired abilities. In the parish preset £250 of improved land and £100 of acquired abilities are fixed capital, and neither is a machine. An apprentice's years of keep are, in Smith's words, a capital &ldquo;fixed and realized, as it were, in his person&rdquo;.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can sort a list of holdings by Smith&#x27;s test.</strong><p>Given a list of holdings, classify each as kept for immediate consumption, fixed capital or circulating capital by whether it yields a revenue and, if so, by staying or by going, and compute the share of each kind and the capital share.</p></div></div><div class="note"><strong>Note:</strong> The classification depends on the owner's point of view, and that is a strength and a limit of it. The lab applies the test to kinds that the lesson assigns, so it cannot show whether Smith's classes cut an economy at its joints, which later writers disputed. The sums in all three presets are written for this lesson; Smith lists the kinds and gives no amounts.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Stock reserved for immediate consumption</summary><p>The part of a stock kept to be used up, not to earn: food in the larder, clothes, furniture and, to its owner, his dwelling-house. It yields no revenue; it is spent, however slowly.</p></details><details class="recall"><summary>Fixed capital</summary><p>What yields a revenue without changing masters: machines and tools, profitable buildings, improvements of land, and the acquired abilities of the people. Its owner profits by keeping it.</p></details><details class="recall"><summary>Circulating capital</summary><p>What yields a revenue only by circulating, by going from its owner and coming back with a profit: money, provisions, materials and finished work in dealers' hands. Its owner profits by parting with it.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 1 sorts every stock, a man's or a nation's, by one test: does it yield a revenue, and if so does it do it by staying or by going? Sort a parish, a farm and an iron-work into Smith's three portions, compute the shares, and see why a farmer's seed is fixed and his cattle's keep is circulating.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Stock reserved for immediate consumption.</strong> The part of a stock kept to be used up, not to earn: food in the larder, clothes, furniture and, to its owner, his dwelling-house. It yields no revenue; it is spent, however slowly.</li><li><strong>Fixed capital.</strong> What yields a revenue without changing masters: machines and tools, profitable buildings, improvements of land, and the acquired abilities of the people. Its owner profits by keeping it.</li><li><strong>Circulating capital.</strong> What yields a revenue only by circulating, by going from its owner and coming back with a profit: money, provisions, materials and finished work in dealers' hands. Its owner profits by parting with it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="kept for use, no revenue. fixed, revenue by staying. circulating, revenue by going and returning. capital equals fixed plus circulating. fixed needs circulating to yield" tabindex="0" role="region" aria-label="Mathematical notation">kept for use: no revenue
 fixed: revenue by staying
 circulating: revenue by going and returning
@@ -2338,11 +2382,40 @@ fixed needs circulating to yield</div><figcaption>The three portions in five lin
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2410,7 +2483,7 @@ fixed needs circulating to yield</div><figcaption>The three portions in five lin
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

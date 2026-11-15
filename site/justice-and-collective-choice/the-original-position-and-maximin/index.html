@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,34 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Justice and Collective Choice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Distributive justice</p>
       <h1>The Original Position and Maximin</h1>
       <p class="lesson-lede">Choose a society without knowing which place in it will be yours, and the rule you choose with decides the society.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The position is the state</li><li>Maximin looks only at the worst place</li><li>Equal chances is a different rule</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Choosing a society from behind the veil</h2>
-      <article class="prose reading"><p>Suppose you must pick the arrangement of a society, and you must do it before learning which place in it you will occupy. You might be among the worst off, in the middle, or among the best off. Rawls called the situation of such a chooser the <strong>original position</strong>, and the ignorance of one's own place the <strong>veil</strong>. What he claimed is that principles chosen under the veil are fair, because no one can tailor them to their own advantage.</p><p>The argument is only worth testing if it can be written down, and it can. Take two societies, one in which everyone has <span class="math" data-say="5">5</span> units of welfare and one in which the worst place has <span class="math" data-say="2">2</span>, the middle <span class="math" data-say="8">8</span> and the best <span class="math" data-say="20">20</span>. The unknown is your place, so the table has three states.</p><div class="mathblock" data-say="bottom, middle, top. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 bottom    middle    top
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Choosing a society from behind the veil</h2><div class="prose reading"><p>Suppose you must pick the arrangement of a society, and you must do it before learning which place in it you will occupy. You might be among the worst off, in the middle, or among the best off. Rawls called the situation of such a chooser the <strong>original position</strong>, and the ignorance of one's own place the <strong>veil</strong>. What he claimed is that principles chosen under the veil are fair, because no one can tailor them to their own advantage.</p><p>The argument is only worth testing if it can be written down, and it can. Take two societies, one in which everyone has <span class="math" data-say="5">5</span> units of welfare and one in which the worst place has <span class="math" data-say="2">2</span>, the middle <span class="math" data-say="8">8</span> and the best <span class="math" data-say="20">20</span>. The unknown is your place, so the table has three states.</p><div class="mathblock" data-say="bottom, middle, top. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 bottom    middle    top
      equal          5         5        5
-     unequal        2         8       20</div><p>Maximin reads off each society's worst entry: <span class="math" data-say="5">5</span> for the equal society and <span class="math" data-say="2">2</span> for the unequal one. The larger worst case is <span class="math" data-say="5">5</span>, so maximin chooses the equal society. Nothing about the <span class="math" data-say="8">8</span> or the <span class="math" data-say="20">20</span> entered the calculation.</p><p>Now give each place the same chance, as Laplace's rule does. The equal society averages <span class="math" data-say="5">5</span>, and the unequal one averages <span class="math" data-say="the quantity 2 plus 8 plus 20, over 3">(2 + 8 + 20) / 3</span>, which is <span class="math" data-say="10">10</span>. The larger average is <span class="math" data-say="10">10</span>, so this rule chooses the unequal society. Same table, same chooser, opposite verdicts, and the difference lies wholly in what the rule is willing to ignore.</p><div class="defbox"><span class="label">Definition &middot; Maximin</span><p><strong>Maximin</strong> scores each act by its worst payoff across the states and chooses the act whose worst payoff is largest.</p></div><h3>What the rule choice is about</h3><p>Rawls's case for maximin is not that people dislike risk. It is that the choice has three features: the chooser has no trustworthy basis for assigning probabilities to the places, the chooser cares little for what is gained above the guaranteed minimum, and the worst outcome of a rejected society would be one hardly bearable. Where those hold, looking only at the floor is a reasonable policy. Where they do not, for instance when the stakes are small and the odds are known, it is a poor one.</p><p>Harsanyi's reply denies the first feature. A chooser who knows nothing about their place has, he argued, no reason to favour any place over another, and equal weights are what that ignorance amounts to. Each side states a valid argument from its premises; the lab computes both and cannot say whether the veil should leave you with no probabilities or with equal ones. That is the question the lesson leaves with you.</p><p>The lab's second table carries one more figure. With each place at probability <span class="math" data-say="1 over 3">1/3</span> the value-of-information tile prints <span class="math" data-say="1">1</span>, and here that quantity has a name: it is the value of lifting the veil. A chooser who learned their place before choosing would take the equal society in the bottom place, where it pays <span class="math" data-say="5">5</span> against <span class="math" data-say="2">2</span>, and the unequal society anywhere else, for an expectation of <span class="math" data-say="the quantity 5 plus 8 plus 20, over 3">(5 + 8 + 20) / 3</span>, which is <span class="math" data-say="11">11</span>; the best a chooser can do without that knowledge is <span class="math" data-say="10">10</span>. The difference, <span class="math" data-say="1">1</span>, is what knowing one's own place would be worth to the chooser. The veil withholds exactly that, and withholds it from everyone, which is what makes a choice made behind it fair on Rawls's account.</p><div class="example"><span class="label">Example &middot; A close call</span><p>In the lab's third table the unequal society pays <span class="math" data-say="5">5</span>, <span class="math" data-say="6">6</span> and <span class="math" data-say="7">7</span> against <span class="math" data-say="5">5</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="5">5</span>. Maximin finds the same worst case, <span class="math" data-say="5">5</span>, in both rows and cannot separate them, while the average separates them at once, <span class="math" data-say="6">6</span> against <span class="math" data-say="5">5</span>. A tie under maximin is a signal that the rule has run out of information, which is where the next lesson begins.</p></div><p>One limit belongs here. The numbers are welfare levels the table's author chose, and the societies are two among the many that could have been offered. The lab computes what each rule picks from the table as stated; it does not tell you that the table describes any real society.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+     unequal        2         8       20</div><p>Maximin reads off each society's worst entry: <span class="math" data-say="5">5</span> for the equal society and <span class="math" data-say="2">2</span> for the unequal one. The larger worst case is <span class="math" data-say="5">5</span>, so maximin chooses the equal society. Nothing about the <span class="math" data-say="8">8</span> or the <span class="math" data-say="20">20</span> entered the calculation.</p><p>Now give each place the same chance, as Laplace's rule does. The equal society averages <span class="math" data-say="5">5</span>, and the unequal one averages <span class="math" data-say="the quantity 2 plus 8 plus 20, over 3">(2 + 8 + 20) / 3</span>, which is <span class="math" data-say="10">10</span>. The larger average is <span class="math" data-say="10">10</span>, so this rule chooses the unequal society. Same table, same chooser, opposite verdicts, and the difference lies wholly in what the rule is willing to ignore.</p><div class="defbox"><span class="label">Definition &middot; Maximin</span><p><strong>Maximin</strong> scores each act by its worst payoff across the states and chooses the act whose worst payoff is largest.</p></div><h3>What the rule choice is about</h3><p>Rawls's case for maximin is not that people dislike risk. It is that the choice has three features: the chooser has no trustworthy basis for assigning probabilities to the places, the chooser cares little for what is gained above the guaranteed minimum, and the worst outcome of a rejected society would be one hardly bearable. Where those hold, looking only at the floor is a reasonable policy. Where they do not, for instance when the stakes are small and the odds are known, it is a poor one.</p><p>Harsanyi's reply denies the first feature. A chooser who knows nothing about their place has, he argued, no reason to favour any place over another, and equal weights are what that ignorance amounts to. Each side states a valid argument from its premises; the lab computes both and cannot say whether the veil should leave you with no probabilities or with equal ones. That is the question the lesson leaves with you.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Acts by states</strong><span>a row per act, a column per state; the rule decides</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="deTable"></table></div>
       <div class="status-banner" id="deStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Choose a society, then change the rule</h3>
-          <p>The rule is shipped as maximin. Switch it to Laplace and the same table gives the other verdict; with the probabilities box filled in, expected utility and the value of information also work.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Choose a society, then change the rule</h3>
+            <p>The rule is shipped as maximin. Switch it to Laplace and the same table gives the other verdict; with the probabilities box filled in, expected utility and the value of information also work.</p>
         <div class="field">
           <label for="dePreset">Worked example</label>
           <select id="dePreset"><option value="rawls" selected>Equal 5, 5, 5 against unequal 2, 8, 20</option><option value="harsanyi">The same table, each place at probability 1/3</option><option value="close-call">Equal 5, 5, 5 against unequal 5, 6, 7</option></select>
@@ -1448,12 +1491,15 @@
           <div class="kpi"><span>Expected utilities tie at</span><strong id="deFlip">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The lab's second table carries one more figure. With each place at probability <span class="math" data-say="1 over 3">1/3</span> the value-of-information tile prints <span class="math" data-say="1">1</span>, and here that quantity has a name: it is the value of lifting the veil. A chooser who learned their place before choosing would take the equal society in the bottom place, where it pays <span class="math" data-say="5">5</span> against <span class="math" data-say="2">2</span>, and the unequal society anywhere else, for an expectation of <span class="math" data-say="the quantity 5 plus 8 plus 20, over 3">(5 + 8 + 20) / 3</span>, which is <span class="math" data-say="11">11</span>; the best a chooser can do without that knowledge is <span class="math" data-say="10">10</span>. The difference, <span class="math" data-say="1">1</span>, is what knowing one's own place would be worth to the chooser. The veil withholds exactly that, and withholds it from everyone, which is what makes a choice made behind it fair on Rawls's account.</p><div class="example"><span class="label">Example &middot; A close call</span><p>In the lab's third table the unequal society pays <span class="math" data-say="5">5</span>, <span class="math" data-say="6">6</span> and <span class="math" data-say="7">7</span> against <span class="math" data-say="5">5</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="5">5</span>. Maximin finds the same worst case, <span class="math" data-say="5">5</span>, in both rows and cannot separate them, while the average separates them at once, <span class="math" data-say="6">6</span> against <span class="math" data-say="5">5</span>. A tie under maximin is a signal that the rule has run out of information, which is where the next lesson begins.</p></div><p>One limit belongs here. The numbers are welfare levels the table's author chose, and the societies are two among the many that could have been offered. The lab computes what each rule picks from the table as stated; it does not tell you that the table describes any real society.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running the original position as a table</h2></div><p>Five moves, and the second one is where the philosophy sits.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the societies as acts</h3><p>Each society on offer is a row. Keep the list short and make sure each row really is a complete arrangement.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Let the places be the states</h3><p>A place is something you might turn out to occupy. Whether the places should carry probabilities, equal or otherwise, is the contested premise, so leave it open for now.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Fill each cell with the welfare of that place in that society</h3><p>Use one scale throughout. The verdicts are verdicts about these numbers, and a different scale is a different table.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Apply maximin</h3><p>Underline the lowest entry in each row and choose the row whose underlined entry is highest. A tie means the rule has no verdict between those rows.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Apply the average and compare</h3><p>Average each row. If the two rules choose differently, the dispute between them is the dispute about the veil, and neither the table nor the lab settles it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running the original position as a table</h2>
+      <p class="lead-in">Five moves, and the second one is where the philosophy sits.</p>
+      <ol class="key-ideas method"><li><strong>List the societies as acts.</strong> Each society on offer is a row. Keep the list short and make sure each row really is a complete arrangement.</li><li><strong>Let the places be the states.</strong> A place is something you might turn out to occupy. Whether the places should carry probabilities, equal or otherwise, is the contested premise, so leave it open for now.</li><li><strong>Fill each cell with the welfare of that place in that society.</strong> Use one scale throughout. The verdicts are verdicts about these numbers, and a different scale is a different table.</li><li><strong>Apply maximin.</strong> Underline the lowest entry in each row and choose the row whose underlined entry is highest. A tie means the rule has no verdict between those rows.</li><li><strong>Apply the average and compare.</strong> Average each row. If the two rules choose differently, the dispute between them is the dispute about the veil, and neither the table nor the lab settles it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1516,16 @@ maximin:   best of 5 and 2    -&gt; equal
 Laplace:   best of 5 and 10   -&gt; unequal</div><p>The rules differ about one thing: whether a gain of <span class="math" data-say="15">15</span> at the top can make up for a loss of <span class="math" data-say="3">3</span> at the bottom. Maximin says it never can. Laplace says it can, here by a wide margin. Nothing in the arithmetic says which of them is describing fairness.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Rawls assumes people are risk-averse about money</strong><span>Maximin is a rule for choosing when the probabilities are not available, and it never uses the size of the other entries. A chooser who valued each unit of welfare equally would still be told by maximin to prefer 5, 5, 5 to 2, 8, 20, because the rule does not add. Risk aversion would be a feature of the numbers in the table, if a utility curve had shaped them. The argument for maximin is about the chooser's ignorance and the cost of the worst case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the veil as ignorance of everything</strong><span>The chooser knows the table: what each society pays in each place. What they lack is their own place. Take the table away and neither rule has anything to compute, and take the veil away and the choice becomes self-interest. The argument needs exactly this much ignorance.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a tie under maximin for equality</strong><span>Equal worst entries mean only that the rule finds no difference at the bottom. The close-call table has different societies with the same floor, and a rule that looks past the floor can tell them apart.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can lay a choice of society out as a table and say what each rule picks from it.</strong><p>Given two societies and three places, build the matrix, compute the worst entry and the average of each row, name the society each rule chooses, and say which premise about the veil the disagreement turns on.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's Laplace and expected-utility rules need no extra work once the probabilities box is filled in. Try making the bottom place much more likely than the other two, say <span class="math" data-say="4 over 5">4/5</span>, <span class="math" data-say="1 over 10">1/10</span> and <span class="math" data-say="1 over 10">1/10</span>, and watch the verdict of the expected-utility rule move to the equal society, <span class="math" data-say="5">5</span> against <span class="math" data-say="22 over 5">22/5</span>, while maximin stays where it was. That is the whole difference between the two kinds of rule.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Rawls assumes people are risk-averse about money</strong><span>Maximin is a rule for choosing when the probabilities are not available, and it never uses the size of the other entries. A chooser who valued each unit of welfare equally would still be told by maximin to prefer 5, 5, 5 to 2, 8, 20, because the rule does not add. Risk aversion would be a feature of the numbers in the table, if a utility curve had shaped them. The argument for maximin is about the chooser's ignorance and the cost of the worst case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the veil as ignorance of everything</strong><span>The chooser knows the table: what each society pays in each place. What they lack is their own place. Take the table away and neither rule has anything to compute, and take the veil away and the choice becomes self-interest. The argument needs exactly this much ignorance.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a tie under maximin for equality</strong><span>Equal worst entries mean only that the rule finds no difference at the bottom. The close-call table has different societies with the same floor, and a rule that looks past the floor can tell them apart.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can lay a choice of society out as a table and say what each rule picks from it.</strong><p>Given two societies and three places, build the matrix, compute the worst entry and the average of each row, name the society each rule chooses, and say which premise about the veil the disagreement turns on.</p></div></div><div class="note"><strong>Note:</strong> The lab's Laplace and expected-utility rules need no extra work once the probabilities box is filled in. Try making the bottom place much more likely than the other two, say <span class="math" data-say="4 over 5">4/5</span>, <span class="math" data-say="1 over 10">1/10</span> and <span class="math" data-say="1 over 10">1/10</span>, and watch the verdict of the expected-utility rule move to the equal society, <span class="math" data-say="5">5</span> against <span class="math" data-say="22 over 5">22/5</span>, while maximin stays where it was. That is the whole difference between the two kinds of rule.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The position is the state</summary><p>Each society is an act. What the chooser does not know is which place in it will fall to them, so each place is a state, and the cell holds how well that place does in that society. The table is the one from Decision and Rationality with the unknown moved from the weather to oneself.</p></details><details class="recall"><summary>Maximin looks only at the worst place</summary><p>Maximin scores a society by the lowest entry in its row and takes the society whose lowest entry is highest. It never adds, averages or weighs, so the probabilities of the places play no part in it.</p></details><details class="recall"><summary>Equal chances is a different rule</summary><p>Laplace's rule treats every place as equally likely and scores a society by its average. Harsanyi argued that this, and not maximin, is what a rational chooser behind the veil would do. The two rules are the two sides of the dispute.</p></details></div>
+      <h3>Summary</h3>
       <p>Rawls asks which society people would pick if they did not know who they would be in it. Laid out as a decision matrix, with the chooser's position as the unknown state, the question becomes a choice of rule: maximin picks one society and equal-probability expected utility picks another from the very same table. The wrong model is that maximin is a taste for safety with money.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The position is the state.</strong> Each society is an act. What the chooser does not know is which place in it will fall to them, so each place is a state, and the cell holds how well that place does in that society. The table is the one from Decision and Rationality with the unknown moved from the weather to oneself.</li><li><strong>Maximin looks only at the worst place.</strong> Maximin scores a society by the lowest entry in its row and takes the society whose lowest entry is highest. It never adds, averages or weighs, so the probabilities of the places play no part in it.</li><li><strong>Equal chances is a different rule.</strong> Laplace's rule treats every place as equally likely and scores a society by its average. Harsanyi argued that this, and not maximin, is what a rational chooser behind the veil would do. The two rules are the two sides of the dispute.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="unknown state, which place will be yours. maximin, take the best worst case. Laplace, weigh every place equally. same table, two rules, two societies" tabindex="0" role="region" aria-label="Mathematical notation">unknown state: which place will be yours
 maximin: take the best worst case
 Laplace: weigh every place equally
@@ -2305,11 +2350,40 @@ same table, two rules, two societies</div><figcaption>One table, two rules</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2377,7 +2451,7 @@ same table, two rules, two societies</div><figcaption>One table, two rules</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

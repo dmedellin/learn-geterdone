@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings and Pattern Matching</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hashing, and the verification</p>
       <h1>Choosing a Modulus, and What the Sweep Says</h1>
       <p class="lesson-lede">Zero collisions at one modulus, and 18 of the 46 primes under 200 collide on the very same text — including one larger than several that do not.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A clean run is a measurement of one choice</li><li>The sweep turns rare into a number, and the number is not monotone</li><li>The analysis quantifies over the modulus, not over the text</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One choice, forty-six choices, and the claim that covers them</h2>
-      <article class="prose reading"><p>Keep the text <span class="math" data-say="the rain in spain stays mainly in the plain">the rain in spain stays mainly in the plain</span>, the pattern <span class="math" data-say="ain">ain</span> and the base 256, and set the modulus to 1000003. The pattern now hashes to 383964, four windows hash to that value, all four are occurrences, and the panel's collision counter reads 0. The verification bill is 12 characters, which is <span class="math" data-say="4 times 3">4 × 3</span> and cannot be lower.</p><p>That is the good case, and the page does not stop there. The lower table keeps this text and this base and replaces the modulus by every prime below 200 in turn.</p><div class="mathblock" data-say="the 46 primes under 200, on this text at base 256. a table, shown on the page. 103109113131137. a table, shown on the page. 107127139149151157163167173179181191193. 197199. worst, modulus, 2, with 18 collisions on 41 windows. largest that collides, 137. smallest that is clean, 11" tabindex="0" role="region" aria-label="Mathematical notation">the 46 primes under 200, on this text at base 256
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One choice, forty-six choices, and the claim that covers them</h2><div class="prose reading"><p>Keep the text <span class="math" data-say="the rain in spain stays mainly in the plain">the rain in spain stays mainly in the plain</span>, the pattern <span class="math" data-say="ain">ain</span> and the base 256, and set the modulus to 1000003. The pattern now hashes to 383964, four windows hash to that value, all four are occurrences, and the panel's collision counter reads 0. The verification bill is 12 characters, which is <span class="math" data-say="4 times 3">4 × 3</span> and cannot be lower.</p><p>That is the good case, and the page does not stop there. The lower table keeps this text and this base and replaces the modulus by every prime below 200 in turn.</p><div class="mathblock" data-say="the 46 primes under 200, on this text at base 256. a table, shown on the page. 103109113131137. a table, shown on the page. 107127139149151157163167173179181191193. 197199. worst, modulus, 2, with 18 collisions on 41 windows. largest that collides, 137. smallest that is clean, 11" tabindex="0" role="region" aria-label="Mathematical notation">the 46 primes under 200, on this text at base 256
 
 collide (18)   2   3   5   7  13  17  23  29  37  41  47  53  67
              103 109 113 131 137
@@ -1401,12 +1445,11 @@ clean   (28)  11  19  31  43  59  61  71  73  79  83  89  97 101
 
 worst  modulus   2   with 18 collisions on 41 windows
 largest that collides   137
-smallest that is clean   11</div><div class="thm"><span class="label">Theorem &middot; The collision set is not an interval</span><p>There exist a text, a pattern and a base together with two primes <span class="math" data-say="q 1 is less than q 2">q1 &lt; q2</span> such that the hash collides at <span class="math" data-say="q 2">q2</span> and not at <span class="math" data-say="q 1">q1</span>. So no threshold <span class="math" data-say="Q">Q</span> exists with the property that every modulus above <span class="math" data-say="Q">Q</span> is collision-free for a given input.</p></div><div class="proof"><p>The table above exhibits one: with the text <span class="math" data-say="the rain in spain stays mainly in the plain">the rain in spain stays mainly in the plain</span>, the pattern <span class="math" data-say="ain">ain</span> and base 256, the modulus 11 produces no spurious hit and the modulus 137 produces three.</p><p>A single instance settles the statement because the claim is existential. The reason is that a collision at modulus <span class="math" data-say="q">q</span> means <span class="math" data-say="q">q</span> divides the difference between two particular integers, and divisibility of a fixed number is not a monotone property of the divisor: 137 divides one of these differences and 11 divides none of them.</p><p><span class="qed">&#9633;</span></p></div><p>That proof shape is worth noticing because it is the opposite of the one this course usually needs. Here the measurement is the proof: the claim is that something exists, and a single exhibited pair establishes it. The claims that measurement cannot establish are the universal ones, and the next paragraph is about one of those.</p><h3>What is actually proved about Rabin–Karp</h3><p>Fix the text, the pattern and the base. A window collides at modulus <span class="math" data-say="q">q</span> exactly when <span class="math" data-say="q">q</span> divides the difference between that window's value and the pattern's. Each of those differences is a fixed integer below <span class="math" data-say="b to the power m">b^m</span>, so it has at most <span class="math" data-say="m times log b over log q">m log b / log q</span> prime divisors above <span class="math" data-say="q">q</span>, and choosing <span class="math" data-say="q">q</span> at random from a range of size <span class="math" data-say="R">R</span> makes the chance that it divides any of the <span class="math" data-say="n">n</span> differences at most a bound of the form <span class="math" data-say="n m times log b over R times log R">n m log b / (R log R)</span>. That is the theorem, and its subject is the random choice.</p><p>Read what it does not say. It does not say that a particular large prime is safe on a particular text &mdash; 137 is not, here. It does not say the collision count falls as the modulus rises &mdash; the table shows 41 and 47 colliding while 43 does not. And it says nothing at all if the modulus is a constant in the source, because then there is no random choice to average over and an adversary can construct a text against it.</p><h3>The cost of a collision, and why a small modulus is not merely inelegant</h3><p>Each candidate costs <span class="math" data-say="m">m</span> character comparisons to settle. At modulus 41 this text produces 7 candidates and a bill of 21 characters, of which 9 are wasted; at 1000003 it produces 4 and a bill of 12, with nothing wasted; at modulus 2 it produces 22 candidates, of which 18 are collisions. In the worst direction the verification dominates and the algorithm degenerates towards comparing every window in full, which is the naive matcher with extra arithmetic.</p><p>So the modulus is not a tuning detail. It decides how much of the algorithm's advertised advantage &mdash; constant work per window &mdash; survives contact with the input, and the only defensible way to choose it is at random from a large range, because that is the one choice the theorem covers.</p><h3>The same sweep on a different text</h3><p>Switch the preset to the binary one, where the alphabet is two characters and the base is 2, and the sweep reports 6 of the 46 primes colliding rather than 18. Switch to the repetitive <span class="math" data-say="abracadabra">abracadabra</span> text at base 256 and it reports 15. The number is a property of the input triple and moves by a factor of three between presets, which is a third way of making the same point: it is not a constant of the method.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A rolling hash, and a collision you can read off the page</h2></div><p>Equal hashes are not a match, and the verification is not optional</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+smallest that is clean   11</div><div class="thm"><span class="label">Theorem &middot; The collision set is not an interval</span><p>There exist a text, a pattern and a base together with two primes <span class="math" data-say="q 1 is less than q 2">q1 &lt; q2</span> such that the hash collides at <span class="math" data-say="q 2">q2</span> and not at <span class="math" data-say="q 1">q1</span>. So no threshold <span class="math" data-say="Q">Q</span> exists with the property that every modulus above <span class="math" data-say="Q">Q</span> is collision-free for a given input.</p></div><div class="proof"><p>The table above exhibits one: with the text <span class="math" data-say="the rain in spain stays mainly in the plain">the rain in spain stays mainly in the plain</span>, the pattern <span class="math" data-say="ain">ain</span> and base 256, the modulus 11 produces no spurious hit and the modulus 137 produces three.</p><p>A single instance settles the statement because the claim is existential. The reason is that a collision at modulus <span class="math" data-say="q">q</span> means <span class="math" data-say="q">q</span> divides the difference between two particular integers, and divisibility of a fixed number is not a monotone property of the divisor: 137 divides one of these differences and 11 divides none of them.</p><p><span class="qed">&#9633;</span></p></div><p>That proof shape is worth noticing because it is the opposite of the one this course usually needs. Here the measurement is the proof: the claim is that something exists, and a single exhibited pair establishes it. The claims that measurement cannot establish are the universal ones, and the next paragraph is about one of those.</p><h3>What is actually proved about Rabin–Karp</h3><p>Fix the text, the pattern and the base. A window collides at modulus <span class="math" data-say="q">q</span> exactly when <span class="math" data-say="q">q</span> divides the difference between that window's value and the pattern's. Each of those differences is a fixed integer below <span class="math" data-say="b to the power m">b^m</span>, so it has at most <span class="math" data-say="m times log b over log q">m log b / log q</span> prime divisors above <span class="math" data-say="q">q</span>, and choosing <span class="math" data-say="q">q</span> at random from a range of size <span class="math" data-say="R">R</span> makes the chance that it divides any of the <span class="math" data-say="n">n</span> differences at most a bound of the form <span class="math" data-say="n m times log b over R times log R">n m log b / (R log R)</span>. That is the theorem, and its subject is the random choice.</p><p>Read what it does not say. It does not say that a particular large prime is safe on a particular text &mdash; 137 is not, here. It does not say the collision count falls as the modulus rises &mdash; the table shows 41 and 47 colliding while 43 does not. And it says nothing at all if the modulus is a constant in the source, because then there is no random choice to average over and an adversary can construct a text against it.</p><h3>The cost of a collision, and why a small modulus is not merely inelegant</h3><p>Each candidate costs <span class="math" data-say="m">m</span> character comparisons to settle. At modulus 41 this text produces 7 candidates and a bill of 21 characters, of which 9 are wasted; at 1000003 it produces 4 and a bill of 12, with nothing wasted; at modulus 2 it produces 22 candidates, of which 18 are collisions. In the worst direction the verification dominates and the algorithm degenerates towards comparing every window in full, which is the naive matcher with extra arithmetic.</p><p>So the modulus is not a tuning detail. It decides how much of the algorithm's advertised advantage &mdash; constant work per window &mdash; survives contact with the input, and the only defensible way to choose it is at random from a large range, because that is the one choice the theorem covers.</p><h3>The same sweep on a different text</h3><p>Switch the preset to the binary one, where the alphabet is two characters and the base is 2, and the sweep reports 6 of the 46 primes colliding rather than 18. Switch to the repetitive <span class="math" data-say="abracadabra">abracadabra</span> text at base 256 and it reports 15. The number is a property of the input triple and moves by a factor of three between presets, which is a third way of making the same point: it is not a constant of the method.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A rolling hash, and a collision you can read off the page</h2></div><p>Equal hashes are not a match, and the verification is not optional</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A rolling hash, and the collisions it actually produces</strong><span>hashes equal, characters not</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a real match</span><span class="tone-red"><i class="legend-swatch"></i>a hash collision that is not a match</span><span class="tone-muted"><i class="legend-swatch"></i>the hash did not match</span></div>
@@ -1416,10 +1459,10 @@ smallest that is clean   11</div><div class="thm"><span class="label">Theorem &m
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="raWindows"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="raSweep"></table></div>
       <div class="status-banner" id="raStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A modulus with no collisions, and the sweep that follows it</h3>
-          <p>The upper table is empty here because no window hashes to the pattern's value except the four real occurrences. The lower table is the same text and base at every prime modulus under 200, so the clean run above can be read against the 46 alternatives rather than on its own.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A modulus with no collisions, and the sweep that follows it</h3>
+            <p>The upper table is empty here because no window hashes to the pattern's value except the four real occurrences. The lower table is the same text and base at every prime modulus under 200, so the clean run above can be read against the 46 alternatives rather than on its own.</p>
         <div class="field">
           <label for="raPreset">Worked example</label>
           <select id="raPreset"><option value="english">prose, base 256, and a modulus that collides</option><option value="dna">four bases, base 4, modulus 13</option><option value="binary">two letters, base 2, modulus 11</option><option value="abra">a repetitive text with a short pattern</option><option value="clean" selected>the same prose at a modulus large enough</option></select>
@@ -1451,12 +1494,14 @@ smallest that is clean   11</div><div class="thm"><span class="label">Theorem &m
           <div class="kpi"><span>Largest of them</span><strong id="raLast">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="raHint" style="margin:0;">The hash of a window is its characters read as digits in the chosen base, taken modulo the chosen modulus, and the next window is computed from this one by removing the leading digit and appending the trailing one. Equal hashes are NOT a match: the algorithm must compare the characters, and the count of times it had to is on the page. Lower the modulus until the collisions appear, then raise it and watch them go — and notice that they do not go monotonically.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a modulus, and reading the sweep instead of one row</h2></div><p>A clean run is one row of the table. Read the column it sits in before drawing anything from it.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Read the collision counter and then the sweep, in that order</h3><p>0 collisions is the row. 18 of 46 is the column. A page that prints only the row has shown a measurement; the column is what says whether the row was luck.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Look for a counterexample to monotonicity before assuming a threshold</h3><p>Scan the clean list for a value smaller than something in the collide list. Here 11 is clean and 137 collides, which settles it: there is no size above which this input stops colliding.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Price the collisions in character comparisons, not in embarrassment</h3><p>Each candidate costs <span class="math" data-say="m">m</span>. Going from 4 candidates to 22 takes the verification bill from 12 characters to 66 on a 43-character text, at which point the arithmetic saving has been spent.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Randomise the choice if you want the theorem to apply</h3><p>The bound is an expectation over the modulus. A constant in the source code has no expectation attached and can be attacked; a modulus drawn at random from a large range is the object the proof is about.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing a modulus, and reading the sweep instead of one row</h2>
+      <p class="lead-in">A clean run is one row of the table. Read the column it sits in before drawing anything from it.</p>
+      <ol class="key-ideas method"><li><strong>Read the collision counter and then the sweep, in that order.</strong> 0 collisions is the row. 18 of 46 is the column. A page that prints only the row has shown a measurement; the column is what says whether the row was luck.</li><li><strong>Look for a counterexample to monotonicity before assuming a threshold.</strong> Scan the clean list for a value smaller than something in the collide list. Here 11 is clean and 137 collides, which settles it: there is no size above which this input stops colliding.</li><li><strong>Price the collisions in character comparisons, not in embarrassment.</strong> Each candidate costs <span class="math" data-say="m">m</span>. Going from 4 candidates to 22 takes the verification bill from 12 characters to 66 on a 43-character text, at which point the arithmetic saving has been spent.</li><li><strong>Randomise the choice if you want the theorem to apply.</strong> The bound is an expectation over the modulus. A constant in the source code has no expectation attached and can be attacked; a modulus drawn at random from a large range is the object the proof is about.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1486,17 +1531,16 @@ the sweep, 46 primes under 200:
   smallest clean        11</div><p>The middle block is the whole lesson in four numbers. Eleven is clean and a hundred and thirty-seven is not, so any sentence beginning &ldquo;a modulus large enough to&rdquo; has to be finished with something other than a size.</p><p>For a faded rehearsal, work out why modulus 2 is the worst. The supplied first move: at base 256 every character's contribution is even except when its code point is odd, so the hash modulo 2 is the parity of the last character's code point alone. Say how many of the 41 windows that puts in the candidate set, and then say what the verification bill becomes.</p><p>Then switch the preset to the binary text and read the sweep again. It reports 6 of 46 rather than 18. Before deciding that a small alphabet is safer, say what the base is in that preset and how many windows there are, and then say which of the three changes you would need to hold fixed to make the comparison mean anything.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the modulus as a threshold to exceed</strong><span>The clean and colliding sets interleave: 41 and 47 collide, 43 does not; 137 collides, 11 does not. Choosing a modulus by size is choosing by a quantity that the outcome does not depend on, and the sweep is printed on the page precisely so that the interleaving is visible rather than argued about.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the expectation as a bound on the input you have</strong><span><span class="math" data-say="n over q">n/q</span> is an average over moduli drawn at random. With the modulus fixed there is nothing left to average over, and the actual collision count on a given text is whatever the divisibility happens to be &mdash; three at modulus 41 here, and eighteen at modulus 2.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing collision counts across presets without holding the base fixed</strong><span>The binary preset collides at 6 of 46 rather than 18, and it also has base 2 rather than 256, a different pattern length and a different number of windows. Four things changed; attributing the difference to the alphabet is picking one of them for no reason the page supplies.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a clean run as one row of a sweep and name the quantifier the bound is over.</strong><p>You should be able to state what a collision at modulus <span class="math" data-say="q">q</span> means arithmetically, exhibit a smaller clean modulus beside a larger colliding one, explain why that rules out a threshold, price candidates in character comparisons, and say why the modulus must be drawn at random for the expectation to apply.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the single-pattern matchers. The last module changes the question: &ldquo;One Pass for Every Word&rdquo; searches for a whole dictionary in one scan rather than one pattern at a time, and &ldquo;The Suffix Array, and What a Sorted Order Answers&rdquo; preprocesses the TEXT instead of the pattern, which is the only way to answer questions about a text nobody has asked yet.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the modulus as a threshold to exceed</strong><span>The clean and colliding sets interleave: 41 and 47 collide, 43 does not; 137 collides, 11 does not. Choosing a modulus by size is choosing by a quantity that the outcome does not depend on, and the sweep is printed on the page precisely so that the interleaving is visible rather than argued about.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the expectation as a bound on the input you have</strong><span><span class="math" data-say="n over q">n/q</span> is an average over moduli drawn at random. With the modulus fixed there is nothing left to average over, and the actual collision count on a given text is whatever the divisibility happens to be &mdash; three at modulus 41 here, and eighteen at modulus 2.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing collision counts across presets without holding the base fixed</strong><span>The binary preset collides at 6 of 46 rather than 18, and it also has base 2 rather than 256, a different pattern length and a different number of windows. Four things changed; attributing the difference to the alphabet is picking one of them for no reason the page supplies.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read a clean run as one row of a sweep and name the quantifier the bound is over.</strong><p>You should be able to state what a collision at modulus <span class="math" data-say="q">q</span> means arithmetically, exhibit a smaller clean modulus beside a larger colliding one, explain why that rules out a threshold, price candidates in character comparisons, and say why the modulus must be drawn at random for the expectation to apply.</p></div></div><div class="note"><strong>Note:</strong> That closes the single-pattern matchers. The last module changes the question: &ldquo;One Pass for Every Word&rdquo; searches for a whole dictionary in one scan rather than one pattern at a time, and &ldquo;The Suffix Array, and What a Sorted Order Answers&rdquo; preprocesses the TEXT instead of the pattern, which is the only way to answer questions about a text nobody has asked yet.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A clean run is a measurement of one choice</summary><p>At modulus 1000003 the panel reports 41 windows, 4 candidates, 4 matches, 0 collisions and a verification bill of 12 characters &mdash; the smallest possible, since the four real occurrences must be checked. Nothing about that run is evidence that the modulus was large enough, because the same run at modulus 11, which is nearly five orders of magnitude smaller, is also clean on this text.</p></details><details class="recall"><summary>The sweep turns rare into a number, and the number is not monotone</summary><p>The lower table runs the identical text and base at every prime modulus from 2 to 199 and reports how many windows collide at each. Eighteen of the forty-six collide. The collide list is 2, 3, 5, 7, 13, 17, 23, 29, 37, 41, 47, 53, 67, 103, 109, 113, 131 and 137; the clean list begins 11, 19, 31, 43, 59. So 137 collides and 11 does not, on the same text, which is what it means for the answer to be a property of the text rather than of the size of the modulus.</p></details><details class="recall"><summary>The analysis quantifies over the modulus, not over the text</summary><p>What can be proved is that for a modulus drawn at random from a suitable range, the expected number of spurious hits is small &mdash; roughly <span class="math" data-say="n over q">n/q</span> for a sufficiently large prime <span class="math" data-say="q">q</span>. That is a statement about the average over choices. Fixing the modulus in the source code and then measuring one text converts it into no statement at all, and an adversary who knows the fixed modulus can build a text on which every window collides. Randomising the modulus is what makes the expectation available.</p></details></div>
+      <h3>Summary</h3>
       <p>At modulus 1000003 the lab's prose produces no collision at all. That is a measurement of one choice, and the sweep beside it runs the same text and base at every prime under 200: 18 of the 46 collide, the largest of them 137, while 11 is clean. Collisions do not switch off above a threshold. What the analysis actually gives is an expectation over a randomly chosen modulus, which is a different statement from a promise about the one you picked.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A clean run is a measurement of one choice.</strong> At modulus 1000003 the panel reports 41 windows, 4 candidates, 4 matches, 0 collisions and a verification bill of 12 characters &mdash; the smallest possible, since the four real occurrences must be checked. Nothing about that run is evidence that the modulus was large enough, because the same run at modulus 11, which is nearly five orders of magnitude smaller, is also clean on this text.</li><li><strong>The sweep turns rare into a number, and the number is not monotone.</strong> The lower table runs the identical text and base at every prime modulus from 2 to 199 and reports how many windows collide at each. Eighteen of the forty-six collide. The collide list is 2, 3, 5, 7, 13, 17, 23, 29, 37, 41, 47, 53, 67, 103, 109, 113, 131 and 137; the clean list begins 11, 19, 31, 43, 59. So 137 collides and 11 does not, on the same text, which is what it means for the answer to be a property of the text rather than of the size of the modulus.</li><li><strong>The analysis quantifies over the modulus, not over the text.</strong> What can be proved is that for a modulus drawn at random from a suitable range, the expected number of spurious hits is small &mdash; roughly <span class="math" data-say="n over q">n/q</span> for a sufficiently large prime <span class="math" data-say="q">q</span>. That is a statement about the average over choices. Fixing the modulus in the source code and then measuring one text converts it into no statement at all, and an adversary who knows the fixed modulus can build a text on which every window collides. Randomising the modulus is what makes the expectation available.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="same text, same base 256, pattern ain, modulus 1000003 gives 0 collisions. the sweep over the 46 primes under 200, 18 of them collide on this text. the largest that collides is 137, 11 is clean, and so are 19, 31, 43. the worst is modulus 2, with 18 collisions on 41 windows. verification bill falls from 21 characters to 12 when the modulus rises. the bound is an expectation over a random modulus, not a property of one" tabindex="0" role="region" aria-label="Mathematical notation">same text, same base 256, pattern ain:  modulus 1000003 gives 0 collisions
 the sweep over the 46 primes under 200:  18 of them collide on this text
 the largest that collides is 137;  11 is clean, and so are 19, 31, 43
@@ -2436,11 +2480,40 @@ the bound is an expectation over a random modulus, not a property of one</div><f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2508,7 +2581,7 @@ the bound is an expectation over a random modulus, not a property of one</div><f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,38 +1424,36 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Decision and Rationality</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Risk</p>
       <h1>Ambiguity and the Ellsberg Urn</h1>
       <p class="lesson-lede">Preferring the known bet in both of two choices fits no single guess about the unknown proportion.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Risk and ambiguity are different</li><li>A single guess settles every bet</li><li>Worst-case rules can avoid the guess</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The urn, the two bets, and the proportion that decides them</h2>
-      <article class="prose reading"><p>Daniel Ellsberg described an urn of 90 balls in 1961. Thirty are red. The other 60 are black or yellow, in a proportion nobody has told you. One ball will be drawn. A bet pays 100 if its colour comes up and nothing otherwise, so on a scale where winning is worth 1 and losing 0, a bet is worth its probability.</p><p>In the first decision you choose between a bet on red and a bet on black. In the second you choose between a bet on red or yellow and a bet on black or yellow. Most people choose red in the first and black or yellow in the second. In both the pick is the bet whose chance is known: red is exactly 30 in 90, and black or yellow is exactly 60 in 90.</p><p>Let <span class="math" data-say="p">p</span> be your credence that a drawn ball is black. Yellow is then <span class="math" data-say="2 over 3 minus p">2/3 − p</span>, since red is 1/3 and the three add to 1. Score each bet by its probability of winning.</p><div class="mathblock" data-say="bet, chance of winning. red, 1 over 3. black, p. red or yellow, 1 over 3 plus 2 over 3 minus p equals 1 minus p. black or yellow, p plus 2 over 3 minus p equals 2 over 3" tabindex="0" role="region" aria-label="Mathematical notation">bet                  chance of winning
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The urn, the two bets, and the proportion that decides them</h2><div class="prose reading"><p>Daniel Ellsberg described an urn of 90 balls in 1961. Thirty are red. The other 60 are black or yellow, in a proportion nobody has told you. One ball will be drawn. A bet pays 100 if its colour comes up and nothing otherwise, so on a scale where winning is worth 1 and losing 0, a bet is worth its probability.</p><p>In the first decision you choose between a bet on red and a bet on black. In the second you choose between a bet on red or yellow and a bet on black or yellow. Most people choose red in the first and black or yellow in the second. In both the pick is the bet whose chance is known: red is exactly 30 in 90, and black or yellow is exactly 60 in 90.</p><p>Let <span class="math" data-say="p">p</span> be your credence that a drawn ball is black. Yellow is then <span class="math" data-say="2 over 3 minus p">2/3 − p</span>, since red is 1/3 and the three add to 1. Score each bet by its probability of winning.</p><div class="mathblock" data-say="bet, chance of winning. red, 1 over 3. black, p. red or yellow, 1 over 3 plus 2 over 3 minus p equals 1 minus p. black or yellow, p plus 2 over 3 minus p equals 2 over 3" tabindex="0" role="region" aria-label="Mathematical notation">bet                  chance of winning
 red                  1/3
 black                p
 red or yellow        1/3 + (2/3 − p) = 1 − p
-black or yellow      p + (2/3 − p) = 2/3</div><p>Red beats black exactly when <span class="math" data-say="1 over 3 is greater than p">1/3 > p</span>. Black or yellow beats red or yellow exactly when <span class="math" data-say="2 over 3 is greater than 1 minus p">2/3 > 1 − p</span>, which is <span class="math" data-say="p is greater than 1 over 3">p > 1/3</span>. The popular pair needs <span class="math" data-say="p">p</span> below a third and above a third. No credence satisfies both, and the lab shows it: the first preset puts black at 2/9 and red wins; the second puts black at 4/9 and black or yellow wins; no one table holds both.</p><div class="thm"><span class="label">Theorem &middot; The pair has no credence</span><p>A strict preference for red over black needs <span class="math" data-say="p is less than 1 over 3">p < 1/3</span>. A strict preference for black or yellow over red or yellow needs <span class="math" data-say="p is greater than 1 over 3">p > 1/3</span>. No single <span class="math" data-say="p">p</span> does both, so the pattern is inconsistent with a probability of black, and with expected utility, whatever the utilities.</p></div><p>It is tempting to call this risk aversion. It is not. Both red and black pay the same prize on the same terms, so any utility for the prize multiplies both scores by the same positive factor and leaves their order alone. A concave utility cannot prefer red to black unless the probability of red is higher, and nothing in the urn says it is. The preference is for a known probability.</p><div class="example"><span class="label">Example &middot; Black at a quarter</span><p>Suppose you believe <span class="math" data-say="p equals 1 over 4">p = 1/4</span>. Then red at 1/3 beats black at 1/4 in the first decision, and red or yellow at 3/4 beats black or yellow at 2/3 in the second. A believer in <span class="math" data-say="p equals 1 over 4">p = 1/4</span> bets on red twice. The popular pattern bets on red once and on black or yellow once.</p></div><p>One rule does reproduce the pattern. Let the possible mixes be 0, 30 or 60 black balls, and score each bet by its worst case over the three. Red wins one third in every mix, so its worst case is 1/3; black wins 0 in the first mix, so its worst case is 0. Red or yellow can fall to 1/3, while black or yellow wins 2/3 in every mix. The worst-case rule picks red in the first decision and black or yellow in the second.</p><p>The third preset sets this up, with one state per mix and each mix given probability 1/3. Under expected utility red and black tie, and red or yellow ties black or yellow; averaging over the mixes has erased the difference between known and unknown. Switch the rule to maximin and black or yellow comes out alone on top.</p><p>Which view to hold is the question. A defender of the pattern says ignorance is not the same as having a credence of one third, and a chooser who has no basis for any <span class="math" data-say="p">p</span> has no reason to average. A critic answers that a credence is what betting behaviour reveals, and that a chooser who will not assign one to black has declined to treat the bets as bets. The lab computes each rule and takes no side.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+black or yellow      p + (2/3 − p) = 2/3</div><p>Red beats black exactly when <span class="math" data-say="1 over 3 is greater than p">1/3 > p</span>. Black or yellow beats red or yellow exactly when <span class="math" data-say="2 over 3 is greater than 1 minus p">2/3 > 1 − p</span>, which is <span class="math" data-say="p is greater than 1 over 3">p > 1/3</span>. The popular pair needs <span class="math" data-say="p">p</span> below a third and above a third. No credence satisfies both, and the lab shows it: the first preset puts black at 2/9 and red wins; the second puts black at 4/9 and black or yellow wins; no one table holds both.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Acts by states</strong><span>a row per act, a column per state; the rule decides</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="deTable"></table></div>
       <div class="status-banner" id="deStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Try every credence for black</h3>
-          <p>In the first preset change the probabilities to 1/3, 1/3, 1/3: red and black tie. Do the same in the second preset and its two bets tie as well; that is the credence in the middle. The third preset gives each mix of black balls the same probability and shows each bet's chance of winning in that mix. Switch the rule from expected utility to maximin and read the verdict again.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Try every credence for black</h3>
+            <p>In the first preset change the probabilities to 1/3, 1/3, 1/3: red and black tie. Do the same in the second preset and its two bets tie as well; that is the credence in the middle. The third preset gives each mix of black balls the same probability and shows each bet's chance of winning in that mix. Switch the rule from expected utility to maximin and read the verdict again.</p>
         <div class="field">
           <label for="dePreset">Worked example</label>
           <select id="dePreset"><option value="ellsberg-1" selected>red against black, black at 2/9</option><option value="ellsberg-2">red or yellow against black or yellow, black at 4/9</option><option value="maximin-view">one state per possible mix of black, each at 1/3</option></select>
@@ -1450,12 +1493,15 @@ black or yellow      p + (2/3 − p) = 2/3</div><p>Red beats black exactly when 
           <div class="kpi"><span>Expected utilities tie at</span><strong id="deFlip">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; The pair has no credence</span><p>A strict preference for red over black needs <span class="math" data-say="p is less than 1 over 3">p < 1/3</span>. A strict preference for black or yellow over red or yellow needs <span class="math" data-say="p is greater than 1 over 3">p > 1/3</span>. No single <span class="math" data-say="p">p</span> does both, so the pattern is inconsistent with a probability of black, and with expected utility, whatever the utilities.</p></div><p>It is tempting to call this risk aversion. It is not. Both red and black pay the same prize on the same terms, so any utility for the prize multiplies both scores by the same positive factor and leaves their order alone. A concave utility cannot prefer red to black unless the probability of red is higher, and nothing in the urn says it is. The preference is for a known probability.</p><div class="example"><span class="label">Example &middot; Black at a quarter</span><p>Suppose you believe <span class="math" data-say="p equals 1 over 4">p = 1/4</span>. Then red at 1/3 beats black at 1/4 in the first decision, and red or yellow at 3/4 beats black or yellow at 2/3 in the second. A believer in <span class="math" data-say="p equals 1 over 4">p = 1/4</span> bets on red twice. The popular pattern bets on red once and on black or yellow once.</p></div><p>One rule does reproduce the pattern. Let the possible mixes be 0, 30 or 60 black balls, and score each bet by its worst case over the three. Red wins one third in every mix, so its worst case is 1/3; black wins 0 in the first mix, so its worst case is 0. Red or yellow can fall to 1/3, while black or yellow wins 2/3 in every mix. The worst-case rule picks red in the first decision and black or yellow in the second.</p><p>The third preset sets this up, with one state per mix and each mix given probability 1/3. Under expected utility red and black tie, and red or yellow ties black or yellow; averaging over the mixes has erased the difference between known and unknown. Switch the rule to maximin and black or yellow comes out alone on top.</p><p>Which view to hold is the question. A defender of the pattern says ignorance is not the same as having a credence of one third, and a chooser who has no basis for any <span class="math" data-say="p">p</span> has no reason to average. A critic answers that a credence is what betting behaviour reveals, and that a chooser who will not assign one to black has declined to treat the bets as bets. The lab computes each rule and takes no side.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing the Ellsberg pattern against any credence</h2></div><p>Four steps, and the unknown stays a symbol until the last.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the unknown</h3><p>Let <span class="math" data-say="p">p</span> be the probability of black. Yellow is whatever is left after red at 1/3 and black, so <span class="math" data-say="2 over 3 minus p">2/3 − p</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Score the four bets</h3><p>Add the probabilities of every colour a bet wins on. A bet's expected utility is that sum, with winning scored 1.</p></article><article class="card concept-card"><div class="icon">3</div><h3>State each choice as an inequality</h3><p>Red over black is <span class="math" data-say="1 over 3 is greater than p">1/3 > p</span>. Black or yellow over red or yellow is <span class="math" data-say="2 over 3 is greater than 1 minus p">2/3 > 1 − p</span>. Solve each for <span class="math" data-say="p">p</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Look for a <span class="math" data-say="p">p</span> that satisfies both</h3><p>If the solution sets do not overlap, the pair of choices fits no credence, and the pattern is not expected utility's.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing the Ellsberg pattern against any credence</h2>
+      <p class="lead-in">Four steps, and the unknown stays a symbol until the last.</p>
+      <ol class="key-ideas method"><li><strong>Name the unknown.</strong> Let <span class="math" data-say="p">p</span> be the probability of black. Yellow is whatever is left after red at 1/3 and black, so <span class="math" data-say="2 over 3 minus p">2/3 − p</span>.</li><li><strong>Score the four bets.</strong> Add the probabilities of every colour a bet wins on. A bet's expected utility is that sum, with winning scored 1.</li><li><strong>State each choice as an inequality.</strong> Red over black is <span class="math" data-say="1 over 3 is greater than p">1/3 > p</span>. Black or yellow over red or yellow is <span class="math" data-say="2 over 3 is greater than 1 minus p">2/3 > 1 − p</span>. Solve each for <span class="math" data-say="p">p</span>.</li><li><strong>Look for a <span class="math" data-say="p">p</span> that satisfies both.</strong> If the solution sets do not overlap, the pair of choices fits no credence, and the pattern is not expected utility's.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1475,17 +1521,16 @@ II: red or yellow wins 1 - p
 both strict: p &lt; 1/3 and p &gt; 1/3</div><p>At <span class="math" data-say="p equals 1 over 3">p = 1/3</span> the bets tie in both decisions, so the credence in the middle is indifferent twice. The popular pattern is strict twice, in opposite directions, and for no credence is that possible.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating ambiguity aversion as risk aversion</strong><span>Risk aversion is a fact about how prizes are valued. Red and black offer the same prize on the same terms, so a curve for the prize multiplies both scores by the same factor and cannot separate them; change the payoff 1 to 5 in the lab and the order is unchanged. What separates them is whether the probability is known.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming ignorance means a credence of 1/3</strong><span>Giving each colour an equal share is a choice, not a consequence of ignorance. It turns the unknown into a known and then removes the preference. Someone who refuses to do so is not confused; the open question is whether they are consistent.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the inconsistency as a fact about psychology</strong><span>The result is a statement about the pair of choices: no probability of black supports both. It does not say how many people choose this way or why, which is an empirical matter.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show that two choices fit no single credence.</strong><p>Given the urn, you should be able to write each bet's chance in terms of one unknown, state each choice as an inequality, find the value at which the bets tie, and show that the popular pair needs the unknown to be on both sides of it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The urn is idealised: the red count is known and the rest is stipulated as unknown. The lab scores the table you enter and has no view on whether ignorance of a proportion should be treated as a probability. That is the question the lesson leaves open.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating ambiguity aversion as risk aversion</strong><span>Risk aversion is a fact about how prizes are valued. Red and black offer the same prize on the same terms, so a curve for the prize multiplies both scores by the same factor and cannot separate them; change the payoff 1 to 5 in the lab and the order is unchanged. What separates them is whether the probability is known.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming ignorance means a credence of 1/3</strong><span>Giving each colour an equal share is a choice, not a consequence of ignorance. It turns the unknown into a known and then removes the preference. Someone who refuses to do so is not confused; the open question is whether they are consistent.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the inconsistency as a fact about psychology</strong><span>The result is a statement about the pair of choices: no probability of black supports both. It does not say how many people choose this way or why, which is an empirical matter.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can show that two choices fit no single credence.</strong><p>Given the urn, you should be able to write each bet's chance in terms of one unknown, state each choice as an inequality, find the value at which the bets tie, and show that the popular pair needs the unknown to be on both sides of it.</p></div></div><div class="note"><strong>Note:</strong> The urn is idealised: the red count is known and the rest is stipulated as unknown. The lab scores the table you enter and has no view on whether ignorance of a proportion should be treated as a probability. That is the question the lesson leaves open.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Risk and ambiguity are different</summary><p>Risk is a gamble with known probabilities, like red here. Ambiguity is a gamble whose probabilities are not known, like black. The prizes are the same; what differs is how much you know.</p></details><details class="recall"><summary>A single guess settles every bet</summary><p>If you hold one credence <span class="math" data-say="p">p</span> for the black share, each bet has a probability, and expected utility ranks all four bets from it. Choices that need two different values of <span class="math" data-say="p">p</span> cannot come from one guess.</p></details><details class="recall"><summary>Worst-case rules can avoid the guess</summary><p>A rule that scores a bet by its worst case over the possible mixes needs no single <span class="math" data-say="p">p</span>, and it reproduces the popular pattern. It pays for that by leaving expected utility.</p></details></div>
+      <h3>Summary</h3>
       <p>An urn holds 30 red balls and 60 that are black or yellow in an unknown mix. People prefer to bet on red rather than black, and to bet on black or yellow rather than red or yellow. Each choice needs a different estimate of the black share, so no one estimate supports both.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Risk and ambiguity are different.</strong> Risk is a gamble with known probabilities, like red here. Ambiguity is a gamble whose probabilities are not known, like black. The prizes are the same; what differs is how much you know.</li><li><strong>A single guess settles every bet.</strong> If you hold one credence <span class="math" data-say="p">p</span> for the black share, each bet has a probability, and expected utility ranks all four bets from it. Choices that need two different values of <span class="math" data-say="p">p</span> cannot come from one guess.</li><li><strong>Worst-case rules can avoid the guess.</strong> A rule that scores a bet by its worst case over the possible mixes needs no single <span class="math" data-say="p">p</span>, and it reproduces the popular pattern. It pays for that by leaving expected utility.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="urn, 30 red, 60 black or yellow, mix unknown. I, bet red, or bet black. II, red or yellow, or black or yellow. red in decision one needs the probability of black below one third. black or yellow in decision two needs the probability of black above one third. both at once fit no single p" tabindex="0" role="region" aria-label="Mathematical notation">urn: 30 red, 60 black or yellow, mix unknown
 I: bet red, or bet black
 II: red or yellow, or black or yellow
@@ -2313,11 +2358,40 @@ both at once fit no single p</div><figcaption>Known odds against unknown odds</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2385,7 +2459,7 @@ both at once fit no single p</div><figcaption>Known odds against unknown odds</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

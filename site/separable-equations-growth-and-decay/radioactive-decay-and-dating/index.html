@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Separable Equations, Growth and Decay</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Exponential change</p>
       <h1>Radioactive Decay and Dating</h1>
       <p class="lesson-lede">Decay is the growth equation with a negative rate, a half-life converts to a rate and back through ln 2, and the fraction of a sample that is left says how many half-lives have passed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Decay is the growth equation with a minus sign</li><li>A half-life and a rate are one fact</li><li>The fraction that is left counts half-lives</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From a half-life to a rate, and from what is left to an age</h2>
-      <article class="prose reading"><p>Carbon dating rests on one observation: a radioactive atom has the same chance of decaying in any given year, whatever its age, so the number of atoms that decay in a year is proportional to the number still there. That is a rate proportional to the size, the equation of &ldquo;Exponential Growth&rdquo; with the direction reversed.</p><div class="defbox"><span class="label">Definition &middot; Radioactive decay</span><p>A quantity <strong>decays</strong> at rate constant <span class="math" data-say="k is greater than 0">k > 0</span> when <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span>. Its <strong>half-life</strong> <span class="math" data-say="T">T</span> is the time in which any amount falls to half.</p><p>The sign is written outside <span class="math" data-say="k">k</span> so that <span class="math" data-say="k">k</span> can be read as a size. In the lab the rate box holds the signed coefficient, <span class="math" data-say="negative k">−k</span>.</p></div><p>The solution is <span class="math" data-say="y equals y sub 0 times e to the power the quantity negative k t">y = y₀·e^(−kt)</span>, by the same separation. It has halved when <span class="math" data-say="e to the power the quantity negative k T, equals 1 over 2">e^(−kT) = 1/2</span>, and taking the natural logarithm of both sides gives <span class="math" data-say="negative k T equals negative the natural log of 2">−kT = −ln 2</span>. That is the same relation as the doubling time of the previous lesson, with the same independence from the start.</p><div class="mathblock" data-say="y prime equals negative k times y, y equals y sub 0 times e to the power the quantity negative k t. halved when, e to the power the quantity negative k T, equals 1 over 2. k times T equals the natural log of 2. T equals the natural log of 2 over k, k equals the natural log of 2 over T. k equals 3 over 25000 per year. T equals the quantity 25000 over 3, times the natural log of 2, is approximately 5776.23 years, rounded" tabindex="0" role="region" aria-label="Mathematical notation">y′ = −k·y,   y = y₀·e^(−kt)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From a half-life to a rate, and from what is left to an age</h2><div class="prose reading"><p>Carbon dating rests on one observation: a radioactive atom has the same chance of decaying in any given year, whatever its age, so the number of atoms that decay in a year is proportional to the number still there. That is a rate proportional to the size, the equation of &ldquo;Exponential Growth&rdquo; with the direction reversed.</p><div class="defbox"><span class="label">Definition &middot; Radioactive decay</span><p>A quantity <strong>decays</strong> at rate constant <span class="math" data-say="k is greater than 0">k > 0</span> when <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span>. Its <strong>half-life</strong> <span class="math" data-say="T">T</span> is the time in which any amount falls to half.</p><p>The sign is written outside <span class="math" data-say="k">k</span> so that <span class="math" data-say="k">k</span> can be read as a size. In the lab the rate box holds the signed coefficient, <span class="math" data-say="negative k">−k</span>.</p></div><p>The solution is <span class="math" data-say="y equals y sub 0 times e to the power the quantity negative k t">y = y₀·e^(−kt)</span>, by the same separation. It has halved when <span class="math" data-say="e to the power the quantity negative k T, equals 1 over 2">e^(−kT) = 1/2</span>, and taking the natural logarithm of both sides gives <span class="math" data-say="negative k T equals negative the natural log of 2">−kT = −ln 2</span>. That is the same relation as the doubling time of the previous lesson, with the same independence from the start.</p><div class="mathblock" data-say="y prime equals negative k times y, y equals y sub 0 times e to the power the quantity negative k t. halved when, e to the power the quantity negative k T, equals 1 over 2. k times T equals the natural log of 2. T equals the natural log of 2 over k, k equals the natural log of 2 over T. k equals 3 over 25000 per year. T equals the quantity 25000 over 3, times the natural log of 2, is approximately 5776.23 years, rounded" tabindex="0" role="region" aria-label="Mathematical notation">y′ = −k·y,   y = y₀·e^(−kt)
 
   halved when   e^(−kT) = 1/2
   k·T = ln 2
@@ -1399,20 +1443,11 @@
   T = ln 2/k          k = ln 2/T
 
 k = 3/25000 per year:
-  T = (25000/3)·ln 2   ≈ 5776.23 years   (rounded)</div><h3>Which rate the lab uses</h3><p>A measured half-life for carbon-14 is commonly quoted as about 5730 years. Turning it into a rate gives <span class="math" data-say="the natural log of 2 over 5730">ln 2/5730</span>, which is irrational, and Euler's factor would then be rounded. The lab instead uses the fraction <span class="math" data-say="k equals 3 over 25000">k = 3/25000</span> per year, which is <span class="math" data-say="0.00012">0.00012</span>: a rate that keeps every Euler step exact, and a half-life that prints as <span class="math" data-say="is approximately 5776.23">≈ 5776.23</span>, close to the measured one and not equal to it. That difference is the cost of choosing a rational rate, and it is stated here so that the lab's age is not read as a measurement.</p><h3>From what is left to an age</h3><p>If a fraction <span class="math" data-say="f">f</span> of the original is left, then <span class="math" data-say="e to the power the quantity negative k t, equals f">e^(−kt) = f</span>, and the age is <span class="math" data-say="t equals the natural log of the quantity 1 over f, over k">t = ln(1/f)/k</span>. For the fractions that are powers of one half this needs no new calculation, because each halving costs one <span class="math" data-say="T">T</span>.</p><div class="mathblock" data-say="time since start, fraction left. 0, 1. T, 1 over 2. 2 T, 1 over 4. 3 T, 1 over 8. a sample with 15 percent left lies between 2 T and 3 T. since 1 over 8 is less than 15 percent is less than 1 over 4" tabindex="0" role="region" aria-label="Mathematical notation">  time since start     fraction left
-
-      0                    1
-      T                    1/2
-      2T                   1/4
-      3T                   1/8
-
-  a sample with 15% left lies between 2T and 3T,
-  since 1/8 &lt; 15% &lt; 1/4</div><p>The last line is a check that needs no logarithm: it brackets the age before any rounded figure is computed, and a rounded answer outside the bracket is wrong.</p><h3>The exact sequence beside it</h3><p>With a step of one century the Euler factor is <span class="math" data-say="1 minus 100 times the quantity 3 over 25000, equals 247 over 250">1 − 100·(3/25000) = 247/250</span>, an exact fraction, and the sequence <span class="math" data-say="the quantity 247 over 250, to the power n">(247/250)ⁿ</span> is geometric as before. The lab prints the first step at which it has fallen to one half or below. The step is a whole number of centuries, so it lands near the half-life <span class="math" data-say="is approximately 5776.23">≈ 5776.23</span> on the grid and not on it.</p><div class="example"><span class="label">Example &middot; A quarter left</span><p>Switch the lab to the second preset, whose target is <span class="math" data-say="1 over 4">1/4</span> and whose step is 200 years. The half-life tile still reads <span class="math" data-say="is approximately 5776.23">≈ 5776.23</span>, because that tile depends on the rate and not on the target. The age of a sample with a quarter left is twice it, <span class="math" data-say="is approximately 11552.5">≈ 11552.5</span> years, a figure the reader computes from the tile and the lab does not print. The step tile gives the grid's version of the same crossing: <span class="math" data-say="step 58, at t equals 11600">step 58 (t = 11600)</span>, which is within one 200-year step of <span class="math" data-say="is approximately 11552.5">≈ 11552.5</span>.</p></div><p>The third preset is the same arithmetic with round numbers: a rate of <span class="math" data-say="1 over 4">1/4</span> per unit time, a start of 100 and a target of 50. The factor is <span class="math" data-say="3 over 4">3/4</span>; <span class="math" data-say="the quantity 3 over 4, squared equals 9 over 16">(3/4)² = 9/16</span> is still above one half and <span class="math" data-say="the quantity 3 over 4, cubed equals 27 over 64">(3/4)³ = 27/64</span> is below it, so the lab prints <span class="math" data-say="step 3, at t equals 3">step 3 (t = 3)</span> while the half-life tile reads <span class="math" data-say="is approximately 2.77259">≈ 2.77259</span>, which is <span class="math" data-say="4 times the natural log of 2">4·ln 2</span>, rounded.</p><p>What dating assumes should be said as plainly as what it computes. It assumes the sample began with a known amount, that nothing entered or left it except by decay, and that the rate constant has not changed. The lab computes what follows from those assumptions; whether they hold for a particular sample is not something it can tell you.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Growth and decay</h2></div><p>A geometric sequence beside an exponential</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  T = (25000/3)·ln 2   ≈ 5776.23 years   (rounded)</div><h3>Which rate the lab uses</h3><p>A measured half-life for carbon-14 is commonly quoted as about 5730 years. Turning it into a rate gives <span class="math" data-say="the natural log of 2 over 5730">ln 2/5730</span>, which is irrational, and Euler's factor would then be rounded. The lab instead uses the fraction <span class="math" data-say="k equals 3 over 25000">k = 3/25000</span> per year, which is <span class="math" data-say="0.00012">0.00012</span>: a rate that keeps every Euler step exact, and a half-life that prints as <span class="math" data-say="is approximately 5776.23">≈ 5776.23</span>, close to the measured one and not equal to it. That difference is the cost of choosing a rational rate, and it is stated here so that the lab's age is not read as a measurement.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Growth and decay</h2></div><p>A geometric sequence beside an exponential</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Growth and decay</strong><span>y′ = k·(y − A)</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>Euler steps (exact)</span><span class="tone-cyan"><i class="legend-swatch"></i>closed form, rounded</span></div>
@@ -1421,10 +1456,10 @@ k = 3/25000 per year:
       <div class="table-wrap" style="margin-top:12px;" id="grTable" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="grStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A decay rate, its half-life, and the step that crosses</h3>
-          <p>The rate box holds the signed coefficient, so a decay rate is typed with its minus sign. The factor tile is the exact Euler multiplier 1 + kh. The half-life tile is ln 2 over the size of k, rounded; the step tile is the first exact value at or below the target. Move the target to 1/8 on the first preset and watch only the step and its time change.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A decay rate, its half-life, and the step that crosses</h3>
+            <p>The rate box holds the signed coefficient, so a decay rate is typed with its minus sign. The factor tile is the exact Euler multiplier 1 + kh. The half-life tile is ln 2 over the size of k, rounded; the step tile is the first exact value at or below the target. Move the target to 1/8 on the first preset and watch only the step and its time change.</p>
         <div class="field">
           <label for="grPreset">Situation</label>
           <select id="grPreset"><option value="carbon" selected>k = −3/25000 per year, y(0) = 1, h = 100, target 1/2</option><option value="quarter">k = −3/25000 per year, y(0) = 1, h = 200, target 1/4</option><option value="fast">k = −1/4, y(0) = 100, h = 1, target 50</option></select>
@@ -1463,12 +1498,23 @@ k = 3/25000 per year:
           <div class="kpi"><span>Steady state A</span><strong id="grSteady">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>From what is left to an age</h3><p>If a fraction <span class="math" data-say="f">f</span> of the original is left, then <span class="math" data-say="e to the power the quantity negative k t, equals f">e^(−kt) = f</span>, and the age is <span class="math" data-say="t equals the natural log of the quantity 1 over f, over k">t = ln(1/f)/k</span>. For the fractions that are powers of one half this needs no new calculation, because each halving costs one <span class="math" data-say="T">T</span>.</p><div class="mathblock" data-say="time since start, fraction left. 0, 1. T, 1 over 2. 2 T, 1 over 4. 3 T, 1 over 8. a sample with 15 percent left lies between 2 T and 3 T. since 1 over 8 is less than 15 percent is less than 1 over 4" tabindex="0" role="region" aria-label="Mathematical notation">  time since start     fraction left
+
+      0                    1
+      T                    1/2
+      2T                   1/4
+      3T                   1/8
+
+  a sample with 15% left lies between 2T and 3T,
+  since 1/8 &lt; 15% &lt; 1/4</div><p>The last line is a check that needs no logarithm: it brackets the age before any rounded figure is computed, and a rounded answer outside the bracket is wrong.</p><h3>The exact sequence beside it</h3><p>With a step of one century the Euler factor is <span class="math" data-say="1 minus 100 times the quantity 3 over 25000, equals 247 over 250">1 − 100·(3/25000) = 247/250</span>, an exact fraction, and the sequence <span class="math" data-say="the quantity 247 over 250, to the power n">(247/250)ⁿ</span> is geometric as before. The lab prints the first step at which it has fallen to one half or below. The step is a whole number of centuries, so it lands near the half-life <span class="math" data-say="is approximately 5776.23">≈ 5776.23</span> on the grid and not on it.</p><div class="example"><span class="label">Example &middot; A quarter left</span><p>Switch the lab to the second preset, whose target is <span class="math" data-say="1 over 4">1/4</span> and whose step is 200 years. The half-life tile still reads <span class="math" data-say="is approximately 5776.23">≈ 5776.23</span>, because that tile depends on the rate and not on the target. The age of a sample with a quarter left is twice it, <span class="math" data-say="is approximately 11552.5">≈ 11552.5</span> years, a figure the reader computes from the tile and the lab does not print. The step tile gives the grid's version of the same crossing: <span class="math" data-say="step 58, at t equals 11600">step 58 (t = 11600)</span>, which is within one 200-year step of <span class="math" data-say="is approximately 11552.5">≈ 11552.5</span>.</p></div><p>The third preset is the same arithmetic with round numbers: a rate of <span class="math" data-say="1 over 4">1/4</span> per unit time, a start of 100 and a target of 50. The factor is <span class="math" data-say="3 over 4">3/4</span>; <span class="math" data-say="the quantity 3 over 4, squared equals 9 over 16">(3/4)² = 9/16</span> is still above one half and <span class="math" data-say="the quantity 3 over 4, cubed equals 27 over 64">(3/4)³ = 27/64</span> is below it, so the lab prints <span class="math" data-say="step 3, at t equals 3">step 3 (t = 3)</span> while the half-life tile reads <span class="math" data-say="is approximately 2.77259">≈ 2.77259</span>, which is <span class="math" data-say="4 times the natural log of 2">4·ln 2</span>, rounded.</p><p>What dating assumes should be said as plainly as what it computes. It assumes the sample began with a known amount, that nothing entered or left it except by decay, and that the rate constant has not changed. The lab computes what follows from those assumptions; whether they hold for a particular sample is not something it can tell you.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Dating a sample</h2></div><p>Five moves. The bracket in the third is the one that catches an arithmetic slip before it is reported.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the rate with its sign</h3><p>Decay is <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>. If you are given a half-life <span class="math" data-say="T">T</span>, the rate is <span class="math" data-say="k equals the natural log of 2 over T">k = ln 2/T</span>, rounded; if you are given <span class="math" data-say="k">k</span>, the half-life is <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Turn the measurement into a fraction</h3><p>Divide what is left now by what was there at the start. A quarter is <span class="math" data-say="1 over 4">1/4</span>, fifteen percent is <span class="math" data-say="15 over 100">15/100</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Bracket the age in half-lives</h3><p>Find the powers of <span class="math" data-say="1 over 2">1/2</span> on either side of the fraction. A quarter is exactly two half-lives; fifteen percent lies between two and three.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the age</h3><p>For a power of one half the age is the number of half-lives times <span class="math" data-say="T">T</span>. For any other fraction it is <span class="math" data-say="the natural log of the quantity 1 over f, over k">ln(1/f)/k</span>, rounded and marked <span class="math" data-say="is approximately">≈</span>.</p></article><article class="card concept-card"><div class="icon">5</div><h3>State what was assumed</h3><p>Name the rate constant, the starting amount and the closed system. The age is exactly as good as those three.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Dating a sample</h2>
+      <p class="lead-in">Five moves. The bracket in the third is the one that catches an arithmetic slip before it is reported.</p>
+      <ol class="key-ideas method"><li><strong>Write the rate with its sign.</strong> Decay is <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>. If you are given a half-life <span class="math" data-say="T">T</span>, the rate is <span class="math" data-say="k equals the natural log of 2 over T">k = ln 2/T</span>, rounded; if you are given <span class="math" data-say="k">k</span>, the half-life is <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span>.</li><li><strong>Turn the measurement into a fraction.</strong> Divide what is left now by what was there at the start. A quarter is <span class="math" data-say="1 over 4">1/4</span>, fifteen percent is <span class="math" data-say="15 over 100">15/100</span>.</li><li><strong>Bracket the age in half-lives.</strong> Find the powers of <span class="math" data-say="1 over 2">1/2</span> on either side of the fraction. A quarter is exactly two half-lives; fifteen percent lies between two and three.</li><li><strong>Compute the age.</strong> For a power of one half the age is the number of half-lives times <span class="math" data-say="T">T</span>. For any other fraction it is <span class="math" data-say="the natural log of the quantity 1 over f, over k">ln(1/f)/k</span>, rounded and marked <span class="math" data-say="is approximately">≈</span>.</li><li><strong>State what was assumed.</strong> Name the rate constant, the starting amount and the closed system. The age is exactly as good as those three.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1490,17 +1536,16 @@ age         2T = (50000/3)·ln 2
 Euler, h = 200:  factor 1 − 600/25000 = 122/125</div><p>The exact sequence <span class="math" data-say="the quantity 122 over 125, to the power n">(122/125)ⁿ</span> is a geometric sequence that never reaches zero, and the lab prints the first step at which it is at or below <span class="math" data-say="1 over 4">1/4</span>. That step is a whole number of 200-year steps, so it sits within one step of the true age and is not the true age.</p><p>Had the sample held fifteen percent, the bracket from the table says its age lies between <span class="math" data-say="2 T">2T</span> and <span class="math" data-say="3 T">3T</span>, which is between <span class="math" data-say="is approximately 11552.5">≈ 11552.5</span> and <span class="math" data-say="is approximately 17328.7">≈ 17328.7</span> years. A computed age outside that range would be a slip.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that after two half-lives nothing is left</strong><span>The mistaken model is that a half-life is half the sample's life, so two of them use it all up. A half-life halves what is there, and half of a half is a quarter, not zero: after two the fraction is <span class="math" data-say="1 over 4">1/4</span>, after three <span class="math" data-say="1 over 8">1/8</span>. The exact Euler sequence shows the same thing with fractions, since <span class="math" data-say="the quantity 247 over 250, to the power n">(247/250)ⁿ</span> is a positive number for every <span class="math" data-say="n">n</span>; the lab's second preset passes <span class="math" data-say="1 over 4">1/4</span> and the sequence goes on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Typing a decay rate with the wrong sign</strong><span>In the equation the rate is written <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>, and the lab wants the signed coefficient, <span class="math" data-say="negative 3 over 25000">−3/25000</span>. Typing the positive <span class="math" data-say="3 over 25000">3/25000</span> there is a growth equation: the table rises, and the half-life tile, which uses the size of the rate, reads exactly as before and hides the mistake. If a decay preset grows, look at the sign first.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking 1/k for the half-life</strong><span>The number <span class="math" data-say="1 over k">1/k</span> is <span class="math" data-say="25000 over 3">25000/3</span>, about 8333 years, and it is the time for the amount to fall to <span class="math" data-say="1 over e">1/e</span> of what it was. The half-life carries the factor <span class="math" data-say="the natural log of 2">ln 2</span>, so <span class="math" data-say="T equals the natural log of 2 over k is approximately 5776.23">T = ln 2/k ≈ 5776.23</span>, which is shorter by that factor. The check is that <span class="math" data-say="k times T">k·T</span> must equal <span class="math" data-say="the natural log of 2">ln 2</span>, not 1.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert a half-life to a rate and back and date a sample from the fraction left.</strong><p>You should be able to write decay as <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span>, derive <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span>, convert in both directions with the result marked rounded, bracket an age between two half-lives, and say what the dating assumes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Decay toward zero is one case of a more general shape: a quantity that moves toward a level that is not zero. &ldquo;Newton's Law of Cooling&rdquo; puts a shift into the same equation, and a substitution turns it back into the decay of this lesson.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that after two half-lives nothing is left</strong><span>The mistaken model is that a half-life is half the sample's life, so two of them use it all up. A half-life halves what is there, and half of a half is a quarter, not zero: after two the fraction is <span class="math" data-say="1 over 4">1/4</span>, after three <span class="math" data-say="1 over 8">1/8</span>. The exact Euler sequence shows the same thing with fractions, since <span class="math" data-say="the quantity 247 over 250, to the power n">(247/250)ⁿ</span> is a positive number for every <span class="math" data-say="n">n</span>; the lab's second preset passes <span class="math" data-say="1 over 4">1/4</span> and the sequence goes on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Typing a decay rate with the wrong sign</strong><span>In the equation the rate is written <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>, and the lab wants the signed coefficient, <span class="math" data-say="negative 3 over 25000">−3/25000</span>. Typing the positive <span class="math" data-say="3 over 25000">3/25000</span> there is a growth equation: the table rises, and the half-life tile, which uses the size of the rate, reads exactly as before and hides the mistake. If a decay preset grows, look at the sign first.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking 1/k for the half-life</strong><span>The number <span class="math" data-say="1 over k">1/k</span> is <span class="math" data-say="25000 over 3">25000/3</span>, about 8333 years, and it is the time for the amount to fall to <span class="math" data-say="1 over e">1/e</span> of what it was. The half-life carries the factor <span class="math" data-say="the natural log of 2">ln 2</span>, so <span class="math" data-say="T equals the natural log of 2 over k is approximately 5776.23">T = ln 2/k ≈ 5776.23</span>, which is shorter by that factor. The check is that <span class="math" data-say="k times T">k·T</span> must equal <span class="math" data-say="the natural log of 2">ln 2</span>, not 1.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can convert a half-life to a rate and back and date a sample from the fraction left.</strong><p>You should be able to write decay as <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span>, derive <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span>, convert in both directions with the result marked rounded, bracket an age between two half-lives, and say what the dating assumes.</p></div></div><div class="note"><strong>Note:</strong> Decay toward zero is one case of a more general shape: a quantity that moves toward a level that is not zero. &ldquo;Newton's Law of Cooling&rdquo; puts a shift into the same equation, and a substitution turns it back into the decay of this lesson.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Decay is the growth equation with a minus sign</summary><p>Write <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>, so that <span class="math" data-say="k">k</span> is the size of the rate and the minus sign carries the direction. The solution is <span class="math" data-say="y sub 0 times e to the power the quantity negative k t">y₀·e^(−kt)</span> by the same separation as before. The lab takes the signed number, so the rate <span class="math" data-say="k equals 3 over 25000">k = 3/25000</span> of this lesson is typed as <span class="math" data-say="negative 3 over 25000">−3/25000</span>.</p></details><details class="recall"><summary>A half-life and a rate are one fact</summary><p>The sample has halved when <span class="math" data-say="e to the power the quantity negative k T, equals 1 over 2">e^(−kT) = 1/2</span>, which is <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span>. Give either <span class="math" data-say="T">T</span> or <span class="math" data-say="k">k</span> and the other follows: <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span> and <span class="math" data-say="k equals the natural log of 2 over T">k = ln 2/T</span>. Because <span class="math" data-say="the natural log of 2">ln 2</span> is irrational, a conversion from a measured half-life produces a rounded rate, and a rational rate produces a rounded half-life.</p></details><details class="recall"><summary>The fraction that is left counts half-lives</summary><p>After <span class="math" data-say="m">m</span> half-lives a fraction <span class="math" data-say="1 over 2">1/2</span> multiplied <span class="math" data-say="m">m</span> times is left. So a quarter means <span class="math" data-say="m equals 2">m = 2</span> and an eighth means <span class="math" data-say="m equals 3">m = 3</span>. A fraction that is not a power of <span class="math" data-say="1 over 2">1/2</span> falls between two of them, and its age needs a logarithm.</p></details></div>
+      <h3>Summary</h3>
       <p>A radioactive sample loses atoms at a rate proportional to the number it has, which is the decay equation <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>. Its half-life <span class="math" data-say="T">T</span> and its rate are tied by <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span>, so each converts to the other, rounded because <span class="math" data-say="the natural log of 2">ln 2</span> is irrational. A sample that has a quarter of its original amount left has been through two half-lives, and the lab prints both that age and the first step at which the exact Euler sequence has fallen that far.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Decay is the growth equation with a minus sign.</strong> Write <span class="math" data-say="y prime equals negative k times y">y′ = −k·y</span> with <span class="math" data-say="k is greater than 0">k > 0</span>, so that <span class="math" data-say="k">k</span> is the size of the rate and the minus sign carries the direction. The solution is <span class="math" data-say="y sub 0 times e to the power the quantity negative k t">y₀·e^(−kt)</span> by the same separation as before. The lab takes the signed number, so the rate <span class="math" data-say="k equals 3 over 25000">k = 3/25000</span> of this lesson is typed as <span class="math" data-say="negative 3 over 25000">−3/25000</span>.</li><li><strong>A half-life and a rate are one fact.</strong> The sample has halved when <span class="math" data-say="e to the power the quantity negative k T, equals 1 over 2">e^(−kT) = 1/2</span>, which is <span class="math" data-say="k times T equals the natural log of 2">k·T = ln 2</span>. Give either <span class="math" data-say="T">T</span> or <span class="math" data-say="k">k</span> and the other follows: <span class="math" data-say="T equals the natural log of 2 over k">T = ln 2/k</span> and <span class="math" data-say="k equals the natural log of 2 over T">k = ln 2/T</span>. Because <span class="math" data-say="the natural log of 2">ln 2</span> is irrational, a conversion from a measured half-life produces a rounded rate, and a rational rate produces a rounded half-life.</li><li><strong>The fraction that is left counts half-lives.</strong> After <span class="math" data-say="m">m</span> half-lives a fraction <span class="math" data-say="1 over 2">1/2</span> multiplied <span class="math" data-say="m">m</span> times is left. So a quarter means <span class="math" data-say="m equals 2">m = 2</span> and an eighth means <span class="math" data-say="m equals 3">m = 3</span>. A fraction that is not a power of <span class="math" data-say="1 over 2">1/2</span> falls between two of them, and its age needs a logarithm.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="y prime equals negative k times y, k is greater than 0, implies, y equals y sub 0 times e to the power the quantity negative k t. half-life T, k times T equals the natural log of 2. the natural log of 2 is approximately 0.693147, rounded. a quarter left, two half-lives, age 2 T. k equals 3 over 25000, T is approximately 5776.23 years" tabindex="0" role="region" aria-label="Mathematical notation">y′ = −k·y,  k &gt; 0  ⟹  y = y₀·e^(−kt)
 half-life T:  k·T = ln 2
 ln 2 ≈ 0.693147   (rounded)
@@ -2948,11 +2993,40 @@ k = 3/25000:  T ≈ 5776.23 years</div><figcaption>Decay, half-life and age</fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3020,7 +3094,7 @@ k = 3/25000:  T ≈ 5776.23 years</div><figcaption>Decay, half-life and age</fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Breakthroughs and Implicit Concepts</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · Making Implicit Concepts Explicit</p>
       <h1>Applying and Implementing Specification</h1>
       <p class="lesson-lede">One rule, three jobs: test an object, choose from a collection, and say what must be built; the model stays one even when the implementations differ.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Selection</li><li>Building to order</li><li>The first false clause</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The three uses first, then their costs, then a selection</h2>
-      <article class="prose reading"><p>&ldquo;These three uses&mdash;validation, selection, and building to order&mdash;are the same on a conceptual level.&rdquo; That is the claim at the head of Applying and Implementing Specification, the last section of Chapter 9. Read it in your own copy first; Evans himself suggests skimming its detail until you need it, and this lesson reads it for the argument.</p><p>The three uses are to check whether an object is fit for some purpose, to choose objects from a collection, and to say what a new object must be like. Without a pattern, Evans says, one rule tends to appear in all three places in different forms, which can come to contradict each other, and the fact that it is one rule is lost. With a specification the model stays one, even where the three implementations have to differ.</p><p>Validation is the plain case, and the last lesson's. Selection is where the implementation gets interesting. If the objects are few and already in memory, a Repository can take any specification and return the objects that satisfy it, and the client's single line of code states the concept. Usually they are in a relational database, and Evans walks through the options. The specification can produce its own SQL, which keeps the rule in one place but leaks the table structure into the domain layer. Some mapping frameworks let a query be stated in terms of the model's objects instead. Failing that, the Repository can offer a specialised query that is not itself a rule, and the specification chooses which to call, by double dispatch.</p><p>He adds an intermediate design: a more generic query on the Repository, with the specification filtering the results in memory. It reads more clearly and costs some performance, and whether that trade is acceptable, he says, depends entirely on circumstances; a stored procedure, used for speed or for security, limits the specification to the parameters the procedure accepts. None of these choices changes the model. For the technical detail he points to Mee and Hieatt's Repository in Fowler's book, read in the Repository lesson of Enterprise Application Patterns; Fowler asks how the query reaches the tables, and Evans asks that the rule it applies stay a concept of the domain.</p><p>Building to Order turns the specification around: it describes objects that are not there yet, as a buyer's requirements describe an aircraft no one has designed. A generator written as a procedure defines its behaviour only implicitly, and the only ways to predict it are to run it or read every line. A generator whose interface takes a specification separates what is wanted from how it is produced, states its rules where callers can read them, leaves the request in the caller's hands, and is easier to test, because the same specification can check the result, an Assertion in Chapter 10's terms.</p><p>The book's long example packs a warehouse, and it is worth reading for how it proceeds: validation first, to make the rules explicit and to have a test for the packer, then a Service interface stated in terms of the specifications, and then a deliberately naive prototype behind that interface, so that the application team and the optimisation team could each work against something real. Its second example, a working prototype, makes the general point: once interface and implementation are separate, any implementation that honours the interface unblocks the people waiting on it.</p><pre class="codeblock" data-say="line 1, comment, Validation one lot, one answer.. line 2, boolean ok is set to distributable dot is satisfied by of lot. line 4, comment, Selection the repository takes the rule the rule stays in the domain.. line 5, interface seed lot repository. line 6, list of seed lot satisfying of lot specification spec. line 9, comment, Building to order the assembler is told what, not how. line 10, comment, and its result is checked against the same specification.. line 11, interface packet assembler. line 12, packet assemble of lot specification wanted, int varieties. line 14, packet packet is set to assembler dot assemble of school garden, 5. line 15, for seed lot each in packet dot lots. line 16, if not school garden dot is satisfied by of each. line 17, throw new illegal state exception of each dot id plus breaks the request" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Validation: one lot, one answer.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The three uses first, then their costs, then a selection</h2><div class="prose reading"><p>&ldquo;These three uses&mdash;validation, selection, and building to order&mdash;are the same on a conceptual level.&rdquo; That is the claim at the head of Applying and Implementing Specification, the last section of Chapter 9. Read it in your own copy first; Evans himself suggests skimming its detail until you need it, and this lesson reads it for the argument.</p><p>The three uses are to check whether an object is fit for some purpose, to choose objects from a collection, and to say what a new object must be like. Without a pattern, Evans says, one rule tends to appear in all three places in different forms, which can come to contradict each other, and the fact that it is one rule is lost. With a specification the model stays one, even where the three implementations have to differ.</p><p>Validation is the plain case, and the last lesson's. Selection is where the implementation gets interesting. If the objects are few and already in memory, a Repository can take any specification and return the objects that satisfy it, and the client's single line of code states the concept. Usually they are in a relational database, and Evans walks through the options. The specification can produce its own SQL, which keeps the rule in one place but leaks the table structure into the domain layer. Some mapping frameworks let a query be stated in terms of the model's objects instead. Failing that, the Repository can offer a specialised query that is not itself a rule, and the specification chooses which to call, by double dispatch.</p><p>He adds an intermediate design: a more generic query on the Repository, with the specification filtering the results in memory. It reads more clearly and costs some performance, and whether that trade is acceptable, he says, depends entirely on circumstances; a stored procedure, used for speed or for security, limits the specification to the parameters the procedure accepts. None of these choices changes the model. For the technical detail he points to Mee and Hieatt's Repository in Fowler's book, read in the Repository lesson of Enterprise Application Patterns; Fowler asks how the query reaches the tables, and Evans asks that the rule it applies stay a concept of the domain.</p><p>Building to Order turns the specification around: it describes objects that are not there yet, as a buyer's requirements describe an aircraft no one has designed. A generator written as a procedure defines its behaviour only implicitly, and the only ways to predict it are to run it or read every line. A generator whose interface takes a specification separates what is wanted from how it is produced, states its rules where callers can read them, leaves the request in the caller's hands, and is easier to test, because the same specification can check the result, an Assertion in Chapter 10's terms.</p><p>The book's long example packs a warehouse, and it is worth reading for how it proceeds: validation first, to make the rules explicit and to have a test for the packer, then a Service interface stated in terms of the specifications, and then a deliberately naive prototype behind that interface, so that the application team and the optimisation team could each work against something real. Its second example, a working prototype, makes the general point: once interface and implementation are separate, any implementation that honours the interface unblocks the people waiting on it.</p><pre class="codeblock" data-say="line 1, comment, Validation one lot, one answer.. line 2, boolean ok is set to distributable dot is satisfied by of lot. line 4, comment, Selection the repository takes the rule the rule stays in the domain.. line 5, interface seed lot repository. line 6, list of seed lot satisfying of lot specification spec. line 9, comment, Building to order the assembler is told what, not how. line 10, comment, and its result is checked against the same specification.. line 11, interface packet assembler. line 12, packet assemble of lot specification wanted, int varieties. line 14, packet packet is set to assembler dot assemble of school garden, 5. line 15, for seed lot each in packet dot lots. line 16, if not school garden dot is satisfied by of each. line 17, throw new illegal state exception of each dot id plus breaks the request" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Validation: one lot, one answer.</span>
 <span class="cl">boolean ok = distributable.isSatisfiedBy(lot);</span>
 <span class="cl"></span>
 <span class="cl">// Selection: the repository takes the rule; the rule stays in the domain.</span>
@@ -1463,12 +1507,11 @@
 <span class="cl">    if (!schoolGarden.isSatisfiedBy(each)) {</span>
 <span class="cl">        throw new IllegalStateException(each.id() + &quot; breaks the request&quot;);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the seed bank again, with all seven lots and the lab's select view, which reports the candidates, the names of those satisfying the specification, and each failing candidate with its first false clause. On the preset <code>distributable</code>, the last lesson's rule selects 2 of 7, lot-01 and lot-06. Of the 5 refused, lot-03 and lot-07 fail first on germination, lot-02 on moisture, lot-04 on age and lot-05 on quarantine: one reason each, in the rule's own terms.</p><p>A school asks for vegetable seed for its garden: germination at least 80 and at most 6 years old. On the preset <code>school-garden</code>, written as just that, 3 lots are selected, lot-01, lot-03 and lot-05. But lot-05 is in quarantine. The request was written as a new rule, and it left out a clause the bank's own rule always carries. The preset <code>school-garden-safe</code> adds it and selects 2, lot-01 and lot-03, with lot-05 refused first at quarantine. That is a cousin of Evans's warning: the bank's rule turned up again in a new guise and lost a clause on the way, on the lesson's illustration; Chapter 10 shows how to build the request from the bank's rule rather than retyping it.</p><h3>Exercise</h3><ul><li>Lots: the seven of the presets.</li><li>Rule: moisture <= 7 and (kind = herb or age <= 3).</li></ul><p>By hand, find the lots the rule selects and, for each lot refused on moisture, say so. Then type the rule into the lab to check, and read the clause it blames for each lot refused for another reason.</p><p>Chapter 9 ends with the rule as an object. The next course, Supple Design, opens Chapter 10, on design that is a pleasure to change, and combines specifications with and, or and not.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the seed bank again, with all seven lots and the lab's select view, which reports the candidates, the names of those satisfying the specification, and each failing candidate with its first false clause. On the preset <code>distributable</code>, the last lesson's rule selects 2 of 7, lot-01 and lot-06. Of the 5 refused, lot-03 and lot-07 fail first on germination, lot-02 on moisture, lot-04 on age and lot-05 on quarantine: one reason each, in the rule's own terms.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Specifications</strong><span>a rule as a query over candidates</span></div>
       </div>
@@ -1476,10 +1519,10 @@
       <div class="table-wrap" id="dspTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dspTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A specification is clauses attribute op value, with op one of = != &lt; &lt;= &gt; &gt;=, joined by and, or, not and parentheses (not binds tightest, then and, then or); a value is a number or a word beginning with a letter. Numbers compare exactly; a word compares only by = and != (an ordering op on a word is refused), and words compare exactly, letter case counted. A clause on an attribute the candidate lacks is false whatever its op, so not of it is true; an ordering clause on a word value is false. Candidates are listed in record order. A failing candidate is shown with the clause that rejects it, found from the left: a false and is blamed on its first false part, a true or on its first true part, and under a not a clause rejects by being true (for clauses joined only by and, this is the first false clause in the order written).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Seed lots selected by a specification</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Seed lots selected by a specification</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of one modelling choice; the choice itself is weighed in the book, against the domain, the team and the project.</p>
         <div class="field">
           <label for="dspPreset">Worked example</label>
           <select id="dspPreset"><option value="distributable" selected>The seven lots against the bank's distribution rule</option><option value="school-garden">A school's request, written as a new rule</option><option value="school-garden-safe">The same request, with the bank's quarantine clause</option></select>
@@ -1498,12 +1541,15 @@
           <div class="kpi"><span>Failing, each with the clause that rejects it</span><strong id="dspFailing">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>A school asks for vegetable seed for its garden: germination at least 80 and at most 6 years old. On the preset <code>school-garden</code>, written as just that, 3 lots are selected, lot-01, lot-03 and lot-05. But lot-05 is in quarantine. The request was written as a new rule, and it left out a clause the bank's own rule always carries. The preset <code>school-garden-safe</code> adds it and selects 2, lot-01 and lot-03, with lot-05 refused first at quarantine. That is a cousin of Evans's warning: the bank's rule turned up again in a new guise and lost a clause on the way, on the lesson's illustration; Chapter 10 shows how to build the request from the bank's rule rather than retyping it.</p><h3>Exercise</h3><ul><li>Lots: the seven of the presets.</li><li>Rule: moisture <= 7 and (kind = herb or age <= 3).</li></ul><p>By hand, find the lots the rule selects and, for each lot refused on moisture, say so. Then type the rule into the lab to check, and read the clause it blames for each lot refused for another reason.</p><p>Chapter 9 ends with the rule as an object. The next course, Supple Design, opens Chapter 10, on design that is a pleasure to change, and combines specifications with and, or and not.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Selecting with a specification</h2></div><p>Five steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the candidates</h3><p>Write each candidate with its attributes, one per line.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Evaluate the rule on each</h3><p>For each candidate, evaluate the clauses in order and note the first false one, or that all are true.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Split the collection</h3><p>Write the names that satisfy the rule, and beside each of the rest its first false clause.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare a request with the standing rule</h3><p>When a new request is written, check it against the rule the business already applies, and add any clause it left out.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on your own code</h3><p>Find a rule in a system you know that is checked on a form, filtered in a query and enforced when something is created. Count the places it is written, write the figure down, and say whether they agree.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Selecting with a specification</h2>
+      <p class="lead-in">Five steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the candidates.</strong> Write each candidate with its attributes, one per line.</li><li><strong>Evaluate the rule on each.</strong> For each candidate, evaluate the clauses in order and note the first false one, or that all are true.</li><li><strong>Split the collection.</strong> Write the names that satisfy the rule, and beside each of the rest its first false clause.</li><li><strong>Compare a request with the standing rule.</strong> When a new request is written, check it against the rule the business already applies, and add any clause it left out.</li><li><strong>Do it on your own code.</strong> Find a rule in a system you know that is checked on a form, filtered in a query and enforced when something is created. Count the places it is written, write the figure down, and say whether they agree.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1522,17 +1568,16 @@ lot-05: vegetable, 90, age 6: selected
 lot-07: 72, refused on germination</div><p>Three lots, one of them quarantined. Adding the bank's clause refuses lot-05 and leaves lot-01 and lot-03. The lab shows the difference; that the request should have carried the clause is a rule of the seed bank, which the lesson states.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing a separate rule for each use</strong><span>A form's check, a report's filter and a generator's procedure can each state the same rule differently until they disagree. Evans's claim is that the three uses are one concept; on the lesson's illustration a request retyped as a new rule admitted a quarantined lot.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a specification must be evaluated in memory</strong><span>Evans walks through SQL in the specification, a query stated in model terms by a framework, a Repository query chosen by double dispatch, a generic query filtered in memory, and stored procedures. The model is the same in all of them; the implementation is chosen for the platform and the volumes, and he says the trade depends on circumstances.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating building to order as a different pattern</strong><span>A specification for objects not yet present is the same concept used the other way round. Its value, in Evans's list, is that the interface states the rules and that the same specification then tests the result.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can use one rule to validate, select and build.</strong><p>Given a rule and a collection, select the candidates that satisfy it with each refusal's first false clause, and say how the same rule would check a generator's output.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab evaluates a rule on candidates you type. It runs no query and no generator, so it cannot show the performance trade Evans describes, or whether a rule retyped for a new use still means what the business means; it can show only that two rules select different lots.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing a separate rule for each use</strong><span>A form's check, a report's filter and a generator's procedure can each state the same rule differently until they disagree. Evans's claim is that the three uses are one concept; on the lesson's illustration a request retyped as a new rule admitted a quarantined lot.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a specification must be evaluated in memory</strong><span>Evans walks through SQL in the specification, a query stated in model terms by a framework, a Repository query chosen by double dispatch, a generic query filtered in memory, and stored procedures. The model is the same in all of them; the implementation is chosen for the platform and the volumes, and he says the trade depends on circumstances.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating building to order as a different pattern</strong><span>A specification for objects not yet present is the same concept used the other way round. Its value, in Evans's list, is that the interface states the rules and that the same specification then tests the result.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can use one rule to validate, select and build.</strong><p>Given a rule and a collection, select the candidates that satisfy it with each refusal's first false clause, and say how the same rule would check a generator's output.</p></div></div><div class="note"><strong>Note:</strong> The lab evaluates a rule on candidates you type. It runs no query and no generator, so it cannot show the performance trade Evans describes, or whether a rule retyped for a new use still means what the business means; it can show only that two rules select different lots.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Selection</summary><p>Using a specification to pick from a collection the objects that satisfy it, typically by passing it to a Repository, which may evaluate it in memory or translate it into a database query.</p></details><details class="recall"><summary>Building to order</summary><p>Using a specification to describe objects that do not exist yet, so that a generator's interface states what it must produce rather than how. The same specification can then check the result.</p></details><details class="recall"><summary>The first false clause</summary><p>In the lab, for each candidate a specification refuses, the first clause in the order written that the candidate fails: one reason, read in the rule's own terms.</p></details></div>
+      <h3>Summary</h3>
       <p>A specification can validate an object, select objects from a collection, or state what a generator must produce. Read Evans on why these are one concept, what each use costs to implement against a database or a generator, and how the same rule can test what was built, then select seed lots for a school garden and see why each of the rest is refused.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Selection.</strong> Using a specification to pick from a collection the objects that satisfy it, typically by passing it to a Repository, which may evaluate it in memory or translate it into a database query.</li><li><strong>Building to order.</strong> Using a specification to describe objects that do not exist yet, so that a generator's interface states what it must produce rather than how. The same specification can then check the result.</li><li><strong>The first false clause.</strong> In the lab, for each candidate a specification refuses, the first clause in the order written that the candidate fails: one reason, read in the rule's own terms.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="validate, select, build to order. the same concept, different code. a repository takes the specification. keep table details out of the domain. a generator told what, not how. the request also tests the result" tabindex="0" role="region" aria-label="Mathematical notation">validate, select, build to order
 the same concept, different code
 a repository takes the specification
@@ -2441,11 +2486,40 @@ the request also tests the result</div><figcaption>Applying Specification in six
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2513,7 +2587,7 @@ the request also tests the result</div><figcaption>Applying Specification in six
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

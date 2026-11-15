@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Lines, Functions and Graphs</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Lines</p>
       <h1>Linear Inequalities in Two Variables</h1>
       <p class="lesson-lede">A boundary line, and which side of it is the answer.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The solution set is a region</li><li>The boundary is in or out, and the symbol says which</li><li>Test a point rather than guessing a side</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Boundary, side, and the sign that flips</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Linear inequality in two variables</span><p>A <strong>linear inequality in two variables</strong> is a statement of the form <span class="math" data-say="A x plus B y is less than C">Ax + By &lt; C</span>, with <span class="math" data-say="less-than-or-equal">≤</span>, <span class="math" data-say="greater-than">&gt;</span> or <span class="math" data-say="greater-than-or-equal">≥</span> equally allowed and <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> not both zero. Its <strong>solution set</strong> is the set of ordered pairs making it true, which is a <strong>half-plane</strong>, including its edge or not.</p></div><p>The line <span class="math" data-say="A x plus B y equals C">Ax + By = C</span> splits the plane into two open regions. Every point in one region makes <span class="math" data-say="A x plus B y">Ax + By</span> larger than <span class="math" data-say="C">C</span>, every point in the other makes it smaller, and points on the line make it equal. That is why one test point settles the whole region: the expression cannot change which side of <span class="math" data-say="C">C</span> it falls on without crossing the line.</p><h3>Drawing the region</h3><ol><li><strong>Replace the inequality sign with an equals sign</strong> and graph that line, by intercepts or by slope-intercept form, whichever “Graphing a Linear Equation”'s methods make easier here.</li><li><strong>Make it solid or dashed.</strong> Solid for <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span>, since those points are solutions; dashed for <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span>, since they are not.</li><li><strong>Test one point off the line,</strong> preferably <span class="math" data-say="0, 0">(0, 0)</span>. Substitute both coordinates into the original inequality.</li><li><strong>Shade the side that won.</strong> If the test point made the statement true, shade its side; if false, shade the other.</li></ol><p>For <span class="math" data-say="2 x plus 3 y is at most 12">2x + 3y ≤ 12</span> the boundary meets the axes at <span class="math" data-say="6, 0">(6, 0)</span> and <span class="math" data-say="0, 4">(0, 4)</span>, and it is solid. Testing <span class="math" data-say="0, 0">(0, 0)</span> gives <span class="math" data-say="0 is at most 12">0 ≤ 12</span>, which is true, so the shaded half-plane is the one containing the origin: the side below and to the left of the line.</p><h3>Why the symbol alone cannot tell you the side</h3><p>It is tempting to read <span class="math" data-say="greater-than">&gt;</span> as "above" and <span class="math" data-say="less-than">&lt;</span> as "below". That works only when the inequality has already been solved for <span class="math" data-say="y">y</span> with a positive coefficient, and it fails as soon as the coefficient of <span class="math" data-say="y">y</span> is negative.</p><div class="mathblock" data-say="4 x minus 2 y is greater than 8. negative 2 y is greater than negative 4 x plus 8. y, is less than, 2 x minus 4, divided by negative 2, so the sign FLIPPED. test 0, 0, 4 times 0 minus 2 times 0 equals 0, 0 is greater than 8 is FALSE. test 3, 1, 4 times 3 minus 2 times 1 equals 10, 10 is greater than 8 is TRUE. test 0, negative 10, 4 times 0 minus 2 times the quantity negative 10, equals 20, 20 is greater than 8 is TRUE. the symbol says is greater than, the shaded region is BELOW the line y equals 2 x minus 4" tabindex="0" role="region" aria-label="Mathematical notation">4x - 2y &gt; 8
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Boundary, side, and the sign that flips</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Linear inequality in two variables</span><p>A <strong>linear inequality in two variables</strong> is a statement of the form <span class="math" data-say="A x plus B y is less than C">Ax + By &lt; C</span>, with <span class="math" data-say="less-than-or-equal">≤</span>, <span class="math" data-say="greater-than">&gt;</span> or <span class="math" data-say="greater-than-or-equal">≥</span> equally allowed and <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> not both zero. Its <strong>solution set</strong> is the set of ordered pairs making it true, which is a <strong>half-plane</strong>, including its edge or not.</p></div><p>The line <span class="math" data-say="A x plus B y equals C">Ax + By = C</span> splits the plane into two open regions. Every point in one region makes <span class="math" data-say="A x plus B y">Ax + By</span> larger than <span class="math" data-say="C">C</span>, every point in the other makes it smaller, and points on the line make it equal. That is why one test point settles the whole region: the expression cannot change which side of <span class="math" data-say="C">C</span> it falls on without crossing the line.</p><h3>Drawing the region</h3><ol><li><strong>Replace the inequality sign with an equals sign</strong> and graph that line, by intercepts or by slope-intercept form, whichever “Graphing a Linear Equation”'s methods make easier here.</li><li><strong>Make it solid or dashed.</strong> Solid for <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span>, since those points are solutions; dashed for <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span>, since they are not.</li><li><strong>Test one point off the line,</strong> preferably <span class="math" data-say="0, 0">(0, 0)</span>. Substitute both coordinates into the original inequality.</li><li><strong>Shade the side that won.</strong> If the test point made the statement true, shade its side; if false, shade the other.</li></ol><p>For <span class="math" data-say="2 x plus 3 y is at most 12">2x + 3y ≤ 12</span> the boundary meets the axes at <span class="math" data-say="6, 0">(6, 0)</span> and <span class="math" data-say="0, 4">(0, 4)</span>, and it is solid. Testing <span class="math" data-say="0, 0">(0, 0)</span> gives <span class="math" data-say="0 is at most 12">0 ≤ 12</span>, which is true, so the shaded half-plane is the one containing the origin: the side below and to the left of the line.</p><h3>Why the symbol alone cannot tell you the side</h3><p>It is tempting to read <span class="math" data-say="greater-than">&gt;</span> as "above" and <span class="math" data-say="less-than">&lt;</span> as "below". That works only when the inequality has already been solved for <span class="math" data-say="y">y</span> with a positive coefficient, and it fails as soon as the coefficient of <span class="math" data-say="y">y</span> is negative.</p><div class="mathblock" data-say="4 x minus 2 y is greater than 8. negative 2 y is greater than negative 4 x plus 8. y, is less than, 2 x minus 4, divided by negative 2, so the sign FLIPPED. test 0, 0, 4 times 0 minus 2 times 0 equals 0, 0 is greater than 8 is FALSE. test 3, 1, 4 times 3 minus 2 times 1 equals 10, 10 is greater than 8 is TRUE. test 0, negative 10, 4 times 0 minus 2 times the quantity negative 10, equals 20, 20 is greater than 8 is TRUE. the symbol says is greater than, the shaded region is BELOW the line y equals 2 x minus 4" tabindex="0" role="region" aria-label="Mathematical notation">4x - 2y &gt; 8
 
      -2y &gt; -4x + 8
       y  &lt;  2x - 4          divided by -2, so the sign FLIPPED
@@ -1400,12 +1444,11 @@ test (0, 0):    4(0) - 2(0) = 0        0 &gt; 8 is FALSE
 test (3, 1):    4(3) - 2(1) = 10      10 &gt; 8 is TRUE
 test (0, -10):  4(0) - 2(-10) = 20    20 &gt; 8 is TRUE
 
-the symbol says &gt;, the shaded region is BELOW the line y = 2x - 4</div><p>The written symbol is <span class="math" data-say="greater-than">&gt;</span> and the region is below. Both facts are correct, and they are consistent because solving for <span class="math" data-say="y">y</span> required dividing by <span class="math" data-say="negative 2">−2</span>, which reversed the inequality into <span class="math" data-say="y is less than 2 x minus 4">y &lt; 2x − 4</span>. A test point reaches the same conclusion without needing the rearrangement at all, which is why it is the more reliable method.</p><div class="thm"><span class="label">Theorem &middot; Multiplying or dividing by a negative reverses the sign</span><p>If <span class="math" data-say="A is less than b">a &lt; b</span> and <span class="math" data-say="c">c</span> is negative then <span class="math" data-say="A c is greater than b c">ac &gt; bc</span>. This is the single rule from “Linear Inequalities” in Linear Equations and Inequalities that survives into two variables, and it is where a correct boundary line ends up with the wrong side shaded. Adding or subtracting anything, and multiplying by a positive, leave the direction alone.</p></div><h3>When the boundary passes through the origin</h3><p><span class="math" data-say="y is less than 3 x">y &lt; 3x</span> has the origin on its boundary, so <span class="math" data-say="0, 0">(0, 0)</span> cannot be the test point: it satisfies the equation, not the inequality, and it lies on the edge rather than in either region. Any other point works. Testing <span class="math" data-say="1, 0">(1, 0)</span> gives <span class="math" data-say="0 is less than 3">0 &lt; 3</span>, which is true, so the shaded region is the one containing <span class="math" data-say="1, 0">(1, 0)</span>, below and to the right of the line.</p><div class="example"><span class="label">Example &middot; Four points against one inequality</span><p>For <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span>: <span class="math" data-say="0, 0">(0, 0)</span> gives <span class="math" data-say="0">0</span>, false. <span class="math" data-say="3, 1">(3, 1)</span> gives <span class="math" data-say="10">10</span>, true. <span class="math" data-say="0, negative 4">(0, −4)</span> gives <span class="math" data-say="8">8</span>, and <span class="math" data-say="8 is greater than 8">8 &gt; 8</span> is false, so this point sits exactly on the dashed boundary and is not a solution. <span class="math" data-say="1, 2">(1, 2)</span> gives <span class="math" data-say="0">0</span>, false. Only <span class="math" data-say="3, 1">(3, 1)</span> is in the solution set, and <span class="math" data-say="0, negative 4">(0, −4)</span> is the one worth pausing on: it would be a solution if the symbol were <span class="math" data-say="greater-than-or-equal">≥</span>.</p></div><h3>Reading a region back into an inequality</h3><p>The reverse direction appears in modelling and in Systems and Matrices. Find the boundary line's equation from two of its points, choose <span class="math" data-say="less-than-or-equal">≤</span> or <span class="math" data-say="less-than">&lt;</span> from whether the line is solid or dashed, and then fix the direction by testing a point taken from inside the shaded region. The last step is the same substitution as before, run with the answer known and the symbol unknown.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Systems of inequalities</h2></div><p>The feasible region, its corners, and whether it is empty</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+the symbol says &gt;, the shaded region is BELOW the line y = 2x - 4</div><p>The written symbol is <span class="math" data-say="greater-than">&gt;</span> and the region is below. Both facts are correct, and they are consistent because solving for <span class="math" data-say="y">y</span> required dividing by <span class="math" data-say="negative 2">−2</span>, which reversed the inequality into <span class="math" data-say="y is less than 2 x minus 4">y &lt; 2x − 4</span>. A test point reaches the same conclusion without needing the rearrangement at all, which is why it is the more reliable method.</p><div class="thm"><span class="label">Theorem &middot; Multiplying or dividing by a negative reverses the sign</span><p>If <span class="math" data-say="A is less than b">a &lt; b</span> and <span class="math" data-say="c">c</span> is negative then <span class="math" data-say="A c is greater than b c">ac &gt; bc</span>. This is the single rule from “Linear Inequalities” in Linear Equations and Inequalities that survives into two variables, and it is where a correct boundary line ends up with the wrong side shaded. Adding or subtracting anything, and multiplying by a positive, leave the direction alone.</p></div><h3>When the boundary passes through the origin</h3><p><span class="math" data-say="y is less than 3 x">y &lt; 3x</span> has the origin on its boundary, so <span class="math" data-say="0, 0">(0, 0)</span> cannot be the test point: it satisfies the equation, not the inequality, and it lies on the edge rather than in either region. Any other point works. Testing <span class="math" data-say="1, 0">(1, 0)</span> gives <span class="math" data-say="0 is less than 3">0 &lt; 3</span>, which is true, so the shaded region is the one containing <span class="math" data-say="1, 0">(1, 0)</span>, below and to the right of the line.</p><div class="example"><span class="label">Example &middot; Four points against one inequality</span><p>For <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span>: <span class="math" data-say="0, 0">(0, 0)</span> gives <span class="math" data-say="0">0</span>, false. <span class="math" data-say="3, 1">(3, 1)</span> gives <span class="math" data-say="10">10</span>, true. <span class="math" data-say="0, negative 4">(0, −4)</span> gives <span class="math" data-say="8">8</span>, and <span class="math" data-say="8 is greater than 8">8 &gt; 8</span> is false, so this point sits exactly on the dashed boundary and is not a solution. <span class="math" data-say="1, 2">(1, 2)</span> gives <span class="math" data-say="0">0</span>, false. Only <span class="math" data-say="3, 1">(3, 1)</span> is in the solution set, and <span class="math" data-say="0, negative 4">(0, −4)</span> is the one worth pausing on: it would be a solution if the symbol were <span class="math" data-say="greater-than-or-equal">≥</span>.</p></div><h3>Reading a region back into an inequality</h3><p>The reverse direction appears in modelling and in Systems and Matrices. Find the boundary line's equation from two of its points, choose <span class="math" data-say="less-than-or-equal">≤</span> or <span class="math" data-say="less-than">&lt;</span> from whether the line is solid or dashed, and then fix the direction by testing a point taken from inside the shaded region. The last step is the same substitution as before, run with the answer known and the symbol unknown.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Systems of inequalities</h2></div><p>The feasible region, its corners, and whether it is empty</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="syTitle">System</strong><span id="sySub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the feasible region</span><span class="tone-purple"><i class="legend-swatch"></i>an included boundary</span><span class="tone-muted"><i class="legend-swatch"></i>a strict boundary</span><span class="tone-amber"><i class="legend-swatch"></i>corners</span></div>
@@ -1413,10 +1456,10 @@ the symbol says &gt;, the shaded region is BELOW the line y = 2x - 4</div><p>The
       <div class="lab-stage" id="syStage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="syPlot"></svg></div>
       <div id="syWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="syStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Boundary, then side</h3>
-          <p>Each preset uses one constraint box and leaves the others empty. The lab draws the boundary and shaded half-plane; it does not accept a clicked test point, so predict and substitute your own point before revealing the graph. Any multi-constraint corner summary is a Systems and Matrices preview, not completion work here.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Boundary, then side</h3>
+            <p>Each preset uses one constraint box and leaves the others empty. The lab draws the boundary and shaded half-plane; it does not accept a clicked test point, so predict and substitute your own point before revealing the graph. Any multi-constraint corner summary is a Systems and Matrices preview, not completion work here.</p>
         <div class="field" id="syFieldPreset">
           <label for="syPreset">Worked example</label>
           <select id="syPreset"><option value="0">solid boundary: 2x + 3y &lt;= 12</option><option value="1">negative y coefficient: 4x - 2y &gt; 8</option><option value="2">boundary through the origin: y &lt; 3x</option><option value="3">vertical boundary: x &gt;= -2</option></select>
@@ -1443,12 +1486,14 @@ the symbol says &gt;, the shaded region is BELOW the line y = 2x - 4</div><p>The
           <div class="kpi"><span id="syK3Lab">&mdash;</span><strong id="syK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="syHint" style="margin:0;">Type inequalities in x and y: <code>x + 2y &lt;= 8</code>, <code>y &gt; x</code>, <code>x/2 - y &gt;= 1</code>. Leave a box empty to drop that constraint. Every corner below is an exact pair of fractions.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Graphing a linear inequality</h2></div><p>Boundary, style, test, shade. Doing the test before choosing a side keeps the symbol from misleading you.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Graph the boundary</h3><p>Swap the inequality for an equals sign and draw that line. Intercepts are usually quickest: for <span class="math" data-say="4 x minus 2 y equals 8">4x − 2y = 8</span> they are <span class="math" data-say="2, 0">(2, 0)</span> and <span class="math" data-say="0, negative 4">(0, −4)</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose solid or dashed</h3><p>Solid when the symbol includes equality, dashed when it does not. Make this decision from the original inequality, before any rearranging, so a flipped sign cannot change it. Rearranging never changes whether the boundary is included.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Substitute a test point</h3><p>Use <span class="math" data-say="0, 0">(0, 0)</span> unless the boundary passes through it, in which case pick any convenient point off the line. Substitute into the original inequality and evaluate to a true or false statement.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Shade the winning side, then confirm</h3><p>True means shade the test point's side; false means shade the other. Then test one point from inside the shaded region: it must satisfy the inequality. That second substitution is the check that catches a reversed sign.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Graphing a linear inequality</h2>
+      <p class="lead-in">Boundary, style, test, shade. Doing the test before choosing a side keeps the symbol from misleading you.</p>
+      <ol class="key-ideas method"><li><strong>Graph the boundary.</strong> Swap the inequality for an equals sign and draw that line. Intercepts are usually quickest: for <span class="math" data-say="4 x minus 2 y equals 8">4x − 2y = 8</span> they are <span class="math" data-say="2, 0">(2, 0)</span> and <span class="math" data-say="0, negative 4">(0, −4)</span>.</li><li><strong>Choose solid or dashed.</strong> Solid when the symbol includes equality, dashed when it does not. Make this decision from the original inequality, before any rearranging, so a flipped sign cannot change it. Rearranging never changes whether the boundary is included.</li><li><strong>Substitute a test point.</strong> Use <span class="math" data-say="0, 0">(0, 0)</span> unless the boundary passes through it, in which case pick any convenient point off the line. Substitute into the original inequality and evaluate to a true or false statement.</li><li><strong>Shade the winning side, then confirm.</strong> True means shade the test point's side; false means shade the other. Then test one point from inside the shaded region: it must satisfy the inequality. That second substitution is the check that catches a reversed sign.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1486,17 +1531,16 @@ the symbol says &gt;, the shaded region is BELOW the line y = 2x - 4</div><p>The
                    (0, -4):   0 +  8 =  8     8 &gt; 8    FALSE, on the edge</div><p>The second example is the whole lesson in one picture. The symbol is <span class="math" data-say="greater-than">&gt;</span>, the region is below, and there is no contradiction: solving for <span class="math" data-say="y">y</span> divided by <span class="math" data-say="negative 2">−2</span> and flipped the sign to <span class="math" data-say="less-than">&lt;</span>. Anyone shading above has applied a rule that is only valid after the rearrangement has been done.</p><p>The point <span class="math" data-say="0, negative 4">(0, −4)</span> is on the boundary and gives <span class="math" data-say="8 is greater than 8">8 &gt; 8</span>, which is false. With <span class="math" data-say="greater-than-or-equal">≥</span> in place of <span class="math" data-say="greater-than">&gt;</span> it would be a solution and the line would be solid. One symbol changes the status of every point on the line and no other point in the plane.</p><p>Both confirmations tested a point from inside the shaded region rather than re-reading the picture. Shading is easy to draw on the wrong side of a correctly drawn line, and only a substitution catches it.</p><p>For a faded graph, use <span class="math" data-say="3 x minus 2 y is at most 6">3x − 2y ≤ 6</span>. The boundary <span class="math" data-say="3 x minus 2 y equals 6">3x − 2y = 6</span> is supplied. Decide its line style, find two points on it, test the origin in the original inequality, shade the winning side, and confirm with a second point. Finally solve for <span class="math" data-say="y">y</span> and use the reversed sign as an independent check on the shading.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Forgetting to flip when dividing by a negative</strong><span><span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span> becomes <span class="math" data-say="y is less than 2 x minus 4">y &lt; 2x − 4</span>, not <span class="math" data-say="y is greater than 2 x minus 4">y &gt; 2x − 4</span>. The boundary line is identical either way, so the graph looks right and the shading is on the wrong side. Testing <span class="math" data-say="0, negative 10">(0, −10)</span>, which satisfies the original, exposes it in one line.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the side off the symbol</strong><span><span class="math" data-say="greater-than">&gt;</span> does not mean above. It means above only after the inequality has been solved for <span class="math" data-say="y">y</span> and the coefficient of <span class="math" data-say="y">y</span> was positive. For <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span> the region is below the boundary. A test point never depends on the form the inequality happens to be written in.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Drawing a solid line for a strict inequality</strong><span><span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span> exclude the boundary, so it is dashed. The difference is real: <span class="math" data-say="0, negative 4">(0, −4)</span> satisfies <span class="math" data-say="4 x minus 2 y is at least 8">4x − 2y ≥ 8</span> and fails <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span>, and a solid line claims every point of the boundary as a solution.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can graph any linear inequality with the right line style and the right side shaded, and can justify the side by a substitution rather than by the symbol.</strong><p>Given <span class="math" data-say="5 x minus 2 y is at least 10">5x − 2y ≥ 10</span> you should draw the solid boundary from two checked points, choose and substitute a test point, shade the correct half-plane, and confirm the result after solving for <span class="math" data-say="y">y</span>. You should also handle a boundary through the origin by choosing a different test point, and read an inequality back off a shaded picture.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the line block. “What a Function Is” changes the question from which pairs solve a statement to whether each input has exactly one output. Systems and Matrices later stacks several shaded regions on one set of axes; the overlap of the shaded half-planes is the feasible set that linear programming optimises over.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Forgetting to flip when dividing by a negative</strong><span><span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span> becomes <span class="math" data-say="y is less than 2 x minus 4">y &lt; 2x − 4</span>, not <span class="math" data-say="y is greater than 2 x minus 4">y &gt; 2x − 4</span>. The boundary line is identical either way, so the graph looks right and the shading is on the wrong side. Testing <span class="math" data-say="0, negative 10">(0, −10)</span>, which satisfies the original, exposes it in one line.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the side off the symbol</strong><span><span class="math" data-say="greater-than">&gt;</span> does not mean above. It means above only after the inequality has been solved for <span class="math" data-say="y">y</span> and the coefficient of <span class="math" data-say="y">y</span> was positive. For <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span> the region is below the boundary. A test point never depends on the form the inequality happens to be written in.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Drawing a solid line for a strict inequality</strong><span><span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span> exclude the boundary, so it is dashed. The difference is real: <span class="math" data-say="0, negative 4">(0, −4)</span> satisfies <span class="math" data-say="4 x minus 2 y is at least 8">4x − 2y ≥ 8</span> and fails <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span>, and a solid line claims every point of the boundary as a solution.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can graph any linear inequality with the right line style and the right side shaded, and can justify the side by a substitution rather than by the symbol.</strong><p>Given <span class="math" data-say="5 x minus 2 y is at least 10">5x − 2y ≥ 10</span> you should draw the solid boundary from two checked points, choose and substitute a test point, shade the correct half-plane, and confirm the result after solving for <span class="math" data-say="y">y</span>. You should also handle a boundary through the origin by choosing a different test point, and read an inequality back off a shaded picture.</p></div></div><div class="note"><strong>Note:</strong> That closes the line block. “What a Function Is” changes the question from which pairs solve a statement to whether each input has exactly one output. Systems and Matrices later stacks several shaded regions on one set of axes; the overlap of the shaded half-planes is the feasible set that linear programming optimises over.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The solution set is a region</summary><p>A solution is still an ordered pair that makes the statement true, exactly as in “The Coordinate Plane”. There are simply infinitely many of them filling an area rather than lying along a line, and shading is how an infinite set gets drawn.</p></details><details class="recall"><summary>The boundary is in or out, and the symbol says which</summary><p><span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span> include the line, drawn solid. <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span> exclude it, drawn dashed. The dashed line is not decoration: <span class="math" data-say="0, negative 4">(0, −4)</span> satisfies <span class="math" data-say="4 x minus 2 y is at least 8">4x − 2y ≥ 8</span> and fails <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span>, and the drawing has to record that difference.</p></details><details class="recall"><summary>Test a point rather than guessing a side</summary><p>Substitute one point that is not on the line. A true statement means that point's side is the solution set; a false one means the other side. <span class="math" data-say="0, 0">(0, 0)</span> is the easiest test point whenever the boundary misses the origin, and when the boundary passes through it, any other point will do.</p></details></div>
+      <h3>Summary</h3>
       <p>Replacing the equals sign in a linear equation with an inequality turns a line into a half-plane. The line itself is the boundary, solid or dashed according to the symbol, and a single test point decides which side gets shaded.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The solution set is a region.</strong> A solution is still an ordered pair that makes the statement true, exactly as in “The Coordinate Plane”. There are simply infinitely many of them filling an area rather than lying along a line, and shading is how an infinite set gets drawn.</li><li><strong>The boundary is in or out, and the symbol says which.</strong> <span class="math" data-say="less-than-or-equal">≤</span> and <span class="math" data-say="greater-than-or-equal">≥</span> include the line, drawn solid. <span class="math" data-say="less-than">&lt;</span> and <span class="math" data-say="greater-than">&gt;</span> exclude it, drawn dashed. The dashed line is not decoration: <span class="math" data-say="0, negative 4">(0, −4)</span> satisfies <span class="math" data-say="4 x minus 2 y is at least 8">4x − 2y ≥ 8</span> and fails <span class="math" data-say="4 x minus 2 y is greater than 8">4x − 2y &gt; 8</span>, and the drawing has to record that difference.</li><li><strong>Test a point rather than guessing a side.</strong> Substitute one point that is not on the line. A true statement means that point's side is the solution set; a false one means the other side. <span class="math" data-say="0, 0">(0, 0)</span> is the easiest test point whenever the boundary misses the origin, and when the boundary passes through it, any other point will do.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="boundary, replace the inequality sign with equals. solid line for equals, dashed line for. test any point off the line, true means shade that side. dividing by a negative reverses the inequality" tabindex="0" role="region" aria-label="Mathematical notation">boundary: replace the inequality sign with =
 solid line for &lt;= or &gt;=      dashed line for &lt; or &gt;
 test any point off the line; true means shade that side
@@ -4002,11 +4046,40 @@ dividing by a negative reverses the inequality</div><figcaption>Three decisions 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -4074,7 +4147,7 @@ dividing by a negative reverses the inequality</div><figcaption>Three decisions 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

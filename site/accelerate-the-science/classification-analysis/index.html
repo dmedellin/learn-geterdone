@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Science Behind the Book</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · The Science Behind This Book</p>
       <h1>Classification Analysis</h1>
       <p class="lesson-lede">Sorting teams into groups without telling the method what counts as good, and how to choose how many groups there are.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Classification (clustering) analysis</li><li>Hierarchical clustering</li><li>Fusion coefficient</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Groups from the data, and where to stop merging</h2>
-      <article class="prose reading"><p>&ldquo;classification variables are entered into the clustering algorithm and significant groups are identified.&rdquo; That is how Chapter 12, in its section on Classification Analysis, describes the process in one line. The book's most quoted result, that there are high, medium and low performers, comes from it. Chapter 2 reports the groups, and the lesson High, Medium and Low Performers reads them; this lesson reads the method.</p><p>Classification is not one of Leek's six, and the authors say so: depending on the context, design and methods, it may count as exploratory, predictive or even causal analysis. They used it for one purpose, to see whether teams differed in how they built and delivered software. They put their four technology performance variables into the algorithm and looked at the groups that emerged. The groups, they report, differ distinctly and with statistical significance: the high group is better than the others on every one of the four measures, the low group worse on every one, and the medium group between the two. Chapter 2 gives the numbers and the years.</p><p>What the algorithm does is easy to say. Each measure is a dimension, so each team is a point in four-dimensional space, and the algorithm looks for groups of points near one another and far from the rest. Chapter 2 adds the important point: it has no understanding of what a good or bad answer is. The names high, medium and low are the researchers' reading of the groups afterwards.</p><p>The chapter's box explains why the authors chose hierarchical clustering over k-means. K-means needs the number of groups chosen first, and they had no theory or prior idea of it; hierarchical clustering lets the data say, and also lets them look at parent and child relationships in the groups, which makes the result easier to interpret; and their dataset was not so large that the computing cost mattered. Appendix C, Tests for Classification, adds that they ran five methods, Ward's among them, and compared the solutions on the change in fusion coefficients, on the number of individuals in each cluster (solutions with very small clusters were excluded), and on univariate F-statistics. Ward's performed best and was chosen.</p><p>Ward's method has a definition the book does not print, so the lab states it. Start with every team alone. Merge the two groups whose joining raises the total within-group sum of squared distances the least; that rise is the fusion coefficient. Repeat until one group remains. For groups A and B, with n teams and average codes a and b on each measure:</p><div class="mathblock" data-say="merge cost of groups A and B equals n A times n B, over n A plus n B, times the sum over the measures of a minus b, squared. where a and b are the two groups&#x27; average codes on each measure" tabindex="0" role="region" aria-label="Mathematical notation">merge cost(A, B)  =  (nA · nB) / (nA + nB)  ·  Σ over measures of (a − b)²
-where a and b are the two groups&#x27; average codes on each measure</div><p>The cost never decreases, which is why the merges can be read as a list: cheap merges join teams that are already alike, and a sudden expensive one joins groups that are not. The lab uses nine invented teams, each coded 1 to 6 on the four measures. In these presets the best answer on each scale (on demand, less than one hour, and the lowest fail-rate band, 0&ndash;15 percent) is coded 6, so a high code is the better answer; the clustering never looks at which end is better.</p><div class="mathblock" data-say="team deploy lead restore fail. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">team  deploy  lead  restore  fail
-T1    6       6     6        6
-T2    2       1     1        1
-T3    5       3     5        3
-T4    4       4     4        4
-T5    6       6     5        6
-T6    5       6     5        5
-T7    1       3     2        1
-T8    2       1     3        1
-T9    3       3     4        4</div><p>On the preset <code>three-groups</code>, which asks for three groups, the lab lists the eight merges and their costs. They are 1/2, 1, 3/2, 2, 3, 10/3, 67/3 and 81. The first six merges, which leave three groups, cost 10/3 at most, about 3.33; the seventh, which would join two of those three, costs 67/3, about 22.33. A jump from about 3 to about 22 says that going from three groups to two forces together teams that are not alike. That is what the authors mean by looking at the change in fusion coefficients, one of their three criteria. Three tiles keep the score: the last merge made, 10/3 here, the next merge to be made, 67/3, and the total within-group sum of squares at this k, 34/3 or about 11.33, which is the first six costs added up.</p><p>The three groups are T1, T5 and T6; T2, T7 and T8; and T3, T4 and T9. By median code on deploy, lead, restore and fail the first is 6, 6, 5, 6, which the lab reads as on demand, less than one hour, less than one day and 0&ndash;15 percent; the second is 2, 1, 2, 1, which reads as between once a month and once every six months, more than six months, between one month and six months and 76&ndash;100 percent, the last a band the lab adds beyond the ranges the book reports; and the third is 4, 3, 4, 4, in between. A researcher would now call the three groups high, low and medium, and would be doing the naming, not the algorithm. The presets <code>two-groups</code> and <code>four-groups</code> are the same merges cut later or earlier. Two groups put T1, T3, T4, T5, T6 and T9 together against T2, T7 and T8, and a group of six has medians that are means of two middle codes: the fail median, 4.5, prints both neighbours, and the lead median, 5, is an answer no team in the group gave; four groups split T7 off from T2 and T8, leaving a group of one. The authors excluded solutions with few individuals in a cluster, and the group of one is why.</p><p>Two reservations belong to the lesson, not the chapter. The distance used treats the codes as numbers with equal steps, which the six answer options only suggest. And a tree of merges always ends in one group; the merge costs help you choose where to cut, and no cut is the true one.</p><h3>Exercise</h3><ul><li>Four invented teams, coded on the four measures as before: <span class="math" data-say="A, 1, 1, 1, 1, B, 2, 1, 1, 1, C, 5, 5, 5, 4, D, 6, 6, 5, 6">A, 1, 1, 1, 1; B, 2, 1, 1, 1; C, 5, 5, 5, 4; D, 6, 6, 5, 6</span>.</li><li>Work out the three merges by hand with the cost formula, then ask the lab for two groups.</li></ul><p>Say which teams join first, what each merge costs, and what the last merge's cost tells you about two groups against one.</p><p>Classification sorts teams by what they report. The next lesson, Latent Constructs, opens Chapter 13 and asks how one trusts what a survey measures.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Delivery performance</h2></div><p>Ward&#x27;s hierarchical clustering of coded answers</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Groups from the data, and where to stop merging</h2><div class="prose reading"><p>&ldquo;classification variables are entered into the clustering algorithm and significant groups are identified.&rdquo; That is how Chapter 12, in its section on Classification Analysis, describes the process in one line. The book's most quoted result, that there are high, medium and low performers, comes from it. Chapter 2 reports the groups, and the lesson High, Medium and Low Performers reads them; this lesson reads the method.</p><p>Classification is not one of Leek's six, and the authors say so: depending on the context, design and methods, it may count as exploratory, predictive or even causal analysis. They used it for one purpose, to see whether teams differed in how they built and delivered software. They put their four technology performance variables into the algorithm and looked at the groups that emerged. The groups, they report, differ distinctly and with statistical significance: the high group is better than the others on every one of the four measures, the low group worse on every one, and the medium group between the two. Chapter 2 gives the numbers and the years.</p><p>What the algorithm does is easy to say. Each measure is a dimension, so each team is a point in four-dimensional space, and the algorithm looks for groups of points near one another and far from the rest. Chapter 2 adds the important point: it has no understanding of what a good or bad answer is. The names high, medium and low are the researchers' reading of the groups afterwards.</p><p>The chapter's box explains why the authors chose hierarchical clustering over k-means. K-means needs the number of groups chosen first, and they had no theory or prior idea of it; hierarchical clustering lets the data say, and also lets them look at parent and child relationships in the groups, which makes the result easier to interpret; and their dataset was not so large that the computing cost mattered. Appendix C, Tests for Classification, adds that they ran five methods, Ward's among them, and compared the solutions on the change in fusion coefficients, on the number of individuals in each cluster (solutions with very small clusters were excluded), and on univariate F-statistics. Ward's performed best and was chosen.</p><p>Ward's method has a definition the book does not print, so the lab states it. Start with every team alone. Merge the two groups whose joining raises the total within-group sum of squared distances the least; that rise is the fusion coefficient. Repeat until one group remains. For groups A and B, with n teams and average codes a and b on each measure:</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Delivery performance</h2></div><p>Ward&#x27;s hierarchical clustering of coded answers</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Delivery performance</strong><span>Ward's hierarchical clustering of coded answers</span></div>
       </div>
@@ -1414,10 +1447,10 @@ T9    3       3     4        4</div><p>On the preset <code>three-groups</code>, 
       <div class="table-wrap" id="adeTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="adeTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each team is a point of four codes, 1 to 6, one per measure. Ward's method starts with every team alone and merges, at each step, the two groups whose merge adds least to the total within-group sum of squares (squared Euclidean distance of each team from its group's mean, summed); that increase, nA·nB/(nA + nB) times the squared distance between the two means, is the merge's fusion coefficient, an exact fraction. The clustering does not know which end of a scale is better; it groups by distance alone. Groups are kept in the order of their earliest team in the input, and a tie between merges goes to the pair whose first group comes earliest, then whose second does. Groups are named G1, G2, … in that order at k. A group's median on a measure is the middle code, or the mean of the two middle codes, decoded to the book's option (a half code shows both neighbours). The table runs every merge down to one group.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Merging teams by Ward&#x27;s method</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Merging teams by Ward&#x27;s method</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="adePreset">Worked example</label>
           <select id="adePreset"><option value="three-groups" selected>Nine invented teams, grouped into three</option><option value="two-groups">The same teams, cut at two groups</option><option value="four-groups">The same teams, cut at four groups</option></select>
@@ -1446,12 +1479,25 @@ T9    3       3     4        4</div><p>On the preset <code>three-groups</code>, 
           <div class="kpi"><span>Fusion coefficient of the next merge (to k − 1)</span><strong id="adeNextCoef">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="merge cost of groups A and B equals n A times n B, over n A plus n B, times the sum over the measures of a minus b, squared. where a and b are the two groups&#x27; average codes on each measure" tabindex="0" role="region" aria-label="Mathematical notation">merge cost(A, B)  =  (nA · nB) / (nA + nB)  ·  Σ over measures of (a − b)²
+where a and b are the two groups&#x27; average codes on each measure</div><p>The cost never decreases, which is why the merges can be read as a list: cheap merges join teams that are already alike, and a sudden expensive one joins groups that are not. The lab uses nine invented teams, each coded 1 to 6 on the four measures. In these presets the best answer on each scale (on demand, less than one hour, and the lowest fail-rate band, 0&ndash;15 percent) is coded 6, so a high code is the better answer; the clustering never looks at which end is better.</p><div class="mathblock" data-say="team deploy lead restore fail. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">team  deploy  lead  restore  fail
+T1    6       6     6        6
+T2    2       1     1        1
+T3    5       3     5        3
+T4    4       4     4        4
+T5    6       6     5        6
+T6    5       6     5        5
+T7    1       3     2        1
+T8    2       1     3        1
+T9    3       3     4        4</div><p>On the preset <code>three-groups</code>, which asks for three groups, the lab lists the eight merges and their costs. They are 1/2, 1, 3/2, 2, 3, 10/3, 67/3 and 81. The first six merges, which leave three groups, cost 10/3 at most, about 3.33; the seventh, which would join two of those three, costs 67/3, about 22.33. A jump from about 3 to about 22 says that going from three groups to two forces together teams that are not alike. That is what the authors mean by looking at the change in fusion coefficients, one of their three criteria. Three tiles keep the score: the last merge made, 10/3 here, the next merge to be made, 67/3, and the total within-group sum of squares at this k, 34/3 or about 11.33, which is the first six costs added up.</p><p>The three groups are T1, T5 and T6; T2, T7 and T8; and T3, T4 and T9. By median code on deploy, lead, restore and fail the first is 6, 6, 5, 6, which the lab reads as on demand, less than one hour, less than one day and 0&ndash;15 percent; the second is 2, 1, 2, 1, which reads as between once a month and once every six months, more than six months, between one month and six months and 76&ndash;100 percent, the last a band the lab adds beyond the ranges the book reports; and the third is 4, 3, 4, 4, in between. A researcher would now call the three groups high, low and medium, and would be doing the naming, not the algorithm. The presets <code>two-groups</code> and <code>four-groups</code> are the same merges cut later or earlier. Two groups put T1, T3, T4, T5, T6 and T9 together against T2, T7 and T8, and a group of six has medians that are means of two middle codes: the fail median, 4.5, prints both neighbours, and the lead median, 5, is an answer no team in the group gave; four groups split T7 off from T2 and T8, leaving a group of one. The authors excluded solutions with few individuals in a cluster, and the group of one is why.</p><p>Two reservations belong to the lesson, not the chapter. The distance used treats the codes as numbers with equal steps, which the six answer options only suggest. And a tree of merges always ends in one group; the merge costs help you choose where to cut, and no cut is the true one.</p><h3>Exercise</h3><ul><li>Four invented teams, coded on the four measures as before: <span class="math" data-say="A, 1, 1, 1, 1, B, 2, 1, 1, 1, C, 5, 5, 5, 4, D, 6, 6, 5, 6">A, 1, 1, 1, 1; B, 2, 1, 1, 1; C, 5, 5, 5, 4; D, 6, 6, 5, 6</span>.</li><li>Work out the three merges by hand with the cost formula, then ask the lab for two groups.</li></ul><p>Say which teams join first, what each merge costs, and what the last merge's cost tells you about two groups against one.</p><p>Classification sorts teams by what they report. The next lesson, Latent Constructs, opens Chapter 13 and asks how one trusts what a survey measures.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Clustering by hand with Ward&#x27;s method</h2></div><p>Five steps, the last of them on teams of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Code each team on each measure</h3><p>Write each team's answer to the four questions as a number from 1 to 6, using the book's six options in their listed order.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the cheapest merge</h3><p>For every pair of groups, compute <span data-say="n times n over the quantity n plus n">n·n/(n+n)</span> times the sum of squared differences between their averages. Merge the pair with the lowest cost and record the cost.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Repeat with the new average</h3><p>Replace the two merged groups by one, whose average is the size-weighted average of the two, and find the cheapest merge again. Stop when one group is left.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Look for the jump</h3><p>Read the costs in order. A cost that is far larger than the one before it marks the point at which you would be forcing unlike groups together.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on teams of your own</h3><p>Pick six teams you know, answer the four questions for each, code the answers and type them in. Ask for two, three and four groups and note which cut the costs favour.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Clustering by hand with Ward&#x27;s method</h2>
+      <p class="lead-in">Five steps, the last of them on teams of your own.</p>
+      <ol class="key-ideas method"><li><strong>Code each team on each measure.</strong> Write each team's answer to the four questions as a number from 1 to 6, using the book's six options in their listed order.</li><li><strong>Find the cheapest merge.</strong> For every pair of groups, compute <span data-say="n times n over the quantity n plus n">n·n/(n+n)</span> times the sum of squared differences between their averages. Merge the pair with the lowest cost and record the cost.</li><li><strong>Repeat with the new average.</strong> Replace the two merged groups by one, whose average is the size-weighted average of the two, and find the cheapest merge again. Stop when one group is left.</li><li><strong>Look for the jump.</strong> Read the costs in order. A cost that is far larger than the one before it marks the point at which you would be forcing unlike groups together.</li><li><strong>Do it on teams of your own.</strong> Pick six teams you know, answer the four questions for each, code the answers and type them in. Ask for two, three and four groups and note which cut the costs favour.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ squared distance 25/9+64/9+1+4 = 134/9
 cost = (3·3/6)·(134/9) = 67/3</div><p>The eight costs add to 344/3, which is also the total of every team's squared distance from the average of all nine. The merges spend that total in order, from the cheap pairs to the expensive last.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the algorithm knows which teams are good</strong><span>Chapter 2 says the technique does not grasp what the responses mean; it has no idea what counts as good or bad. The labels high, medium and low come after, from reading the groups. In the lab, flip every code to the other end of the scale and the groups are the same.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing the number of groups before looking</strong><span>That is what the authors avoided by choosing hierarchical clustering. The merge costs are the evidence for where to cut, and a jump is a prompt for judgement, with group sizes and the subject matter, not a rule.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the lab&#x27;s three groups as the book&#x27;s finding</strong><span>The groups, the codes and the costs belong to nine invented teams. The book's finding is that its survey's respondents formed high, medium and low groups that differed significantly on all four measures, in each year it checked (Appendix C notes one exception, 2016, which Chapter 2 discusses), as Chapter 2 reports.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can follow a hierarchical clustering.</strong><p>Given a small table of teams coded on four measures, find the order of merges and their costs, and say where the costs suggest stopping.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab clusters the codes you type with Ward's cost, exactly. It cannot tell whether the codes are a fair sample of teams, whether equal steps between the answer options is a fair assumption, or whether the groups mean anything beyond the sample.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the algorithm knows which teams are good</strong><span>Chapter 2 says the technique does not grasp what the responses mean; it has no idea what counts as good or bad. The labels high, medium and low come after, from reading the groups. In the lab, flip every code to the other end of the scale and the groups are the same.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing the number of groups before looking</strong><span>That is what the authors avoided by choosing hierarchical clustering. The merge costs are the evidence for where to cut, and a jump is a prompt for judgement, with group sizes and the subject matter, not a rule.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the lab&#x27;s three groups as the book&#x27;s finding</strong><span>The groups, the codes and the costs belong to nine invented teams. The book's finding is that its survey's respondents formed high, medium and low groups that differed significantly on all four measures, in each year it checked (Appendix C notes one exception, 2016, which Chapter 2 discusses), as Chapter 2 reports.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can follow a hierarchical clustering.</strong><p>Given a small table of teams coded on four measures, find the order of merges and their costs, and say where the costs suggest stopping.</p></div></div><div class="note"><strong>Note:</strong> The lab clusters the codes you type with Ward's cost, exactly. It cannot tell whether the codes are a fair sample of teams, whether equal steps between the answer options is a fair assumption, or whether the groups mean anything beyond the sample.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Classification (clustering) analysis</summary><p>A method that puts the cases into groups so that those in a group are more alike than those in different groups. The authors fed in four measures, deployment frequency, lead time for changes, time to restore service and change fail rate, and looked at which groups emerged. Depending on design and context, they say, it can count as exploratory, predictive or even causal analysis.</p></details><details class="recall"><summary>Hierarchical clustering</summary><p>Clustering that starts with every case alone and repeatedly merges the two closest groups, so that the merges form a tree. The authors chose it over k-means because they had no prior idea how many groups to expect, because it shows parent and child groups, and because their dataset was not huge.</p></details><details class="recall"><summary>Fusion coefficient</summary><p>The cost of one merge. Under Ward's method, the one the authors kept, it is the increase in the groups' within-group sum of squared distances that the merge causes. Appendix C says solutions were compared on the change in fusion coefficients, among other things.</p></details></div>
+      <h3>Summary</h3>
       <p>Classification is the one analysis the chapter says does not fit the ladder. Read how the authors fed their four delivery measures to a clustering algorithm to get high, medium and low performers, why they chose hierarchical clustering, and what Appendix C says they compared. Then cluster nine invented teams into two, three and four groups and read the merge costs that tell you where to stop.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Classification (clustering) analysis.</strong> A method that puts the cases into groups so that those in a group are more alike than those in different groups. The authors fed in four measures, deployment frequency, lead time for changes, time to restore service and change fail rate, and looked at which groups emerged. Depending on design and context, they say, it can count as exploratory, predictive or even causal analysis.</li><li><strong>Hierarchical clustering.</strong> Clustering that starts with every case alone and repeatedly merges the two closest groups, so that the merges form a tree. The authors chose it over k-means because they had no prior idea how many groups to expect, because it shows parent and child groups, and because their dataset was not huge.</li><li><strong>Fusion coefficient.</strong> The cost of one merge. Under Ward's method, the one the authors kept, it is the increase in the groups' within-group sum of squared distances that the merge causes. Appendix C says solutions were compared on the change in fusion coefficients, among other things.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="classification, grouping by similarity. four measures in, groups out. the method does not know good from bad. hierarchical, no group count chosen first. ward the character s merge cost the rise in spread. a jump in merge cost marks where to stop" tabindex="0" role="region" aria-label="Mathematical notation">classification: grouping by similarity
 four measures in, groups out
 the method does not know good from bad
@@ -2372,11 +2417,40 @@ a jump in merge cost marks where to stop</div><figcaption>Classification analysi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2444,7 +2518,7 @@ a jump in merge cost marks where to stop</div><figcaption>Classification analysi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

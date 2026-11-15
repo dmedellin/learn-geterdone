@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Number Theory and Cryptography</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Divisibility</p>
       <h1>Primes and Unique Factorisation</h1>
       <p class="lesson-lede">Every integer above 1 factors into primes, in exactly one way.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>1 is not prime, by decision</li><li>Uniqueness is the substantive half</li><li>Trial division stops at <span class="math" data-say="the square root of n">√n</span></li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Primes</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Prime and composite</span><p>An integer <span class="math" data-say="p is greater than 1">p &gt; 1</span> is <strong>prime</strong> if its only positive divisors are 1 and <span class="math" data-say="p">p</span>. An integer <span class="math" data-say="n is greater than 1">n &gt; 1</span> that is not prime is <strong>composite</strong>. The number 1 is neither.</p></div><p>Excluding 1 is a convention chosen to make the fundamental theorem clean. If 1 were prime, <span class="math" data-say="6">6</span> would factor as <span class="math" data-say="2 times 3">2·3</span>, <span class="math" data-say="1 times 2 times 3">1·2·3</span>, <span class="math" data-say="1 times 1 times 2 times 3">1·1·2·3</span> and so on, and uniqueness would need an awkward qualification.</p><div class="thm"><span class="label">Theorem &middot; Fundamental theorem of arithmetic</span><p>Every integer <span class="math" data-say="n is greater than 1">n &gt; 1</span> can be written as a product of primes, and the factorisation is unique up to the order of the factors.</p></div><div class="proof"><p><strong>Existence</strong>, by strong induction (“Strong Induction” in Induction and Recursion). If <span class="math" data-say="n">n</span> is prime it is a product of one prime. Otherwise <span class="math" data-say="n equals A b">n = ab</span> with <span class="math" data-say="1 is less than A, b is less than n">1 &lt; a, b &lt; n</span>, and by the inductive hypothesis both factor into primes; concatenating the two factorisations gives one for <span class="math" data-say="n">n</span>.</p><p><strong>Uniqueness</strong> requires Euclid's lemma (“Bézout's Identity and Modular Inverses”): if a prime <span class="math" data-say="p">p</span> divides <span class="math" data-say="ab">ab</span> then <span class="math" data-say="p divides a">p | a</span> or <span class="math" data-say="p divides b">p | b</span>. Given two factorisations of <span class="math" data-say="n">n</span>, the first prime of one divides the product forming the other, hence divides one of its primes, hence equals it. Cancelling and repeating matches the factorisations term by term.</p><p><span class="qed">&#9633;</span></p></div><p>Uniqueness is not obvious and it is not universal. In the number system <span class="math" data-say="the set A plus b the square root of negative 5">{a + b√−5}</span> the number 6 factors as <span class="math" data-say="2 times 3">2 · 3</span> and as <span class="math" data-say="the quantity 1 plus the square root of negative 5, times the quantity 1 minus the square root of negative 5">(1 + √−5)(1 − √−5)</span>, with all four factors irreducible. Unique factorisation is a property of <span class="math" data-say="the integers">ℤ</span>, and it is what Number Theory and Cryptography relies on throughout.</p><div class="thm"><span class="label">Theorem &middot; Euclid: infinitely many primes</span><p>For any finite list of primes there is a prime not on it.</p></div><div class="proof"><p>Given primes <span class="math" data-say="p sub 1, and so on, p sub k">p₁, …, p_k</span>, let <span class="math" data-say="N equals p sub 1 p sub 2 and so on p sub k plus 1">N = p₁p₂⋯p_k + 1</span>. Since <span class="math" data-say="N is greater than 1">N &gt; 1</span> it has a prime factor <span class="math" data-say="q">q</span>.</p><p>If <span class="math" data-say="q">q</span> were some <span class="math" data-say="p sub i">pᵢ</span>, it would divide both <span class="math" data-say="p sub 1 and so on p sub k">p₁⋯p_k</span> and <span class="math" data-say="N">N</span>, hence their difference 1 &mdash; impossible for a prime. So <span class="math" data-say="q">q</span> is not on the list.</p><p><span class="qed">&#9633;</span></p></div><p><span class="math" data-say="N">N</span> itself need not be prime: <span class="math" data-say="2 times 3 times 5 times 7 times 11 times 13 plus 1 equals 30031 equals 59 times 509">2·3·5·7·11·13 + 1 = 30031 = 59 · 509</span>. The proof produces a prime not on the list, not necessarily <span class="math" data-say="N">N</span>, and misremembering that is the standard error.</p><div class="thm"><span class="label">Theorem &middot; Trial division bound</span><p>If <span class="math" data-say="n is greater than 1">n &gt; 1</span> is composite, it has a prime factor <span class="math" data-say="p is at most the square root of n">p ≤ √n</span>.</p></div><div class="proof"><p>Write <span class="math" data-say="n equals A b">n = ab</span> with <span class="math" data-say="1 is less than A is at most b is less than n">1 &lt; a ≤ b &lt; n</span>. If both exceeded <span class="math" data-say="the square root of n">√n</span> their product would exceed <span class="math" data-say="n">n</span>, so <span class="math" data-say="A is at most the square root of n">a ≤ √n</span>. Any prime factor of <span class="math" data-say="A">a</span> is a prime factor of <span class="math" data-say="n">n</span> and is at most <span class="math" data-say="A is at most the square root of n">a ≤ √n</span>.</p><p><span class="qed">&#9633;</span></p></div><p>So testing 101 for primality needs only the primes up to 10: 2, 3, 5, 7. None divides it, so it is prime. That is four divisions rather than ninety-nine.</p><h3>How the primes are distributed</h3><p>There are 25 primes below 100, 168 below 1000, and 78 498 below a million. The prime number theorem says the count below <span class="math" data-say="n">n</span> is approximately <span class="math" data-say="n over the natural log of n">n / ln n</span>, so primes thin out slowly &mdash; near <span class="math" data-say="10 to the power 100">10¹⁰⁰</span> roughly one number in 230 is prime. That density is what makes RSA key generation practical: random large numbers can be tested until one is prime.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Number theory workbench</h2></div><p>Algorithms with their traces</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Primes</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Prime and composite</span><p>An integer <span class="math" data-say="p is greater than 1">p &gt; 1</span> is <strong>prime</strong> if its only positive divisors are 1 and <span class="math" data-say="p">p</span>. An integer <span class="math" data-say="n is greater than 1">n &gt; 1</span> that is not prime is <strong>composite</strong>. The number 1 is neither.</p></div><p>Excluding 1 is a convention chosen to make the fundamental theorem clean. If 1 were prime, <span class="math" data-say="6">6</span> would factor as <span class="math" data-say="2 times 3">2·3</span>, <span class="math" data-say="1 times 2 times 3">1·2·3</span>, <span class="math" data-say="1 times 1 times 2 times 3">1·1·2·3</span> and so on, and uniqueness would need an awkward qualification.</p><div class="thm"><span class="label">Theorem &middot; Fundamental theorem of arithmetic</span><p>Every integer <span class="math" data-say="n is greater than 1">n &gt; 1</span> can be written as a product of primes, and the factorisation is unique up to the order of the factors.</p></div><div class="proof"><p><strong>Existence</strong>, by strong induction (“Strong Induction” in Induction and Recursion). If <span class="math" data-say="n">n</span> is prime it is a product of one prime. Otherwise <span class="math" data-say="n equals A b">n = ab</span> with <span class="math" data-say="1 is less than A, b is less than n">1 &lt; a, b &lt; n</span>, and by the inductive hypothesis both factor into primes; concatenating the two factorisations gives one for <span class="math" data-say="n">n</span>.</p><p><strong>Uniqueness</strong> requires Euclid's lemma (“Bézout's Identity and Modular Inverses”): if a prime <span class="math" data-say="p">p</span> divides <span class="math" data-say="ab">ab</span> then <span class="math" data-say="p divides a">p | a</span> or <span class="math" data-say="p divides b">p | b</span>. Given two factorisations of <span class="math" data-say="n">n</span>, the first prime of one divides the product forming the other, hence divides one of its primes, hence equals it. Cancelling and repeating matches the factorisations term by term.</p><p><span class="qed">&#9633;</span></p></div><p>Uniqueness is not obvious and it is not universal. In the number system <span class="math" data-say="the set A plus b the square root of negative 5">{a + b√−5}</span> the number 6 factors as <span class="math" data-say="2 times 3">2 · 3</span> and as <span class="math" data-say="the quantity 1 plus the square root of negative 5, times the quantity 1 minus the square root of negative 5">(1 + √−5)(1 − √−5)</span>, with all four factors irreducible. Unique factorisation is a property of <span class="math" data-say="the integers">ℤ</span>, and it is what Number Theory and Cryptography relies on throughout.</p><div class="thm"><span class="label">Theorem &middot; Euclid: infinitely many primes</span><p>For any finite list of primes there is a prime not on it.</p></div><div class="proof"><p>Given primes <span class="math" data-say="p sub 1, and so on, p sub k">p₁, …, p_k</span>, let <span class="math" data-say="N equals p sub 1 p sub 2 and so on p sub k plus 1">N = p₁p₂⋯p_k + 1</span>. Since <span class="math" data-say="N is greater than 1">N &gt; 1</span> it has a prime factor <span class="math" data-say="q">q</span>.</p><p>If <span class="math" data-say="q">q</span> were some <span class="math" data-say="p sub i">pᵢ</span>, it would divide both <span class="math" data-say="p sub 1 and so on p sub k">p₁⋯p_k</span> and <span class="math" data-say="N">N</span>, hence their difference 1 &mdash; impossible for a prime. So <span class="math" data-say="q">q</span> is not on the list.</p><p><span class="qed">&#9633;</span></p></div><p><span class="math" data-say="N">N</span> itself need not be prime: <span class="math" data-say="2 times 3 times 5 times 7 times 11 times 13 plus 1 equals 30031 equals 59 times 509">2·3·5·7·11·13 + 1 = 30031 = 59 · 509</span>. The proof produces a prime not on the list, not necessarily <span class="math" data-say="N">N</span>, and misremembering that is the standard error.</p><div class="thm"><span class="label">Theorem &middot; Trial division bound</span><p>If <span class="math" data-say="n is greater than 1">n &gt; 1</span> is composite, it has a prime factor <span class="math" data-say="p is at most the square root of n">p ≤ √n</span>.</p></div><div class="proof"><p>Write <span class="math" data-say="n equals A b">n = ab</span> with <span class="math" data-say="1 is less than A is at most b is less than n">1 &lt; a ≤ b &lt; n</span>. If both exceeded <span class="math" data-say="the square root of n">√n</span> their product would exceed <span class="math" data-say="n">n</span>, so <span class="math" data-say="A is at most the square root of n">a ≤ √n</span>. Any prime factor of <span class="math" data-say="A">a</span> is a prime factor of <span class="math" data-say="n">n</span> and is at most <span class="math" data-say="A is at most the square root of n">a ≤ √n</span>.</p><p><span class="qed">&#9633;</span></p></div><p>So testing 101 for primality needs only the primes up to 10: 2, 3, 5, 7. None divides it, so it is prime. That is four divisions rather than ninety-nine.</p><h3>How the primes are distributed</h3><p>There are 25 primes below 100, 168 below 1000, and 78 498 below a million. The prime number theorem says the count below <span class="math" data-say="n">n</span> is approximately <span class="math" data-say="n over the natural log of n">n / ln n</span>, so primes thin out slowly &mdash; near <span class="math" data-say="10 to the power 100">10¹⁰⁰</span> roughly one number in 230 is prime. That density is what makes RSA key generation practical: random large numbers can be tested until one is prime.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Number theory workbench</h2></div><p>Algorithms with their traces</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="ntTitle">Number theory workbench</strong><span id="ntSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the step that decides</span></div>
       </div>
       <div class="lab-stage"><div class="table-wrap" id="ntOut" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="ntStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Factorisation, step by step</h3>
-          <p>The preset is the worked example: trial division from 2 upward reads <span class="math" data-say="360 equals 2 cubed times 3 squared times 5">360 = 2^3 · 3^2 · 5</span> with 24 in the divisors corner, from <span class="math" data-say="the quantity 3 plus 1, times the quantity 2 plus 1, times the quantity 1 plus 1">(3+1)(2+1)(1+1)</span>. Enter 2520 and predict 48 before the page says so. The divisor count comes from the exponents, which is the fundamental theorem being used rather than quoted.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Factorisation, step by step</h3>
+            <p>The preset is the worked example: trial division from 2 upward reads <span class="math" data-say="360 equals 2 cubed times 3 squared times 5">360 = 2^3 · 3^2 · 5</span> with 24 in the divisors corner, from <span class="math" data-say="the quantity 3 plus 1, times the quantity 2 plus 1, times the quantity 1 plus 1">(3+1)(2+1)(1+1)</span>. Enter 2520 and predict 48 before the page says so. The divisor count comes from the exponents, which is the fundamental theorem being used rather than quoted.</p>
         <div class="field">
           <label for="ntMode">Mode</label>
           <select id="ntMode">
@@ -1444,12 +1487,14 @@
           <div class="kpi"><span id="ntK1Label">gcd</span><strong id="ntK1">&mdash;</strong></div>
           <div class="kpi"><span id="ntK2Label">steps</span><strong id="ntK2">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Factoring and testing</h2></div><p>Small primes first, stop at the square root.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Divide out the small primes in order</h3><p>2, then 3, then 5, and so on, taking each as many times as it goes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Stop when the divisor exceeds <span class="math" data-say="the square root of remaining">√(remaining)</span></h3><p>Whatever is left is then prime. This is the bound above, and it is what keeps hand factorisation feasible.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count divisors from the exponents</h3><p>If <span class="math" data-say="n equals p sub 1 to the power e sub 1 and so on p sub k to the power e sub k">n = p₁^{e₁}⋯p_k^{e_k}</span> then <span class="math" data-say="n">n</span> has <span class="math" data-say="e sub 1 plus 1 and so on e sub k plus 1">(e₁+1)⋯(e_k+1)</span> positive divisors, since each exponent is chosen independently from 0 to <span class="math" data-say="e sub i">eᵢ</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>To test primality, divide by primes up to <span class="math" data-say="the square root of n">√n</span></h3><p>If none divides, it is prime. For large numbers this is hopeless and probabilistic tests are used instead.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Factoring and testing</h2>
+      <p class="lead-in">Small primes first, stop at the square root.</p>
+      <ol class="key-ideas method"><li><strong>Divide out the small primes in order.</strong> 2, then 3, then 5, and so on, taking each as many times as it goes.</li><li><strong>Stop when the divisor exceeds <span class="math" data-say="the square root of remaining">√(remaining)</span>.</strong> Whatever is left is then prime. This is the bound above, and it is what keeps hand factorisation feasible.</li><li><strong>Count divisors from the exponents.</strong> If <span class="math" data-say="n equals p sub 1 to the power e sub 1 and so on p sub k to the power e sub k">n = p₁^{e₁}⋯p_k^{e_k}</span> then <span class="math" data-say="n">n</span> has <span class="math" data-say="e sub 1 plus 1 and so on e sub k plus 1">(e₁+1)⋯(e_k+1)</span> positive divisors, since each exponent is chosen independently from 0 to <span class="math" data-say="e sub i">eᵢ</span>.</li><li><strong>To test primality, divide by primes up to <span class="math" data-say="the square root of n">√n</span>.</strong> If none divides, it is prime. For large numbers this is hopeless and probabilistic tests are used instead.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1517,16 @@ Check by listing:  1,2,3,4,5,6,8,9,10,12,15,18,20,24,30,36,40,45,
                    60,72,90,120,180,360        — 24 of them   ✓</div><p>The divisor count is a product rule application: a divisor is determined by choosing an exponent for each prime independently, from 0 up to its exponent in <span class="math" data-say="n">n</span>. “The Sum and Product Rules” in Combinatorics and Counting is doing the work, and the fundamental theorem is what guarantees the choice determines the divisor uniquely.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling 1 prime</strong><span>It is neither prime nor composite, and the exclusion is what makes unique factorisation stateable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing Euclid&#x27;s <span class="math" data-say="N">N</span> is always prime</strong><span>It has a prime factor outside the list, which is all the proof needs and all it claims.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trial dividing past the square root</strong><span>Unnecessary. If nothing up to <span class="math" data-say="the square root of n">√n</span> divides <span class="math" data-say="n">n</span>, nothing above it does either.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can factor a four-digit number and count its divisors.</strong><p>Factor 2520 completely and predict its divisor count from the exponents before listing anything. <span class="math" data-say="2520 equals 2 cubed times 3 squared times 5 times 7">2520 = 2³·3²·5·7</span>, so there are <span class="math" data-say="4 times 3 times 2 times 2 equals 48">4·3·2·2 = 48</span> divisors.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Factoring is easy for small numbers and believed hard for large ones, and that asymmetry is the entire basis of RSA in “RSA Encryption”. The best known general algorithms are sub-exponential but not polynomial, and no proof exists that factoring is genuinely hard.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling 1 prime</strong><span>It is neither prime nor composite, and the exclusion is what makes unique factorisation stateable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Believing Euclid&#x27;s <span class="math" data-say="N">N</span> is always prime</strong><span>It has a prime factor outside the list, which is all the proof needs and all it claims.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Trial dividing past the square root</strong><span>Unnecessary. If nothing up to <span class="math" data-say="the square root of n">√n</span> divides <span class="math" data-say="n">n</span>, nothing above it does either.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can factor a four-digit number and count its divisors.</strong><p>Factor 2520 completely and predict its divisor count from the exponents before listing anything. <span class="math" data-say="2520 equals 2 cubed times 3 squared times 5 times 7">2520 = 2³·3²·5·7</span>, so there are <span class="math" data-say="4 times 3 times 2 times 2 equals 48">4·3·2·2 = 48</span> divisors.</p></div></div><div class="note"><strong>Note:</strong> Factoring is easy for small numbers and believed hard for large ones, and that asymmetry is the entire basis of RSA in “RSA Encryption”. The best known general algorithms are sub-exponential but not polynomial, and no proof exists that factoring is genuinely hard.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>1 is not prime, by decision</summary><p>Because uniqueness of factorisation would fail: <span class="math" data-say="6 equals 2 times 3 equals 1 times 2 times 3 equals 1 times 1 times 2 times 3">6 = 2·3 = 1·2·3 = 1·1·2·3</span>. The definition is chosen to make the theorem true.</p></details><details class="recall"><summary>Uniqueness is the substantive half</summary><p>Existence follows from strong induction in three lines. Uniqueness needs Euclid's lemma, which needs Bézout.</p></details><details class="recall"><summary>Trial division stops at <span class="math" data-say="the square root of n">√n</span></summary><p>A composite <span class="math" data-say="n">n</span> has a factor at most <span class="math" data-say="the square root of n">√n</span>, so testing beyond that is unnecessary &mdash; and it is why the sieve of “The Sieve of Eratosthenes” stops where it does.</p></details></div>
+      <h3>Summary</h3>
       <p>The fundamental theorem of arithmetic. Primes are the multiplicative atoms, there are infinitely many, and the uniqueness of the factorisation is what makes almost every later argument possible.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>1 is not prime, by decision.</strong> Because uniqueness of factorisation would fail: <span class="math" data-say="6 equals 2 times 3 equals 1 times 2 times 3 equals 1 times 1 times 2 times 3">6 = 2·3 = 1·2·3 = 1·1·2·3</span>. The definition is chosen to make the theorem true.</li><li><strong>Uniqueness is the substantive half.</strong> Existence follows from strong induction in three lines. Uniqueness needs Euclid's lemma, which needs Bézout.</li><li><strong>Trial division stops at <span class="math" data-say="the square root of n">√n</span>.</strong> A composite <span class="math" data-say="n">n</span> has a factor at most <span class="math" data-say="the square root of n">√n</span>, so testing beyond that is unnecessary &mdash; and it is why the sieve of “The Sieve of Eratosthenes” stops where it does.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="prime, exactly two positive divisors, 1 and itself, 1 is NOT prime. every n is greater than 1 is a product of primes, uniquely up to order. there are infinitely many primes, Euclid. if n is composite it has a prime factor is at most the square root of n" tabindex="0" role="region" aria-label="Mathematical notation">prime: exactly two positive divisors, 1 and itself.  1 is NOT prime.
 every n &gt; 1 is a product of primes, uniquely up to order
 there are infinitely many primes                    (Euclid)
@@ -2400,11 +2444,40 @@ if n is composite it has a prime factor ≤ √n</div><figcaption>The atoms of m
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2472,7 +2545,7 @@ if n is composite it has a prime factor ≤ √n</div><figcaption>The atoms of m
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

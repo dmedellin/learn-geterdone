@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Repeated games</p>
       <h1>Hume&#x27;s Farmers and Convention</h1>
       <p class="lesson-lede">Two farmers who would each gain from the other&#x27;s help refuse in one season and help over many, with no promise between them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The exchange is the dilemma</li><li>One harvest has no tomorrow</li><li>A convention is a habit the others keep</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Why the second farmer helps</h2>
-      <article class="prose reading"><p>Hume imagines two neighbours whose corn is ripe on different days. Your corn is ripe today and mine will be ripe tomorrow, and it would profit us both that I labour with you today and you aid me tomorrow. But I have no kindness for you and know you have as little for me, so I will not take pains on your account; and if I did, I should expect to be disappointed. You reason the same way. In his words, &ldquo;both of us lose our harvests for want of mutual confidence and security.&rdquo;</p><p>Write each season as a game in which both farmers choose, help or refuse, and the payoffs follow the order just described. Hume's farmers in fact move in turns, and the lab has them choose together; the dilemma is the same, and the turns are left out. The four numbers below are the course's standard ones and nothing in the lab knows about corn, so only their order should be read as Hume's.</p><div class="mathblock" data-say="neighbour helps, neighbour refuses. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 neighbour helps    neighbour refuses
-     I help           3, 3                0, 5
-     I refuse         5, 0                1, 1</div><p>Played once, this is the dilemma of “The Prisoner's Dilemma”. Refusing pays <span class="math" data-say="5">5</span> against a farmer who helps and <span class="math" data-say="1">1</span> against one who does not, so it beats helping either way. Both refuse and each collects <span class="math" data-say="1">1</span>. That dominance was computed in “The Prisoner's Dilemma”'s lab, which checks every cell; the lab here plays matches, and its first preset only plays the single harvest between two farmers who refuse and prints the <span class="math" data-say="1">1</span> each. Hume's conclusion is right for one harvest, and it has nothing to do with the farmers being unkind: change them into saints with the same payoffs and the table is the same.</p><h3>The second farmer</h3><p>The tempted farmer is whichever one has just been helped. Refusing to return the help pays <span class="math" data-say="5">5</span> this season in place of <span class="math" data-say="3">3</span>, a gain of <span class="math" data-say="2">2</span>. Hume's point is that the same farmer will want help again, and that the neighbour knows it. If the neighbour follows tit for tat, which helps first and afterwards does whatever the other did last, then a refusal is answered by a refusal, and the gain of <span class="math" data-say="2">2</span> is followed by seasons at <span class="math" data-say="1">1</span> where there would have been <span class="math" data-say="3">3</span>.</p><p>That trade is worth refusing exactly when the future counts for little. From “The Shadow of the Future”, with these payoffs tit for tat is stable against itself when the chance of another season is at least <span class="math" data-say="2 over 3">2/3</span>. The lab's second preset sets that chance at <span class="math" data-say="9 over 10">9/10</span>, and the tile says it sustains cooperation.</p><div class="defbox"><span class="label">Definition &middot; Convention</span><p>A <strong>convention</strong> is a regularity of behaviour that each member keeps because the others keep it, so that no one gains by departing from it alone. Hume's example is two men rowing a boat, who pull together without ever having promised to.</p></div><p>Twelve seasons of tit for tat against tit for tat are all help, and each farmer collects <span class="math" data-say="12">12</span> times <span class="math" data-say="3">3</span>, which is <span class="math" data-say="36">36</span>. Nobody gave a word, and nobody is kind. Each is doing the best available given what the other will do, which is the definition of an equilibrium met in “Nash Equilibrium in Pure and Mixed Strategies”. A convention in Hume's sense is that equilibrium, reached by habit.</p><p>The word is wider here than in “Coordination, Conventions and the Stag Hunt”, where a convention picked one of several matches in a coordination game and another match would have served as well. Hume's rowers are a case of that kind. His farmers are not: helping is not an equilibrium of the one-harvest game at all, and becomes one only because the seasons repeat and a refusal can be answered. What the two uses share is the part that does the work in both lessons: a regularity that each keeps because the others keep it, with no promise behind it.</p><h3>A refusal that begins the season</h3><p>The third preset has one farmer suspicious: he refuses in the first season and afterwards copies his neighbour, who helps first. In the first season the suspicious farmer collects <span class="math" data-say="5">5</span> and the neighbour <span class="math" data-say="0">0</span>. In the next each copies the other, and the roles reverse. The pair then alternate, helped and refused in turn, and over twelve seasons each collects <span class="math" data-say="30">30</span>, six short of what the two trusting farmers made. Neither can leave the pattern by following his own rule.</p><p>Three limits belong here. The twelve seasons are a stand-in for a game with no known end: farmers who knew which harvest was the last would, by the argument in the previous lesson, stop helping before it and unravel the whole run. Second, tit for tat is not the only way the pair could play, and two farmers who always refuse are an equilibrium too. Third, the payoffs are chosen, and a farmer who also enjoys the company is playing a different game.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The repeated prisoner&#x27;s dilemma</h2></div><p>one match, a tournament of seven strategies, and the discount that sustains cooperation</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Why the second farmer helps</h2><div class="prose reading"><p>Hume imagines two neighbours whose corn is ripe on different days. Your corn is ripe today and mine will be ripe tomorrow, and it would profit us both that I labour with you today and you aid me tomorrow. But I have no kindness for you and know you have as little for me, so I will not take pains on your account; and if I did, I should expect to be disappointed. You reason the same way. In his words, &ldquo;both of us lose our harvests for want of mutual confidence and security.&rdquo;</p><p>Write each season as a game in which both farmers choose, help or refuse, and the payoffs follow the order just described. Hume's farmers in fact move in turns, and the lab has them choose together; the dilemma is the same, and the turns are left out. The four numbers below are the course's standard ones and nothing in the lab knows about corn, so only their order should be read as Hume's.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The repeated prisoner&#x27;s dilemma</h2></div><p>one match, a tournament of seven strategies, and the discount that sustains cooperation</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Playing the dilemma again</strong><span>C cooperates, D defects; payoffs R S T P</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="itTable"></table></div>
       <div class="status-banner" id="itStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Play one harvest, then a season</h3>
-          <p>Player A is the first farmer and player B the second. Change the strategies or the number of rounds and read the two totals; the last tile gives the continuation chance the lab needs for help to be stable.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Play one harvest, then a season</h3>
+            <p>Player A is the first farmer and player B the second. Change the strategies or the number of rounds and read the two totals; the last tile gives the continuation chance the lab needs for help to be stable.</p>
         <div class="field">
           <label for="itPreset">Worked example</label>
           <select id="itPreset"><option value="farmers-once" selected>One harvest, neither farmer helps</option><option value="farmers-season">Twelve seasons, help answered by help</option><option value="farmers-suspicious">Twelve seasons, one farmer refuses first</option></select>
@@ -1440,12 +1481,17 @@
           <div class="kpi"><span>Cooperation needs</span><strong id="itThresh">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="neighbour helps, neighbour refuses. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">                 neighbour helps    neighbour refuses
+     I help           3, 3                0, 5
+     I refuse         5, 0                1, 1</div><p>Played once, this is the dilemma of “The Prisoner's Dilemma”. Refusing pays <span class="math" data-say="5">5</span> against a farmer who helps and <span class="math" data-say="1">1</span> against one who does not, so it beats helping either way. Both refuse and each collects <span class="math" data-say="1">1</span>. That dominance was computed in “The Prisoner's Dilemma”'s lab, which checks every cell; the lab here plays matches, and its first preset only plays the single harvest between two farmers who refuse and prints the <span class="math" data-say="1">1</span> each. Hume's conclusion is right for one harvest, and it has nothing to do with the farmers being unkind: change them into saints with the same payoffs and the table is the same.</p><h3>The second farmer</h3><p>The tempted farmer is whichever one has just been helped. Refusing to return the help pays <span class="math" data-say="5">5</span> this season in place of <span class="math" data-say="3">3</span>, a gain of <span class="math" data-say="2">2</span>. Hume's point is that the same farmer will want help again, and that the neighbour knows it. If the neighbour follows tit for tat, which helps first and afterwards does whatever the other did last, then a refusal is answered by a refusal, and the gain of <span class="math" data-say="2">2</span> is followed by seasons at <span class="math" data-say="1">1</span> where there would have been <span class="math" data-say="3">3</span>.</p><p>That trade is worth refusing exactly when the future counts for little. From “The Shadow of the Future”, with these payoffs tit for tat is stable against itself when the chance of another season is at least <span class="math" data-say="2 over 3">2/3</span>. The lab's second preset sets that chance at <span class="math" data-say="9 over 10">9/10</span>, and the tile says it sustains cooperation.</p><div class="defbox"><span class="label">Definition &middot; Convention</span><p>A <strong>convention</strong> is a regularity of behaviour that each member keeps because the others keep it, so that no one gains by departing from it alone. Hume's example is two men rowing a boat, who pull together without ever having promised to.</p></div><p>Twelve seasons of tit for tat against tit for tat are all help, and each farmer collects <span class="math" data-say="12">12</span> times <span class="math" data-say="3">3</span>, which is <span class="math" data-say="36">36</span>. Nobody gave a word, and nobody is kind. Each is doing the best available given what the other will do, which is the definition of an equilibrium met in “Nash Equilibrium in Pure and Mixed Strategies”. A convention in Hume's sense is that equilibrium, reached by habit.</p><p>The word is wider here than in “Coordination, Conventions and the Stag Hunt”, where a convention picked one of several matches in a coordination game and another match would have served as well. Hume's rowers are a case of that kind. His farmers are not: helping is not an equilibrium of the one-harvest game at all, and becomes one only because the seasons repeat and a refusal can be answered. What the two uses share is the part that does the work in both lessons: a regularity that each keeps because the others keep it, with no promise behind it.</p><h3>A refusal that begins the season</h3><p>The third preset has one farmer suspicious: he refuses in the first season and afterwards copies his neighbour, who helps first. In the first season the suspicious farmer collects <span class="math" data-say="5">5</span> and the neighbour <span class="math" data-say="0">0</span>. In the next each copies the other, and the roles reverse. The pair then alternate, helped and refused in turn, and over twelve seasons each collects <span class="math" data-say="30">30</span>, six short of what the two trusting farmers made. Neither can leave the pattern by following his own rule.</p><p>Three limits belong here. The twelve seasons are a stand-in for a game with no known end: farmers who knew which harvest was the last would, by the argument in the previous lesson, stop helping before it and unravel the whole run. Second, tit for tat is not the only way the pair could play, and two farmers who always refuse are an equilibrium too. Third, the payoffs are chosen, and a farmer who also enjoys the company is playing a different game.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>From a refusal to a convention</h2></div><p>The same five moves for any pair of farmers.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the exchange as a table</h3><p>Put the four outcomes in order of what each farmer would rather have, and give them the course's numbers. If help-and-be-helped is not below being helped for nothing, the game is not a dilemma.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Play it once</h3><p>Compare refusing with helping against each choice of the neighbour. Refusing wins both comparisons, so one harvest ends with nobody helping.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose the rule each farmer follows</h3><p>Tit for tat helps first and then copies. State what it plays in the opening season and what it plays after a refusal.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Play the season and add the payoffs</h3><p>Sum the seasons for each farmer. Two rules that never refuse each other earn the reward every season.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check the temptation against the future</h3><p>The farmer who refuses gains <span class="math" data-say="2">2</span> once and loses <span class="math" data-say="2">2</span> in each later season the neighbour answers. Whether that is a loss depends on the continuation chance, not on the farmer's character.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>From a refusal to a convention</h2>
+      <p class="lead-in">The same five moves for any pair of farmers.</p>
+      <ol class="key-ideas method"><li><strong>Write the exchange as a table.</strong> Put the four outcomes in order of what each farmer would rather have, and give them the course's numbers. If help-and-be-helped is not below being helped for nothing, the game is not a dilemma.</li><li><strong>Play it once.</strong> Compare refusing with helping against each choice of the neighbour. Refusing wins both comparisons, so one harvest ends with nobody helping.</li><li><strong>Choose the rule each farmer follows.</strong> Tit for tat helps first and then copies. State what it plays in the opening season and what it plays after a refusal.</li><li><strong>Play the season and add the payoffs.</strong> Sum the seasons for each farmer. Two rules that never refuse each other earn the reward every season.</li><li><strong>Check the temptation against the future.</strong> The farmer who refuses gains <span class="math" data-say="2">2</span> once and loses <span class="math" data-say="2">2</span> in each later season the neighbour answers. Whether that is a loss depends on the continuation chance, not on the farmer's character.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1465,17 +1511,16 @@ One farmer refuses first: seasons alternate 5 and 0
 Each farmer:  6 x 5 + 6 x 0 = 30</div><p>The gap between <span class="math" data-say="1">1</span> and <span class="math" data-say="36">36</span> is the cost of playing once, and it is paid by two farmers who are exactly as self-interested in both cases. The gap between <span class="math" data-say="36">36</span> and <span class="math" data-say="30">30</span> is the cost of a single refusal to go first.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Hume&#x27;s farmers fail because they are selfish</strong><span>The farmers of the twelve-season preset are exactly as selfish as those of the one-harvest preset: the payoffs are identical and so is each farmer's wish to be helped for nothing. One harvest ends in <span class="math" data-say="1">1</span> each and twelve seasons of tit for tat in <span class="math" data-say="36">36</span>, so what separates failure from success is whether there is a next season, and not the character of the people in the story.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a convention needs a promise</strong><span>Hume's rowers pull together though they have never promised, and the farmers help each other for the same reason. A promise can start such a habit, but what keeps it going is that each does best by keeping it while the other does. The lab has no promises in it and the farmers still reach <span class="math" data-say="36">36</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading twelve seasons as proof that the farmers must cooperate</strong><span>Two farmers who always refuse are also in equilibrium, and the lab's totals say what happens if both follow tit for tat, not that they will. The result also needs a season that might come: farmers who know which harvest is the last will refuse in it, and so on backwards, as in the previous lesson.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what turns the farmers&#x27; refusal into help.</strong><p>Given the standard payoffs, play one harvest and a twelve-season run between named rules, read both totals, and state the continuation chance above which repaying a favour is better than refusing it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Hume's own farmers are not playing together; the second harvests after being helped. That version is a game in turns, which this course does not build, and flattening it loses the sequence while keeping the incentive. Try a season in which one farmer follows ALLD against the other's TFT, and read what the helper loses.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Hume&#x27;s farmers fail because they are selfish</strong><span>The farmers of the twelve-season preset are exactly as selfish as those of the one-harvest preset: the payoffs are identical and so is each farmer's wish to be helped for nothing. One harvest ends in <span class="math" data-say="1">1</span> each and twelve seasons of tit for tat in <span class="math" data-say="36">36</span>, so what separates failure from success is whether there is a next season, and not the character of the people in the story.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a convention needs a promise</strong><span>Hume's rowers pull together though they have never promised, and the farmers help each other for the same reason. A promise can start such a habit, but what keeps it going is that each does best by keeping it while the other does. The lab has no promises in it and the farmers still reach <span class="math" data-say="36">36</span>.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading twelve seasons as proof that the farmers must cooperate</strong><span>Two farmers who always refuse are also in equilibrium, and the lab's totals say what happens if both follow tit for tat, not that they will. The result also needs a season that might come: farmers who know which harvest is the last will refuse in it, and so on backwards, as in the previous lesson.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what turns the farmers&#x27; refusal into help.</strong><p>Given the standard payoffs, play one harvest and a twelve-season run between named rules, read both totals, and state the continuation chance above which repaying a favour is better than refusing it.</p></div></div><div class="note"><strong>Note:</strong> Hume's own farmers are not playing together; the second harvests after being helped. That version is a game in turns, which this course does not build, and flattening it loses the sequence while keeping the incentive. Try a season in which one farmer follows ALLD against the other's TFT, and read what the helper loses.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The exchange is the dilemma</summary><p>Each farmer does best by being helped and not helping, next best by helping and being helped, worse by neither, and worst by helping alone. That is the ordering of the prisoner's dilemma, and the four payoffs here are the course's standard ones: <span class="math" data-say="3">3</span>, <span class="math" data-say="0">0</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="1">1</span>.</p></details><details class="recall"><summary>One harvest has no tomorrow</summary><p>Played once, refusing pays more than helping whatever the neighbour does. Both refuse, each collects <span class="math" data-say="1">1</span>, and the harvests are lost for want of the help that would have paid both.</p></details><details class="recall"><summary>A convention is a habit the others keep</summary><p>Hume's farmers need no promise and no kindness. A farmer helps because the neighbour will stop helping otherwise, and the neighbour helps for the same reason. The habit is stable when each, keeping it, does best given that the other keeps it.</p></details></div>
+      <h3>Summary</h3>
       <p>Hume's two neighbours have corn that ripens on different days, and each would harvest faster with the other's help. Played once, the exchange is the prisoner's dilemma and nobody helps; played season after season by farmers who answer help with help, it pays both of them. The farmers are no less selfish in the second case: what has changed is that there is a next season.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The exchange is the dilemma.</strong> Each farmer does best by being helped and not helping, next best by helping and being helped, worse by neither, and worst by helping alone. That is the ordering of the prisoner's dilemma, and the four payoffs here are the course's standard ones: <span class="math" data-say="3">3</span>, <span class="math" data-say="0">0</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="1">1</span>.</li><li><strong>One harvest has no tomorrow.</strong> Played once, refusing pays more than helping whatever the neighbour does. Both refuse, each collects <span class="math" data-say="1">1</span>, and the harvests are lost for want of the help that would have paid both.</li><li><strong>A convention is a habit the others keep.</strong> Hume's farmers need no promise and no kindness. A farmer helps because the neighbour will stop helping otherwise, and the neighbour helps for the same reason. The habit is stable when each, keeping it, does best given that the other keeps it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one harvest, refusing dominates, no help. a season, help answered by help pays both. a convention is kept as the others keep it. no promise, no kindness, a next season" tabindex="0" role="region" aria-label="Mathematical notation">one harvest: refusing dominates, no help
 a season: help answered by help pays both
 a convention is kept as the others keep it
@@ -2154,11 +2199,40 @@ no promise, no kindness, a next season</div><figcaption>From one harvest to a se
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2226,7 +2300,7 @@ no promise, no kindness, a next season</div><figcaption>From one harvest to a se
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

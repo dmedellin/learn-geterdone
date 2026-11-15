@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,39 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Organizing Domain Logic</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · Domain Logic Patterns</p>
       <h1>Table Module, and Making a Choice</h1>
       <p class="lesson-lede">One object for all the rows of a table, working on a Record Set; and Fowler&#x27;s advice on choosing among the three patterns, which no count can settle.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Table Module</li><li>Record Set</li><li>Identity</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then Record Set, then the choice</h2>
-      <article class="prose reading"><p>&ldquo;The bad news is that nobody knows how to measure the complexity of domain logic.&rdquo; That is from Making a Choice, the section of Chapter 2 that follows the three patterns and comes before Service Layer, which this lesson reads last. First come Chapter 9's Table Module and the Record Set it works on, from Chapter 18, both read as tools; then the choice among the three patterns, read as Fowler's argument. Read them in your own copy first.</p><p>A Table Module gives each table one class, and one instance of it carries every operation on that table's data. The main difference from a Domain Model, Fowler says, is this: with many orders, a Domain Model has an object for each order, and a Table Module has one object for all of them. So the module has no notion of identity for the rows it works with. To ask about one row you call a method on the module and pass the row's key, usually the database's primary key.</p><p>It is usually backed by tabular data, the result of a SQL query held in a Record Set, and several Table Modules can work on one Record Set. The module can be an instance, which can be set up with an existing Record Set and can use inheritance, or a collection of static methods. It can run its own queries or take them from a Table Data Gateway. The flow Fowler describes is a round trip: a gateway fills a Record Set, a module works on it, table-aware widgets show and edit it, and the module validates it again before it is saved. A module can be tested on a Record Set built in memory. When to Use It names the cost: no direct links between instances, and polymorphism does not work well, so for complicated logic a Domain Model is the better choice.</p><p>Record Set, in Chapter 18, is the structure that makes the module worth having. It has the shape of a query's result, so it can go straight to a data-aware screen, and it can be built or changed by domain code. It is usually the vendor's, and Fowler's 2002 examples are ADO.NET's data set and JDBC's row set. Most have an implicit interface, a column asked for by name as a string, which Fowler generally frowns on; he minds it less here, because a Record Set usually carries its legal columns and the query that made it names them. His advice: where the environment relies on Record Sets, organise the domain logic with a Table Module.</p><p>The listing below is a Table Module in small: one <span class="math" data-say="invoice lines">InvoiceLines</span> object for the whole invoice-line table, given a Record Set when it is made. To total one invoice the caller passes its key, and the module walks the rows with that key. <span class="math" data-say="record set">RecordSet</span> and <span class="math" data-say="record">Record</span> stand for the platform's types, and <span class="math" data-say="r dot get long of cents">r.getLong("cents")</span> is the implicit interface Fowler frowns on: the column named by a string. There are no lab figures for this listing; the lab counts objects.</p><pre class="codeblock" data-say="line 1, comment, One object for the whole invoice-line table, not one per row.. line 2, class invoice lines. line 3, private final record set rows. line 5, invoice lines of record set rows. line 6, this dot rows is set to rows. line 9, long total cents of long invoice id. line 10, long total is set to 0. line 11, for record r in rows dot where of invoice id, invoice id. line 12, total is set to total plus r dot get long of cents. line 14, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One object for the whole invoice-line table, not one per row.</span>
-<span class="cl">class InvoiceLines {</span>
-<span class="cl">    private final RecordSet rows;</span>
-<span class="cl"></span>
-<span class="cl">    InvoiceLines(RecordSet rows) {</span>
-<span class="cl">        this.rows = rows;</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    long totalCents(long invoiceId) {</span>
-<span class="cl">        long total = 0;</span>
-<span class="cl">        for (Record r : rows.where(&quot;invoice_id&quot;, invoiceId)) {</span>
-<span class="cl">            total = total + r.getLong(&quot;cents&quot;);</span>
-<span class="cl">        }</span>
-<span class="cl">        return total;</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The lab takes tables and their row counts and prints five tiles: the tables, the rows, the objects at one a row, as a Domain Model or a Row Data Gateway holds them, the objects at one a table, as a Table Module holds them, and the largest table with its rows, which is the most rows one module's Record Set carries. On <code>small-shop</code>, four tables of 200 customers, 1,500 orders, 120 products and 6,000 lines, it prints 4 tables, 7,820 rows, 7,820 objects one a row, 4 objects one a table, and line 6,000. Its banner says what the count is not: objects, not memory, and every row loaded, which neither pattern requires.</p><p>On <code>one-big-table</code>, 250,000 meter readings and 400 meters, it prints 2 tables, 250,400 rows, 250,400 objects one a row, 2 one a table, and reading 250,000. Read the banner with it. A Domain Model would not load a quarter of a million readings; Chapter 9 says a session pulls in only the objects it needs. What the count shows is the difference in kind: one object per reading, each with its own identity and its own methods, against one module that is handed the readings and a key. Which you want depends on the logic, and the count is silent on that.</p><p>Making a Choice asks how to choose, and answers that it depends very much on how complex the domain logic is. Fowler draws a sketch of effort against complexity for the three patterns and disowns it in advance, as one of the unquantified graphs that irritate him in slides. With simple logic a Domain Model costs more than it pays back; as the logic grows, the other two hit a wall. He then names a threshold to two decimal places, and takes it back in the sentence quoted above. All you can do, he says, is find experienced people to analyse the requirements and make a judgement call.</p><p>Some factors shift the curves. A team that knows Domain Model lowers its starting cost, though not to the others' level because of the database mapping, and the better the team the more he leans to it. Table Module depends on the Record Set tools around it: with them, as on .NET, it is much more attractive, and without them he would not bother. The decision can be changed, with difficulty: from scripts, do not hesitate to refactor toward a Domain Model; the other way is usually less worth it, unless it lets you simplify the data source layer. And the three can be mixed. Chapter 8, Starting with the Domain Layer, makes the same choice again with the database in view, calls it the central choice, and adds that the tools you have shape the architecture: of the three, Table Module gains most when the tools suit it.</p><h3>Exercise</h3><ul><li><span class="math" data-say="patient">patient</span>: 900 rows</li><li><span class="math" data-say="visit">visit</span>: 5,400 rows</li><li><span class="math" data-say="doctor">doctor</span>: 30 rows</li><li><span class="math" data-say="ward">ward</span>: 12 rows</li></ul><p>For these four tables of a small clinic, give by hand the objects a Domain Model would hold with every row loaded, the objects a Table Module would hold, and the largest Record Set one module would work on. Then type the tables into the lab, as <span class="math" data-say="patient, 900, visit, 5400">patient, 900; visit, 5400</span> and so on, to check.</p><p>Whichever pattern holds the domain logic, some code must call it, begin and end its transactions, and tell other people what happened. The next lesson, Service Layer, reads where that code goes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Loading from the database</h2></div><p>objects held, one a row or one a table</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then Record Set, then the choice</h2><div class="prose reading"><p>&ldquo;The bad news is that nobody knows how to measure the complexity of domain logic.&rdquo; That is from Making a Choice, the section of Chapter 2 that follows the three patterns and comes before Service Layer, which this lesson reads last. First come Chapter 9's Table Module and the Record Set it works on, from Chapter 18, both read as tools; then the choice among the three patterns, read as Fowler's argument. Read them in your own copy first.</p><p>A Table Module gives each table one class, and one instance of it carries every operation on that table's data. The main difference from a Domain Model, Fowler says, is this: with many orders, a Domain Model has an object for each order, and a Table Module has one object for all of them. So the module has no notion of identity for the rows it works with. To ask about one row you call a method on the module and pass the row's key, usually the database's primary key.</p><p>It is usually backed by tabular data, the result of a SQL query held in a Record Set, and several Table Modules can work on one Record Set. The module can be an instance, which can be set up with an existing Record Set and can use inheritance, or a collection of static methods. It can run its own queries or take them from a Table Data Gateway. The flow Fowler describes is a round trip: a gateway fills a Record Set, a module works on it, table-aware widgets show and edit it, and the module validates it again before it is saved. A module can be tested on a Record Set built in memory. When to Use It names the cost: no direct links between instances, and polymorphism does not work well, so for complicated logic a Domain Model is the better choice.</p><p>Record Set, in Chapter 18, is the structure that makes the module worth having. It has the shape of a query's result, so it can go straight to a data-aware screen, and it can be built or changed by domain code. It is usually the vendor's, and Fowler's 2002 examples are ADO.NET's data set and JDBC's row set. Most have an implicit interface, a column asked for by name as a string, which Fowler generally frowns on; he minds it less here, because a Record Set usually carries its legal columns and the query that made it names them. His advice: where the environment relies on Record Sets, organise the domain logic with a Table Module.</p><p>The listing below is a Table Module in small: one <span class="math" data-say="invoice lines">InvoiceLines</span> object for the whole invoice-line table, given a Record Set when it is made. To total one invoice the caller passes its key, and the module walks the rows with that key. <span class="math" data-say="record set">RecordSet</span> and <span class="math" data-say="record">Record</span> stand for the platform's types, and <span class="math" data-say="r dot get long of cents">r.getLong("cents")</span> is the implicit interface Fowler frowns on: the column named by a string. There are no lab figures for this listing; the lab counts objects.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Loading from the database</h2></div><p>objects held, one a row or one a table</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Loading from the database</strong><span>objects held, one a row or one a table</span></div>
       </div>
@@ -1473,10 +1501,10 @@
       <div class="table-wrap" id="ldTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ldTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> One object a row, as a Domain Model or Row Data Gateway holds them; one object a table, as Table Module holds them. The largest table is the first with the most rows.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Objects a row against objects a table</h3>
-          <p>A count over the situation the lesson states. Each record is a table and its rows. The lab counts the objects a Domain Model or Row Data Gateway would hold, one a row, and a Table Module would hold, one a table, with every row loaded. The tables are illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Objects a row against objects a table</h3>
+            <p>A count over the situation the lesson states. Each record is a table and its rows. The lab counts the objects a Domain Model or Row Data Gateway would hold, one a row, and a Table Module would hold, one a table, with every row loaded. The tables are illustrative.</p>
         <div class="field">
           <label for="ldPreset">Worked example</label>
           <select id="ldPreset"><option value="small-shop" selected>A small shop: customers, orders, products and lines (illustrative)</option><option value="one-big-table">Meter readings: one table far larger than the rest (illustrative)</option></select>
@@ -1493,12 +1521,30 @@
           <div class="kpi"><span>Largest table, and its rows</span><strong id="ldLargest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, One object for the whole invoice-line table, not one per row.. line 2, class invoice lines. line 3, private final record set rows. line 5, invoice lines of record set rows. line 6, this dot rows is set to rows. line 9, long total cents of long invoice id. line 10, long total is set to 0. line 11, for record r in rows dot where of invoice id, invoice id. line 12, total is set to total plus r dot get long of cents. line 14, return total" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// One object for the whole invoice-line table, not one per row.</span>
+<span class="cl">class InvoiceLines {</span>
+<span class="cl">    private final RecordSet rows;</span>
+<span class="cl"></span>
+<span class="cl">    InvoiceLines(RecordSet rows) {</span>
+<span class="cl">        this.rows = rows;</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    long totalCents(long invoiceId) {</span>
+<span class="cl">        long total = 0;</span>
+<span class="cl">        for (Record r : rows.where(&quot;invoice_id&quot;, invoiceId)) {</span>
+<span class="cl">            total = total + r.getLong(&quot;cents&quot;);</span>
+<span class="cl">        }</span>
+<span class="cl">        return total;</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>The lab takes tables and their row counts and prints five tiles: the tables, the rows, the objects at one a row, as a Domain Model or a Row Data Gateway holds them, the objects at one a table, as a Table Module holds them, and the largest table with its rows, which is the most rows one module's Record Set carries. On <code>small-shop</code>, four tables of 200 customers, 1,500 orders, 120 products and 6,000 lines, it prints 4 tables, 7,820 rows, 7,820 objects one a row, 4 objects one a table, and line 6,000. Its banner says what the count is not: objects, not memory, and every row loaded, which neither pattern requires.</p><p>On <code>one-big-table</code>, 250,000 meter readings and 400 meters, it prints 2 tables, 250,400 rows, 250,400 objects one a row, 2 one a table, and reading 250,000. Read the banner with it. A Domain Model would not load a quarter of a million readings; Chapter 9 says a session pulls in only the objects it needs. What the count shows is the difference in kind: one object per reading, each with its own identity and its own methods, against one module that is handed the readings and a key. Which you want depends on the logic, and the count is silent on that.</p><p>Making a Choice asks how to choose, and answers that it depends very much on how complex the domain logic is. Fowler draws a sketch of effort against complexity for the three patterns and disowns it in advance, as one of the unquantified graphs that irritate him in slides. With simple logic a Domain Model costs more than it pays back; as the logic grows, the other two hit a wall. He then names a threshold to two decimal places, and takes it back in the sentence quoted above. All you can do, he says, is find experienced people to analyse the requirements and make a judgement call.</p><p>Some factors shift the curves. A team that knows Domain Model lowers its starting cost, though not to the others' level because of the database mapping, and the better the team the more he leans to it. Table Module depends on the Record Set tools around it: with them, as on .NET, it is much more attractive, and without them he would not bother. The decision can be changed, with difficulty: from scripts, do not hesitate to refactor toward a Domain Model; the other way is usually less worth it, unless it lets you simplify the data source layer. And the three can be mixed. Chapter 8, Starting with the Domain Layer, makes the same choice again with the database in view, calls it the central choice, and adds that the tools you have shape the architecture: of the three, Table Module gains most when the tools suit it.</p><h3>Exercise</h3><ul><li><span class="math" data-say="patient">patient</span>: 900 rows</li><li><span class="math" data-say="visit">visit</span>: 5,400 rows</li><li><span class="math" data-say="doctor">doctor</span>: 30 rows</li><li><span class="math" data-say="ward">ward</span>: 12 rows</li></ul><p>For these four tables of a small clinic, give by hand the objects a Domain Model would hold with every row loaded, the objects a Table Module would hold, and the largest Record Set one module would work on. Then type the tables into the lab, as <span class="math" data-say="patient, 900, visit, 5400">patient, 900; visit, 5400</span> and so on, to check.</p><p>Whichever pattern holds the domain logic, some code must call it, begin and end its transactions, and tell other people what happened. The next lesson, Service Layer, reads where that code goes.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting objects under two organisations</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the tables</h3><p>Write each table with its number of rows. Their number is the count of table modules.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Add the rows</h3><p>Add the row counts. With every row loaded, that is the number of objects a Domain Model would hold, one a row.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the largest table</h3><p>The table with the most rows is the largest Record Set one module works on; on a tie, take the first.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Take the three largest tables in a system you know, write their row counts and the two object counts, and say in one sentence which of the three domain patterns its code is closest to, and why.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting objects under two organisations</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the tables.</strong> Write each table with its number of rows. Their number is the count of table modules.</li><li><strong>Add the rows.</strong> Add the row counts. With every row loaded, that is the number of objects a Domain Model would hold, one a row.</li><li><strong>Find the largest table.</strong> The table with the most rows is the largest Record Set one module works on; on a tie, take the first.</li><li><strong>Do it on your own system.</strong> Take the three largest tables in a system you know, write their row counts and the two object counts, and say in one sentence which of the three domain patterns its code is closest to, and why.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1516,17 +1562,16 @@ one object a table: 4
 largest table: line, with 6000 rows</div><p>A Domain Model with everything loaded would hold 7,820 objects, each with an identity; four table modules would hold the same rows in Record Sets, the largest of them 6,000 rows long. Neither pattern needs everything loaded, and the count does not say which to choose.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Table Module is a Domain Model with fewer objects</strong><span>A Table Module has no object for each row, so it has no identity for each row, and the logic for one row runs on the module given that row's key. Fowler sets the two patterns apart on exactly this. It also gives up what identity buys: direct links from one instance to another, and the polymorphism a rich Domain Model relies on. The lab's count of 7,820 against 4 is the size of that difference on the lesson's illustration, not a saving.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading Making a Choice as a threshold</strong><span>The chapter's sketch has no units on either axis, and Fowler says so; the precise figure he offers is a joke he withdraws in the next sentence, because nobody can measure the complexity of domain logic. The threshold is a judgement by experienced people, and this lesson does not pretend to compute it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing Table Module without the tools it needs</strong><span>Table Module's strength is how it fits the rest of an architecture built around Record Sets: queries, screens and validation all passing the same structure. Without that tooling, Fowler says, he would not bother with it, and if the objects and tables are much alike he suggests a Domain Model with Active Record instead.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the objects each organisation holds.</strong><p>Given tables and their row counts, state how many objects a Domain Model and a Table Module hold with every row loaded, and the most rows one module object's Record Set carries.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts objects, not memory, and it assumes every row is loaded, which neither pattern requires. It cannot place a system on Fowler's complexity axis, because, as Making a Choice says, nobody knows how to measure that; the choice among the three patterns is a judgement the count only informs.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Table Module is a Domain Model with fewer objects</strong><span>A Table Module has no object for each row, so it has no identity for each row, and the logic for one row runs on the module given that row's key. Fowler sets the two patterns apart on exactly this. It also gives up what identity buys: direct links from one instance to another, and the polymorphism a rich Domain Model relies on. The lab's count of 7,820 against 4 is the size of that difference on the lesson's illustration, not a saving.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading Making a Choice as a threshold</strong><span>The chapter's sketch has no units on either axis, and Fowler says so; the precise figure he offers is a joke he withdraws in the next sentence, because nobody can measure the complexity of domain logic. The threshold is a judgement by experienced people, and this lesson does not pretend to compute it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing Table Module without the tools it needs</strong><span>Table Module's strength is how it fits the rest of an architecture built around Record Sets: queries, screens and validation all passing the same structure. Without that tooling, Fowler says, he would not bother with it, and if the objects and tables are much alike he suggests a Domain Model with Active Record instead.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the objects each organisation holds.</strong><p>Given tables and their row counts, state how many objects a Domain Model and a Table Module hold with every row loaded, and the most rows one module object's Record Set carries.</p></div></div><div class="note"><strong>Note:</strong> The lab counts objects, not memory, and it assumes every row is loaded, which neither pattern requires. It cannot place a system on Fowler's complexity axis, because, as Making a Choice says, nobody knows how to measure that; the choice among the three patterns is a judgement the count only informs.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Table Module</summary><p>One object that carries the business logic for a whole table or view. It has no object for each row, so to act on one row you pass the module that row's key.</p></details><details class="recall"><summary>Record Set</summary><p>Tabular data held in memory in the shape a query returns, which other code can also create and edit. It usually the platform's own, such as a data set or a row set.</p></details><details class="recall"><summary>Identity</summary><p>What makes one object a particular thing, so that holding a reference to it means holding that employee or that order. A Domain Model's objects have it, one per row; a Table Module's rows do not.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 9's third pattern holds the logic for a whole table in one object that works on a Record Set, Chapter 18's in-memory table. Count the objects each organisation would hold for the same tables, then read Making a Choice, where Fowler admits that the quantity his choice turns on cannot be measured.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Table Module.</strong> One object that carries the business logic for a whole table or view. It has no object for each row, so to act on one row you pass the module that row's key.</li><li><strong>Record Set.</strong> Tabular data held in memory in the shape a query returns, which other code can also create and edit. It usually the platform's own, such as a data set or a row set.</li><li><strong>Identity.</strong> What makes one object a particular thing, so that holding a reference to it means holding that employee or that order. A Domain Model's objects have it, one per row; a Table Module's rows do not.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one object for all the rows of a table. pass the key to act on one row. built to work on A record set. fits platforms with record set tools. no measure of domain complexity. the choice is a judgement call" tabindex="0" role="region" aria-label="Mathematical notation">one object for all the rows of a table
 pass the key to act on one row
 built to work on a Record Set
@@ -2195,11 +2240,40 @@ the choice is a judgement call</div><figcaption>Table Module and the choice in s
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2267,7 +2341,7 @@ the choice is a judgement call</div><figcaption>Table Module and the choice in s
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

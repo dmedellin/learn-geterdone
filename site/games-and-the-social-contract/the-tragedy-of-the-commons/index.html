@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,33 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Games and the Social Contract</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Many players</p>
       <h1>The Tragedy of the Commons</h1>
       <p class="lesson-lede">Each herder gains from one more animal while the cost falls on all, so every herder adds and all are left worse off.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A payoff as a function of the others</li><li>The equilibrium and the optimum are different questions</li><li>A cost on others is not a wish for more</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Ten herders and one pasture</h2>
-      <article class="prose reading"><p>Ten herders graze one pasture. Each keeps one animal and may add a second. Every animal on the pasture yields <span class="math" data-say="22">22</span> less the number of animals grazing there, so each animal added makes every animal, the herder's own included, worth one less. A herder owns either one animal or two.</p><p>Count the others who restrain, <span class="math" data-say="k">k</span>, from <span class="math" data-say="0">0</span> to <span class="math" data-say="9">9</span>. If I restrain, the pasture carries ten animals plus the second animals of the nine other herders who add, which is <span class="math" data-say="2 times n minus 1 minus k">2·n − 1 − k</span> in all, with <span class="math" data-say="n equals 10">n = 10</span> herders, and my one animal is worth <span class="math" data-say="22 minus the quantity 2 times n minus 1 minus k">22 − (2·n − 1 − k)</span>. If I add, the pasture carries <span class="math" data-say="2 times n minus k">2·n − k</span> animals, and my two are each worth <span class="math" data-say="22 minus the quantity 2 times n minus k">22 − (2·n − k)</span>.</p><div class="mathblock" data-say="C of k equals 22 minus the quantity 2 times n minus 1 minus k. D of k equals 2 times the quantity 22 minus the quantity 2 times n minus k" tabindex="0" role="region" aria-label="Mathematical notation">C(k) = 22 − (2·n − 1 − k)
-D(k) = 2·(22 − (2·n − k))</div><p>With ten herders these are <span class="math" data-say="C of k equals 3 plus k">C(k) = 3 + k</span> and <span class="math" data-say="D of k equals 4 plus 2 times k">D(k) = 4 + 2·k</span>. The difference is <span class="math" data-say="D of k minus C of k equals 1 plus k">D(k) − C(k) = 1 + k</span>, which is positive for every <span class="math" data-say="k">k</span>. Adding pays more than restraining whatever the others do, so adding dominates. The lab's dominance tile says so, and it reports one equilibrium, with no herder restraining. A lone restrainer among nine adders would get <span class="math" data-say="3">3</span> where adding gets <span class="math" data-say="4">4</span>, so no herder can improve alone.</p><p>Compare the equilibrium with the best the group could do. Each herder gets <span class="math" data-say="4">4</span> there, <span class="math" data-say="40">40</span> in all. If all ten restrain, each gets <span class="math" data-say="12">12</span> and the total is <span class="math" data-say="120">120</span>. The lab searches every number of restrainers for the largest total, and finds it at nine restraining and one adding, <span class="math" data-say="121">121</span>, because the first extra animal does little harm to a pasture that is otherwise lightly stocked. The point survives: the equilibrium is far below the optimum.</p><h3>What one herder gains and what everyone loses</h3><p>A herder who adds while the other nine restrain gets <span class="math" data-say="D of 9 equals 22">D(9) = 22</span> against <span class="math" data-say="C of 9 equals 12">C(9) = 12</span>, a gain of <span class="math" data-say="10">10</span>. If every herder does the same thing, each gets <span class="math" data-say="4">4</span> where all restraining would have given <span class="math" data-say="12">12</span>, a loss of <span class="math" data-say="8">8</span> each. The lab prints both in the tile for what defecting gains. The gain is private and the loss is shared, and that asymmetry is the whole of the tragedy.</p><h3>Make the adder pay</h3><p>Put a fee of <span class="math" data-say="11">11</span> on every animal added. The most a herder ever gains by adding is <span class="math" data-say="10">10</span>, when the other nine restrain, so <span class="math" data-say="11">11</span> is more than anyone gains in any case. Restraining now pays more at every <span class="math" data-say="k">k</span>, and the only equilibrium is all ten restraining. A fee of exactly <span class="math" data-say="10">10</span> is the border, and the lab's fourth preset sits on it: a herder facing nine restrainers is then indifferent, so the equilibria tile lists nine restrainers as well as ten, while the dominance tile already says restraining dominates, because this lab counts dominance the way “The Decision Matrix and Dominance” did, at least as good everywhere and better somewhere, where the two-player lab of “The Prisoner's Dilemma” counted only strict dominance. The herders' wishes are the same as before: the cost of the extra animal has been moved onto the herder who adds it. Giving each herder his own pasture would do the same.</p><p>Three herders on the same pasture do not reach a tragedy. Adding is still best for each, but three herders do not crowd the grass enough for the equilibrium to fall below the optimum. The lab finds the equilibrium total, <span class="math" data-say="96">96</span>, to be the best total as well, and it shows that each herder would even get <span class="math" data-say="13">13</span> more if all three added than if all three restrained. The payoffs are written with the number of herders in them, so the slider shows where the gap opens: at five herders the equilibrium is still the best total, and at six it is not. It is a fact about how large the cost to others is compared with the gain, and a lightly used commons can be left alone.</p><p>Two limits. The herders here cannot talk, and real commons are often managed by their users with rules that change the payoffs; Elinor Ostrom's work on such arrangements is the reason this lesson claims no more than a conditional. And the payoffs are chosen: a pasture that regrows differently is a different table.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The many-player dilemma</h2></div><p>payoffs as exact expressions in k, and what follows from them</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Ten herders and one pasture</h2><div class="prose reading"><p>Ten herders graze one pasture. Each keeps one animal and may add a second. Every animal on the pasture yields <span class="math" data-say="22">22</span> less the number of animals grazing there, so each animal added makes every animal, the herder's own included, worth one less. A herder owns either one animal or two.</p><p>Count the others who restrain, <span class="math" data-say="k">k</span>, from <span class="math" data-say="0">0</span> to <span class="math" data-say="9">9</span>. If I restrain, the pasture carries ten animals plus the second animals of the nine other herders who add, which is <span class="math" data-say="2 times n minus 1 minus k">2·n − 1 − k</span> in all, with <span class="math" data-say="n equals 10">n = 10</span> herders, and my one animal is worth <span class="math" data-say="22 minus the quantity 2 times n minus 1 minus k">22 − (2·n − 1 − k)</span>. If I add, the pasture carries <span class="math" data-say="2 times n minus k">2·n − k</span> animals, and my two are each worth <span class="math" data-say="22 minus the quantity 2 times n minus k">22 − (2·n − k)</span>.</p><div class="mathblock" data-say="C of k equals 22 minus the quantity 2 times n minus 1 minus k. D of k equals 2 times the quantity 22 minus the quantity 2 times n minus k" tabindex="0" role="region" aria-label="Mathematical notation">C(k) = 22 − (2·n − 1 − k)
+D(k) = 2·(22 − (2·n − k))</div><p>With ten herders these are <span class="math" data-say="C of k equals 3 plus k">C(k) = 3 + k</span> and <span class="math" data-say="D of k equals 4 plus 2 times k">D(k) = 4 + 2·k</span>. The difference is <span class="math" data-say="D of k minus C of k equals 1 plus k">D(k) − C(k) = 1 + k</span>, which is positive for every <span class="math" data-say="k">k</span>. Adding pays more than restraining whatever the others do, so adding dominates. The lab's dominance tile says so, and it reports one equilibrium, with no herder restraining. A lone restrainer among nine adders would get <span class="math" data-say="3">3</span> where adding gets <span class="math" data-say="4">4</span>, so no herder can improve alone.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The many-player dilemma</h2></div><p>payoffs as exact expressions in k, and what follows from them</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>One choice, n players</strong><span>C(k) and D(k): a player's payoff when k of the others cooperate</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cmTable"></table></div>
       <div class="status-banner" id="cmStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change the herd, the fee or the number of herders</h3>
-          <p>Payoffs are expressions in k, the number of other herders who restrain, and n, the number of herders. Subtract a fee from the adder's payoff and find the smallest whole fee at which the dominance tile turns, and the smallest at which the equilibria tile lists ten restrainers alone.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change the herd, the fee or the number of herders</h3>
+            <p>Payoffs are expressions in k, the number of other herders who restrain, and n, the number of herders. Subtract a fee from the adder's payoff and find the smallest whole fee at which the dominance tile turns, and the smallest at which the equilibria tile lists ten restrainers alone.</p>
         <div class="field">
           <label for="cmPreset">Worked example</label>
           <select id="cmPreset"><option value="herders" selected>Ten herders, each animal worth 22 less the animals grazing</option><option value="small-commons">Three herders on the same pasture</option><option value="regulated">Ten herders and a fee of 11 on each animal added</option><option value="fee-ten">Ten herders and a fee of 10, the border</option></select>
@@ -1440,12 +1483,15 @@ D(k) = 2·(22 − (2·n − k))</div><p>With ten herders these are <span class="
           <div class="kpi"><span>Cooperators after the generations</span><strong id="cmShare">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Compare the equilibrium with the best the group could do. Each herder gets <span class="math" data-say="4">4</span> there, <span class="math" data-say="40">40</span> in all. If all ten restrain, each gets <span class="math" data-say="12">12</span> and the total is <span class="math" data-say="120">120</span>. The lab searches every number of restrainers for the largest total, and finds it at nine restraining and one adding, <span class="math" data-say="121">121</span>, because the first extra animal does little harm to a pasture that is otherwise lightly stocked. The point survives: the equilibrium is far below the optimum.</p><h3>What one herder gains and what everyone loses</h3><p>A herder who adds while the other nine restrain gets <span class="math" data-say="D of 9 equals 22">D(9) = 22</span> against <span class="math" data-say="C of 9 equals 12">C(9) = 12</span>, a gain of <span class="math" data-say="10">10</span>. If every herder does the same thing, each gets <span class="math" data-say="4">4</span> where all restraining would have given <span class="math" data-say="12">12</span>, a loss of <span class="math" data-say="8">8</span> each. The lab prints both in the tile for what defecting gains. The gain is private and the loss is shared, and that asymmetry is the whole of the tragedy.</p><h3>Make the adder pay</h3><p>Put a fee of <span class="math" data-say="11">11</span> on every animal added. The most a herder ever gains by adding is <span class="math" data-say="10">10</span>, when the other nine restrain, so <span class="math" data-say="11">11</span> is more than anyone gains in any case. Restraining now pays more at every <span class="math" data-say="k">k</span>, and the only equilibrium is all ten restraining. A fee of exactly <span class="math" data-say="10">10</span> is the border, and the lab's fourth preset sits on it: a herder facing nine restrainers is then indifferent, so the equilibria tile lists nine restrainers as well as ten, while the dominance tile already says restraining dominates, because this lab counts dominance the way “The Decision Matrix and Dominance” did, at least as good everywhere and better somewhere, where the two-player lab of “The Prisoner's Dilemma” counted only strict dominance. The herders' wishes are the same as before: the cost of the extra animal has been moved onto the herder who adds it. Giving each herder his own pasture would do the same.</p><p>Three herders on the same pasture do not reach a tragedy. Adding is still best for each, but three herders do not crowd the grass enough for the equilibrium to fall below the optimum. The lab finds the equilibrium total, <span class="math" data-say="96">96</span>, to be the best total as well, and it shows that each herder would even get <span class="math" data-say="13">13</span> more if all three added than if all three restrained. The payoffs are written with the number of herders in them, so the slider shows where the gap opens: at five herders the equilibrium is still the best total, and at six it is not. It is a fact about how large the cost to others is compared with the gain, and a lightly used commons can be left alone.</p><p>Two limits. The herders here cannot talk, and real commons are often managed by their users with rules that change the payoffs; Elinor Ostrom's work on such arrangements is the reason this lesson claims no more than a conditional. And the payoffs are chosen: a pasture that regrows differently is a different table.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Writing a commons as a game</h2></div><p>Four steps, and the last is the comparison the lesson exists for.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix one herder and count the others who restrain</h3><p>Call the count <span class="math" data-say="k">k</span>. Everything the herder needs to know about the others is that number.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write what restraining and adding pay at each k</h3><p>Count the animals on the pasture in each case and value each at the pasture's yield per animal. These are <span class="math" data-say="C of k">C(k)</span> and <span class="math" data-say="D of k">D(k)</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare the two lists</h3><p>If adding pays at least as much at every <span class="math" data-say="k">k</span> and more at some, adding dominates, and the only equilibrium is that nobody restrains.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add up the herders&#x27; payoffs for each number of restrainers</h3><p>The largest sum is the optimum. If it exceeds the sum at the equilibrium, there is a gap, and that gap is what a fee or an owner is for.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Writing a commons as a game</h2>
+      <p class="lead-in">Four steps, and the last is the comparison the lesson exists for.</p>
+      <ol class="key-ideas method"><li><strong>Fix one herder and count the others who restrain.</strong> Call the count <span class="math" data-say="k">k</span>. Everything the herder needs to know about the others is that number.</li><li><strong>Write what restraining and adding pay at each k.</strong> Count the animals on the pasture in each case and value each at the pasture's yield per animal. These are <span class="math" data-say="C of k">C(k)</span> and <span class="math" data-say="D of k">D(k)</span>.</li><li><strong>Compare the two lists.</strong> If adding pays at least as much at every <span class="math" data-say="k">k</span> and more at some, adding dominates, and the only equilibrium is that nobody restrains.</li><li><strong>Add up the herders&#x27; payoffs for each number of restrainers.</strong> The largest sum is the optimum. If it exceeds the sum at the equilibrium, there is a gap, and that gap is what a fee or an owner is for.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1510,16 @@ All ten restrain: 10 x 12 = 120
 Best total, nine restrain and one adds: 121</div><p>No herder, looking at the nine others adding, would restrain: restraining pays <span class="math" data-say="3">3</span> and adding pays <span class="math" data-say="4">4</span>. The total of <span class="math" data-say="40">40</span> is a third of what restraint would give, and each step that led there was individually sensible.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the tragedy requires greed</strong><span>No herder in the table wants more than one extra animal, and the herders of the regulated preset want exactly the same. The equilibrium is bad because the cost of the extra animal falls on the nine others: add the fee that moves the cost to the adder and all ten restrain. Greed would be a change in wishes; the tragedy needs only a change in who pays.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Mistaking the equilibrium for the best the herders can do</strong><span>No herder gains by changing alone at four each, and the total of <span class="math" data-say="40">40</span> is still below the <span class="math" data-say="120">120</span> of all restraining and the <span class="math" data-say="121">121</span> of the best split. Stability is not merit, as in “The Prisoner's Dilemma”.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking every shared resource is a tragedy</strong><span>Three herders on the same pasture have no gap between the equilibrium and the optimum, since three animals added do not crowd it. The lab's verdict depends on the size of the cost to others in comparison with the gain, and different payoffs can remove it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find the gap and say what closes it.</strong><p>Write each herder's payoff as a function of how many others restrain, find the dominance verdict and the equilibrium, find the best total, state the difference, and choose a fee that makes restraint dominate.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The yield rule here, a fixed number less the animals grazing, is the simplest that makes each animal worse for all the others. Drag the number of herders from three up to ten and read where the equilibrium total stops matching the best total. The last tile, the share of cooperators after some generations, is the replicator step of “The Evolution of Cooperation”; with the generations at zero it repeats the starting share.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the tragedy requires greed</strong><span>No herder in the table wants more than one extra animal, and the herders of the regulated preset want exactly the same. The equilibrium is bad because the cost of the extra animal falls on the nine others: add the fee that moves the cost to the adder and all ten restrain. Greed would be a change in wishes; the tragedy needs only a change in who pays.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Mistaking the equilibrium for the best the herders can do</strong><span>No herder gains by changing alone at four each, and the total of <span class="math" data-say="40">40</span> is still below the <span class="math" data-say="120">120</span> of all restraining and the <span class="math" data-say="121">121</span> of the best split. Stability is not merit, as in “The Prisoner's Dilemma”.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking every shared resource is a tragedy</strong><span>Three herders on the same pasture have no gap between the equilibrium and the optimum, since three animals added do not crowd it. The lab's verdict depends on the size of the cost to others in comparison with the gain, and different payoffs can remove it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find the gap and say what closes it.</strong><p>Write each herder's payoff as a function of how many others restrain, find the dominance verdict and the equilibrium, find the best total, state the difference, and choose a fee that makes restraint dominate.</p></div></div><div class="note"><strong>Note:</strong> The yield rule here, a fixed number less the animals grazing, is the simplest that makes each animal worse for all the others. Drag the number of herders from three up to ten and read where the equilibrium total stops matching the best total. The last tile, the share of cooperators after some generations, is the replicator step of “The Evolution of Cooperation”; with the generations at zero it repeats the starting share.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A payoff as a function of the others</summary><p>Fix a herder and count how many of the other herders restrain. Call the count <span class="math" data-say="k">k</span>. Then the herder's payoff from restraining is <span class="math" data-say="C of k">C(k)</span> and from adding is <span class="math" data-say="D of k">D(k)</span>, and the whole game is those two lists.</p></details><details class="recall"><summary>The equilibrium and the optimum are different questions</summary><p>The equilibrium asks where no herder gains by changing alone. The optimum asks where the herders' payoffs sum to most. In a dilemma these are different answers, and the gap is the tragedy.</p></details><details class="recall"><summary>A cost on others is not a wish for more</summary><p>Greed would mean wanting more animals than the pasture can carry. The tragedy needs only that the herder who adds does not pay the whole cost of adding, which is a fact about who bears the grass, not about the herder.</p></details></div>
+      <h3>Summary</h3>
       <p>Ten herders share a pasture, and each can keep a single animal or add a second. An added animal pays its owner in full and costs every herder a share of the grass, so adding is best whatever the others do. The lab finds the one equilibrium, the best total for the group, and the gap between them. No herder needs to be greedy for this to happen.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A payoff as a function of the others.</strong> Fix a herder and count how many of the other herders restrain. Call the count <span class="math" data-say="k">k</span>. Then the herder's payoff from restraining is <span class="math" data-say="C of k">C(k)</span> and from adding is <span class="math" data-say="D of k">D(k)</span>, and the whole game is those two lists.</li><li><strong>The equilibrium and the optimum are different questions.</strong> The equilibrium asks where no herder gains by changing alone. The optimum asks where the herders' payoffs sum to most. In a dilemma these are different answers, and the gap is the tragedy.</li><li><strong>A cost on others is not a wish for more.</strong> Greed would mean wanting more animals than the pasture can carry. The tragedy needs only that the herder who adds does not pay the whole cost of adding, which is a fact about who bears the grass, not about the herder.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="my animal&#x27;s gain is mine, its cost is shared. adding dominates, so every herder adds. the equilibrium falls short of the best. make the adder pay and the gap closes" tabindex="0" role="region" aria-label="Mathematical notation">my animal&#x27;s gain is mine, its cost is shared
 adding dominates, so every herder adds
 the equilibrium falls short of the best
@@ -2250,11 +2295,40 @@ make the adder pay and the gap closes</div><figcaption>A gain kept and a cost sh
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2322,7 +2396,7 @@ make the adder pay and the gap closes</div><figcaption>A gain kept and a cost sh
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

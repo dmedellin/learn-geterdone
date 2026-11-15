@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,35 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Latency and the Tail</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Budgets and limits</p>
       <h1>Percentiles Do Not Add</h1>
       <p class="lesson-lede">Compute the p99 of a two-stage sum by convolution and compare it with the sum of the two stage p99s.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The sum’s distribution is the convolution</li><li>Expectation is linear; ranks are not</li><li>Adding the p99s assumes both bad days coincide</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Convolution, and the sum that is not a percentile</h2>
-      <article class="prose reading"><p>The lab holds two stages, each given as a list of <span class="math" data-say="milliseconds, weight">milliseconds:weight</span> pairs. Stage A is mostly fast &mdash; <span class="math" data-say="4 milliseconds">4 ms</span> on more than half of calls &mdash; with a thin tail out to <span class="math" data-say="70 milliseconds">70 ms</span>. Stage B is slower and steadier, centred near <span class="math" data-say="17 milliseconds">17 ms</span> with a tail to <span class="math" data-say="130 milliseconds">130 ms</span>. They run one after the other, so the request takes the sum.</p><div class="defbox"><span class="label">Definition &middot; Convolution of two distributions</span><p>For independent <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> taking values with probabilities <span class="math" data-say="P of A">P(a)</span> and <span class="math" data-say="Q of b">Q(b)</span>, the <strong>convolution</strong> is the distribution of <span class="math" data-say="A plus B">A + B</span>: the probability of a total <span class="math" data-say="t">t</span> is the sum of <span class="math" data-say="P of A times Q of b">P(a)·Q(b)</span> over every pair with <span class="math" data-say="A plus b equals t">a + b = t</span>. With finitely many outcomes it is computed by enumerating all the pairs, so it is exact and needs no approximation at all.</p></div><p>Take the two stages&rsquo; own percentiles first, by the rank rule of &ldquo;Percentiles from a Sample&rdquo;. Stage A has a p99 of <span class="math" data-say="38 milliseconds">38 ms</span>; stage B has a p99 of <span class="math" data-say="72 milliseconds">72 ms</span>. Add them and you get <span class="math" data-say="110 milliseconds">110 ms</span>, and that number appears in a great many latency budgets. Now compute the distribution of the sum and read its p99 off the same rank rule.</p><div class="mathblock" data-say="stage A, 4, 520, 6, 250, 9, 120, 14, 60, 22, 30, 38, 16, 70, 4. stage B, 12, 420 17, 300 24, 150 34, 80, 48, 36, 72, 12, 130, 2. p 50, p 95, p 99, mean. a table, shown on the page. p 99 times the quantity A plus B, equals 78 milliseconds, p 99 times A plus p 99 times B equals 110 milliseconds, gap 32 milliseconds, 41.0 percent. cumulative at 77 milliseconds, 24693 over 25000 equals 0.98772, short of 99 over 100. cumulative at 78 milliseconds, 3096 over 3125, equals 0.99072, first to reach it" tabindex="0" role="region" aria-label="Mathematical notation">stage A    4:520  6:250  9:120  14:60  22:30  38:16  70:4
-stage B    12:420 17:300 24:150 34:80  48:36  72:12  130:2
-
-            p50    p95    p99     mean
-  A           4     14     38     881/125   =  7.048
-  B          17     34     72    2414/125   = 19.312
-  added      21     48    110     659/25    = 26.360
-  A + B      21     52     78     659/25    = 26.360
-
-p99(A + B) = 78 ms      p99(A) + p99(B) = 110 ms      gap 32 ms, 41.0%
-cumulative at 77 ms:  24693/25000 = 0.98772   — short of 99/100
-cumulative at 78 ms:   3096/3125  = 0.99072   — first to reach it</div><p>The true p99 of the two stages together is <span class="math" data-say="78 milliseconds">78 ms</span>. The sum of the p99s is <span class="math" data-say="110 milliseconds">110 ms</span>, which overstates it by <span class="math" data-say="32 milliseconds">32 ms</span> &mdash; <span class="math" data-say="41.0 percent">41.0%</span>. Budgeting the pair at <span class="math" data-say="110 milliseconds">110 ms</span> reserves a third more time than the percentile being promised actually needs, and if that budget is what sizes a timeout or a machine count, the overstatement is paid for in capacity.</p><p>Read the two mean columns while you are here. <span class="math" data-say="881 over 125 plus 2414 over 125">881/125 + 2414/125</span> is <span class="math" data-say="3295 over 125">3295/125</span>, which is <span class="math" data-say="659 over 25">659/25</span> &mdash; and <span class="math" data-say="659 over 25">659/25</span> is exactly the mean of the convolved distribution. The added row and the true row agree to the last digit for means and disagree by a third for the p99. That is the whole lesson in one table: linearity of expectation is a theorem, and there is no theorem next to it for percentiles.</p><h3>Why it is not a bound either</h3><p>The natural repair is to keep adding the percentiles and call the result conservative. Look at the p95 row of the same table. The stage p95s are <span class="math" data-say="14 milliseconds">14 ms</span> and <span class="math" data-say="34 milliseconds">34 ms</span>, which add to <span class="math" data-say="48 milliseconds">48 ms</span>; the true p95 of the sum is <span class="math" data-say="52 milliseconds">52 ms</span>. Here the naive arithmetic <em>understates</em> by four milliseconds, on the very same pair of stages, at a percentile one step away.</p><p>So the sum of the percentiles is not an upper bound, not a lower bound, and not conservative. It is a number obtained by adding two quantities that were never addends. Whether it comes out high or low depends on how the mass beyond each stage&rsquo;s percentile is arranged: when each stage&rsquo;s tail is thin and far out, a single rare spike carries the pair over the line on its own and the true percentile can sit above the naive sum.</p><div class="example"><span class="label">Example &middot; How rare the naive answer actually is</span><p>For the total to reach <span class="math" data-say="110 milliseconds">110 ms</span> by both stages being at their p99 together, stage A must exceed <span class="math" data-say="37 milliseconds">37 ms</span> &mdash; probability <span class="math" data-say="1 over 50">1/50</span> &mdash; and stage B must exceed <span class="math" data-say="71 milliseconds">71 ms</span> &mdash; probability <span class="math" data-say="7 over 500">7/500</span>. Independently that is <span class="math" data-say="7 over 25000">7/25000</span>, or <span class="math" data-say="0.0280 percent">0.0280%</span>. The question asked was about the worst one percent of requests; the number returned describes the worst three in ten thousand. They are different questions with a factor of thirty-five between them.</p></div><p>What to do instead is in the lab. Convolve: enumerate the pairs, accumulate the probabilities onto their totals, and read the percentile of the result by rank. For two stages of seven outcomes that is forty-nine multiplications, every probability an exact fraction, and the answer is the percentile of the thing that was actually asked about.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Two stages in series</h2></div><p>The sum by convolution, beside the sum of the p99s that is not it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Convolution, and the sum that is not a percentile</h2><div class="prose reading"><p>The lab holds two stages, each given as a list of <span class="math" data-say="milliseconds, weight">milliseconds:weight</span> pairs. Stage A is mostly fast &mdash; <span class="math" data-say="4 milliseconds">4 ms</span> on more than half of calls &mdash; with a thin tail out to <span class="math" data-say="70 milliseconds">70 ms</span>. Stage B is slower and steadier, centred near <span class="math" data-say="17 milliseconds">17 ms</span> with a tail to <span class="math" data-say="130 milliseconds">130 ms</span>. They run one after the other, so the request takes the sum.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Two stages in series</h2></div><p>The sum by convolution, beside the sum of the p99s that is not it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Percentiles do not add</strong><span>the sum's distribution is the convolution, and its p99 is not the sum of the p99s</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the sum's pmf</span><span class="tone-green"><i class="legend-swatch"></i>true p99 of A + B</span><span class="tone-red"><i class="legend-swatch"></i>p99(A) + p99(B)</span></div>
@@ -1416,10 +1448,10 @@ cumulative at 78 ms:   3096/3125  = 0.99072   — first to reach it</div><p>The 
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cvTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="cvAtoms"></table></div>
       <div class="status-banner" id="cvStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Edit the two stages</h3>
-          <p>Every pair of outcomes is enumerated and its probability multiplied out, so the distribution of the total is exact and so is its p99. The table prints the naive addition and the convolution side by side at the p50, the p95 and the p99 &mdash; they do not always disagree in the same direction.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Edit the two stages</h3>
+            <p>Every pair of outcomes is enumerated and its probability multiplied out, so the distribution of the total is exact and so is its p99. The table prints the naive addition and the convolution side by side at the p50, the p95 and the p99 &mdash; they do not always disagree in the same direction.</p>
         <div class="field">
           <label for="cvA">Stage A, as ms:weight pairs</label>
           <input id="cvA" type="text" value="4:520, 6:250, 9:120, 14:60, 22:30, 38:16, 70:4" inputmode="text" autocomplete="off">
@@ -1435,12 +1467,26 @@ cumulative at 78 ms:   3096/3125  = 0.99072   — first to reach it</div><p>The 
           <div class="kpi"><span>Means, which do add</span><strong id="cvMeans">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="cvHint" style="margin:0;">The convolution enumerates every pair of outcomes and multiplies their probabilities, so the sum's distribution is exact. Adding the two p99s assumes both stages are having their bad day at the same time, and independent stages almost never are.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Convolution of two distributions</span><p>For independent <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> taking values with probabilities <span class="math" data-say="P of A">P(a)</span> and <span class="math" data-say="Q of b">Q(b)</span>, the <strong>convolution</strong> is the distribution of <span class="math" data-say="A plus B">A + B</span>: the probability of a total <span class="math" data-say="t">t</span> is the sum of <span class="math" data-say="P of A times Q of b">P(a)·Q(b)</span> over every pair with <span class="math" data-say="A plus b equals t">a + b = t</span>. With finitely many outcomes it is computed by enumerating all the pairs, so it is exact and needs no approximation at all.</p></div><p>Take the two stages&rsquo; own percentiles first, by the rank rule of &ldquo;Percentiles from a Sample&rdquo;. Stage A has a p99 of <span class="math" data-say="38 milliseconds">38 ms</span>; stage B has a p99 of <span class="math" data-say="72 milliseconds">72 ms</span>. Add them and you get <span class="math" data-say="110 milliseconds">110 ms</span>, and that number appears in a great many latency budgets. Now compute the distribution of the sum and read its p99 off the same rank rule.</p><div class="mathblock" data-say="stage A, 4, 520, 6, 250, 9, 120, 14, 60, 22, 30, 38, 16, 70, 4. stage B, 12, 420 17, 300 24, 150 34, 80, 48, 36, 72, 12, 130, 2. p 50, p 95, p 99, mean. a table, shown on the page. p 99 times the quantity A plus B, equals 78 milliseconds, p 99 times A plus p 99 times B equals 110 milliseconds, gap 32 milliseconds, 41.0 percent. cumulative at 77 milliseconds, 24693 over 25000 equals 0.98772, short of 99 over 100. cumulative at 78 milliseconds, 3096 over 3125, equals 0.99072, first to reach it" tabindex="0" role="region" aria-label="Mathematical notation">stage A    4:520  6:250  9:120  14:60  22:30  38:16  70:4
+stage B    12:420 17:300 24:150 34:80  48:36  72:12  130:2
+
+            p50    p95    p99     mean
+  A           4     14     38     881/125   =  7.048
+  B          17     34     72    2414/125   = 19.312
+  added      21     48    110     659/25    = 26.360
+  A + B      21     52     78     659/25    = 26.360
+
+p99(A + B) = 78 ms      p99(A) + p99(B) = 110 ms      gap 32 ms, 41.0%
+cumulative at 77 ms:  24693/25000 = 0.98772   — short of 99/100
+cumulative at 78 ms:   3096/3125  = 0.99072   — first to reach it</div><p>The true p99 of the two stages together is <span class="math" data-say="78 milliseconds">78 ms</span>. The sum of the p99s is <span class="math" data-say="110 milliseconds">110 ms</span>, which overstates it by <span class="math" data-say="32 milliseconds">32 ms</span> &mdash; <span class="math" data-say="41.0 percent">41.0%</span>. Budgeting the pair at <span class="math" data-say="110 milliseconds">110 ms</span> reserves a third more time than the percentile being promised actually needs, and if that budget is what sizes a timeout or a machine count, the overstatement is paid for in capacity.</p><p>Read the two mean columns while you are here. <span class="math" data-say="881 over 125 plus 2414 over 125">881/125 + 2414/125</span> is <span class="math" data-say="3295 over 125">3295/125</span>, which is <span class="math" data-say="659 over 25">659/25</span> &mdash; and <span class="math" data-say="659 over 25">659/25</span> is exactly the mean of the convolved distribution. The added row and the true row agree to the last digit for means and disagree by a third for the p99. That is the whole lesson in one table: linearity of expectation is a theorem, and there is no theorem next to it for percentiles.</p><h3>Why it is not a bound either</h3><p>The natural repair is to keep adding the percentiles and call the result conservative. Look at the p95 row of the same table. The stage p95s are <span class="math" data-say="14 milliseconds">14 ms</span> and <span class="math" data-say="34 milliseconds">34 ms</span>, which add to <span class="math" data-say="48 milliseconds">48 ms</span>; the true p95 of the sum is <span class="math" data-say="52 milliseconds">52 ms</span>. Here the naive arithmetic <em>understates</em> by four milliseconds, on the very same pair of stages, at a percentile one step away.</p><p>So the sum of the percentiles is not an upper bound, not a lower bound, and not conservative. It is a number obtained by adding two quantities that were never addends. Whether it comes out high or low depends on how the mass beyond each stage&rsquo;s percentile is arranged: when each stage&rsquo;s tail is thin and far out, a single rare spike carries the pair over the line on its own and the true percentile can sit above the naive sum.</p><div class="example"><span class="label">Example &middot; How rare the naive answer actually is</span><p>For the total to reach <span class="math" data-say="110 milliseconds">110 ms</span> by both stages being at their p99 together, stage A must exceed <span class="math" data-say="37 milliseconds">37 ms</span> &mdash; probability <span class="math" data-say="1 over 50">1/50</span> &mdash; and stage B must exceed <span class="math" data-say="71 milliseconds">71 ms</span> &mdash; probability <span class="math" data-say="7 over 500">7/500</span>. Independently that is <span class="math" data-say="7 over 25000">7/25000</span>, or <span class="math" data-say="0.0280 percent">0.0280%</span>. The question asked was about the worst one percent of requests; the number returned describes the worst three in ten thousand. They are different questions with a factor of thirty-five between them.</p></div><p>What to do instead is in the lab. Convolve: enumerate the pairs, accumulate the probabilities onto their totals, and read the percentile of the result by rank. For two stages of seven outcomes that is forty-nine multiplications, every probability an exact fraction, and the answer is the percentile of the thing that was actually asked about.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Adding two stages properly</h2></div><p>Four steps, and the first is a decision about which question you are answering.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide whether the question is about means or about a percentile</h3><p>For total work, capacity and cost, add the means: that is exact and needs no independence. For a latency objective stated as a percentile, the addition is not available and the next three steps are the method.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Enumerate every pair of outcomes</h3><p>Each pair contributes its two times added together, with probability the product of the two probabilities. Keep the probabilities as fractions; with integer weights they stay exact and the final comparison needs no rounding argument.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Accumulate onto totals and read the percentile by rank</h3><p>Different pairs land on the same total, so add their probabilities together. Then walk the totals in order, accumulating, and take the first value whose cumulative probability reaches <span class="math" data-say="q">q</span>. That is the percentile of the sum.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare it with the naive sum and quote the gap</h3><p>Report both numbers and their difference. The gap is what the naive arithmetic was about to cost, in either direction, and it is the only thing that will persuade anyone to do the convolution next time.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Adding two stages properly</h2>
+      <p class="lead-in">Four steps, and the first is a decision about which question you are answering.</p>
+      <ol class="key-ideas method"><li><strong>Decide whether the question is about means or about a percentile.</strong> For total work, capacity and cost, add the means: that is exact and needs no independence. For a latency objective stated as a percentile, the addition is not available and the next three steps are the method.</li><li><strong>Enumerate every pair of outcomes.</strong> Each pair contributes its two times added together, with probability the product of the two probabilities. Keep the probabilities as fractions; with integer weights they stay exact and the final comparison needs no rounding argument.</li><li><strong>Accumulate onto totals and read the percentile by rank.</strong> Different pairs land on the same total, so add their probabilities together. Then walk the totals in order, accumulating, and take the first value whose cumulative probability reaches <span class="math" data-say="q">q</span>. That is the percentile of the sum.</li><li><strong>Compare it with the naive sum and quote the gap.</strong> Report both numbers and their difference. The gap is what the naive arithmetic was about to cost, in either direction, and it is the only thing that will persuade anyone to do the convolution next time.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1518,16 @@ compare      110 − 78 = 32 ms overstated,  41.0% high
 means        881/125 + 2414/125 = 659/25,  and mean(A + B) = 659/25   ✓</div><p>The tick on the last line is not decoration. The means were computed two ways &mdash; added, and taken from the convolved distribution &mdash; and they agree exactly. That is a check on the convolution itself: if those two disagreed, the enumeration would have a bug in it, and the p99 it produced would be worth nothing.</p><p>The <span class="math" data-say="41.0 percent">41.0%</span> gap is not a general figure. It depends entirely on the shapes: two stages with fat, nearby tails give a smaller gap, and the p95 row of the same pair gives a gap of the opposite sign. What is general is that the two numbers are answers to different questions, and that only one of them was asked.</p><p>For a faded rehearsal, replace stage B with <span class="math" data-say="10, 900, 100, 100">10:900, 100:100</span> &mdash; a stage that is fast nine times in ten and takes <span class="math" data-say="100 milliseconds">100 ms</span> otherwise. The supplied first move is B&rsquo;s own p99, which by rank is <span class="math" data-say="100 milliseconds">100 ms</span>. Predict whether the true p99 of the sum will be above or below <span class="math" data-say="38 plus 100 equals 138 milliseconds">38 + 100 = 138 ms</span> before you compute anything, then type the stage into the lab and see. Write down which way you guessed and why before opening the quiz.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding stage percentiles to get an end-to-end percentile</strong><span>It is the single most common arithmetic error in a latency budget. On the lab&rsquo;s stages it overstates the p99 by <span class="math" data-say="32 milliseconds">32 ms</span>, and on the same stages it understates the p95 by <span class="math" data-say="4 milliseconds">4 ms</span>. The operation is not conservative, not a bound, and not defined &mdash; the right method is to convolve.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the naive sum errs in a known direction</strong><span>&ldquo;It is at least pessimistic&rdquo; is the usual defence, and the p95 row refutes it on the very same data. Which way it errs depends on how the mass past each percentile is arranged, so it has to be computed rather than assumed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using the mean because it composes, when the objective is a percentile</strong><span>The means do add, exactly, which makes them tempting. But an SLO written as a p99 is not a statement about a mean, and on the lab&rsquo;s stages the mean of the total is <span class="math" data-say="26.36 milliseconds">26.36 ms</span> against a p99 of <span class="math" data-say="78 milliseconds">78 ms</span>. Budgeting the p99 in means understates the requirement by a factor of three.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when adding two p99s looks like a category error rather than an approximation.</strong><p>You should be able to convolve two small distributions by enumerating pairs, read the percentile of the result by rank, compare it with the sum of the stage percentiles, and state the probability of the joint event the naive sum actually describes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The stage floors of &ldquo;The Speed-of-Light Floor&rdquo; and &ldquo;Round Trips, Not Bytes&rdquo;, the graph of &ldquo;Serial Sums, Parallel Maxes&rdquo; and the percentile arithmetic of this lesson are now all available, and &ldquo;Latency Budgets&rdquo; puts them in one place: an objective at the top, the floors subtracted first, and what is left divided among the stages that are allowed to spend it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding stage percentiles to get an end-to-end percentile</strong><span>It is the single most common arithmetic error in a latency budget. On the lab&rsquo;s stages it overstates the p99 by <span class="math" data-say="32 milliseconds">32 ms</span>, and on the same stages it understates the p95 by <span class="math" data-say="4 milliseconds">4 ms</span>. The operation is not conservative, not a bound, and not defined &mdash; the right method is to convolve.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the naive sum errs in a known direction</strong><span>&ldquo;It is at least pessimistic&rdquo; is the usual defence, and the p95 row refutes it on the very same data. Which way it errs depends on how the mass past each percentile is arranged, so it has to be computed rather than assumed.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using the mean because it composes, when the objective is a percentile</strong><span>The means do add, exactly, which makes them tempting. But an SLO written as a p99 is not a statement about a mean, and on the lab&rsquo;s stages the mean of the total is <span class="math" data-say="26.36 milliseconds">26.36 ms</span> against a p99 of <span class="math" data-say="78 milliseconds">78 ms</span>. Budgeting the p99 in means understates the requirement by a factor of three.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when adding two p99s looks like a category error rather than an approximation.</strong><p>You should be able to convolve two small distributions by enumerating pairs, read the percentile of the result by rank, compare it with the sum of the stage percentiles, and state the probability of the joint event the naive sum actually describes.</p></div></div><div class="note"><strong>Note:</strong> The stage floors of &ldquo;The Speed-of-Light Floor&rdquo; and &ldquo;Round Trips, Not Bytes&rdquo;, the graph of &ldquo;Serial Sums, Parallel Maxes&rdquo; and the percentile arithmetic of this lesson are now all available, and &ldquo;Latency Budgets&rdquo; puts them in one place: an objective at the top, the floors subtracted first, and what is left divided among the stages that are allowed to spend it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The sum’s distribution is the convolution</summary><p>If stage A takes <span class="math" data-say="A">a</span> with probability <span class="math" data-say="P of A">P(a)</span> and stage B takes <span class="math" data-say="b">b</span> with probability <span class="math" data-say="Q of b">Q(b)</span>, independently, then the total takes <span class="math" data-say="A plus b">a + b</span> with probability <span class="math" data-say="P of A times Q of b">P(a)·Q(b)</span>. Enumerate every pair, add up the probabilities that land on the same total, and you have the distribution of the sum. Seven outcomes each give forty-nine pairs and <span class="math" data-say="43">43</span> distinct totals.</p></details><details class="recall"><summary>Expectation is linear; ranks are not</summary><p><span class="math" data-say="E of A plus B equals E of A plus E of B">E[A + B] = E[A] + E[B]</span> needs no independence and holds exactly: on the preset, <span class="math" data-say="881 over 125 plus 2414 over 125 equals 659 over 25">881/125 + 2414/125 = 659/25</span>, which the lab prints as three exact fractions. There is no corresponding law for percentiles, because a percentile is a position in a sorted list and positions do not add.</p></details><details class="recall"><summary>Adding the p99s assumes both bad days coincide</summary><p><span class="math" data-say="p 99 times A plus p 99 times B">p99(A) + p99(B)</span> is the time taken when stage A is at its p99 <em>and</em> stage B is at its p99 in the same request. Independently that happens with probability <span class="math" data-say="7 over 25000">7/25000</span>, about <span class="math" data-say="0.028 percent">0.028%</span> &mdash; roughly three requests in ten thousand, not one in a hundred. The naive sum is a percentile of the joint worst case, which is a far rarer event than the one being asked about.</p></details></div>
+      <h3>Summary</h3>
       <p>Means add: the expected time of two stages in series is the sum of their expected times, exactly. Percentiles do not. The distribution of the sum is the convolution of the two stage distributions, and on the lab&rsquo;s stages its p99 is <span class="math" data-say="78 milliseconds">78 ms</span> while the two stage p99s add to <span class="math" data-say="110 milliseconds">110 ms</span>. The naive sum is not a bound and it is not conservative &mdash; it is a percentile of nothing.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The sum’s distribution is the convolution.</strong> If stage A takes <span class="math" data-say="A">a</span> with probability <span class="math" data-say="P of A">P(a)</span> and stage B takes <span class="math" data-say="b">b</span> with probability <span class="math" data-say="Q of b">Q(b)</span>, independently, then the total takes <span class="math" data-say="A plus b">a + b</span> with probability <span class="math" data-say="P of A times Q of b">P(a)·Q(b)</span>. Enumerate every pair, add up the probabilities that land on the same total, and you have the distribution of the sum. Seven outcomes each give forty-nine pairs and <span class="math" data-say="43">43</span> distinct totals.</li><li><strong>Expectation is linear; ranks are not.</strong> <span class="math" data-say="E of A plus B equals E of A plus E of B">E[A + B] = E[A] + E[B]</span> needs no independence and holds exactly: on the preset, <span class="math" data-say="881 over 125 plus 2414 over 125 equals 659 over 25">881/125 + 2414/125 = 659/25</span>, which the lab prints as three exact fractions. There is no corresponding law for percentiles, because a percentile is a position in a sorted list and positions do not add.</li><li><strong>Adding the p99s assumes both bad days coincide.</strong> <span class="math" data-say="p 99 times A plus p 99 times B">p99(A) + p99(B)</span> is the time taken when stage A is at its p99 <em>and</em> stage B is at its p99 in the same request. Independently that happens with probability <span class="math" data-say="7 over 25000">7/25000</span>, about <span class="math" data-say="0.028 percent">0.028%</span> &mdash; roughly three requests in ten thousand, not one in a hundred. The naive sum is a percentile of the joint worst case, which is a far rarer event than the one being asked about.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="means, E of A plus B equals E of A plus E of B, exactly, always. percentiles p 99 times the quantity A plus B, is not equal to p 99 times A plus p 99 times B. the sum&#x27;s distribution equals the convolution of the two. preset, p 99 times A equals 38, p 99 times B equals 72, sum of p 99 s equals 110 milliseconds. p 99 times the quantity A plus B, equals 78 milliseconds, the naive sum is 41.0 percent high" tabindex="0" role="region" aria-label="Mathematical notation">means       E[A + B] = E[A] + E[B]        exactly, always
 percentiles p99(A + B) ≠ p99(A) + p99(B)
 the sum&#x27;s distribution = the convolution of the two
@@ -2532,11 +2577,40 @@ preset:  p99(A) = 38   p99(B) = 72   sum of p99s = 110 ms
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2604,7 +2678,7 @@ preset:  p99(A) = 38   p99(B) = 72   sum of p99s = 110 ms
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

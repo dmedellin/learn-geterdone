@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns I: Requests, Languages and Traversal</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Memento</h1>
       <p class="lesson-lede">An object that holds a snapshot of another object&#x27;s internal state, so it can be restored later by objects that never see what the state is.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Originator</li><li>Caretaker</li><li>Narrow and wide interface</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then its costs, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Without violating encapsulation, capture and externalize an object's internal state so that the object can be restored to this state later.&rdquo; That is Memento's Intent, the last pattern of this course and the one that Command's undo and Iterator's cursors both point to. This lesson reads it section by section; read it in your own copy first.</p><p>The motivation is undo and checkpoints. To put an object back as it was, its state must be saved somewhere, yet an object normally hides its state, and exposing it would cost the reliability and extensibility encapsulation buys. The book's example is a graphical editor in which a constraint solver keeps connected shapes connected as they move. Undoing a move by moving the shape back the same distance need not put everything where it was, because the solver may have resolved slack differently, and the solver's public interface is not enough to reverse it exactly. So the editor asks the solver for a memento before the move and gives it back on undo, and the solver restores its own equations and variables from it.</p><p>The participants, as you would apply them. The Memento holds whatever part of the Originator's state the originator decides to put in it, and lets no one else at it. The Originator makes a memento of where it stands now and later resets itself from one. The Caretaker keeps the memento and never looks inside. The collaboration is short: the caretaker asks for a memento, holds it a while and hands it back, or never does if no undo comes. A memento does nothing by itself; only the originator that made it writes or reads what it holds.</p><pre class="codeblock" data-say="line 1, final class tile view, comment, the Originator. line 2, private int zoom, x, y. line 4, snapshot save return new snapshot of zoom, x, y. line 6, void restore of snapshot s zoom is set to s dot zoom, x is set to s dot x, y is set to s dot y. line 8, comment, The Memento. Its fields and constructor are private, so only the. line 9, comment, enclosing TileView can make one or read it the wide interface.. line 10, static final class snapshot. line 11, private final int zoom, x, y. line 12, private snapshot of int zoom, int x, int y. line 13, this dot zoom is set to zoom, this dot x is set to x, this dot y is set to y" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class TileView {                        // the Originator</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then its costs, then the count</h2><div class="prose reading"><p>&ldquo;Without violating encapsulation, capture and externalize an object's internal state so that the object can be restored to this state later.&rdquo; That is Memento's Intent, the last pattern of this course and the one that Command's undo and Iterator's cursors both point to. This lesson reads it section by section; read it in your own copy first.</p><p>The motivation is undo and checkpoints. To put an object back as it was, its state must be saved somewhere, yet an object normally hides its state, and exposing it would cost the reliability and extensibility encapsulation buys. The book's example is a graphical editor in which a constraint solver keeps connected shapes connected as they move. Undoing a move by moving the shape back the same distance need not put everything where it was, because the solver may have resolved slack differently, and the solver's public interface is not enough to reverse it exactly. So the editor asks the solver for a memento before the move and gives it back on undo, and the solver restores its own equations and variables from it.</p><p>The participants, as you would apply them. The Memento holds whatever part of the Originator's state the originator decides to put in it, and lets no one else at it. The Originator makes a memento of where it stands now and later resets itself from one. The Caretaker keeps the memento and never looks inside. The collaboration is short: the caretaker asks for a memento, holds it a while and hands it back, or never does if no undo comes. A memento does nothing by itself; only the originator that made it writes or reads what it holds.</p><pre class="codeblock" data-say="line 1, final class tile view, comment, the Originator. line 2, private int zoom, x, y. line 4, snapshot save return new snapshot of zoom, x, y. line 6, void restore of snapshot s zoom is set to s dot zoom, x is set to s dot x, y is set to s dot y. line 8, comment, The Memento. Its fields and constructor are private, so only the. line 9, comment, enclosing TileView can make one or read it the wide interface.. line 10, static final class snapshot. line 11, private final int zoom, x, y. line 12, private snapshot of int zoom, int x, int y. line 13, this dot zoom is set to zoom, this dot x is set to x, this dot y is set to y" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">final class TileView {                        // the Originator</span>
 <span class="cl">    private int zoom, x, y;</span>
 <span class="cl"></span>
 <span class="cl">    Snapshot save() { return new Snapshot(zoom, x, y); }</span>
@@ -1472,19 +1516,11 @@
 <span class="cl">            view.restore(saved.pop());</span>
 <span class="cl">        }</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Five consequences, and the authors are candid about the costs. Memento preserves encapsulation boundaries, keeping state only the originator should manage out of other objects' reach even though it is stored outside it. It simplifies the originator, which no longer keeps every version clients asked for. But mementos may be expensive, if the originator must copy a lot of state or mementos are made often; unless saving and restoring is cheap, the pattern may not fit. Some languages make narrow and wide interfaces hard to enforce. And there are hidden costs in caring for them: the caretaker cannot see how much state a memento holds, so a light caretaker can carry a heavy load.</p><p>The second implementation issue answers the cost. When mementos are made and returned in a predictable order, as on a command history where undo and redo go in sequence, a memento can store only the incremental change rather than the whole state, which is why a Command can keep just what it needs for undo. The Sample Code builds the editor's move command with a solver memento; the Known Uses are Unidraw's connectivity solver, the iteration state of Dylan's collections, a memento by another name, and the QOCA constraint toolkit, whose mementos hold only the variables that changed and so must be restored in order. Related Patterns: Command, which can keep undo state in mementos, and Iterator, since a memento can hold an iteration's state, as Dylan's collections do; Iterator's own Implementation calls its cursor a simple memento.</p><p>Now the lab, on a map tile viewer whose state is its zoom level and the position of its centre: zoom 3, x 120, y 80. Five commands: <code>nearer</code> and <code>farther</code> add 1 and −1 to the zoom, <code>east</code> adds 40 to x, <code>home</code> sets x to 0 and <code>level</code> sets y to 0. On the preset <code>tiles</code> the script zooms in twice, moves east, goes home, levels, undoes the level and zooms out. The final view is zoom 4, x 0, y 80; the undo stack holds 5 commands and the redo stack none, because <code>farther</code> discarded the 1 entry the undo had put there. Under the inverse scheme the history holds 1 value, the 160 that <code>home</code> replaced: each <code>add</code> is undone by subtracting, and the <code>level</code> that replaced a y value has gone with the discarded redo entry.</p><p>The preset <code>tiles-snapshot</code> runs the same script under the snapshot scheme, a full memento of all 3 cells for each of the 5 entries: 15 values against the inverse scheme's 1. The states are the same step for step; only what is kept differs. The preset <code>scoreboard</code>, a quiz app's six players, shows the cost growing with the originator: 5 entries, of which two are sets, hold 2 values as inverses and <span data-say="5 times 6 equals 30">5 × 6 = 30</span> as snapshots. That is the authors' warning about expensive mementos in a number. It is not a verdict on snapshots: an inverse is exact here only because adding whole numbers is exactly reversible, and the book's case for a memento is the solver whose effects are not.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, state, as cell, value. line 2, free, 12, held, 0, fee, 3. line 3, comment, commands, as command, op, cell, amount. line 4, drop, add, held, 1. line 5, pick, add, held, minus 1. line 6, surge, set, fee, 5. line 7, comment, the script. line 8, drop drop surge pick undo" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// state, as cell, value</span>
-<span class="cl">free, 12; held, 0; fee, 3</span>
-<span class="cl">// commands, as command, op, cell, amount</span>
-<span class="cl">drop, add, held, 1;</span>
-<span class="cl">pick, add, held, -1;</span>
-<span class="cl">surge, set, fee, 5</span>
-<span class="cl">// the script</span>
-<span class="cl">drop drop surge pick undo</span></code></pre><p>A parcel locker bank's counters. By hand, run the script, give the final state and both stacks, and count the values the history holds at the end under each scheme. Then type it into the lab and switch the scheme to check, and say which cell every snapshot stores without any command ever touching it.</p><p>This course ends here, half way through Chapter 5. The next course, Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion, reads its other five patterns, beginning with Observer, then State, Strategy, Template Method and Visitor, the chapter's Discussion of Behavioral Patterns, and the book's last chapter.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Commands, undo and redo</h2></div><p>the undo and redo stacks after a sequence of commands</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Five consequences, and the authors are candid about the costs. Memento preserves encapsulation boundaries, keeping state only the originator should manage out of other objects' reach even though it is stored outside it. It simplifies the originator, which no longer keeps every version clients asked for. But mementos may be expensive, if the originator must copy a lot of state or mementos are made often; unless saving and restoring is cheap, the pattern may not fit. Some languages make narrow and wide interfaces hard to enforce. And there are hidden costs in caring for them: the caretaker cannot see how much state a memento holds, so a light caretaker can carry a heavy load.</p><p>The second implementation issue answers the cost. When mementos are made and returned in a predictable order, as on a command history where undo and redo go in sequence, a memento can store only the incremental change rather than the whole state, which is why a Command can keep just what it needs for undo. The Sample Code builds the editor's move command with a solver memento; the Known Uses are Unidraw's connectivity solver, the iteration state of Dylan's collections, a memento by another name, and the QOCA constraint toolkit, whose mementos hold only the variables that changed and so must be restored in order. Related Patterns: Command, which can keep undo state in mementos, and Iterator, since a memento can hold an iteration's state, as Dylan's collections do; Iterator's own Implementation calls its cursor a simple memento.</p><p>Now the lab, on a map tile viewer whose state is its zoom level and the position of its centre: zoom 3, x 120, y 80. Five commands: <code>nearer</code> and <code>farther</code> add 1 and −1 to the zoom, <code>east</code> adds 40 to x, <code>home</code> sets x to 0 and <code>level</code> sets y to 0. On the preset <code>tiles</code> the script zooms in twice, moves east, goes home, levels, undoes the level and zooms out. The final view is zoom 4, x 0, y 80; the undo stack holds 5 commands and the redo stack none, because <code>farther</code> discarded the 1 entry the undo had put there. Under the inverse scheme the history holds 1 value, the 160 that <code>home</code> replaced: each <code>add</code> is undone by subtracting, and the <code>level</code> that replaced a y value has gone with the discarded redo entry.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Commands, undo and redo</h2></div><p>the undo and redo stacks after a sequence of commands</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Commands, undo and redo</strong><span>the undo and redo stacks after a sequence of commands</span></div>
       </div>
@@ -1492,10 +1528,10 @@
       <div class="table-wrap" id="ghiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ghiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A command name in the script runs it: set puts its amount in the cell, add adds it. Running a command pushes it on the undo stack and empties the redo stack, whose entries are discarded. Undo pops the undo stack, restores the state before that command and pushes it on the redo stack; redo pops the redo stack, runs the command again and pushes it back. An undo or redo with its stack empty does nothing and is counted. Stored values count what the history holds at the end, one entry per command on either stack: as inverse operations, one old value per set (an add is undone by subtracting its amount, which the command already holds); as snapshots, every cell of the state per entry. The states are the same under both.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Snapshots against inverse operations</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Snapshots against inverse operations</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="ghiPreset">Worked example</label>
           <select id="ghiPreset"><option value="tiles" selected>A map tile viewer, undo kept as inverse operations</option><option value="tiles-snapshot">The same viewer, undo kept as full snapshots</option><option value="scoreboard">A quiz scoreboard of six players</option></select>
@@ -1526,12 +1562,22 @@
           <div class="kpi"><span>Under the other scheme</span><strong id="ghiOther">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>tiles-snapshot</code> runs the same script under the snapshot scheme, a full memento of all 3 cells for each of the 5 entries: 15 values against the inverse scheme's 1. The states are the same step for step; only what is kept differs. The preset <code>scoreboard</code>, a quiz app's six players, shows the cost growing with the originator: 5 entries, of which two are sets, hold 2 values as inverses and <span data-say="5 times 6 equals 30">5 × 6 = 30</span> as snapshots. That is the authors' warning about expensive mementos in a number. It is not a verdict on snapshots: an inverse is exact here only because adding whole numbers is exactly reversible, and the book's case for a memento is the solver whose effects are not.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, state, as cell, value. line 2, free, 12, held, 0, fee, 3. line 3, comment, commands, as command, op, cell, amount. line 4, drop, add, held, 1. line 5, pick, add, held, minus 1. line 6, surge, set, fee, 5. line 7, comment, the script. line 8, drop drop surge pick undo" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// state, as cell, value</span>
+<span class="cl">free, 12; held, 0; fee, 3</span>
+<span class="cl">// commands, as command, op, cell, amount</span>
+<span class="cl">drop, add, held, 1;</span>
+<span class="cl">pick, add, held, -1;</span>
+<span class="cl">surge, set, fee, 5</span>
+<span class="cl">// the script</span>
+<span class="cl">drop drop surge pick undo</span></code></pre><p>A parcel locker bank's counters. By hand, run the script, give the final state and both stacks, and count the values the history holds at the end under each scheme. Then type it into the lab and switch the scheme to check, and say which cell every snapshot stores without any command ever touching it.</p><p>This course ends here, half way through Chapter 5. The next course, Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion, reads its other five patterns, beginning with Observer, then State, Strategy, Template Method and Visitor, the chapter's Discussion of Behavioral Patterns, and the book's last chapter.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting what a history keeps</h2></div><p>Four steps, the last of them on an application of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Run the script</h3><p>Work through the commands, undos and redos with two stacks, as in the lesson Command, and write the state after each step. The scheme does not change the states.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the snapshots</h3><p>Under full snapshots, each entry on either stack keeps a memento of every cell: entries times cells, whether or not the command touched them.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the inverses</h3><p>Under inverse operations, an addition is undone by subtracting and keeps nothing; a set keeps the one value it replaced. Count the sets on the two stacks.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on an application of your own</h3><p>Pick an object in a system you know that needs undo or a checkpoint. Estimate the size of its state and of a typical change, say whether every change can be reversed exactly from its inputs, and choose between snapshots and incremental mementos with a reason.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting what a history keeps</h2>
+      <p class="lead-in">Four steps, the last of them on an application of your own.</p>
+      <ol class="key-ideas method"><li><strong>Run the script.</strong> Work through the commands, undos and redos with two stacks, as in the lesson Command, and write the state after each step. The scheme does not change the states.</li><li><strong>Count the snapshots.</strong> Under full snapshots, each entry on either stack keeps a memento of every cell: entries times cells, whether or not the command touched them.</li><li><strong>Count the inverses.</strong> Under inverse operations, an addition is undone by subtracting and keeps nothing; a set keeps the one value it replaced. Count the sets on the two stacks.</li><li><strong>Do it on an application of your own.</strong> Pick an object in a system you know that needs undo or a checkpoint. Estimate the size of its state and of a typical change, say whether every change can be reversed exactly from its inputs, and choose between snapshots and incremental mementos with a reason.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1551,17 +1597,16 @@ inverse: 1 set, home, so 1 value
 snapshot: 5 entries × 3 cells, so 15 values</div><p>Both schemes restore the same states. The snapshot scheme pays for every cell on every entry; the inverse scheme pays only where a value was overwritten.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Opening the originator&#x27;s state so undo can save it</strong><span>Getters and setters for every private field let an undo mechanism save and restore an object, at the price the pattern exists to avoid: its implementation becomes everyone's business. A memento gives the saved state to the originator alone. On the lesson's illustration the <code>ViewHistory</code> stores 15 values it cannot read.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a memento is cheap because the caretaker is</strong><span>The caretaker cannot see how much a memento holds, so a small history class can carry a great deal of state. The authors list this hidden cost, and the expense of copying large state often, among the consequences.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Undoing by inverse where the inverse is not exact</strong><span>Moving a shape back the distance it moved does not undo what a constraint solver did in between; that is the book's motivating case. An inverse operation is enough only when the change can be reversed exactly from its inputs; otherwise a memento of the state is needed.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a history keeps under each scheme.</strong><p>Given a state, commands and a script, give the final state and both stacks, count the values kept as snapshots and as inverses, and name the originator, the caretaker and the two interfaces in a design you know.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's inverse operations are exact because they add and set whole numbers. It cannot show a change whose inverse is not exact, which is the case the pattern was written for, or the time copying a large state takes; it counts the values kept on the design stated.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Opening the originator&#x27;s state so undo can save it</strong><span>Getters and setters for every private field let an undo mechanism save and restore an object, at the price the pattern exists to avoid: its implementation becomes everyone's business. A memento gives the saved state to the originator alone. On the lesson's illustration the <code>ViewHistory</code> stores 15 values it cannot read.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming a memento is cheap because the caretaker is</strong><span>The caretaker cannot see how much a memento holds, so a small history class can carry a great deal of state. The authors list this hidden cost, and the expense of copying large state often, among the consequences.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Undoing by inverse where the inverse is not exact</strong><span>Moving a shape back the distance it moved does not undo what a constraint solver did in between; that is the book's motivating case. An inverse operation is enough only when the change can be reversed exactly from its inputs; otherwise a memento of the state is needed.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a history keeps under each scheme.</strong><p>Given a state, commands and a script, give the final state and both stacks, count the values kept as snapshots and as inverses, and name the originator, the caretaker and the two interfaces in a design you know.</p></div></div><div class="note"><strong>Note:</strong> The lab's inverse operations are exact because they add and set whole numbers. It cannot show a change whose inverse is not exact, which is the case the pattern was written for, or the time copying a large state takes; it counts the values kept on the design stated.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Originator</summary><p>The object whose state is saved. It makes a memento holding a snapshot of its own internal state, and later restores itself from one; it alone decides what goes in.</p></details><details class="recall"><summary>Caretaker</summary><p>The object that keeps mementos safe and passes them back, such as an undo mechanism. It never examines or changes what a memento contains.</p></details><details class="recall"><summary>Narrow and wide interface</summary><p>The two faces of a memento. The caretaker sees the narrow one, which lets it hold the memento and pass it on and nothing more; the originator sees the wide one, which gives it everything it needs to restore itself.</p></details></div>
+      <h3>Summary</h3>
       <p>Memento lets an object hand out a record of its own state that only it can read, so undo and checkpoints work without breaking its encapsulation. Read the narrow and wide interfaces, the cost of mementos and the case for storing only what changed, then run a map viewer's history and count the values kept as full snapshots against inverse operations.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Originator.</strong> The object whose state is saved. It makes a memento holding a snapshot of its own internal state, and later restores itself from one; it alone decides what goes in.</li><li><strong>Caretaker.</strong> The object that keeps mementos safe and passes them back, such as an undo mechanism. It never examines or changes what a memento contains.</li><li><strong>Narrow and wide interface.</strong> The two faces of a memento. The caretaker sees the narrow one, which lets it hold the memento and pass it on and nothing more; the originator sees the wide one, which gives it everything it needs to restore itself.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="save state without exposing it. only the originator reads a memento. the caretaker only holds it. a narrow and a wide interface. snapshots cost every cell. an inverse keeps only what it replaced" tabindex="0" role="region" aria-label="Mathematical notation">save state without exposing it
 only the originator reads a memento
 the caretaker only holds it
@@ -2344,11 +2389,40 @@ an inverse keeps only what it replaced</div><figcaption>Memento in six lines</fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2416,7 +2490,7 @@ an inverse keeps only what it replaced</div><figcaption>Memento in six lines</fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

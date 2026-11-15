@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Polynomials and Factoring</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Factoring</p>
       <h1>The AC Method</h1>
       <p class="lesson-lede">Factor <span data-say="A x squared plus b x plus c">ax² + bx + c</span> by an exhaustive ac pair search followed by grouping.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Splitting the middle term changes nothing</li><li>The search is finite, so it can be completed</li><li>No pair means no factorisation over the integers</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The AC method</h2>
-      <article class="prose reading"><p>“Factoring Simple Trinomials” factored <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> by finding two numbers that multiply to <span class="math" data-say="c">c</span> and add to <span class="math" data-say="b">b</span>. That shortcut depends on the leading coefficient being <span class="math" data-say="1">1</span>. Once <span class="math" data-say="A is not equal to 1">a ≠ 1</span>, the constant term of the product is no longer the product of the two numbers you are looking for, because the <span class="math" data-say="A">a</span> distributes into both binomials.</p><div class="defbox"><span class="label">Definition &middot; The AC method</span><p>To factor <span class="math" data-say="A x squared plus b x plus c">ax² + bx + c</span> with integer coefficients: compute <span class="math" data-say="ac">ac</span>; find integers <span class="math" data-say="m">m</span> and <span class="math" data-say="n">n</span> with <span class="math" data-say="m n equals A c">mn = ac</span> and <span class="math" data-say="m plus n equals b">m + n = b</span>; rewrite <span class="math" data-say="bx">bx</span> as <span class="math" data-say="m x plus n x">mx + nx</span>; then factor the resulting four terms by grouping.</p></div><div class="thm"><span class="label">Theorem &middot; The split is an identity</span><p>If <span class="math" data-say="m plus n equals b">m + n = b</span> then <span class="math" data-say="A x squared plus m x plus n x plus c equals A x squared plus the quantity m plus n, times x plus c equals A x squared plus b x plus c">ax² + mx + nx + c = ax² + (m + n)x + c = ax² + bx + c</span>. The two expressions agree for every <span class="math" data-say="x">x</span>, so one may be replaced by the other anywhere. Nothing is being done to an equation; a single expression is being rewritten.</p></div><p>This is the point worth holding on to. The method looks like a trick because the number <span class="math" data-say="ac">ac</span> appears from nowhere, but the only step that could possibly be illegal &mdash; replacing <span class="math" data-say="bx">bx</span> by <span class="math" data-say="m x plus n x">mx + nx</span> &mdash; is justified by one line of arithmetic that you control.</p><div class="example"><span class="label">Example &middot; <span data-say="6 x squared plus 11 x plus 3">6x² + 11x + 3</span></span><p><span class="math" data-say="A c equals 6 times 3 equals 18">ac = 6 · 3 = 18</span>. The factor pairs of <span class="math" data-say="18">18</span> are <span class="math" data-say="1 times 18">1·18</span>, <span class="math" data-say="2 times 9">2·9</span> and <span class="math" data-say="3 times 6">3·6</span>, with sums <span class="math" data-say="19">19</span>, <span class="math" data-say="11">11</span> and <span class="math" data-say="9">9</span>. The pair is <span class="math" data-say="9">9</span> and <span class="math" data-say="2">2</span>. Splitting: <span class="math" data-say="6 x squared plus 9 x plus 2 x plus 3 equals 3 x times the quantity 2 x plus 3, plus 1 times the quantity 2 x plus 3, equals the quantity 3 x plus 1, times the quantity 2 x plus 3">6x² + 9x + 2x + 3 = 3x(2x + 3) + 1(2x + 3) = (3x + 1)(2x + 3)</span>.</p></div><p>The order of <span class="math" data-say="m">m</span> and <span class="math" data-say="n">n</span> does not matter. Splitting as <span class="math" data-say="6 x squared plus 2 x plus 9 x plus 3">6x² + 2x + 9x + 3</span> gives <span class="math" data-say="2 x times the quantity 3 x plus 1, plus 3 times the quantity 3 x plus 1, equals the quantity 2 x plus 3, times the quantity 3 x plus 1">2x(3x + 1) + 3(3x + 1) = (2x + 3)(3x + 1)</span> &mdash; the same two factors in the other order. If your grouping produces two brackets that are not identical, you have made an arithmetic slip, not discovered a second answer.</p><h3>When there is no pair</h3><div class="thm"><span class="label">Theorem &middot; Why an empty pair list rules out integer brackets</span><p>If <span class="math" data-say="A x squared plus b x plus c equals the quantity r x plus s, times the quantity t x plus u">ax² + bx + c = (rx + s)(tx + u)</span> with integer coefficients, then <span class="math" data-say="A equals r t">a = rt</span>, <span class="math" data-say="b equals r u plus s t">b = ru + st</span> and <span class="math" data-say="c equals s u">c = su</span>. The two middle products <span class="math" data-say="m equals r u">m = ru</span> and <span class="math" data-say="n equals s t">n = st</span> therefore satisfy <span class="math" data-say="m n equals A c">mn = ac</span> and <span class="math" data-say="m plus n equals b">m + n = b</span>. Any integer-coefficient binomial factorisation must produce a pair on the ac list.</p></div><div class="example"><span class="label">Example &middot; <span data-say="2 x squared plus 3 x plus 4">2x² + 3x + 4</span> has no integer-binomial factorisation</span><p><span class="math" data-say="A c equals 8">ac = 8</span>. The positive pairs <span class="math" data-say="1 times 8">1·8</span> and <span class="math" data-say="2 times 4">2·4</span> give sums <span class="math" data-say="9">9</span> and <span class="math" data-say="6">6</span>; the negative pairs <span class="math" data-say="the quantity negative 1, times the quantity negative 8">(-1)(-8)</span> and <span class="math" data-say="the quantity negative 2, times the quantity negative 4">(-2)(-4)</span> give <span class="math" data-say="negative 9">-9</span> and <span class="math" data-say="negative 6">-6</span>. None is <span class="math" data-say="3">3</span>, and the theorem above shows why the completed list rules out every product of integer-coefficient binomials.</p></div><p>Take the common factor out first, always. <span class="math" data-say="12 x squared plus 22 x plus 6">12x² + 22x + 6</span> has <span class="math" data-say="A c equals 72">ac = 72</span> and a messier pair list, but <span class="math" data-say="12 x squared plus 22 x plus 6 equals 2 times the quantity 6 x squared plus 11 x plus 3, equals 2 times the quantity 3 x plus 1, times the quantity 2 x plus 3">12x² + 22x + 6 = 2(6x² + 11x + 3) = 2(3x + 1)(2x + 3)</span> reduces it to the example above. “Factoring Out the Greatest Common Factor” put the common factor at the top of the decision list for exactly this reason.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>ax^2 + bx + c</h2></div><p>The ac search, with every pair it tried</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The AC method</h2><div class="prose reading"><p>“Factoring Simple Trinomials” factored <span class="math" data-say="x squared plus b x plus c">x² + bx + c</span> by finding two numbers that multiply to <span class="math" data-say="c">c</span> and add to <span class="math" data-say="b">b</span>. That shortcut depends on the leading coefficient being <span class="math" data-say="1">1</span>. Once <span class="math" data-say="A is not equal to 1">a ≠ 1</span>, the constant term of the product is no longer the product of the two numbers you are looking for, because the <span class="math" data-say="A">a</span> distributes into both binomials.</p><div class="defbox"><span class="label">Definition &middot; The AC method</span><p>To factor <span class="math" data-say="A x squared plus b x plus c">ax² + bx + c</span> with integer coefficients: compute <span class="math" data-say="ac">ac</span>; find integers <span class="math" data-say="m">m</span> and <span class="math" data-say="n">n</span> with <span class="math" data-say="m n equals A c">mn = ac</span> and <span class="math" data-say="m plus n equals b">m + n = b</span>; rewrite <span class="math" data-say="bx">bx</span> as <span class="math" data-say="m x plus n x">mx + nx</span>; then factor the resulting four terms by grouping.</p></div><div class="thm"><span class="label">Theorem &middot; The split is an identity</span><p>If <span class="math" data-say="m plus n equals b">m + n = b</span> then <span class="math" data-say="A x squared plus m x plus n x plus c equals A x squared plus the quantity m plus n, times x plus c equals A x squared plus b x plus c">ax² + mx + nx + c = ax² + (m + n)x + c = ax² + bx + c</span>. The two expressions agree for every <span class="math" data-say="x">x</span>, so one may be replaced by the other anywhere. Nothing is being done to an equation; a single expression is being rewritten.</p></div><p>This is the point worth holding on to. The method looks like a trick because the number <span class="math" data-say="ac">ac</span> appears from nowhere, but the only step that could possibly be illegal &mdash; replacing <span class="math" data-say="bx">bx</span> by <span class="math" data-say="m x plus n x">mx + nx</span> &mdash; is justified by one line of arithmetic that you control.</p><div class="example"><span class="label">Example &middot; <span data-say="6 x squared plus 11 x plus 3">6x² + 11x + 3</span></span><p><span class="math" data-say="A c equals 6 times 3 equals 18">ac = 6 · 3 = 18</span>. The factor pairs of <span class="math" data-say="18">18</span> are <span class="math" data-say="1 times 18">1·18</span>, <span class="math" data-say="2 times 9">2·9</span> and <span class="math" data-say="3 times 6">3·6</span>, with sums <span class="math" data-say="19">19</span>, <span class="math" data-say="11">11</span> and <span class="math" data-say="9">9</span>. The pair is <span class="math" data-say="9">9</span> and <span class="math" data-say="2">2</span>. Splitting: <span class="math" data-say="6 x squared plus 9 x plus 2 x plus 3 equals 3 x times the quantity 2 x plus 3, plus 1 times the quantity 2 x plus 3, equals the quantity 3 x plus 1, times the quantity 2 x plus 3">6x² + 9x + 2x + 3 = 3x(2x + 3) + 1(2x + 3) = (3x + 1)(2x + 3)</span>.</p></div><p>The order of <span class="math" data-say="m">m</span> and <span class="math" data-say="n">n</span> does not matter. Splitting as <span class="math" data-say="6 x squared plus 2 x plus 9 x plus 3">6x² + 2x + 9x + 3</span> gives <span class="math" data-say="2 x times the quantity 3 x plus 1, plus 3 times the quantity 3 x plus 1, equals the quantity 2 x plus 3, times the quantity 3 x plus 1">2x(3x + 1) + 3(3x + 1) = (2x + 3)(3x + 1)</span> &mdash; the same two factors in the other order. If your grouping produces two brackets that are not identical, you have made an arithmetic slip, not discovered a second answer.</p><h3>When there is no pair</h3><div class="thm"><span class="label">Theorem &middot; Why an empty pair list rules out integer brackets</span><p>If <span class="math" data-say="A x squared plus b x plus c equals the quantity r x plus s, times the quantity t x plus u">ax² + bx + c = (rx + s)(tx + u)</span> with integer coefficients, then <span class="math" data-say="A equals r t">a = rt</span>, <span class="math" data-say="b equals r u plus s t">b = ru + st</span> and <span class="math" data-say="c equals s u">c = su</span>. The two middle products <span class="math" data-say="m equals r u">m = ru</span> and <span class="math" data-say="n equals s t">n = st</span> therefore satisfy <span class="math" data-say="m n equals A c">mn = ac</span> and <span class="math" data-say="m plus n equals b">m + n = b</span>. Any integer-coefficient binomial factorisation must produce a pair on the ac list.</p></div><div class="example"><span class="label">Example &middot; <span data-say="2 x squared plus 3 x plus 4">2x² + 3x + 4</span> has no integer-binomial factorisation</span><p><span class="math" data-say="A c equals 8">ac = 8</span>. The positive pairs <span class="math" data-say="1 times 8">1·8</span> and <span class="math" data-say="2 times 4">2·4</span> give sums <span class="math" data-say="9">9</span> and <span class="math" data-say="6">6</span>; the negative pairs <span class="math" data-say="the quantity negative 1, times the quantity negative 8">(-1)(-8)</span> and <span class="math" data-say="the quantity negative 2, times the quantity negative 4">(-2)(-4)</span> give <span class="math" data-say="negative 9">-9</span> and <span class="math" data-say="negative 6">-6</span>. None is <span class="math" data-say="3">3</span>, and the theorem above shows why the completed list rules out every product of integer-coefficient binomials.</p></div><p>Take the common factor out first, always. <span class="math" data-say="12 x squared plus 22 x plus 6">12x² + 22x + 6</span> has <span class="math" data-say="A c equals 72">ac = 72</span> and a messier pair list, but <span class="math" data-say="12 x squared plus 22 x plus 6 equals 2 times the quantity 6 x squared plus 11 x plus 3, equals 2 times the quantity 3 x plus 1, times the quantity 2 x plus 3">12x² + 22x + 6 = 2(6x² + 11x + 3) = 2(3x + 1)(2x + 3)</span> reduces it to the example above. “Factoring Out the Greatest Common Factor” put the common factor at the top of the decision list for exactly this reason.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>ax^2 + bx + c</h2></div><p>The ac search, with every pair it tried</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="fcTitle">ax^2 + bx + c</strong><span id="fcSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the polynomial</span><span class="tone-green"><i class="legend-swatch"></i>rational roots</span><span class="tone-muted"><i class="legend-swatch"></i>candidates that failed</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="fcPlot"></svg></div>
       <div id="fcWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="fcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Watch the pair search run</h3>
-          <p>Enter <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>. The lab computes <span class="math" data-say="ac">ac</span>, lists every integer factor pair of it with its sum, and marks the one that equals <span class="math" data-say="b">b</span>. Try <span class="math" data-say="2 x squared plus 3 x plus 4">2x² + 3x + 4</span> and watch the list run out with nothing marked.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Watch the pair search run</h3>
+            <p>Enter <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>. The lab computes <span class="math" data-say="ac">ac</span>, lists every integer factor pair of it with its sum, and marks the one that equals <span class="math" data-say="b">b</span>. Try <span class="math" data-say="2 x squared plus 3 x plus 4">2x² + 3x + 4</span> and watch the list run out with nothing marked.</p>
         <div class="field">
           <label for="fcPreset">Example</label>
           <select id="fcPreset"><option value="6x^2 + 11x + 3">6x^2 + 11x + 3</option><option value="2x^2 - 7x + 3">2x^2 - 7x + 3</option><option value="4x^2 - 4x - 15">4x^2 - 4x - 15</option><option value="3x^2 + 2x + 5">3x^2 + 2x + 5   (no pair works)</option><option value="12x^2 + 10x - 12">12x^2 + 10x - 12   (take the GCF out first)</option><option value="6x^2 - x - 2">6x^2 - x - 2</option></select>
@@ -1420,12 +1463,14 @@
         <p class="small-copy" style="margin:0;">Type as you would write it: <code>6x^3 + 9x^2 - 15x</code>,
         <code>(1/2)x^2 + 3/4</code>. Every divisor list, every pair tried and every test below is
         computed in your browser from what is in this box.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Factoring <span data-say="A x squared plus b x plus c">ax² + bx + c</span></h2></div><p>Four steps, and the first one is not optional.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take out the greatest common factor</h3><p>Divide out any factor common to all three terms, including a leading <span class="math" data-say="negative 1">-1</span> if <span class="math" data-say="A">a</span> is negative. Skipping this is what turns a small pair search into a large one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute ac</h3><p>Multiply the leading coefficient by the constant term, signs included. For <span class="math" data-say="12 x squared minus 17 x plus 6">12x² - 17x + 6</span> this is <span class="math" data-say="72">72</span>; for <span class="math" data-say="6 x squared minus 7 x minus 20">6x² - 7x - 20</span> it is <span class="math" data-say="negative 120">-120</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Search the factor pairs of ac</h3><p>List every pair, with its sum. If <span class="math" data-say="ac">ac</span> is positive the pair shares the sign of <span class="math" data-say="b">b</span>; if <span class="math" data-say="ac">ac</span> is negative the pair has opposite signs. Stop at the pair whose sum is <span class="math" data-say="b">b</span>, or stop when the list is exhausted.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Split, group, then expand to check</h3><p>Rewrite <span class="math" data-say="bx">bx</span> as <span class="math" data-say="m x plus n x">mx + nx</span>, group the four terms in pairs, and take out the common binomial. Multiply your answer back out &mdash; on this topic checking is faster than the work.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Factoring <span data-say="A x squared plus b x plus c">ax² + bx + c</span></h2>
+      <p class="lead-in">Four steps, and the first one is not optional.</p>
+      <ol class="key-ideas method"><li><strong>Take out the greatest common factor.</strong> Divide out any factor common to all three terms, including a leading <span class="math" data-say="negative 1">-1</span> if <span class="math" data-say="A">a</span> is negative. Skipping this is what turns a small pair search into a large one.</li><li><strong>Compute ac.</strong> Multiply the leading coefficient by the constant term, signs included. For <span class="math" data-say="12 x squared minus 17 x plus 6">12x² - 17x + 6</span> this is <span class="math" data-say="72">72</span>; for <span class="math" data-say="6 x squared minus 7 x minus 20">6x² - 7x - 20</span> it is <span class="math" data-say="negative 120">-120</span>.</li><li><strong>Search the factor pairs of ac.</strong> List every pair, with its sum. If <span class="math" data-say="ac">ac</span> is positive the pair shares the sign of <span class="math" data-say="b">b</span>; if <span class="math" data-say="ac">ac</span> is negative the pair has opposite signs. Stop at the pair whose sum is <span class="math" data-say="b">b</span>, or stop when the list is exhausted.</li><li><strong>Split, group, then expand to check.</strong> Rewrite <span class="math" data-say="bx">bx</span> as <span class="math" data-say="m x plus n x">mx + nx</span>, group the four terms in pairs, and take out the common binomial. Multiply your answer back out &mdash; on this topic checking is faster than the work.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1450,17 +1495,16 @@ both negative: -8 and -9    (-8)(-9) = 72,   -8 + (-9) = -17
 check  (4x - 3)(3x - 2) = 12x² - 8x - 9x + 6 = 12x² - 17x + 6</div><p>The second group is <span class="math" data-say="negative 9 x plus 6">-9x + 6</span>, and the factor taken out is <span class="math" data-say="negative 3">-3</span>, not <span class="math" data-say="3">3</span>. Pulling out <span class="math" data-say="3">3</span> would give <span class="math" data-say="3 times the quantity negative 3 x plus 2">3(-3x + 2)</span>, whose bracket does not match <span class="math" data-say="3 x minus 2">3x - 2</span>, and the grouping would appear to fail. When the two brackets differ only by an overall sign, the sign you extracted is the thing to fix.</p><p>For a faded ac pass, start <span class="math" data-say="6 x squared minus 7 x minus 20">6x² - 7x - 20</span> from the supplied product <span class="math" data-say="A c equals negative 120">ac = -120</span>. Search opposite-sign factor pairs for sum <span class="math" data-say="negative 7">-7</span>, split the middle term, group, and expand. The pair is <span class="math" data-say="8">8</span> and <span class="math" data-say="negative 15">-15</span>, giving <span class="math" data-say="the quantity 2 x minus 5, times the quantity 3 x plus 4">(2x - 5)(3x + 4)</span>; using <span class="math" data-say="negative 8">-8</span> and <span class="math" data-say="15">15</span> preserves the product but reverses the middle coefficient.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Forgetting the common factor and searching a huge ac</strong><span><span class="math" data-say="24 x squared plus 44 x plus 12">24x² + 44x + 12</span> has <span class="math" data-say="A c equals 288">ac = 288</span>. Divided by <span class="math" data-say="4">4</span> it is <span class="math" data-say="6 x squared plus 11 x plus 3">6x² + 11x + 3</span> with <span class="math" data-say="A c equals 18">ac = 18</span>. Same answer, about a third of the work &mdash; <span class="math" data-say="288">288</span> has nine factor pairs to check, <span class="math" data-say="18">18</span> has three &mdash; and far fewer chances to misread a pair.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing the sign when grouping the second pair</strong><span>In <span class="math" data-say="12 x squared minus 8 x minus 9 x plus 6">12x² - 8x - 9x + 6</span> the second group needs <span class="math" data-say="negative 3">-3</span> extracted, not <span class="math" data-say="3">3</span>. If your two brackets come out as <span class="math" data-say="3 x minus 2">3x - 2</span> and <span class="math" data-say="negative 3 x plus 2">-3x + 2</span>, factor <span class="math" data-say="negative 1">-1</span> out of the second and continue.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a failed search as a failed attempt</strong><span>Running out of pairs is the method succeeding. It has told you the trinomial is irreducible over the integers, which is exactly what “The Factor Theorem and Rational Roots” will need you to be able to conclude.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an empty pair list reads as a result rather than a dead end.</strong><p>You should be able to factor <span class="math" data-say="6 x squared minus 7 x minus 20">6x² - 7x - 20</span> and <span class="math" data-say="12 x squared minus 17 x plus 6">12x² - 17x + 6</span> without hesitation, and to say of <span class="math" data-say="2 x squared plus 3 x plus 4">2x² + 3x + 4</span> that it does not factor into integer-coefficient binomials &mdash; naming the completed ac pair search as your reason.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab prints the whole pair list rather than only the winning pair, because the list is the argument. A pair that is simply asserted is a guess that happened to work; a list that has been exhausted is a proof, and “The Factor Theorem and Rational Roots” runs the same kind of complete search over a candidate list of roots.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Forgetting the common factor and searching a huge ac</strong><span><span class="math" data-say="24 x squared plus 44 x plus 12">24x² + 44x + 12</span> has <span class="math" data-say="A c equals 288">ac = 288</span>. Divided by <span class="math" data-say="4">4</span> it is <span class="math" data-say="6 x squared plus 11 x plus 3">6x² + 11x + 3</span> with <span class="math" data-say="A c equals 18">ac = 18</span>. Same answer, about a third of the work &mdash; <span class="math" data-say="288">288</span> has nine factor pairs to check, <span class="math" data-say="18">18</span> has three &mdash; and far fewer chances to misread a pair.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Losing the sign when grouping the second pair</strong><span>In <span class="math" data-say="12 x squared minus 8 x minus 9 x plus 6">12x² - 8x - 9x + 6</span> the second group needs <span class="math" data-say="negative 3">-3</span> extracted, not <span class="math" data-say="3">3</span>. If your two brackets come out as <span class="math" data-say="3 x minus 2">3x - 2</span> and <span class="math" data-say="negative 3 x plus 2">-3x + 2</span>, factor <span class="math" data-say="negative 1">-1</span> out of the second and continue.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a failed search as a failed attempt</strong><span>Running out of pairs is the method succeeding. It has told you the trinomial is irreducible over the integers, which is exactly what “The Factor Theorem and Rational Roots” will need you to be able to conclude.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when an empty pair list reads as a result rather than a dead end.</strong><p>You should be able to factor <span class="math" data-say="6 x squared minus 7 x minus 20">6x² - 7x - 20</span> and <span class="math" data-say="12 x squared minus 17 x plus 6">12x² - 17x + 6</span> without hesitation, and to say of <span class="math" data-say="2 x squared plus 3 x plus 4">2x² + 3x + 4</span> that it does not factor into integer-coefficient binomials &mdash; naming the completed ac pair search as your reason.</p></div></div><div class="note"><strong>Note:</strong> The lab prints the whole pair list rather than only the winning pair, because the list is the argument. A pair that is simply asserted is a guess that happened to work; a list that has been exhausted is a proof, and “The Factor Theorem and Rational Roots” runs the same kind of complete search over a candidate list of roots.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Splitting the middle term changes nothing</summary><p><span class="math" data-say="m x plus n x">mx + nx</span> is <span class="math" data-say="the quantity m plus n, times x">(m + n)x</span>, and <span class="math" data-say="m plus n">m + n</span> is <span class="math" data-say="b">b</span> by construction. The expression after the split is equal to the one before it for every value of <span class="math" data-say="x">x</span> &mdash; you have written <span class="math" data-say="bx">bx</span> as a sum, not altered the polynomial. That equality is the whole licence for the step.</p></details><details class="recall"><summary>The search is finite, so it can be completed</summary><p><span class="math" data-say="ac">ac</span> is one integer and it has finitely many factor pairs. Listing them and checking each sum is a complete search, so it either produces the pair or establishes that none exists.</p></details><details class="recall"><summary>No pair means no factorisation over the integers</summary><p>An empty search is an answer. If no integer factor pair of <span class="math" data-say="ac">ac</span> sums to <span class="math" data-say="b">b</span>, then <span class="math" data-say="A x squared plus b x plus c">ax² + bx + c</span> is not a product of two binomials with integer coefficients, and no amount of further staring will make it one.</p></details></div>
+      <h3>Summary</h3>
       <p>When the leading coefficient is not <span class="math" data-say="1">1</span>, guessing the two binomials is a search with too many branches. The AC method replaces the guess with arithmetic: one product to compute, one pair of integers to find, and then the grouping of “Factoring by Grouping” finishes the job.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Splitting the middle term changes nothing.</strong> <span class="math" data-say="m x plus n x">mx + nx</span> is <span class="math" data-say="the quantity m plus n, times x">(m + n)x</span>, and <span class="math" data-say="m plus n">m + n</span> is <span class="math" data-say="b">b</span> by construction. The expression after the split is equal to the one before it for every value of <span class="math" data-say="x">x</span> &mdash; you have written <span class="math" data-say="bx">bx</span> as a sum, not altered the polynomial. That equality is the whole licence for the step.</li><li><strong>The search is finite, so it can be completed.</strong> <span class="math" data-say="ac">ac</span> is one integer and it has finitely many factor pairs. Listing them and checking each sum is a complete search, so it either produces the pair or establishes that none exists.</li><li><strong>No pair means no factorisation over the integers.</strong> An empty search is an answer. If no integer factor pair of <span class="math" data-say="ac">ac</span> sums to <span class="math" data-say="b">b</span>, then <span class="math" data-say="A x squared plus b x plus c">ax² + bx + c</span> is not a product of two binomials with integer coefficients, and no amount of further staring will make it one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A x squared plus b x plus c, A is not equal to 1. find m, n, m n equals A c, and, m plus n equals b. A x squared plus m x plus n x plus c, split, then group. 6 x squared plus 11 x plus 3, equals, the quantity 3 x plus 1, times the quantity 2 x plus 3" tabindex="0" role="region" aria-label="Mathematical notation">ax² + bx + c            a ≠ 1
 find m, n :   mn = ac   and   m + n = b
 ax² + mx + nx + c       split, then group
@@ -3799,11 +3843,40 @@ ax² + mx + nx + c       split, then group
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3871,7 +3944,7 @@ ax² + mx + nx + c       split, then group
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

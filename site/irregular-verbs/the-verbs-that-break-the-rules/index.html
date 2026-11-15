@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Irregular Verbs</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The exception list Tense Tables kept pointing at</p>
       <h1>The Verbs That Break the Rules</h1>
       <p class="lesson-lede">About 180 verbs ignore the -ed rule, and they include most of the verbs you use every day.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A verb is irregular when the -ed rule fails</li><li>The list is short and it is counted</li><li>Frequency is what keeps a verb irregular</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Running the test on three verbs</h2>
-      <article class="prose reading"><p><em>Tense Tables</em> ended with a score. Four rules build the five forms of any regular verb, and on the 1,210 regular verbs of the word list they were right 99.92%, 99.34% and 99.26% of the time. The few they missed were regular verbs with a spelling twist, such as <em>panic</em> and <em>panicking</em>. But before that score was taken, a set of verbs was put aside, because no rule builds their past at all. This course is that set.</p><h3>What irregular means here</h3><p>Every verb has a base form, a past, and a form used after <em>have</em>. The last of these is called the <dfn>participle</dfn>. For <em>walk</em> the past and the participle are both <em>walked</em>, and the <em>-ed</em> rule builds them.</p><p>A verb is <em>irregular</em> when that rule gives the wrong answer for the past, the participle, or both. <em>Bring</em>, <em>brought</em>, <em>brought</em>. <em>Know</em>, <em>knew</em>, <em>known</em>. No rule from <em>Tense Tables</em> makes these, and you cannot work them out from the base.</p><h3>How many there are</h3><p>The lab holds 133 verbs, printed with their three forms. 132 of them fall into six classes, and the biggest class has 60; the tile that counts the classes reads 6, because <em>be</em> stands outside them all. The next lesson shows how the classes are defined.</p><p>The wider figure is Pinker&rsquo;s: about 180 irregular verbs in all. A list of 183 was put together for this course, and that is close to his number. It is a count that depends on where you draw the line, so read it as a size and not as an exact total.</p><h3>They are the common words</h3><p>When this course was built, the 183 verbs were checked against a list of the 2,809 most common words in English. 132 of them were in it, which is 72.1%. The 51 that were not include <em>weep</em>, <em>flee</em>, <em>creep</em>, <em>shed</em> and <em>forgive</em>. That check was made once, and it is quoted here: the page does not carry the 183, so it cannot redo it. The lab holds 133, one more than the 132, because the list was settled by hand after the check; every one of the 133 is in the common list.</p><p>Look at the kept verbs by rank in that common list. The middle verb is at rank 697.5, so half of them sit among the 700 commonest words, and 44% are in the top 500. These two figures are quoted too: the page carries each word&rsquo;s band, not its rank. The irregular verbs gather at the frequent end.</p><h3>Why the common words are the odd ones</h3><p>This is an observation more than a proof, and it is Pinker&rsquo;s, not something measured here. A word that you meet thousands of times is stored in memory whole. It never has to be built, so the regular rule never gets the chance to replace it. Frequency keeps a verb irregular.</p><p>A rare verb works the other way. You meet it too rarely to store its past, so you build the past each time, and what you build is the regular one. Over many years, rare irregular verbs tend to move toward <em>-ed</em>. The common ones stay as they are.</p><h3>What the numbers do not say</h3><p>The word list check shows that irregular verbs are common. It does not show why. The idea of memory is a good reason, and other reasons may also play a part. Treat it as the best account available, and do not lean on it too hard.</p><p>The rest of this course puts numbers on the list. Next comes its shape, six classes with a rule each. After that comes the question of how much of a real page these verbs fill, and there the first number you see turns out to need a fix.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Every irregular verb the course covers, with its three forms</h2></div><p>133 verbs, and the class the sorting questions put each one in</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Running the test on three verbs</h2><div class="prose reading"><p><em>Tense Tables</em> ended with a score. Four rules build the five forms of any regular verb, and on the 1,210 regular verbs of the word list they were right 99.92%, 99.34% and 99.26% of the time. The few they missed were regular verbs with a spelling twist, such as <em>panic</em> and <em>panicking</em>. But before that score was taken, a set of verbs was put aside, because no rule builds their past at all. This course is that set.</p><h3>What irregular means here</h3><p>Every verb has a base form, a past, and a form used after <em>have</em>. The last of these is called the <dfn>participle</dfn>. For <em>walk</em> the past and the participle are both <em>walked</em>, and the <em>-ed</em> rule builds them.</p><p>A verb is <em>irregular</em> when that rule gives the wrong answer for the past, the participle, or both. <em>Bring</em>, <em>brought</em>, <em>brought</em>. <em>Know</em>, <em>knew</em>, <em>known</em>. No rule from <em>Tense Tables</em> makes these, and you cannot work them out from the base.</p><h3>How many there are</h3><p>The lab holds 133 verbs, printed with their three forms. 132 of them fall into six classes, and the biggest class has 60; the tile that counts the classes reads 6, because <em>be</em> stands outside them all. The next lesson shows how the classes are defined.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Every irregular verb the course covers, with its three forms</h2></div><p>133 verbs, and the class the sorting questions put each one in</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>verbs shown</span><strong id="irCount">&mdash;</strong></div><div class="kpi"><span>classes</span><strong id="irClasses">&mdash;</strong></div><div class="kpi"><span>largest class</span><strong id="irBiggest">&mdash;</strong></div><div class="kpi"><span>share of the list</span><strong id="irPct">&mdash;</strong></div></div><div id="irRule" class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation"></div><div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table id="irTable"><thead><tr><th>base</th><th>past</th><th>after <em>have</em></th><th>class</th></tr></thead><tbody id="irBody"></tbody></table></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Every irregular verb in the list, in three forms</h3>
-          <p>These are the 133 verbs the lab holds, each with its base, its past and its form after <em>have</em>, and the class the sorting rule puts it in. Search for a verb you use every day and see whether it is here. Then narrow the list to one class and read how the six classes share out the whole list. The counts in the tiles are made in your browser from the printed rows.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Every irregular verb in the list, in three forms</h3>
+            <p>These are the 133 verbs the lab holds, each with its base, its past and its form after <em>have</em>, and the class the sorting rule puts it in. Search for a verb you use every day and see whether it is here. Then narrow the list to one class and read how the six classes share out the whole list. The counts in the tiles are made in your browser from the printed rows.</p>
 <label for="irPreset">Which verbs</label> <select id="irPreset"><option value="all">every verb on the list</option><option value="past_eq_pp">past and participle are the same word</option><option value="all_same">all three forms the same</option><option value="all_diff_n">all three differ, participle ends in -n</option><option value="all_diff_other">all three differ, participle does not end in -n</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The wider figure is Pinker&rsquo;s: about 180 irregular verbs in all. A list of 183 was put together for this course, and that is close to his number. It is a count that depends on where you draw the line, so read it as a size and not as an exact total.</p><h3>They are the common words</h3><p>When this course was built, the 183 verbs were checked against a list of the 2,809 most common words in English. 132 of them were in it, which is 72.1%. The 51 that were not include <em>weep</em>, <em>flee</em>, <em>creep</em>, <em>shed</em> and <em>forgive</em>. That check was made once, and it is quoted here: the page does not carry the 183, so it cannot redo it. The lab holds 133, one more than the 132, because the list was settled by hand after the check; every one of the 133 is in the common list.</p><p>Look at the kept verbs by rank in that common list. The middle verb is at rank 697.5, so half of them sit among the 700 commonest words, and 44% are in the top 500. These two figures are quoted too: the page carries each word&rsquo;s band, not its rank. The irregular verbs gather at the frequent end.</p><h3>Why the common words are the odd ones</h3><p>This is an observation more than a proof, and it is Pinker&rsquo;s, not something measured here. A word that you meet thousands of times is stored in memory whole. It never has to be built, so the regular rule never gets the chance to replace it. Frequency keeps a verb irregular.</p><p>A rare verb works the other way. You meet it too rarely to store its past, so you build the past each time, and what you build is the regular one. Over many years, rare irregular verbs tend to move toward <em>-ed</em>. The common ones stay as they are.</p><h3>What the numbers do not say</h3><p>The word list check shows that irregular verbs are common. It does not show why. The idea of memory is a good reason, and other reasons may also play a part. Treat it as the best account available, and do not lean on it too hard.</p><p>The rest of this course puts numbers on the list. Next comes its shape, six classes with a rule each. After that comes the question of how much of a real page these verbs fill, and there the first number you see turns out to need a fix.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing a verb</h2></div><p>To find out whether a verb is irregular, do this.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the three forms</h3><p>The base, the past, and the form used after <em>have</em>. These three are enough. The other two forms, the <em>-s</em> form and the <em>-ing</em> form, follow the rules from that course for every irregular verb but two: <em>have</em> makes <em>has</em>, and <em>be</em> has <em>am</em>, <em>is</em>, <em>are</em> and <em>being</em>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Build the past by the -ed rule</h3><p>Add <em>-ed</em>, with the small changes that course listed. This is your guess.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare the guess with what people write</h3><p>If they match, the verb is regular. If they do not, the verb is irregular, and the difference is what you have to learn.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Look at the form after have</h3><p>Check the third form on its own. For <em>show</em> the past is regular, <em>showed</em>, but the form after <em>have</em> is <em>shown</em>. One wrong form is enough.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing a verb</h2>
+      <p class="lead-in">To find out whether a verb is irregular, do this.</p>
+      <ol class="key-ideas method"><li><strong>Write the three forms.</strong> The base, the past, and the form used after <em>have</em>. These three are enough. The other two forms, the <em>-s</em> form and the <em>-ing</em> form, follow the rules from that course for every irregular verb but two: <em>have</em> makes <em>has</em>, and <em>be</em> has <em>am</em>, <em>is</em>, <em>are</em> and <em>being</em>.</li><li><strong>Build the past by the -ed rule.</strong> Add <em>-ed</em>, with the small changes that course listed. This is your guess.</li><li><strong>Compare the guess with what people write.</strong> If they match, the verb is regular. If they do not, the verb is irregular, and the difference is what you have to learn.</li><li><strong>Look at the form after have.</strong> Check the third form on its own. For <em>show</em> the past is regular, <em>showed</em>, but the form after <em>have</em> is <em>shown</em>. One wrong form is enough.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1429,17 +1475,16 @@ bring:  guess bringed, bringed
         written brought, brought    irregular</div><p><em>Walk</em> passes both steps. <em>Show</em> passes the past and fails the form after <em>have</em>, and one failure is enough, so it is on the list. <em>Bring</em> fails both. The test never asks how a verb sounds or how common it is; it compares two spellings, which is what lets the lab print the list without a judgement in it.</p><p>The lab shows the written forms for all 133. Pick any row, build the guess yourself, and you will find the row is there because the guess is wrong.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling a verb irregular because it feels odd</strong><span><em>Showed</em> feels fine, so <em>show</em> seems regular. But the form after <em>have</em> is <em>shown</em>, and that one breaks the rule. A verb is irregular if any of its forms break the rule, not only the past.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the odd forms are mistakes that stuck</strong><span><em>Went</em> and <em>was</em> are not errors. They are very old forms that stayed because people used them too often to change. Treating them as errors is the wrong starting point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Learning the list in the order of a book</strong><span>A list in the order of the letters hides the fact that the verbs fall into a few shapes. The next lesson sorts them by shape, which is much easier to hold in mind.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test a verb against the -ed rule, give the size of the list, and explain why the list is short but the words are everywhere.</strong><p>You should be able to run the four-step test on any verb and say regular or irregular, name the three forms that matter, say how many irregular verbs there are and where that figure comes from, and explain why a verb you use every day is far more likely to be irregular than one you rarely meet.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The figure of 180 is Pinker&rsquo;s, and it is a count of judgement, not of measurement. Where you draw the edge of the list changes the number. What does not change is the shape: many common verbs, few rare ones.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling a verb irregular because it feels odd</strong><span><em>Showed</em> feels fine, so <em>show</em> seems regular. But the form after <em>have</em> is <em>shown</em>, and that one breaks the rule. A verb is irregular if any of its forms break the rule, not only the past.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the odd forms are mistakes that stuck</strong><span><em>Went</em> and <em>was</em> are not errors. They are very old forms that stayed because people used them too often to change. Treating them as errors is the wrong starting point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Learning the list in the order of a book</strong><span>A list in the order of the letters hides the fact that the verbs fall into a few shapes. The next lesson sorts them by shape, which is much easier to hold in mind.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test a verb against the -ed rule, give the size of the list, and explain why the list is short but the words are everywhere.</strong><p>You should be able to run the four-step test on any verb and say regular or irregular, name the three forms that matter, say how many irregular verbs there are and where that figure comes from, and explain why a verb you use every day is far more likely to be irregular than one you rarely meet.</p></div></div><div class="note"><strong>Note:</strong> The figure of 180 is Pinker&rsquo;s, and it is a count of judgement, not of measurement. Where you draw the edge of the list changes the number. What does not change is the shape: many common verbs, few rare ones.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A verb is irregular when the -ed rule fails</summary><p><em>Tense Tables</em> showed that adding <em>-ed</em> gives the past of almost every regular verb. A verb is <em>irregular</em> when that rule gives the wrong answer. <em>Bring</em> becomes <em>brought</em>, and nothing in the spelling of <em>bring</em> tells you so.</p></details><details class="recall"><summary>The list is short and it is counted</summary><p>The lab holds 133 verbs. 132 of them fall into six classes, the largest with 60, and <em>be</em> stands outside the classes. Pinker, who has written about this at length, puts the whole list at about 180. A list of 180 is a small thing to learn next to a language of many thousands of verbs.</p></details><details class="recall"><summary>Frequency is what keeps a verb irregular</summary><p>The idea, which Pinker has argued, is that a word you hear all the time is held in memory whole. It never needs the rule, so the rule never takes it over. A rare word has to be built each time, and a build soon settles on the regular rule. That is why the odd verbs are the common ones.</p></details></div>
+      <h3>Summary</h3>
       <p><em>Tense Tables</em> gave four rules that build every regular verb, and on the regular verbs the rules were right more than 99 times in 100. The <dfn>irregular</dfn> verbs were set aside before that score was taken, because no rule makes their past: <em>bring</em> does not become <em>bringed</em>. This course is about them. The lab holds 133, printed with their three forms; 132 of them sort into six classes by a rule a computer can check, and <em>be</em> stands outside. The list is short, but it is made of the words you say most.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A verb is irregular when the -ed rule fails.</strong> <em>Tense Tables</em> showed that adding <em>-ed</em> gives the past of almost every regular verb. A verb is <em>irregular</em> when that rule gives the wrong answer. <em>Bring</em> becomes <em>brought</em>, and nothing in the spelling of <em>bring</em> tells you so.</li><li><strong>The list is short and it is counted.</strong> The lab holds 133 verbs. 132 of them fall into six classes, the largest with 60, and <em>be</em> stands outside the classes. Pinker, who has written about this at length, puts the whole list at about 180. A list of 180 is a small thing to learn next to a language of many thousands of verbs.</li><li><strong>Frequency is what keeps a verb irregular.</strong> The idea, which Pinker has argued, is that a word you hear all the time is held in memory whole. It never needs the rule, so the rule never takes it over. A rare word has to be built each time, and a build soon settles on the regular rule. That is why the odd verbs are the common ones.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="base, past, form after have. walk, walked, walked. the ed rule builds both. bring, brought, brought. no rule builds these, learn them. 133 verbs in the lab, 132 in 6 classes, and be" tabindex="0" role="region" aria-label="Mathematical notation">base / past / form after have
 
 walk / walked / walked
@@ -1932,11 +1977,40 @@ var irCounts = function () {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2004,7 +2078,7 @@ var irCounts = function () {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

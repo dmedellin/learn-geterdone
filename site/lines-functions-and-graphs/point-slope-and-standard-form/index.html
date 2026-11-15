@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Lines, Functions and Graphs</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Lines</p>
       <h1>Point-Slope and Standard Form</h1>
       <p class="lesson-lede">Building a line from a point and a slope, and the form that treats x and y alike.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Point-slope is the definition of slope, rearranged</li><li>Either point gives the same line</li><li>Standard form is symmetric, and that is its use</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two forms and the choice between them</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Point-slope form</span><p>The line through <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> with slope <span class="math" data-say="m">m</span> is <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Why the form is what it is</span><p>Let <span class="math" data-say="x, y">(x, y)</span> be any other point on the line. By “Slope” the slope computed from <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> to <span class="math" data-say="x, y">(x, y)</span> must equal <span class="math" data-say="m">m</span>, so <span class="math" data-say="the quantity y minus y sub 1, over the quantity x minus x sub 1, equals m">(y − y₁)/(x − x₁) = m</span>. Multiplying both sides by <span class="math" data-say="x minus x sub 1">(x − x₁)</span> gives <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span>. The multiplication also admits the point <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> itself, which the fraction had to exclude.</p></div><p>That derivation is worth following once, because it explains the minus signs. The form contains <span class="math" data-say="x minus x sub 1">x − x₁</span>, so a point with a negative coordinate produces a double negative: through <span class="math" data-say="negative 2, 1">(−2, 1)</span> the form is <span class="math" data-say="y minus 1 equals m times the quantity x minus the quantity negative 2">y − 1 = m(x − (−2))</span>, that is, <span class="math" data-say="y minus 1 equals m times the quantity x plus 2">y − 1 = m(x + 2)</span>. Writing the substitution before simplifying is what keeps that straight.</p><h3>From two points</h3><p>Two points is the most common starting position, and it is handled in two moves: compute the slope by “Slope”, then feed it and either point into point-slope. Nothing else is needed.</p><div class="mathblock" data-say="through negative 2, 1 and 4, 10. slope, m equals the quantity 10 minus 1, over the quantity 4 minus the quantity negative 2, equals 9 over 6 equals 3 over 2. using negative 2, 1, y minus 1, equals the quantity 3 over 2, times the quantity x plus 2. y minus 1, equals the quantity 3 over 2, times x plus 3. y, equals the quantity 3 over 2, times x plus 4. using 4, 10, y minus 10 equals the quantity 3 over 2, times the quantity x minus 4. y minus 10 equals the quantity 3 over 2, times x minus 6. y, equals the quantity 3 over 2, times x plus 4, the same line" tabindex="0" role="region" aria-label="Mathematical notation">through (-2, 1) and (4, 10)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two forms and the choice between them</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Point-slope form</span><p>The line through <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> with slope <span class="math" data-say="m">m</span> is <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Why the form is what it is</span><p>Let <span class="math" data-say="x, y">(x, y)</span> be any other point on the line. By “Slope” the slope computed from <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> to <span class="math" data-say="x, y">(x, y)</span> must equal <span class="math" data-say="m">m</span>, so <span class="math" data-say="the quantity y minus y sub 1, over the quantity x minus x sub 1, equals m">(y − y₁)/(x − x₁) = m</span>. Multiplying both sides by <span class="math" data-say="x minus x sub 1">(x − x₁)</span> gives <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span>. The multiplication also admits the point <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> itself, which the fraction had to exclude.</p></div><p>That derivation is worth following once, because it explains the minus signs. The form contains <span class="math" data-say="x minus x sub 1">x − x₁</span>, so a point with a negative coordinate produces a double negative: through <span class="math" data-say="negative 2, 1">(−2, 1)</span> the form is <span class="math" data-say="y minus 1 equals m times the quantity x minus the quantity negative 2">y − 1 = m(x − (−2))</span>, that is, <span class="math" data-say="y minus 1 equals m times the quantity x plus 2">y − 1 = m(x + 2)</span>. Writing the substitution before simplifying is what keeps that straight.</p><h3>From two points</h3><p>Two points is the most common starting position, and it is handled in two moves: compute the slope by “Slope”, then feed it and either point into point-slope. Nothing else is needed.</p><div class="mathblock" data-say="through negative 2, 1 and 4, 10. slope, m equals the quantity 10 minus 1, over the quantity 4 minus the quantity negative 2, equals 9 over 6 equals 3 over 2. using negative 2, 1, y minus 1, equals the quantity 3 over 2, times the quantity x plus 2. y minus 1, equals the quantity 3 over 2, times x plus 3. y, equals the quantity 3 over 2, times x plus 4. using 4, 10, y minus 10 equals the quantity 3 over 2, times the quantity x minus 4. y minus 10 equals the quantity 3 over 2, times x minus 6. y, equals the quantity 3 over 2, times x plus 4, the same line" tabindex="0" role="region" aria-label="Mathematical notation">through (-2, 1) and (4, 10)
 
 slope       m = (10 - 1)/(4 - (-2)) = 9/6 = 3/2
 
@@ -1401,12 +1445,11 @@ using (-2, 1):     y - 1  = (3/2)(x + 2)
 
 using (4, 10):     y - 10 = (3/2)(x - 4)
                    y - 10 = (3/2)x - 6
-                       y  = (3/2)x + 4        the same line</div><p>The two routes converge, as the concept above promised. If yours does not converge with a printed answer, put both into slope-intercept form and compare there &mdash; that form is unique for a given line, so it settles the question.</p><h3>Standard form</h3><div class="defbox"><span class="label">Definition &middot; Standard form</span><p><span class="math" data-say="A x plus B y equals C">Ax + By = C</span> with <span class="math" data-say="A">A</span>, <span class="math" data-say="B">B</span>, <span class="math" data-say="C">C</span> integers, <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> not both zero. It is conventional to clear fractions and to take <span class="math" data-say="A">A</span> positive.</p></div><p>Converting into it means clearing denominators and collecting both variables on the left. From <span class="math" data-say="y equals the quantity 3 over 2, times x plus 4">y = (3/2)x + 4</span>: multiply by 2 to get <span class="math" data-say="2 y equals 3 x plus 8">2y = 3x + 8</span>, then move the <span class="math" data-say="x">x</span>-term across for <span class="math" data-say="negative 3 x plus 2 y equals 8">−3x + 2y = 8</span>, and finally negate throughout so that <span class="math" data-say="A">A</span> is positive: <span class="math" data-say="3 x minus 2 y equals negative 8">3x − 2y = −8</span>. Negating an equation changes no solutions.</p><div class="example"><span class="label">Example &middot; Checking the conversion</span><p><span class="math" data-say="3 x minus 2 y equals negative 8">3x − 2y = −8</span> at <span class="math" data-say="negative 2, 1">(−2, 1)</span>: <span class="math" data-say="negative 6 minus 2 equals negative 8">−6 − 2 = −8</span>, true. At <span class="math" data-say="4, 10">(4, 10)</span>: <span class="math" data-say="12 minus 20 equals negative 8">12 − 20 = −8</span>, true. Both original points satisfy the converted equation, which is what a conversion has to preserve.</p></div><p>Standard form is the only one of the three that copes with every line: <span class="math" data-say="x equals 5">x = 5</span> is <span class="math" data-say="1 times x plus 0 times y equals 5">1·x + 0·y = 5</span>. Point-slope needs a slope to exist and slope-intercept needs to be solvable for <span class="math" data-say="y">y</span>, so both fail on vertical lines, while standard form does not notice the difference.</p><p>Choosing between the forms is part of the skill. Point and slope, or two points, go to point-slope. A question about shape, steepness or comparison goes to slope-intercept. Intercepts, or a system to be solved by elimination in Systems and Matrices, go to standard.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Point-slope form</h2></div><p>Either point gives the same line, and the lab proves it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                       y  = (3/2)x + 4        the same line</div><p>The two routes converge, as the concept above promised. If yours does not converge with a printed answer, put both into slope-intercept form and compare there &mdash; that form is unique for a given line, so it settles the question.</p><h3>Standard form</h3><div class="defbox"><span class="label">Definition &middot; Standard form</span><p><span class="math" data-say="A x plus B y equals C">Ax + By = C</span> with <span class="math" data-say="A">A</span>, <span class="math" data-say="B">B</span>, <span class="math" data-say="C">C</span> integers, <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> not both zero. It is conventional to clear fractions and to take <span class="math" data-say="A">A</span> positive.</p></div><p>Converting into it means clearing denominators and collecting both variables on the left. From <span class="math" data-say="y equals the quantity 3 over 2, times x plus 4">y = (3/2)x + 4</span>: multiply by 2 to get <span class="math" data-say="2 y equals 3 x plus 8">2y = 3x + 8</span>, then move the <span class="math" data-say="x">x</span>-term across for <span class="math" data-say="negative 3 x plus 2 y equals 8">−3x + 2y = 8</span>, and finally negate throughout so that <span class="math" data-say="A">A</span> is positive: <span class="math" data-say="3 x minus 2 y equals negative 8">3x − 2y = −8</span>. Negating an equation changes no solutions.</p><div class="example"><span class="label">Example &middot; Checking the conversion</span><p><span class="math" data-say="3 x minus 2 y equals negative 8">3x − 2y = −8</span> at <span class="math" data-say="negative 2, 1">(−2, 1)</span>: <span class="math" data-say="negative 6 minus 2 equals negative 8">−6 − 2 = −8</span>, true. At <span class="math" data-say="4, 10">(4, 10)</span>: <span class="math" data-say="12 minus 20 equals negative 8">12 − 20 = −8</span>, true. Both original points satisfy the converted equation, which is what a conversion has to preserve.</p></div><p>Standard form is the only one of the three that copes with every line: <span class="math" data-say="x equals 5">x = 5</span> is <span class="math" data-say="1 times x plus 0 times y equals 5">1·x + 0·y = 5</span>. Point-slope needs a slope to exist and slope-intercept needs to be solvable for <span class="math" data-say="y">y</span>, so both fail on vertical lines, while standard form does not notice the difference.</p><p>Choosing between the forms is part of the skill. Point and slope, or two points, go to point-slope. A question about shape, steepness or comparison goes to slope-intercept. Intercepts, or a system to be solved by elimination in Systems and Matrices, go to standard.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Point-slope form</h2></div><p>Either point gives the same line, and the lab proves it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="lnTitle">A line</strong><span id="lnSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the line</span><span class="tone-amber"><i class="legend-swatch"></i>your two points</span><span class="tone-green"><i class="legend-swatch"></i>intercepts</span><span class="tone-purple"><i class="legend-swatch"></i>second line</span></div>
@@ -1414,10 +1457,10 @@ using (4, 10):     y - 10 = (3/2)(x - 4)
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="lnPlot"></svg></div>
       <div id="lnWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="lnStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Built from each point in turn</h3>
-          <p>Point-slope form is written from both of your points, expanded, and the two results compared. They are derived separately, so their agreement is evidence that either point may be used &mdash; not a restatement of the claim.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Built from each point in turn</h3>
+            <p>Point-slope form is written from both of your points, expanded, and the two results compared. They are derived separately, so their agreement is evidence that either point may be used &mdash; not a restatement of the claim.</p>
         <div class="field">
           <label for="lnPreset">Example</label>
           <select id="lnPreset"><option value="2|5|6|13|2|-3">(2, 5) and (6, 13)</option><option value="-3|4|1|-4|2|-3">(-3, 4) and (1, -4)</option><option value="1|1|7|5|2|-3">(1, 1) and (7, 5): slope 2/3</option><option value="0|-4|5|-4|2|-3">(0, -4) and (5, -4): slope 0</option><option value="-6|-1|-2|5|2|-3">(-6, -1) and (-2, 5)</option><option value="2|3|2|9|2|-3">(2, 3) and (2, 9): vertical</option></select>
@@ -1445,12 +1488,14 @@ using (4, 10):     y - 10 = (3/2)(x - 4)
         </div>
         <p class="small-copy" id="lnHint" style="margin:0;">Every number below is recomputed from the two points as exact fractions &mdash; nothing is rounded, and nothing is stored.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding the equation of a line through two points</h2></div><p>Slope, substitute, simplify, verify with the point you did not use.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute the slope</h3><p><span class="math" data-say="m equals the quantity y sub 2 minus y sub 1, over the quantity x sub 2 minus x sub 1">m = (y₂ − y₁)/(x₂ − x₁)</span>, in a consistent order. If the two <span class="math" data-say="x">x</span>-values agree the line is vertical and the answer is <span class="math" data-say="x equals x sub 1">x = x₁</span>; stop there.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Substitute into point-slope</h3><p><span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span> with either point. Write the substitution out, including the brackets around a negative coordinate, before touching it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Simplify to the form the question wants</h3><p>Distribute <span class="math" data-say="m">m</span>, then isolate <span class="math" data-say="y">y</span> for slope-intercept, or clear fractions and collect terms for standard form.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check with the other point</h3><p>Substitute the point you did not build from. It must satisfy the final equation &mdash; this is the check that catches a slope or sign error, because that point played no part in producing the answer.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding the equation of a line through two points</h2>
+      <p class="lead-in">Slope, substitute, simplify, verify with the point you did not use.</p>
+      <ol class="key-ideas method"><li><strong>Compute the slope.</strong> <span class="math" data-say="m equals the quantity y sub 2 minus y sub 1, over the quantity x sub 2 minus x sub 1">m = (y₂ − y₁)/(x₂ − x₁)</span>, in a consistent order. If the two <span class="math" data-say="x">x</span>-values agree the line is vertical and the answer is <span class="math" data-say="x equals x sub 1">x = x₁</span>; stop there.</li><li><strong>Substitute into point-slope.</strong> <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span> with either point. Write the substitution out, including the brackets around a negative coordinate, before touching it.</li><li><strong>Simplify to the form the question wants.</strong> Distribute <span class="math" data-say="m">m</span>, then isolate <span class="math" data-say="y">y</span> for slope-intercept, or clear fractions and collect terms for standard form.</li><li><strong>Check with the other point.</strong> Substitute the point you did not build from. It must satisfy the final equation &mdash; this is the check that catches a slope or sign error, because that point played no part in producing the answer.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1480,17 +1525,16 @@ using (4, 10):     y - 10 = (3/2)(x - 4)
         ( 4, 10):  3(4)  - 2(10) = 12 - 20 = -8   TRUE</div><p>Step 2 is where the sign errors live. The form subtracts <span class="math" data-say="x sub 1">x₁</span>, and <span class="math" data-say="x sub 1">x₁</span> is <span class="math" data-say="negative 2">−2</span>, so the bracket becomes <span class="math" data-say="x plus 2">x + 2</span>. Writing <span class="math" data-say="x minus 2">x − 2</span> here produces a line parallel to the right one and through neither point.</p><p>Step 5 is the reason to trust the answer. The point <span class="math" data-say="4, 10">(4, 10)</span> was never used after step 1, so its satisfying the final equation is genuine evidence rather than a restatement of the work.</p><p>For a faded construction, use the points <span class="math" data-say="negative 3, 5">(−3, 5)</span> and <span class="math" data-say="1, negative 3">(1, −3)</span>. The supplied slope is <span class="math" data-say="negative 2">−2</span>. Build point-slope form from <span class="math" data-say="negative 3, 5">(−3, 5)</span>, convert it to slope-intercept and standard form, then use <span class="math" data-say="1, negative 3">(1, −3)</span> as the unused-point check. If the check fails, identify whether the slope, the double negative or the distribution caused it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dropping the minus signs built into the form</strong><span>The form is <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span>. Through <span class="math" data-say="negative 2, 1">(−2, 1)</span> that is <span class="math" data-say="y minus 1 equals m times the quantity x plus 2">y − 1 = m(x + 2)</span>. Substituting a negative coordinate without brackets is how <span class="math" data-say="x plus 2">x + 2</span> becomes <span class="math" data-say="x minus 2">x − 2</span> and the line moves.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Distributing over only the first term</strong><span><span class="math" data-say="negative 4 times the quantity x minus 2">−4(x − 2)</span> is <span class="math" data-say="negative 4 x plus 8">−4x + 8</span>. Getting <span class="math" data-say="negative 4 x minus 8">−4x − 8</span> shifts the line by 16 and still produces a straight, plausible answer, which is why the check with the unused point matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating standard form as a normal form</strong><span><span class="math" data-say="3 x minus 2 y equals negative 8">3x − 2y = −8</span> and <span class="math" data-say="6 x minus 4 y equals negative 16">6x − 4y = −16</span> are the same line. Two standard forms can differ by a constant multiple, so comparing lines is a job for slope-intercept, which is unique.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when two points, or a point and a slope, become an equation in any requested form without hesitation.</strong><p>Given six lines specified in mixed ways &mdash; two points, a point and a slope, one vertical &mdash; you should produce the requested form each time and verify with a point that was not used in the construction. That verification habit is what makes the answer yours rather than the back of the book's.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Point-slope is the form that generalises furthest. Later courses write the tangent to a curve at a point in exactly this shape, because a point and a direction is all a tangent is; what changes is where the slope comes from, not the form it feeds.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Dropping the minus signs built into the form</strong><span>The form is <span class="math" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1">y − y₁ = m(x − x₁)</span>. Through <span class="math" data-say="negative 2, 1">(−2, 1)</span> that is <span class="math" data-say="y minus 1 equals m times the quantity x plus 2">y − 1 = m(x + 2)</span>. Substituting a negative coordinate without brackets is how <span class="math" data-say="x plus 2">x + 2</span> becomes <span class="math" data-say="x minus 2">x − 2</span> and the line moves.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Distributing over only the first term</strong><span><span class="math" data-say="negative 4 times the quantity x minus 2">−4(x − 2)</span> is <span class="math" data-say="negative 4 x plus 8">−4x + 8</span>. Getting <span class="math" data-say="negative 4 x minus 8">−4x − 8</span> shifts the line by 16 and still produces a straight, plausible answer, which is why the check with the unused point matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating standard form as a normal form</strong><span><span class="math" data-say="3 x minus 2 y equals negative 8">3x − 2y = −8</span> and <span class="math" data-say="6 x minus 4 y equals negative 16">6x − 4y = −16</span> are the same line. Two standard forms can differ by a constant multiple, so comparing lines is a job for slope-intercept, which is unique.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when two points, or a point and a slope, become an equation in any requested form without hesitation.</strong><p>Given six lines specified in mixed ways &mdash; two points, a point and a slope, one vertical &mdash; you should produce the requested form each time and verify with a point that was not used in the construction. That verification habit is what makes the answer yours rather than the back of the book's.</p></div></div><div class="note"><strong>Note:</strong> Point-slope is the form that generalises furthest. Later courses write the tangent to a curve at a point in exactly this shape, because a point and a direction is all a tangent is; what changes is where the slope comes from, not the form it feeds.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Point-slope is the definition of slope, rearranged</summary><p>Slope from <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> to a general point <span class="math" data-say="x, y">(x, y)</span> is <span class="math" data-say="the quantity y minus y sub 1, over the quantity x minus x sub 1, equals m">(y − y₁)/(x − x₁) = m</span>. Multiplying up gives the form. It is not a new fact to memorise, it is “Slope” with the fraction cleared.</p></details><details class="recall"><summary>Either point gives the same line</summary><p>Given two points you may build from whichever you prefer. The two equations look different and simplify to the same thing, which is worth seeing once so that a mismatch with a textbook answer does not read as an error.</p></details><details class="recall"><summary>Standard form is symmetric, and that is its use</summary><p><span class="math" data-say="A x plus B y equals C">Ax + By = C</span> treats the two variables alike, so it covers vertical lines, hands you both intercepts cheaply, and is the shape Systems and Matrices needs for elimination. It hides the slope, which is the price.</p></details></div>
+      <h3>Summary</h3>
       <p>Point-slope form writes down a line the moment you have one point and a slope, with no solving. Standard form keeps <span class="math" data-say="x">x</span> and <span class="math" data-say="y">y</span> symmetric, which is what systems and intercepts want. Neither replaces the other.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Point-slope is the definition of slope, rearranged.</strong> Slope from <span class="math" data-say="x sub 1, y sub 1">(x₁, y₁)</span> to a general point <span class="math" data-say="x, y">(x, y)</span> is <span class="math" data-say="the quantity y minus y sub 1, over the quantity x minus x sub 1, equals m">(y − y₁)/(x − x₁) = m</span>. Multiplying up gives the form. It is not a new fact to memorise, it is “Slope” with the fraction cleared.</li><li><strong>Either point gives the same line.</strong> Given two points you may build from whichever you prefer. The two equations look different and simplify to the same thing, which is worth seeing once so that a mismatch with a textbook answer does not read as an error.</li><li><strong>Standard form is symmetric, and that is its use.</strong> <span class="math" data-say="A x plus B y equals C">Ax + By = C</span> treats the two variables alike, so it covers vertical lines, hands you both intercepts cheaply, and is the shape Systems and Matrices needs for elimination. It hides the slope, which is the price.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="y minus y sub 1 equals m times the quantity x minus x sub 1, point-slope. A x plus B y equals C, standard. two points, goes to, find m, goes to, point-slope, goes to, simplify. either point works, the line is the same" tabindex="0" role="region" aria-label="Mathematical notation">y − y₁ = m(x − x₁)          point-slope
 Ax + By = C                 standard
 two points  →  find m  →  point-slope  →  simplify
@@ -3491,11 +3535,40 @@ either point works; the line is the same</div><figcaption>Two more forms, and wh
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3563,7 +3636,7 @@ either point works; the line is the same</div><figcaption>Two more forms, and wh
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,35 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Decision and Rationality</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Puzzles of expected value</p>
       <h1>Newcomb&#x27;s Problem</h1>
       <p class="lesson-lede">Two valid arguments recommend opposite acts, and the predictor&#x27;s accuracy fixes where the evidential one turns.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Dominance looks at the state</li><li>Evidential value looks at the act as news</li><li>Accuracy is a dial</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The table, the two arguments and the accuracy at which they part</h2>
-      <article class="prose reading"><p>Robert Nozick's version of William Newcomb's problem runs like this. Two boxes sit in front of you. Box A is open and holds 1,000 dollars. Box B is closed and holds either 1,000,000 dollars or nothing. You may take both boxes or take box B alone. A predictor, who has been right in the past, has already decided what to put in B: the million if it forecast that you would take only B, nothing if it forecast that you would take both.</p><p>Write the table with two states, box full and box empty, and two acts. Dollars are scored at face value here, so the threshold below is a dollar threshold; a concave utility would move it and leave the structure alone.</p><div class="mathblock" data-say="act, box full, box empty. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">act           box full      box empty
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The table, the two arguments and the accuracy at which they part</h2><div class="prose reading"><p>Robert Nozick's version of William Newcomb's problem runs like this. Two boxes sit in front of you. Box A is open and holds 1,000 dollars. Box B is closed and holds either 1,000,000 dollars or nothing. You may take both boxes or take box B alone. A predictor, who has been right in the past, has already decided what to put in B: the million if it forecast that you would take only B, nothing if it forecast that you would take both.</p><p>Write the table with two states, box full and box empty, and two acts. Dollars are scored at face value here, so the threshold below is a dollar threshold; a concave utility would move it and leave the structure alone.</p><div class="mathblock" data-say="act, box full, box empty. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">act           box full      box empty
 one-box       1,000,000             0
 two-box       1,001,000         1,000</div><p>The first argument is dominance. The boxes are filled and what you do now cannot change them. Whichever state you are in, the two-box row is 1,000 higher than the one-box row, so two-boxing is the better act in every state. This is the same argument as in “The Decision Matrix and Dominance”, and it is valid.</p><p>The second argument uses the predictor's record. Let <span class="math" data-say="A">a</span> be the probability that the predictor is right about whoever stands before it. Then a one-boxer finds a full box with probability <span class="math" data-say="A">a</span>, and a two-boxer finds a full box with probability <span class="math" data-say="1 minus A">1 − a</span>. Score each act with those conditional probabilities.</p><div class="mathblock" data-say="EU of the quantity one-b o x, equals A times 1000000. EU of the quantity two-b o x, equals the quantity 1 minus A, times 1001000 plus A times 1000" tabindex="0" role="region" aria-label="Mathematical notation">EU(one-box) = a·1,000,000
-EU(two-box) = (1 − a)·1,001,000 + a·1,000</div><div class="thm"><span class="label">Theorem &middot; The evidential threshold</span><p>One-boxing has the higher evidential expected value exactly when <span class="math" data-say="A is greater than 1001 over 2000">a > 1001/2000</span>. At <span class="math" data-say="A equals 1001 over 2000">a = 1001/2000</span> the two tie, and below it two-boxing is ahead.</p></div><p>At accuracy 9/10 the lab scores one-boxing at 900,000 and two-boxing at 101,000. The evidential rule recommends taking one box, while the dominance rule, switched on in the same lab, says the second row wins. At accuracy 1/2, a coin flip, one-boxing scores 500,000 and two-boxing 501,000, so the evidential rule also recommends both boxes. The switch lies just above one half, because the extra 1,000 in box A is small beside the million.</p><p>The two rules agree below the threshold and part above it. A predictor right fewer than 1001 times in 2000 gives both rules the same answer, two boxes, and at exactly that accuracy the evidential scores tie. For every accuracy above it the rules part, and which is correct depends on what one thinks an act is for.</p><p>The one-boxer says: look at who ends up rich. The two-boxer says: the money is there or not already, and a rational chooser takes what she can. Each says a valid thing. The dominance argument takes the states as fixed; the evidential argument treats the act as information about the state. Whether the act can be treated as independent of the contents of the box is the premise the problem exists to test.</p><p>Two quick answers fail. One says the predictor's record is irrelevant because the boxes are already filled. That confuses what the act causes with what it is evidence for, and the lab shows the record changing the evidential figure from 101,000 to 900,000. The other says a high accuracy settles the question. It settles only the evidential rule, which is the rule in dispute.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+EU(two-box) = (1 − a)·1,001,000 + a·1,000</div><div class="thm"><span class="label">Theorem &middot; The evidential threshold</span><p>One-boxing has the higher evidential expected value exactly when <span class="math" data-say="A is greater than 1001 over 2000">a > 1001/2000</span>. At <span class="math" data-say="A equals 1001 over 2000">a = 1001/2000</span> the two tie, and below it two-boxing is ahead.</p></div><p>At accuracy 9/10 the lab scores one-boxing at 900,000 and two-boxing at 101,000. The evidential rule recommends taking one box, while the dominance rule, switched on in the same lab, says the second row wins. At accuracy 1/2, a coin flip, one-boxing scores 500,000 and two-boxing 501,000, so the evidential rule also recommends both boxes. The switch lies just above one half, because the extra 1,000 in box A is small beside the million.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Acts by states</strong><span>a row per act, a column per state; the rule decides</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="deTable"></table></div>
       <div class="status-banner" id="deStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Move the accuracy, then switch the rule</h3>
-          <p>The rule starts as evidential, which scores each act by the conditional rows. Edit both conditional rows in the first preset so the accuracy falls from 9/10 to 1/2: the choice flips from one-box to two-box on the way, at 1001/2000. Then switch the rule to dominance, which ignores the conditional rows, and the verdict is two-box for every accuracy. The third preset sits on the threshold, where the evidential scores tie.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Move the accuracy, then switch the rule</h3>
+            <p>The rule starts as evidential, which scores each act by the conditional rows. Edit both conditional rows in the first preset so the accuracy falls from 9/10 to 1/2: the choice flips from one-box to two-box on the way, at 1001/2000. Then switch the rule to dominance, which ignores the conditional rows, and the verdict is two-box for every accuracy. The third preset sits on the threshold, where the evidential scores tie.</p>
         <div class="field">
           <label for="dePreset">Worked example</label>
           <select id="dePreset"><option value="newcomb-90" selected>a predictor right nine times in ten</option><option value="newcomb-coin">a predictor right half the time</option><option value="threshold">accuracy at the threshold, 1001/2000</option></select>
@@ -1449,12 +1492,15 @@ EU(two-box) = (1 − a)·1,001,000 + a·1,000</div><div class="thm"><span class=
           <div class="kpi"><span>Expected utilities tie at</span><strong id="deFlip">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The two rules agree below the threshold and part above it. A predictor right fewer than 1001 times in 2000 gives both rules the same answer, two boxes, and at exactly that accuracy the evidential scores tie. For every accuracy above it the rules part, and which is correct depends on what one thinks an act is for.</p><p>The one-boxer says: look at who ends up rich. The two-boxer says: the money is there or not already, and a rational chooser takes what she can. Each says a valid thing. The dominance argument takes the states as fixed; the evidential argument treats the act as information about the state. Whether the act can be treated as independent of the contents of the box is the premise the problem exists to test.</p><p>Two quick answers fail. One says the predictor's record is irrelevant because the boxes are already filled. That confuses what the act causes with what it is evidence for, and the lab shows the record changing the evidential figure from 101,000 to 900,000. The other says a high accuracy settles the question. It settles only the evidential rule, which is the rule in dispute.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring both arguments and finding the switch</h2></div><p>Five steps; the first four are mechanical.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the table</h3><p>Two acts, two states (box full, box empty), and the dollar payoffs. Check that two-boxing is 1,000 higher in each column.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Test dominance</h3><p>An act dominates when it is at least as good in every state and better in one. Here two-boxing is better in both.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the conditional rows</h3><p>For each act, the probability of each state given that you choose it. With accuracy <span class="math" data-say="A">a</span> the one-boxer's row is <span class="math" data-say="A">a</span> and <span class="math" data-say="1 minus A">1 − a</span>, the two-boxer's is <span class="math" data-say="1 minus A">1 − a</span> and <span class="math" data-say="A">a</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Score each act with its own row</h3><p>Weight the payoffs by the act's conditional probabilities and add. Compare the two scores, and set them equal to find the accuracy where they tie.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say which premise you reject</h3><p>Dominance needs the states to be fixed whatever you do; the evidential score treats the act as evidence. Decide which you will give up before you choose.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Scoring both arguments and finding the switch</h2>
+      <p class="lead-in">Five steps; the first four are mechanical.</p>
+      <ol class="key-ideas method"><li><strong>Write the table.</strong> Two acts, two states (box full, box empty), and the dollar payoffs. Check that two-boxing is 1,000 higher in each column.</li><li><strong>Test dominance.</strong> An act dominates when it is at least as good in every state and better in one. Here two-boxing is better in both.</li><li><strong>Write the conditional rows.</strong> For each act, the probability of each state given that you choose it. With accuracy <span class="math" data-say="A">a</span> the one-boxer's row is <span class="math" data-say="A">a</span> and <span class="math" data-say="1 minus A">1 − a</span>, the two-boxer's is <span class="math" data-say="1 minus A">1 − a</span> and <span class="math" data-say="A">a</span>.</li><li><strong>Score each act with its own row.</strong> Weight the payoffs by the act's conditional probabilities and add. Compare the two scores, and set them equal to find the accuracy where they tie.</li><li><strong>Say which premise you reject.</strong> Dominance needs the states to be fixed whatever you do; the evidential score treats the act as evidence. Decide which you will give up before you choose.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1473,17 +1519,16 @@ tie:  a·1,000,000 = 1,001,000 - a·1,000,000
       a = 1001/2000</div><p>At 9/10 the evidential rule says one box, by 900,000 to 101,000, and dominance says two, row by row. Both can be checked in the lab. They are different rules applied to the same table, and the accuracy at which the first gives way is just above a half.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the predictor&#x27;s record as irrelevant, or as decisive</strong><span>The record is irrelevant to dominance and fully relevant to the evidential score: at 9/10 it takes one-boxing from 101,000 for two-boxing up to 900,000. It is not decisive either, because it matters only if the act is to be treated as evidence about the box, which is what the two-boxer denies. The threshold, 1001/2000, shows where the evidential rule turns.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking one of the two arguments is invalid</strong><span>Both are valid. Dominance takes the states as fixed whatever you do; the evidential argument takes the act as information about the state. The disagreement is over a premise, not a step, and the lab computes both without choosing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a high accuracy to be needed</strong><span>The evidential switch is at 1001/2000, a hair above one half. A predictor right 51 times in 100 already favours one-boxing, because the million is so much larger than the thousand. The problem does not need a near-perfect predictor.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute both verdicts and the accuracy at which they part.</strong><p>Given the box payoffs and an accuracy, you should be able to show that two-boxing dominates, compute each act's evidential expected value from the conditional rows, find the accuracy at which the evidential scores tie, and name the premise each argument relies on.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The causal alternative to the evidential rule, which scores acts by what they bring about and not by what they indicate, is not built here: the table can show dominance and the evidential figure and no more. Dollars are scored at face value, which a concave utility would change in the figures and not in the shape.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the predictor&#x27;s record as irrelevant, or as decisive</strong><span>The record is irrelevant to dominance and fully relevant to the evidential score: at 9/10 it takes one-boxing from 101,000 for two-boxing up to 900,000. It is not decisive either, because it matters only if the act is to be treated as evidence about the box, which is what the two-boxer denies. The threshold, 1001/2000, shows where the evidential rule turns.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking one of the two arguments is invalid</strong><span>Both are valid. Dominance takes the states as fixed whatever you do; the evidential argument takes the act as information about the state. The disagreement is over a premise, not a step, and the lab computes both without choosing.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a high accuracy to be needed</strong><span>The evidential switch is at 1001/2000, a hair above one half. A predictor right 51 times in 100 already favours one-boxing, because the million is so much larger than the thousand. The problem does not need a near-perfect predictor.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute both verdicts and the accuracy at which they part.</strong><p>Given the box payoffs and an accuracy, you should be able to show that two-boxing dominates, compute each act's evidential expected value from the conditional rows, find the accuracy at which the evidential scores tie, and name the premise each argument relies on.</p></div></div><div class="note"><strong>Note:</strong> The causal alternative to the evidential rule, which scores acts by what they bring about and not by what they indicate, is not built here: the table can show dominance and the evidential figure and no more. Dollars are scored at face value, which a concave utility would change in the figures and not in the shape.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Dominance looks at the state</summary><p>The boxes are already filled. Whatever is in the second box, taking both leaves you 1,000 better off than taking one. An act that is better in every state dominates.</p></details><details class="recall"><summary>Evidential value looks at the act as news</summary><p>What you choose is evidence about what the predictor foresaw. If it is usually right, one-boxers usually find a full box and two-boxers an empty one, and the average over those cases favours one-boxing.</p></details><details class="recall"><summary>Accuracy is a dial</summary><p>How strongly the act is evidence depends on how reliable the predictor is. At accuracy one half the act tells you nothing, and above a threshold slightly over one half the evidential verdict flips.</p></details></div>
+      <h3>Summary</h3>
       <p>A predictor has already filled or emptied a box according to what it forecast you would do. Two-boxing beats one-boxing in every column of the table, while one-boxing has the higher expected value once the predictor's record is counted. The accuracy at which the evidential verdict turns is computed.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Dominance looks at the state.</strong> The boxes are already filled. Whatever is in the second box, taking both leaves you 1,000 better off than taking one. An act that is better in every state dominates.</li><li><strong>Evidential value looks at the act as news.</strong> What you choose is evidence about what the predictor foresaw. If it is usually right, one-boxers usually find a full box and two-boxers an empty one, and the average over those cases favours one-boxing.</li><li><strong>Accuracy is a dial.</strong> How strongly the act is evidence depends on how reliable the predictor is. At accuracy one half the act tells you nothing, and above a threshold slightly over one half the evidential verdict flips.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="box A holds 1000 for certain. box B holds 1 M if one-boxing was foreseen. accuracy a, predictor right with chance a. dominance, two-boxing ahead in every state. o n e-boxing wins iff A is greater than 1001 over 2000" tabindex="0" role="region" aria-label="Mathematical notation">box A holds 1,000 for certain
 box B holds 1M if one-boxing was foreseen
 accuracy a: predictor right with chance a
@@ -2310,11 +2355,40 @@ one-boxing wins iff a &gt; 1001/2000</div><figcaption>Dominance against the reco
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2382,7 +2456,7 @@ one-boxing wins iff a &gt; 1001/2000</div><figcaption>Dominance against the reco
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Sets, Relations, and Functions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Functions</p>
       <h1>Composition and Inverse Functions</h1>
       <p class="lesson-lede">Chaining functions, and undoing them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Composition reads right to left</li><li>Composition is associative, not commutative</li><li>An inverse needs a bijection</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Composition and inversion</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Composition</span><p>For <span class="math" data-say="f, A to B">f : A → B</span> and <span class="math" data-say="g, B to C">g : B → C</span>, the composition <span class="math" data-say="g composed with f, A to C">g ∘ f : A → C</span> is defined by <span class="math" data-say="g composed with f times A equals g of f of A">(g ∘ f)(a) = g(f(a))</span>. It requires the codomain of <span class="math" data-say="f">f</span> to be contained in the domain of <span class="math" data-say="g">g</span>.</p></div><p>Order matters twice over. <span class="math" data-say="g composed with f">g ∘ f</span> and <span class="math" data-say="f composed with g">f ∘ g</span> are different functions when both are defined, and often only one of them is defined at all &mdash; the types have to line up.</p><div class="thm"><span class="label">Theorem &middot; Associativity</span><p><span class="math" data-say="h composed with g composed with f equals h composed with g composed with f">(h ∘ g) ∘ f = h ∘ (g ∘ f)</span> whenever the compositions are defined.</p></div><div class="proof"><p>Both sides send <span class="math" data-say="A">a</span> to <span class="math" data-say="h of g of f of A">h(g(f(a)))</span>. Two functions with the same domain, the same codomain and the same value everywhere are equal.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; Composition preserves the properties</span><p>If <span class="math" data-say="f">f</span> and <span class="math" data-say="g">g</span> are both injective, so is <span class="math" data-say="g composed with f">g ∘ f</span>. If both are surjective, so is <span class="math" data-say="g composed with f">g ∘ f</span>. If both are bijective, so is <span class="math" data-say="g composed with f">g ∘ f</span>.</p></div><div class="proof"><p>Injective: suppose <span class="math" data-say="g of f of x equals g of f of y">g(f(x)) = g(f(y))</span>. Injectivity of <span class="math" data-say="g">g</span> gives <span class="math" data-say="f of x equals f of y">f(x) = f(y)</span>, and injectivity of <span class="math" data-say="f">f</span> gives <span class="math" data-say="x equals y">x = y</span>.</p><p>Surjective: take <span class="math" data-say="c in C">c ∈ C</span>. Surjectivity of <span class="math" data-say="g">g</span> gives <span class="math" data-say="b in B">b ∈ B</span> with <span class="math" data-say="g of b equals c">g(b) = c</span>; surjectivity of <span class="math" data-say="f">f</span> gives <span class="math" data-say="A in A">a ∈ A</span> with <span class="math" data-say="f of A equals b">f(a) = b</span>. Then <span class="math" data-say="g composed with f times A equals c">(g ∘ f)(a) = c</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The converses are weaker and worth knowing. If <span class="math" data-say="g composed with f">g ∘ f</span> is injective then <span class="math" data-say="f">f</span> must be injective &mdash; but <span class="math" data-say="g">g</span> need not be. If <span class="math" data-say="g composed with f">g ∘ f</span> is surjective then <span class="math" data-say="g">g</span> must be surjective &mdash; but <span class="math" data-say="f">f</span> need not be. Each is a short argument and each catches a plausible false claim.</p><div class="defbox"><span class="label">Definition &middot; Inverse function</span><p><span class="math" data-say="g, B to A">g : B → A</span> is an <strong>inverse</strong> of <span class="math" data-say="f, A to B">f : A → B</span> when <span class="math" data-say="g composed with f equals i d sub A">g ∘ f = id_A</span> and <span class="math" data-say="f composed with g equals i d sub B">f ∘ g = id_B</span>. When it exists it is unique and is written <span class="math" data-say="f inverse">f⁻¹</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Inverses exist exactly for bijections</span><p><span class="math" data-say="f, A to B">f : A → B</span> has an inverse if and only if <span class="math" data-say="f">f</span> is a bijection.</p></div><div class="proof"><p>Suppose <span class="math" data-say="f">f</span> is a bijection. For each <span class="math" data-say="b in B">b ∈ B</span>, surjectivity gives at least one <span class="math" data-say="A">a</span> with <span class="math" data-say="f of A equals b">f(a) = b</span> and injectivity gives at most one, so exactly one. Defining <span class="math" data-say="f inverse of b">f⁻¹(b)</span> to be that <span class="math" data-say="A">a</span> is a legitimate function, and it satisfies both identities by construction.</p><p>Conversely, suppose <span class="math" data-say="g">g</span> is an inverse. If <span class="math" data-say="f of x equals f of y">f(x) = f(y)</span> then applying <span class="math" data-say="g">g</span> gives <span class="math" data-say="x equals y">x = y</span>, so <span class="math" data-say="f">f</span> is injective. And for any <span class="math" data-say="b">b</span>, <span class="math" data-say="f of g of b equals b">f(g(b)) = b</span>, so <span class="math" data-say="g of b">g(b)</span> is a preimage of <span class="math" data-say="b">b</span> and <span class="math" data-say="f">f</span> is surjective.</p><p><span class="qed">&#9633;</span></p></div><p>Uniqueness follows quickly: if <span class="math" data-say="g">g</span> and <span class="math" data-say="h">h</span> are both inverses then <span class="math" data-say="g equals g composed with i d equals g composed with f composed with h equals g composed with f composed with h equals i d composed with h equals h">g = g ∘ id = g ∘ (f ∘ h) = (g ∘ f) ∘ h = id ∘ h = h</span>. The chain uses associativity, which is why associativity was worth stating.</p><div class="example"><span class="label">Example &middot; Finding an inverse</span><p><span class="math" data-say="f, the reals to the reals">f : ℝ → ℝ</span>, <span class="math" data-say="f of x equals 3 x minus 5">f(x) = 3x − 5</span>. Set <span class="math" data-say="y equals 3 x minus 5">y = 3x − 5</span> and solve: <span class="math" data-say="x equals the quantity y plus 5, over 3">x = (y + 5)/3</span>, so <span class="math" data-say="f inverse of y equals the quantity y plus 5, over 3">f⁻¹(y) = (y + 5)/3</span>. Check: <span class="math" data-say="f of f inverse of y equals 3 times the quantity the quantity y plus 5, over 3, minus 5 equals y">f(f⁻¹(y)) = 3((y+5)/3) − 5 = y</span>. Both directions should be checked, because solving for <span class="math" data-say="x">x</span> proves only one of them.</p></div><div class="thm"><span class="label">Theorem &middot; Inverse of a composition</span><p><span class="math" data-say="g composed with f to the power negative 1 equals f inverse composed with g inverse">(g ∘ f)⁻¹ = f⁻¹ ∘ g⁻¹</span> when both inverses exist &mdash; the order reverses. Undoing "socks then shoes" is "shoes off, then socks".</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Injective, surjective, bijective</h2></div><p>Built by hand, classified by counting</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Composition and inversion</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Composition</span><p>For <span class="math" data-say="f, A to B">f : A → B</span> and <span class="math" data-say="g, B to C">g : B → C</span>, the composition <span class="math" data-say="g composed with f, A to C">g ∘ f : A → C</span> is defined by <span class="math" data-say="g composed with f times A equals g of f of A">(g ∘ f)(a) = g(f(a))</span>. It requires the codomain of <span class="math" data-say="f">f</span> to be contained in the domain of <span class="math" data-say="g">g</span>.</p></div><p>Order matters twice over. <span class="math" data-say="g composed with f">g ∘ f</span> and <span class="math" data-say="f composed with g">f ∘ g</span> are different functions when both are defined, and often only one of them is defined at all &mdash; the types have to line up.</p><div class="thm"><span class="label">Theorem &middot; Associativity</span><p><span class="math" data-say="h composed with g composed with f equals h composed with g composed with f">(h ∘ g) ∘ f = h ∘ (g ∘ f)</span> whenever the compositions are defined.</p></div><div class="proof"><p>Both sides send <span class="math" data-say="A">a</span> to <span class="math" data-say="h of g of f of A">h(g(f(a)))</span>. Two functions with the same domain, the same codomain and the same value everywhere are equal.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; Composition preserves the properties</span><p>If <span class="math" data-say="f">f</span> and <span class="math" data-say="g">g</span> are both injective, so is <span class="math" data-say="g composed with f">g ∘ f</span>. If both are surjective, so is <span class="math" data-say="g composed with f">g ∘ f</span>. If both are bijective, so is <span class="math" data-say="g composed with f">g ∘ f</span>.</p></div><div class="proof"><p>Injective: suppose <span class="math" data-say="g of f of x equals g of f of y">g(f(x)) = g(f(y))</span>. Injectivity of <span class="math" data-say="g">g</span> gives <span class="math" data-say="f of x equals f of y">f(x) = f(y)</span>, and injectivity of <span class="math" data-say="f">f</span> gives <span class="math" data-say="x equals y">x = y</span>.</p><p>Surjective: take <span class="math" data-say="c in C">c ∈ C</span>. Surjectivity of <span class="math" data-say="g">g</span> gives <span class="math" data-say="b in B">b ∈ B</span> with <span class="math" data-say="g of b equals c">g(b) = c</span>; surjectivity of <span class="math" data-say="f">f</span> gives <span class="math" data-say="A in A">a ∈ A</span> with <span class="math" data-say="f of A equals b">f(a) = b</span>. Then <span class="math" data-say="g composed with f times A equals c">(g ∘ f)(a) = c</span>.</p><p><span class="qed">&#9633;</span></p></div><p>The converses are weaker and worth knowing. If <span class="math" data-say="g composed with f">g ∘ f</span> is injective then <span class="math" data-say="f">f</span> must be injective &mdash; but <span class="math" data-say="g">g</span> need not be. If <span class="math" data-say="g composed with f">g ∘ f</span> is surjective then <span class="math" data-say="g">g</span> must be surjective &mdash; but <span class="math" data-say="f">f</span> need not be. Each is a short argument and each catches a plausible false claim.</p><div class="defbox"><span class="label">Definition &middot; Inverse function</span><p><span class="math" data-say="g, B to A">g : B → A</span> is an <strong>inverse</strong> of <span class="math" data-say="f, A to B">f : A → B</span> when <span class="math" data-say="g composed with f equals i d sub A">g ∘ f = id_A</span> and <span class="math" data-say="f composed with g equals i d sub B">f ∘ g = id_B</span>. When it exists it is unique and is written <span class="math" data-say="f inverse">f⁻¹</span>.</p></div><div class="thm"><span class="label">Theorem &middot; Inverses exist exactly for bijections</span><p><span class="math" data-say="f, A to B">f : A → B</span> has an inverse if and only if <span class="math" data-say="f">f</span> is a bijection.</p></div><div class="proof"><p>Suppose <span class="math" data-say="f">f</span> is a bijection. For each <span class="math" data-say="b in B">b ∈ B</span>, surjectivity gives at least one <span class="math" data-say="A">a</span> with <span class="math" data-say="f of A equals b">f(a) = b</span> and injectivity gives at most one, so exactly one. Defining <span class="math" data-say="f inverse of b">f⁻¹(b)</span> to be that <span class="math" data-say="A">a</span> is a legitimate function, and it satisfies both identities by construction.</p><p>Conversely, suppose <span class="math" data-say="g">g</span> is an inverse. If <span class="math" data-say="f of x equals f of y">f(x) = f(y)</span> then applying <span class="math" data-say="g">g</span> gives <span class="math" data-say="x equals y">x = y</span>, so <span class="math" data-say="f">f</span> is injective. And for any <span class="math" data-say="b">b</span>, <span class="math" data-say="f of g of b equals b">f(g(b)) = b</span>, so <span class="math" data-say="g of b">g(b)</span> is a preimage of <span class="math" data-say="b">b</span> and <span class="math" data-say="f">f</span> is surjective.</p><p><span class="qed">&#9633;</span></p></div><p>Uniqueness follows quickly: if <span class="math" data-say="g">g</span> and <span class="math" data-say="h">h</span> are both inverses then <span class="math" data-say="g equals g composed with i d equals g composed with f composed with h equals g composed with f composed with h equals i d composed with h equals h">g = g ∘ id = g ∘ (f ∘ h) = (g ∘ f) ∘ h = id ∘ h = h</span>. The chain uses associativity, which is why associativity was worth stating.</p><div class="example"><span class="label">Example &middot; Finding an inverse</span><p><span class="math" data-say="f, the reals to the reals">f : ℝ → ℝ</span>, <span class="math" data-say="f of x equals 3 x minus 5">f(x) = 3x − 5</span>. Set <span class="math" data-say="y equals 3 x minus 5">y = 3x − 5</span> and solve: <span class="math" data-say="x equals the quantity y plus 5, over 3">x = (y + 5)/3</span>, so <span class="math" data-say="f inverse of y equals the quantity y plus 5, over 3">f⁻¹(y) = (y + 5)/3</span>. Check: <span class="math" data-say="f of f inverse of y equals 3 times the quantity the quantity y plus 5, over 3, minus 5 equals y">f(f⁻¹(y)) = 3((y+5)/3) − 5 = y</span>. Both directions should be checked, because solving for <span class="math" data-say="x">x</span> proves only one of them.</p></div><div class="thm"><span class="label">Theorem &middot; Inverse of a composition</span><p><span class="math" data-say="g composed with f to the power negative 1 equals f inverse composed with g inverse">(g ∘ f)⁻¹ = f⁻¹ ∘ g⁻¹</span> when both inverses exist &mdash; the order reverses. Undoing "socks then shoes" is "shoes off, then socks".</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Injective, surjective, bijective</h2></div><p>Built by hand, classified by counting</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>f : A &rarr; B</strong><span>Choose where each element of A is sent</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>hit once</span><span class="tone-amber"><i class="legend-swatch"></i>hit twice or more</span><span class="tone-muted"><i class="legend-swatch"></i>never hit</span></div>
       </div>
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="fnPlot" viewBox="0 0 460 300" role="img" aria-label="Two columns of dots with an arrow from each element of the domain to its image."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fnProps"></table></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>When does an inverse exist?</h3>
-          <p>Build a bijection and the arrows can be read backwards without ambiguity. Break injectivity and two arrows point at one target, so the reverse has a choice to make &mdash; which is exactly why no inverse exists.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>When does an inverse exist?</h3>
+            <p>Build a bijection and the arrows can be read backwards without ambiguity. Break injectivity and two arrows point at one target, so the reverse has a choice to make &mdash; which is exactly why no inverse exists.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="fnA">|A| (domain)</label><span class="range-value" id="fnAOut">4</span></div>
           <input id="fnA" type="range" min="1" max="6" value="4" />
@@ -1425,12 +1468,14 @@
           <div class="kpi"><span>Image size</span><strong id="fnImg">&mdash;</strong></div>
         </div>
         <div class="status-banner" id="fnStatus">Change the sizes and try to build a bijection.</div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Composing and inverting</h2></div><p>Check the types, then work inside out.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check the codomain and domain line up</h3><p><span class="math" data-say="g composed with f">g ∘ f</span> needs <span class="math" data-say="f">f</span>'s outputs to be legal inputs for <span class="math" data-say="g">g</span>. A type mismatch is not a subtlety; the composition does not exist.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Evaluate inside out</h3><p><span class="math" data-say="g composed with f times 3">(g ∘ f)(3)</span> is <span class="math" data-say="g of f of 3">g(f(3))</span>. Compute <span class="math" data-say="f of 3">f(3)</span> first. Half of all composition errors are order errors.</p></article><article class="card concept-card"><div class="icon">3</div><h3>To invert, verify bijectivity first</h3><p>No bijection, no inverse. Solving <span class="math" data-say="y equals f of x">y = f(x)</span> for <span class="math" data-say="x">x</span> and finding two solutions or none is the same discovery arrived at slowly.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check both identities</h3><p><span class="math" data-say="f inverse composed with f equals i d">f⁻¹ ∘ f = id</span> and <span class="math" data-say="f composed with f inverse equals i d">f ∘ f⁻¹ = id</span>. Solving for <span class="math" data-say="x">x</span> naturally establishes one; the other is a separate substitution.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Composing and inverting</h2>
+      <p class="lead-in">Check the types, then work inside out.</p>
+      <ol class="key-ideas method"><li><strong>Check the codomain and domain line up.</strong> <span class="math" data-say="g composed with f">g ∘ f</span> needs <span class="math" data-say="f">f</span>'s outputs to be legal inputs for <span class="math" data-say="g">g</span>. A type mismatch is not a subtlety; the composition does not exist.</li><li><strong>Evaluate inside out.</strong> <span class="math" data-say="g composed with f times 3">(g ∘ f)(3)</span> is <span class="math" data-say="g of f of 3">g(f(3))</span>. Compute <span class="math" data-say="f of 3">f(3)</span> first. Half of all composition errors are order errors.</li><li><strong>To invert, verify bijectivity first.</strong> No bijection, no inverse. Solving <span class="math" data-say="y equals f of x">y = f(x)</span> for <span class="math" data-say="x">x</span> and finding two solutions or none is the same discovery arrived at slowly.</li><li><strong>Check both identities.</strong> <span class="math" data-say="f inverse composed with f equals i d">f⁻¹ ∘ f = id</span> and <span class="math" data-say="f composed with f inverse equals i d">f ∘ f⁻¹ = id</span>. Solving for <span class="math" data-say="x">x</span> naturally establishes one; the other is a separate substitution.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1453,17 +1498,16 @@ Inverses:
    g⁻¹(f⁻¹(y))  = g⁻¹(y/2)   = y/2 − 3          does NOT</div><p>The last two lines are the order-reversal law being tested rather than asserted. <span class="math" data-say="g composed with f to the power negative 1 equals f inverse composed with g inverse">(g ∘ f)⁻¹ = f⁻¹ ∘ g⁻¹</span>, and composing the inverses in the original order gives a different function entirely.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Composing left to right</strong><span><span class="math" data-say="g composed with f">g ∘ f</span> applies <span class="math" data-say="f">f</span> first. The notation follows <span class="math" data-say="g of f of x">g(f(x))</span>, and reading it the other way produces a different function silently.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Writing <span class="math" data-say="f inverse">f⁻¹</span> for a function that is not a bijection</strong><span>The preimage <span class="math" data-say="f inverse of T">f⁻¹(T)</span> of a set always exists; the inverse function does not. The shared notation is a genuine trap.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Checking only one of the two inverse identities</strong><span><span class="math" data-say="g composed with f equals i d sub A">g ∘ f = id_A</span> alone makes <span class="math" data-say="g">g</span> a left inverse, which is weaker. Both identities are needed for <span class="math" data-say="g equals f inverse">g = f⁻¹</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can invert a composition in the right order.</strong><p>With <span class="math" data-say="f of x equals 3 x plus 1">f(x) = 3x + 1</span> and <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span> on <span class="math" data-say="the reals">ℝ</span>, compute <span class="math" data-say="g composed with f">g ∘ f</span> and <span class="math" data-say="g composed with f to the power negative 1">(g ∘ f)⁻¹</span> directly, then check the answer equals <span class="math" data-say="f inverse composed with g inverse">f⁻¹ ∘ g⁻¹</span>. If the two agree you have the order right.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Bijections from a set to itself are called permutations, and under composition they form a group: associative, with identity, and every element invertible. Combinatorics and Counting counts them &mdash; there are <span class="math" data-say="n factorial">n!</span> &mdash; and that count is the reason permutations appear everywhere in combinatorics.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Composing left to right</strong><span><span class="math" data-say="g composed with f">g ∘ f</span> applies <span class="math" data-say="f">f</span> first. The notation follows <span class="math" data-say="g of f of x">g(f(x))</span>, and reading it the other way produces a different function silently.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Writing <span class="math" data-say="f inverse">f⁻¹</span> for a function that is not a bijection</strong><span>The preimage <span class="math" data-say="f inverse of T">f⁻¹(T)</span> of a set always exists; the inverse function does not. The shared notation is a genuine trap.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Checking only one of the two inverse identities</strong><span><span class="math" data-say="g composed with f equals i d sub A">g ∘ f = id_A</span> alone makes <span class="math" data-say="g">g</span> a left inverse, which is weaker. Both identities are needed for <span class="math" data-say="g equals f inverse">g = f⁻¹</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can invert a composition in the right order.</strong><p>With <span class="math" data-say="f of x equals 3 x plus 1">f(x) = 3x + 1</span> and <span class="math" data-say="g of x equals x minus 4">g(x) = x − 4</span> on <span class="math" data-say="the reals">ℝ</span>, compute <span class="math" data-say="g composed with f">g ∘ f</span> and <span class="math" data-say="g composed with f to the power negative 1">(g ∘ f)⁻¹</span> directly, then check the answer equals <span class="math" data-say="f inverse composed with g inverse">f⁻¹ ∘ g⁻¹</span>. If the two agree you have the order right.</p></div></div><div class="note"><strong>Note:</strong> Bijections from a set to itself are called permutations, and under composition they form a group: associative, with identity, and every element invertible. Combinatorics and Counting counts them &mdash; there are <span class="math" data-say="n factorial">n!</span> &mdash; and that count is the reason permutations appear everywhere in combinatorics.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Composition reads right to left</summary><p><span class="math" data-say="g composed with f">g ∘ f</span> applies <span class="math" data-say="f">f</span> first. The notation matches <span class="math" data-say="g of f of x">g(f(x))</span>, which is why it looks backwards until you read it as substitution.</p></details><details class="recall"><summary>Composition is associative, not commutative</summary><p><span class="math" data-say="h composed with g composed with f equals h composed with g composed with f">(h ∘ g) ∘ f = h ∘ (g ∘ f)</span> always. <span class="math" data-say="f composed with g equals g composed with f">f ∘ g = g ∘ f</span> almost never.</p></details><details class="recall"><summary>An inverse needs a bijection</summary><p>Not injective means two inputs share an output, so the inverse could not choose. Not surjective means some output has no input, so the inverse would be undefined there.</p></details></div>
+      <h3>Summary</h3>
       <p><span class="math" data-say="g composed with f times x equals g of f of x">(g ∘ f)(x) = g(f(x))</span> &mdash; right to left. Composition preserves injectivity and surjectivity, and an inverse function exists exactly when <span class="math" data-say="f">f</span> is a bijection.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Composition reads right to left.</strong> <span class="math" data-say="g composed with f">g ∘ f</span> applies <span class="math" data-say="f">f</span> first. The notation matches <span class="math" data-say="g of f of x">g(f(x))</span>, which is why it looks backwards until you read it as substitution.</li><li><strong>Composition is associative, not commutative.</strong> <span class="math" data-say="h composed with g composed with f equals h composed with g composed with f">(h ∘ g) ∘ f = h ∘ (g ∘ f)</span> always. <span class="math" data-say="f composed with g equals g composed with f">f ∘ g = g ∘ f</span> almost never.</li><li><strong>An inverse needs a bijection.</strong> Not injective means two inputs share an output, so the inverse could not choose. Not surjective means some output has no input, so the inverse would be undefined there.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="g composed with f times x equals g of f of x, apply f FIRST. f composed with g is not equal to g composed with f, in general. f inverse exists, if and only if, f is a bijection. f inverse composed with f equals i d sub A, f composed with f inverse equals i d sub B" tabindex="0" role="region" aria-label="Mathematical notation">(g ∘ f)(x) = g(f(x))              apply f FIRST
 f ∘ g ≠ g ∘ f                     in general
 f⁻¹ exists  ⟺  f is a bijection
@@ -1924,11 +1968,40 @@ f⁻¹ ∘ f = id_A      f ∘ f⁻¹ = id_B</div><figcaption>Compose right to l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -1996,7 +2069,7 @@ f⁻¹ ∘ f = id_A      f ∘ f⁻¹ = id_B</div><figcaption>Compose right to l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

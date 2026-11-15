@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Decision and Rationality</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Risk</p>
       <h1>Expected Value and Expected Utility</h1>
       <p class="lesson-lede">Weight each payoff by the probability of its state, add, and take the largest.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Expected utility is a weighted average</li><li>The score need not be a possible payoff</li><li>The recommendation has a tipping point</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Scoring acts by expected utility</h2>
-      <article class="prose reading"><p>Knowledge and Evidence introduced credences: degrees of belief that obey the laws of probability. Suppose your credence in rain is 1/3, and so 2/3 in no rain. Those two numbers are the new ingredient, and with them the umbrella table can be scored in a way the rules for ignorance could not.</p><div class="defbox"><span class="label">Definition &middot; Expected utility</span><p>The <strong>expected utility</strong> of act <span class="math" data-say="A">a</span> is the sum, over states <span class="math" data-say="s">s</span>, of the probability of the state times the payoff of <span class="math" data-say="A">a</span> in it: <span class="math" data-say="the expected utility of a equals the sum over states s of the probability of s times the utility of a in s">EU(a) = Σ P(s)·u(a, s)</span>. The rule recommends an act with the largest expected utility.</p></div><p>For take, the weighted sum is <span data-say="2 times the quantity 1 over 3, plus 1 times the quantity 2 over 3, equals 4 over 3">2·(1/3) + 1·(2/3) = 4/3</span>. For leave it is <span data-say="the quantity negative 3, times the quantity 1 over 3, plus 3 times the quantity 2 over 3, equals 1">(−3)·(1/3) + 3·(2/3) = 1</span>. Take scores higher, so at a credence of 1/3 in rain the rule recommends the umbrella, which is the verdict maximin and minimax regret also gave.</p><p>The number 4/3 deserves a closer look, because the word &ldquo;expected&rdquo; misleads. No single outing with the umbrella pays 4/3; it pays 2 or 1. The figure is what the average would be if the same decision were faced many times with the same odds. For one decision it is a score, a number that ranks acts by weighing every state in proportion to how likely you think it is. That is the whole claim of the rule, and it is a substantial one.</p><div class="thm"><span class="label">Theorem &middot; The tipping point</span><p>With two states, let <span class="math" data-say="p">p</span> be the probability of the first. Each act's score is a straight line in <span class="math" data-say="p">p</span>, so the two lines cross at one value, and the recommendation changes only there.</p></div><p>For the umbrella, let <span class="math" data-say="p">p</span> be the probability of rain. Take scores <span data-say="2 times p plus 1 times the quantity 1 minus p, equals 1 plus p">2·p + 1·(1 − p) = 1 + p</span> and leave scores <span data-say="the quantity negative 3, times p plus 3 times the quantity 1 minus p, equals 3 minus 6 times p">(−3)·p + 3·(1 − p) = 3 − 6·p</span>. They tie when <span data-say="1 plus p equals 3 minus 6 times p">1 + p = 3 − 6·p</span>, that is when <span data-say="7 times p equals 2">7·p = 2</span>, so <span class="math" data-say="p equals 2 over 7">p = 2/7</span>. Above 2/7 the umbrella is recommended and below it the act of leaving is. The lab prints that figure as the point where the expected utilities tie.</p><p>The tipping point is the most useful number in the lab, because it separates two questions. How likely is rain is a question about the world; whether the answer matters is a question about the table. If you are sure rain is more likely than 2/7, your exact estimate is irrelevant to what to do.</p><div class="example"><span class="label">Example &middot; A fair bet</span><p>Win 1 or lose 1 with probability 1/2 each, against not betting at all. Betting scores <span data-say="1 times the quantity 1 over 2, plus the quantity negative 1, times the quantity 1 over 2, equals 0">1·(1/2) + (−1)·(1/2) = 0</span> and not betting scores 0. The two tie, and the tipping point is p = 1/2. A bet is worth taking when your probability of winning is above that.</p></div><p>The <span class="math" data-say="lottery-ticket">lottery-ticket</span> preset is the same comparison with the odds moved. A ticket costing 1 pays 500 if it wins, so buying scores 499 with probability 1/1000 and minus 1 otherwise, which comes to 499/1000 − 999/1000 = −1/2, against 0 for skipping. The lab recommends skipping and prints the tie at a probability of winning of 1/500, which is where the prize is exactly the odds against it. Only above that is buying recommended, and a lottery that sold tickets there would be paying out more than it took in.</p><p>One caution. The payoffs in the table are utilities, numbers that stand for how much you value each outcome, and for money amounts the two can come apart. The next lesson takes the difference up. Here the payoffs are taken as utilities from the start, so there is nothing to convert.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Scoring acts by expected utility</h2><div class="prose reading"><p>Knowledge and Evidence introduced credences: degrees of belief that obey the laws of probability. Suppose your credence in rain is 1/3, and so 2/3 in no rain. Those two numbers are the new ingredient, and with them the umbrella table can be scored in a way the rules for ignorance could not.</p><div class="defbox"><span class="label">Definition &middot; Expected utility</span><p>The <strong>expected utility</strong> of act <span class="math" data-say="A">a</span> is the sum, over states <span class="math" data-say="s">s</span>, of the probability of the state times the payoff of <span class="math" data-say="A">a</span> in it: <span class="math" data-say="the expected utility of a equals the sum over states s of the probability of s times the utility of a in s">EU(a) = Σ P(s)·u(a, s)</span>. The rule recommends an act with the largest expected utility.</p></div><p>For take, the weighted sum is <span data-say="2 times the quantity 1 over 3, plus 1 times the quantity 2 over 3, equals 4 over 3">2·(1/3) + 1·(2/3) = 4/3</span>. For leave it is <span data-say="the quantity negative 3, times the quantity 1 over 3, plus 3 times the quantity 2 over 3, equals 1">(−3)·(1/3) + 3·(2/3) = 1</span>. Take scores higher, so at a credence of 1/3 in rain the rule recommends the umbrella, which is the verdict maximin and minimax regret also gave.</p><p>The number 4/3 deserves a closer look, because the word &ldquo;expected&rdquo; misleads. No single outing with the umbrella pays 4/3; it pays 2 or 1. The figure is what the average would be if the same decision were faced many times with the same odds. For one decision it is a score, a number that ranks acts by weighing every state in proportion to how likely you think it is. That is the whole claim of the rule, and it is a substantial one.</p><div class="thm"><span class="label">Theorem &middot; The tipping point</span><p>With two states, let <span class="math" data-say="p">p</span> be the probability of the first. Each act's score is a straight line in <span class="math" data-say="p">p</span>, so the two lines cross at one value, and the recommendation changes only there.</p></div><p>For the umbrella, let <span class="math" data-say="p">p</span> be the probability of rain. Take scores <span data-say="2 times p plus 1 times the quantity 1 minus p, equals 1 plus p">2·p + 1·(1 − p) = 1 + p</span> and leave scores <span data-say="the quantity negative 3, times p plus 3 times the quantity 1 minus p, equals 3 minus 6 times p">(−3)·p + 3·(1 − p) = 3 − 6·p</span>. They tie when <span data-say="1 plus p equals 3 minus 6 times p">1 + p = 3 − 6·p</span>, that is when <span data-say="7 times p equals 2">7·p = 2</span>, so <span class="math" data-say="p equals 2 over 7">p = 2/7</span>. Above 2/7 the umbrella is recommended and below it the act of leaving is. The lab prints that figure as the point where the expected utilities tie.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A decision table under every rule</h2></div><p>the same payoffs, eight ways of choosing, each computed exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Acts by states</strong><span>a row per act, a column per state; the rule decides</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="deTable"></table></div>
       <div class="status-banner" id="deStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Change a probability and find where the choice flips</h3>
-          <p>Each preset ships with its probabilities filled in. On the umbrella, change the probabilities from 1/3 and 2/3 to 1/5 and 4/5: the act recommended switches to leave. The last tile prints the probability at which the two best acts tie, so you can check that 1/5 is below it and 1/3 above. A text box that does not parse, or probabilities that do not add to 1, are refused with a message and not repaired.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Change a probability and find where the choice flips</h3>
+            <p>Each preset ships with its probabilities filled in. On the umbrella, change the probabilities from 1/3 and 2/3 to 1/5 and 4/5: the act recommended switches to leave. The last tile prints the probability at which the two best acts tie, so you can check that 1/5 is below it and 1/3 above. A text box that does not parse, or probabilities that do not add to 1, are refused with a message and not repaired.</p>
         <div class="field">
           <label for="dePreset">Worked example</label>
           <select id="dePreset"><option value="umbrella-p" selected>umbrella, rain at 1/3</option><option value="bet">a fair bet against not betting</option><option value="lottery-ticket">a ticket costing 1 that pays 500</option></select>
@@ -1446,12 +1489,15 @@
           <div class="kpi"><span>Expected utilities tie at</span><strong id="deFlip">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The tipping point is the most useful number in the lab, because it separates two questions. How likely is rain is a question about the world; whether the answer matters is a question about the table. If you are sure rain is more likely than 2/7, your exact estimate is irrelevant to what to do.</p><div class="example"><span class="label">Example &middot; A fair bet</span><p>Win 1 or lose 1 with probability 1/2 each, against not betting at all. Betting scores <span data-say="1 times the quantity 1 over 2, plus the quantity negative 1, times the quantity 1 over 2, equals 0">1·(1/2) + (−1)·(1/2) = 0</span> and not betting scores 0. The two tie, and the tipping point is p = 1/2. A bet is worth taking when your probability of winning is above that.</p></div><p>The <span class="math" data-say="lottery-ticket">lottery-ticket</span> preset is the same comparison with the odds moved. A ticket costing 1 pays 500 if it wins, so buying scores 499 with probability 1/1000 and minus 1 otherwise, which comes to 499/1000 − 999/1000 = −1/2, against 0 for skipping. The lab recommends skipping and prints the tie at a probability of winning of 1/500, which is where the prize is exactly the odds against it. Only above that is buying recommended, and a lottery that sold tickets there would be paying out more than it took in.</p><p>One caution. The payoffs in the table are utilities, numbers that stand for how much you value each outcome, and for money amounts the two can come apart. The next lesson takes the difference up. Here the payoffs are taken as utilities from the start, so there is nothing to convert.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Scoring an act and finding the tipping point</h2></div><p>Four steps. The last two apply only when there are two states.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check the probabilities</h3><p>One per state, none negative, summing to 1. A table whose probabilities do not sum to 1 describes some other problem.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply across each row</h3><p>Pair every payoff with the probability of its column and multiply. Keep the fractions; rounding early moves a tie.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add and compare</h3><p>The sum is the act's expected utility. The act with the largest sum is recommended, and a tie means the rule does not choose.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve for the tie</h3><p>With two states write each score as a function of <span class="math" data-say="p">p</span>, set them equal and solve. The answer tells you how wrong your estimate can be before the choice changes.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Scoring an act and finding the tipping point</h2>
+      <p class="lead-in">Four steps. The last two apply only when there are two states.</p>
+      <ol class="key-ideas method"><li><strong>Check the probabilities.</strong> One per state, none negative, summing to 1. A table whose probabilities do not sum to 1 describes some other problem.</li><li><strong>Multiply across each row.</strong> Pair every payoff with the probability of its column and multiply. Keep the fractions; rounding early moves a tie.</li><li><strong>Add and compare.</strong> The sum is the act's expected utility. The act with the largest sum is recommended, and a tie means the rule does not choose.</li><li><strong>Solve for the tie.</strong> With two states write each score as a function of <span class="math" data-say="p">p</span>, set them equal and solve. The answer tells you how wrong your estimate can be before the choice changes.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1516,16 @@ general p:   1 + p = 3 - 6·p
 7·p = 2,   p = 2/7</div><p>The credence 1/3 is above 2/7, so the umbrella wins, but not by much: only 1/21 of probability separates them. A forecaster who revised rain from 1/3 to 1/5 would reverse the advice.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading expected value as the value you expect</strong><span>The expected utility of taking the umbrella is 4/3, and no outcome of taking it is worth 4/3: it pays 2 or 1. The figure is an average, weighted by probability, that ranks the acts. It is not a forecast of what will happen on this occasion, and acting on it does not promise a result near it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the probability as a fact rather than an estimate</strong><span>The 1/3 is your credence, and the tipping point of 2/7 shows how much room it has: a credence of 1/5 reverses the advice. Report the recommendation together with the tipping point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a tie to mean the choice does not matter</strong><span>At the tipping point the two scores are equal, so the rule is silent, but the payoffs still differ state by state. Which one you take decides what you get in rain and in sun, and indifference between the averages is not indifference between the outcomes.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score two acts and say where the choice flips.</strong><p>Given a table and a probability for each state, you should be able to compute each act's expected utility, name the act the rule recommends, and for two states solve for the probability at which the recommendation changes.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The payoff numbers are inputs: the lab scores the table you give it and cannot tell you that a soaking is worth minus 3. “Risk Aversion and the Value of Information” is where the difference between a sum of money and its worth to you is made explicit.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading expected value as the value you expect</strong><span>The expected utility of taking the umbrella is 4/3, and no outcome of taking it is worth 4/3: it pays 2 or 1. The figure is an average, weighted by probability, that ranks the acts. It is not a forecast of what will happen on this occasion, and acting on it does not promise a result near it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the probability as a fact rather than an estimate</strong><span>The 1/3 is your credence, and the tipping point of 2/7 shows how much room it has: a credence of 1/5 reverses the advice. Report the recommendation together with the tipping point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a tie to mean the choice does not matter</strong><span>At the tipping point the two scores are equal, so the rule is silent, but the payoffs still differ state by state. Which one you take decides what you get in rain and in sun, and indifference between the averages is not indifference between the outcomes.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can score two acts and say where the choice flips.</strong><p>Given a table and a probability for each state, you should be able to compute each act's expected utility, name the act the rule recommends, and for two states solve for the probability at which the recommendation changes.</p></div></div><div class="note"><strong>Note:</strong> The payoff numbers are inputs: the lab scores the table you give it and cannot tell you that a soaking is worth minus 3. “Risk Aversion and the Value of Information” is where the difference between a sum of money and its worth to you is made explicit.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Expected utility is a weighted average</summary><p>Multiply each payoff in an act's row by the probability of its state and add the products. An act that pays 2 with probability 1/3 and 1 with probability 2/3 scores 4/3.</p></details><details class="recall"><summary>The score need not be a possible payoff</summary><p>4/3 is not a number the act can pay. It is a number for comparing acts, and it has a meaning only as a comparison.</p></details><details class="recall"><summary>The recommendation has a tipping point</summary><p>With two states, the probability at which two acts score equally divides the cases where one is recommended from those where the other is. Your estimate matters only if it is on the other side of that point.</p></details></div>
+      <h3>Summary</h3>
       <p>When the states have probabilities, an act can be scored by the average of its payoffs weighted by those probabilities. That score is its expected utility, and the act with the largest score is the one the rule recommends. The probability at which two acts tie says how much the recommendation depends on your estimate.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Expected utility is a weighted average.</strong> Multiply each payoff in an act's row by the probability of its state and add the products. An act that pays 2 with probability 1/3 and 1 with probability 2/3 scores 4/3.</li><li><strong>The score need not be a possible payoff.</strong> 4/3 is not a number the act can pay. It is a number for comparing acts, and it has a meaning only as a comparison.</li><li><strong>The recommendation has a tipping point.</strong> With two states, the probability at which two acts score equally divides the cases where one is recommended from those where the other is. Your estimate matters only if it is on the other side of that point.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the expected utility of a equals the sum over states s of the probability of s times the utility of a in s. Take the largest. P of s, probability of state s. u of a and s is the payoff of act a in state s. tie at p, solve EU of A equals EU of b for p. EU is a score, not a prediction" tabindex="0" role="region" aria-label="Mathematical notation">EU(a) = Σ P(s)·u(a, s)   take the largest
 P(s): probability of state s
 u(a, s): payoff of act a in state s
@@ -2307,11 +2352,40 @@ EU is a score, not a prediction</div><figcaption>Weight, add, compare</figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2379,7 +2453,7 @@ EU is a score, not a prediction</div><figcaption>Weight, add, compare</figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Natural Condition and the Laws of Nature</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 13 · Of the Naturall Condition of Mankind</p>
       <h1>Equality of Ability</h1>
       <p class="lesson-lede">Hobbes starts the war with a claim about strength: the weakest man can kill the strongest by a plot or with allies, so no one&#x27;s strength entitles him to more than others claim.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Equality of body</li><li>Equality of mind</li><li>From equal ability to enmity</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then equality of strength, of mind and of hope</h2>
-      <article class="prose reading"><p><strong>Chapter 13.</strong> &ldquo;Nature hath made men so equall, in the faculties of body, and mind; as that though there bee found one man sometimes manifestly stronger in body, or of quicker mind then another; yet when all is reckoned together, the difference between man, and man, is not so considerable, as that one man can thereupon claim to himselfe any benefit, to which another may not pretend, as well as he. For as to the strength of body, the weakest has strength enough to kill the strongest, either by secret machination, or by confederacy with others, that are in the same danger with himselfe.&rdquo;</p><p>Leviathan came out in London in 1651. Two years before, a king had been tried and beheaded in the same city, and Hobbes, who had left England for Paris in 1640, wrote the book in exile while the quarrel that killed him was still being fought. The chapter people remember is this one, the chapter of the war of every man against every man, and it is worth noticing where it starts. It does not start with fear, or greed, or wickedness. It starts with a claim about arithmetic: how much stronger can one man be than another.</p><p>Read the sentence for what Hobbes gives away. He allows that one man is &ldquo;sometimes manifestly stronger in body, or of quicker mind&rdquo; than another. What he denies is that the difference is enough to found a title. The test is in the words &ldquo;when all is reckoned together&rdquo; (in Chapter 5 he had said that reason is nothing but reckoning, adding and subtracting) and in the phrase &ldquo;any benefit, to which another may not pretend, as well as he&rdquo;. Equality here means equality of claim: no man's superiority is so large that the rest have no ground to say <em>and why not I</em>.</p><p>Then the proof for the body, in two ways. By &ldquo;secret machination&rdquo; the weakest overcomes the strongest because the strongest sleeps, or looks away, or does not know. By &ldquo;confederacy with others, that are in the same danger with himselfe&rdquo; he overcomes him by adding strengths. The lab does the second as a sum. Six men, whose strengths are the lesson's own figures and nothing Hobbes gives, have <span class="math" data-say="10">10</span>, <span class="math" data-say="8">8</span>, <span class="math" data-say="7">7</span>, <span class="math" data-say="6">6</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="3">3</span>. In an open fight (the open preset) the strongest, Aldo, cannot be beaten by Bea alone, who has <span class="math" data-say="8">8</span>, but can be beaten by Bea and Cato together, who have <span class="math" data-say="15">15</span>, so two others are enough. Everyone else is beaten by Aldo alone, who outweighs each of them, so all six men can be overcome by two or fewer.</p><p>Secret machination goes into the lab as a factor on the attacker's strength: a sleeping victim is as good as a weaker one. In the machination preset the factor is <span class="math" data-say="4">4</span>, so Finn, the weakest, has <span class="math" data-say="3 times 4 equals 12">3 × 4 = 12</span>, which is more than Aldo's <span class="math" data-say="10">10</span>, and Hobbes's claim in its first form holds: the weakest has strength enough to kill the strongest. The lab keeps the claim honest by showing what would break it. In the giant preset Aldo has <span class="math" data-say="24">24</span>, and the others must all but gather to beat him: Bea, Cato, Dara and Edo together have <span class="math" data-say="26">26</span>, so four of the five are needed. In the beyond preset he has <span class="math" data-say="30">30</span>, and the other five together reach only <span class="math" data-say="29">29</span>: he is beyond every coalition. Hobbes's premise is therefore a premise about size. It says that the strongest man is never so far ahead that all the rest together cannot match him, and it leaves to the reader whether men are like that.</p><p>Now the mind. Hobbes says he finds &ldquo;a greater equality amongst men, than that of strength&rdquo;, and takes out two exceptions at once: &ldquo;the arts grounded upon words&rdquo; and science, which &ldquo;very few have, and but in few things&rdquo;. What is left is prudence, and &ldquo;Prudence, is but Experience; which equall time, equally bestowes on all men, in those things they equally apply themselves unto&rdquo;. Then comes his most sardonic paragraph. What makes this equality hard to believe is &ldquo;a vain conceipt of ones owne wisdome&rdquo;, since every man will grant that others are more witty, more eloquent, or more learned, yet &ldquo;will hardly believe there be many so wise as themselves&rdquo;, for &ldquo;they see their own wit at hand, and other mens at a distance&rdquo;. And he turns the vanity into the proof: there is no greater sign of an equal distribution of anything than that every man is contented with his share.</p><p>The third paragraph is where equality starts to do harm. &ldquo;From this equality of ability, ariseth equality of hope in the attaining of our Ends.&rdquo; If two men want the same thing and cannot both have it, they become enemies, and the end each pursues is &ldquo;principally their owne conservation, and sometimes their delectation only&rdquo;. Notice that the ends are modest. Then the invader enters. Where an invader fears no more than one man's single power, someone who plants, sows or builds may expect others to come &ldquo;prepared with forces united&rdquo;, to take from him &ldquo;not only of the fruit of his labour, but also of his life, or liberty&rdquo;. And &ldquo;the Invader again is in the like danger of another.&rdquo; The weakest may kill the strongest, so everybody has reason to fear everybody, and fear is the next lesson's subject.</p><p>Two objections suggest themselves, and the book has something to say to each. Aristotle, whom Hobbes names in Chapter 15, had held that some men are by nature fitter to command and others to serve. Hobbes answers that this is against experience as well as reason, since the wise in their own conceit do not often win when they contend by force with men who distrust their own wisdom. The second objection is that the weak do not combine so easily. Allies in &ldquo;the same danger&rdquo; have a motive to join, and the lab supposes they do. Whether each would trust the others to stay in is a different question, and Chapter 14's covenants are where the book comes to it. The lab adds strengths and stops there.</p><p>So far the chapter has said what men can do to each other. The next lesson, &ldquo;The War of Every Man Against Every Man&rdquo;, reads what Hobbes concludes from it: the three causes of quarrel, the condition he calls war, and the claim that in it nothing is unjust.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Equality of ability</h2></div><p>who can be overcome, and by how few</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then equality of strength, of mind and of hope</h2><div class="prose reading"><p><strong>Chapter 13.</strong> &ldquo;Nature hath made men so equall, in the faculties of body, and mind; as that though there bee found one man sometimes manifestly stronger in body, or of quicker mind then another; yet when all is reckoned together, the difference between man, and man, is not so considerable, as that one man can thereupon claim to himselfe any benefit, to which another may not pretend, as well as he. For as to the strength of body, the weakest has strength enough to kill the strongest, either by secret machination, or by confederacy with others, that are in the same danger with himselfe.&rdquo;</p><p>Leviathan came out in London in 1651. Two years before, a king had been tried and beheaded in the same city, and Hobbes, who had left England for Paris in 1640, wrote the book in exile while the quarrel that killed him was still being fought. The chapter people remember is this one, the chapter of the war of every man against every man, and it is worth noticing where it starts. It does not start with fear, or greed, or wickedness. It starts with a claim about arithmetic: how much stronger can one man be than another.</p><p>Read the sentence for what Hobbes gives away. He allows that one man is &ldquo;sometimes manifestly stronger in body, or of quicker mind&rdquo; than another. What he denies is that the difference is enough to found a title. The test is in the words &ldquo;when all is reckoned together&rdquo; (in Chapter 5 he had said that reason is nothing but reckoning, adding and subtracting) and in the phrase &ldquo;any benefit, to which another may not pretend, as well as he&rdquo;. Equality here means equality of claim: no man's superiority is so large that the rest have no ground to say <em>and why not I</em>.</p><p>Then the proof for the body, in two ways. By &ldquo;secret machination&rdquo; the weakest overcomes the strongest because the strongest sleeps, or looks away, or does not know. By &ldquo;confederacy with others, that are in the same danger with himselfe&rdquo; he overcomes him by adding strengths. The lab does the second as a sum. Six men, whose strengths are the lesson's own figures and nothing Hobbes gives, have <span class="math" data-say="10">10</span>, <span class="math" data-say="8">8</span>, <span class="math" data-say="7">7</span>, <span class="math" data-say="6">6</span>, <span class="math" data-say="5">5</span> and <span class="math" data-say="3">3</span>. In an open fight (the open preset) the strongest, Aldo, cannot be beaten by Bea alone, who has <span class="math" data-say="8">8</span>, but can be beaten by Bea and Cato together, who have <span class="math" data-say="15">15</span>, so two others are enough. Everyone else is beaten by Aldo alone, who outweighs each of them, so all six men can be overcome by two or fewer.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Equality of ability</h2></div><p>who can be overcome, and by how few</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Equality of ability</strong><span>who can be overcome, and by how few</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="leqTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="leqTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A coalition's force is the sum of its members' strengths times the factor (secret machination, or the victim asleep; 1 for none). It overcomes a person when its force exceeds his strength (rule exceed) or at least equals it (rule match). For each person, the others are taken from the strongest down, ties in input order, until their force overcomes him; that is the fewest who can, and the coalition shown. A person whom all the others together cannot overcome is beyond every coalition. The strongest is the first of the greatest strength in input order, the weakest the first of the least strength other than him; the weakest alone has the factor too.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Who can be overcome, and by how few</h3>
-          <p>A figure computed from what the lesson states. Six men's strengths go in, with a factor for secret machination. For each man the lab finds the fewest others whose strengths, added and multiplied by the factor, exceed his. Start with the open fight, then change Aldo's strength and watch the figure for the fewest others who overcome each man.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Who can be overcome, and by how few</h3>
+            <p>A figure computed from what the lesson states. Six men's strengths go in, with a factor for secret machination. For each man the lab finds the fewest others whose strengths, added and multiplied by the factor, exceed his. Start with the open fight, then change Aldo's strength and watch the figure for the fewest others who overcome each man.</p>
         <div class="field">
           <label for="leqPreset">Worked example</label>
           <select id="leqPreset"><option value="open" selected>Six men in an open fight</option><option value="machination">A plot against a sleeping man: attackers count four times</option><option value="giant">Aldo has 24</option><option value="beyond">Aldo has 30</option></select>
@@ -1433,12 +1476,15 @@
           <div class="kpi"><span>Overcome by two or fewer</span><strong id="leqByTwo">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Secret machination goes into the lab as a factor on the attacker's strength: a sleeping victim is as good as a weaker one. In the machination preset the factor is <span class="math" data-say="4">4</span>, so Finn, the weakest, has <span class="math" data-say="3 times 4 equals 12">3 × 4 = 12</span>, which is more than Aldo's <span class="math" data-say="10">10</span>, and Hobbes's claim in its first form holds: the weakest has strength enough to kill the strongest. The lab keeps the claim honest by showing what would break it. In the giant preset Aldo has <span class="math" data-say="24">24</span>, and the others must all but gather to beat him: Bea, Cato, Dara and Edo together have <span class="math" data-say="26">26</span>, so four of the five are needed. In the beyond preset he has <span class="math" data-say="30">30</span>, and the other five together reach only <span class="math" data-say="29">29</span>: he is beyond every coalition. Hobbes's premise is therefore a premise about size. It says that the strongest man is never so far ahead that all the rest together cannot match him, and it leaves to the reader whether men are like that.</p><p>Now the mind. Hobbes says he finds &ldquo;a greater equality amongst men, than that of strength&rdquo;, and takes out two exceptions at once: &ldquo;the arts grounded upon words&rdquo; and science, which &ldquo;very few have, and but in few things&rdquo;. What is left is prudence, and &ldquo;Prudence, is but Experience; which equall time, equally bestowes on all men, in those things they equally apply themselves unto&rdquo;. Then comes his most sardonic paragraph. What makes this equality hard to believe is &ldquo;a vain conceipt of ones owne wisdome&rdquo;, since every man will grant that others are more witty, more eloquent, or more learned, yet &ldquo;will hardly believe there be many so wise as themselves&rdquo;, for &ldquo;they see their own wit at hand, and other mens at a distance&rdquo;. And he turns the vanity into the proof: there is no greater sign of an equal distribution of anything than that every man is contented with his share.</p><p>The third paragraph is where equality starts to do harm. &ldquo;From this equality of ability, ariseth equality of hope in the attaining of our Ends.&rdquo; If two men want the same thing and cannot both have it, they become enemies, and the end each pursues is &ldquo;principally their owne conservation, and sometimes their delectation only&rdquo;. Notice that the ends are modest. Then the invader enters. Where an invader fears no more than one man's single power, someone who plants, sows or builds may expect others to come &ldquo;prepared with forces united&rdquo;, to take from him &ldquo;not only of the fruit of his labour, but also of his life, or liberty&rdquo;. And &ldquo;the Invader again is in the like danger of another.&rdquo; The weakest may kill the strongest, so everybody has reason to fear everybody, and fear is the next lesson's subject.</p><p>Two objections suggest themselves, and the book has something to say to each. Aristotle, whom Hobbes names in Chapter 15, had held that some men are by nature fitter to command and others to serve. Hobbes answers that this is against experience as well as reason, since the wise in their own conceit do not often win when they contend by force with men who distrust their own wisdom. The second objection is that the weak do not combine so easily. Allies in &ldquo;the same danger&rdquo; have a motive to join, and the lab supposes they do. Whether each would trust the others to stay in is a different question, and Chapter 14's covenants are where the book comes to it. The lab adds strengths and stops there.</p><p>So far the chapter has said what men can do to each other. The next lesson, &ldquo;The War of Every Man Against Every Man&rdquo;, reads what Hobbes concludes from it: the three causes of quarrel, the condition he calls war, and the claim that in it nothing is unjust.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Testing Hobbes&#x27;s equality for a stated group</h2></div><p>Four steps, the same for any set of strengths.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List each man&#x27;s strength as one number</h3><p>The lab takes strength to be a single figure that adds. That is a model of Hobbes's body, and the figures are the lesson's, not the book's.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Fix the factor for the attack</h3><p>Use <span class="math" data-say="1">1</span> for an open fight. Use a larger factor where the attacker has the advantage of a plot, a surprise or a sleeping victim, and say which.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the fewest attackers</h3><p>For each man, add the other men's strengths from the strongest down, each multiplied by the factor, until the sum exceeds his. The number added is the smallest coalition.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the result against the claim</h3><p>If even the strongest is overcome by a few, no man's strength is a title to more than others claim. If someone is beyond every coalition, the claim fails for him on these figures.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Testing Hobbes&#x27;s equality for a stated group</h2>
+      <p class="lead-in">Four steps, the same for any set of strengths.</p>
+      <ol class="key-ideas method"><li><strong>List each man&#x27;s strength as one number.</strong> The lab takes strength to be a single figure that adds. That is a model of Hobbes's body, and the figures are the lesson's, not the book's.</li><li><strong>Fix the factor for the attack.</strong> Use <span class="math" data-say="1">1</span> for an open fight. Use a larger factor where the attacker has the advantage of a plot, a surprise or a sleeping victim, and say which.</li><li><strong>Find the fewest attackers.</strong> For each man, add the other men's strengths from the strongest down, each multiplied by the factor, until the sum exceeds his. The number added is the smallest coalition.</li><li><strong>Read the result against the claim.</strong> If even the strongest is overcome by a few, no man's strength is a title to more than others claim. If someone is beyond every coalition, the claim fails for him on these figures.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1457,17 +1503,16 @@ plot, factor 4:  Finn alone has 3 · 4 = 12
 Aldo 30:  8 + 7 + 6 + 5 + 3 = 29, not more than 30</div><p>At <span class="math" data-say="24">24</span> the other five must still combine: <span class="math" data-say="8 plus 7 plus 6 plus 5 equals 26">8 + 7 + 6 + 5 = 26</span> is the first sum above <span class="math" data-say="24">24</span>, so four men are needed. At <span class="math" data-say="30">30</span> no coalition is large enough, and Hobbes's sentence would not be true of a man like that.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Hobbes says men are equally strong and equally clever</strong><span>He says the opposite at the start: &ldquo;manifestly stronger in body, or of quicker mind&rdquo;. What he claims is that the difference is not so considerable that one man may claim a benefit another may not. He also takes science and the arts of words out of the comparison, and in the lab Aldo has <span class="math" data-say="10">10</span> where Finn has <span class="math" data-say="3">3</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the equality as a compliment</strong><span>The chapter does not praise men for being alike. Equal ability yields equal hope, equal hope for one thing yields enmity, and the weakest being able to kill the strongest is a reason for the strongest to be afraid. Equality is the premise of the danger.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the lab predicts that the weak will band together</strong><span>The figure says only that a coalition of that size would have strength enough. Whether the allies would find one another and stay in is a question about trust, and the lab does not touch it. Hobbes's phrase is &ldquo;confederacy with others, that are in the same danger with himselfe&rdquo;, which gives them a motive and no more.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say who can be overcome and by how few.</strong><p>Given six men's strengths and a factor for machination, compute for the strongest and the weakest the fewest others that can overcome them, say whether any man is beyond every coalition, and say what that does to Hobbes's claim.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Strength is a single number in the lab, and it adds. A real contest is not a sum, and Hobbes's &ldquo;when all is reckoned together&rdquo; is a judgement about men that no figure here can make. The lab shows how large a difference would break his premise, and whether men differ by that much is what the premise states and a critic may dispute.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking Hobbes says men are equally strong and equally clever</strong><span>He says the opposite at the start: &ldquo;manifestly stronger in body, or of quicker mind&rdquo;. What he claims is that the difference is not so considerable that one man may claim a benefit another may not. He also takes science and the arts of words out of the comparison, and in the lab Aldo has <span class="math" data-say="10">10</span> where Finn has <span class="math" data-say="3">3</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the equality as a compliment</strong><span>The chapter does not praise men for being alike. Equal ability yields equal hope, equal hope for one thing yields enmity, and the weakest being able to kill the strongest is a reason for the strongest to be afraid. Equality is the premise of the danger.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking the lab predicts that the weak will band together</strong><span>The figure says only that a coalition of that size would have strength enough. Whether the allies would find one another and stay in is a question about trust, and the lab does not touch it. Hobbes's phrase is &ldquo;confederacy with others, that are in the same danger with himselfe&rdquo;, which gives them a motive and no more.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say who can be overcome and by how few.</strong><p>Given six men's strengths and a factor for machination, compute for the strongest and the weakest the fewest others that can overcome them, say whether any man is beyond every coalition, and say what that does to Hobbes's claim.</p></div></div><div class="note"><strong>Note:</strong> Strength is a single number in the lab, and it adds. A real contest is not a sum, and Hobbes's &ldquo;when all is reckoned together&rdquo; is a judgement about men that no figure here can make. The lab shows how large a difference would break his premise, and whether men differ by that much is what the premise states and a critic may dispute.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Equality of body</summary><p>Hobbes does not say men are equally strong. He says that when all is reckoned together the difference between man and man is not so considerable that one can claim a benefit another may not pretend to as well, because the weakest has strength enough to kill the strongest, either by secret machination or by confederacy with others who are in the same danger.</p></details><details class="recall"><summary>Equality of mind</summary><p>He finds an even greater equality of mind, setting aside the arts grounded on words and science, which very few have. Prudence is only experience, which equal time bestows equally on all men in the things they equally apply themselves to. What makes this seem incredible is a vain conceit of one's own wisdom.</p></details><details class="recall"><summary>From equal ability to enmity</summary><p>From equality of ability comes equality of hope in attaining our ends. If two men want the same thing and cannot both enjoy it, they become enemies and try to destroy or subdue one another. An invader who fears only one man's single power finds others coming with united forces against the man who plants and builds, and the invader is in the like danger of another.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 13 opens with equality, not with fear. Hobbes grants that one man is sometimes manifestly stronger or quicker than another and says the difference is not great enough to give him a claim that others may not make as well, because the weakest can kill the strongest by secret machination or by confederacy. Six men's strengths are added up to find who can be overcome, by how few, and how large a difference would break the claim.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Equality of body.</strong> Hobbes does not say men are equally strong. He says that when all is reckoned together the difference between man and man is not so considerable that one can claim a benefit another may not pretend to as well, because the weakest has strength enough to kill the strongest, either by secret machination or by confederacy with others who are in the same danger.</li><li><strong>Equality of mind.</strong> He finds an even greater equality of mind, setting aside the arts grounded on words and science, which very few have. Prudence is only experience, which equal time bestows equally on all men in the things they equally apply themselves to. What makes this seem incredible is a vain conceit of one's own wisdom.</li><li><strong>From equal ability to enmity.</strong> From equality of ability comes equality of hope in attaining our ends. If two men want the same thing and cannot both enjoy it, they become enemies and try to destroy or subdue one another. An invader who fears only one man's single power finds others coming with united forces against the man who plants and builds, and the invader is in the like danger of another.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="weakest can kill strongest, plot or allies. equal ability gives equal hope. equal hope, one object, they become enemies. a coalition beats anyone it outweighs. a giant who outweighs all the rest is safe" tabindex="0" role="region" aria-label="Mathematical notation">weakest can kill strongest: plot or allies
 equal ability gives equal hope
 equal hope, one object: they become enemies
@@ -2262,11 +2307,40 @@ a giant who outweighs all the rest is safe</div><figcaption>The first step of th
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2334,7 +2408,7 @@ a giant who outweighs all the rest is safe</div><figcaption>The first step of th
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Advanced Design and Analysis Techniques</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 15 · Dynamic Programming</p>
       <h1>Elements of Dynamic Programming</h1>
       <p class="lesson-lede">Dynamic programming needs two things, optimal substructure and overlapping subproblems, and a problem that looks like a shortest path can lack the first, as the longest simple path does.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Optimal substructure</li><li>Independent subproblems</li><li>Overlapping subproblems</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two ingredients, one subtlety, and the memo</h2>
-      <article class="prose reading"><p>&ldquo;Whenever a problem exhibits optimal substructure, we have a good clue that dynamic programming might apply.&rdquo; The authors choose the words carefully: a clue, and <em>might</em>. Section 15.3 is about the two ingredients an optimization problem needs before dynamic programming is worth trying, and about how to check each one instead of hoping.</p><p>The first ingredient is optimal substructure, and the authors describe the pattern you will find yourself following to discover it. Show that a solution consists of a choice, a first piece or a split point, that leaves subproblems. Suppose you are handed the choice an optimal solution makes, without worrying yet how to find it. Work out which subproblems follow and how to describe their space. Then prove, by the cut-and-paste argument, that the parts of an optimal solution that solve those subproblems must be optimal for them.</p><p>Keep the subproblem space as simple as possible and widen it only when forced. For rod cutting, one length per subproblem was enough. For the matrix chain, subproblems of the form <span class="math" data-say="A sub 1 and so on A sub j">A₁⋯Aⱼ</span> are not: a split leaves a suffix <span class="math" data-say="A sub k plus 1 and so on A sub j">Aₖ₊₁⋯Aⱼ</span> that does not start at 1, so both ends must vary. Problems also differ in how many subproblems an optimal solution uses and how many choices are tried for each, and informally the running time is the product of the number of subproblems and the choices per subproblem: <span class="math" data-say="theta of n">Θ(n)</span> subproblems with n choices for rod cutting, <span class="math" data-say="theta of n squared">Θ(n²)</span> with <span class="math" data-say="n minus 1">n − 1</span> for the chain. The subproblem graph tells the same story with vertices and arcs.</p><p>The authors set greedy algorithms against this in a paragraph. Both rely on optimal substructure, but dynamic programming solves the subproblems first and then chooses with their answers in hand, while a greedy algorithm makes the choice that looks best now and solves only the one subproblem left. That it sometimes works is Chapter 16's subject.</p><p>Then the subtlety. Unweighted shortest paths have optimal substructure: if a shortest path from u to v passes through w, its two parts are shortest paths from u to w and from w to v, or one could be replaced by a shorter one. The longest simple path, the path with the most arcs and no repeated vertex, looks just as decomposable, and is not. Here is a small directed graph of this lesson's own, four vertices and six arcs, none of them two-way.</p><div class="mathblock" data-say="arcs, u to v, u to w, v to w, w to x, x to u, x to v. longest simple path u to v, u to w to x to v, 3 arcs, the only one. its prefix u goes to w has 1 arc, longest u to w, u to v to w, 2 arcs. its suffix w goes to x goes to v, 2 arcs, longest w to v, w to x to u to v, 3 arcs. splice the two longest pieces, u to v to w to x to u to v, repeats u and v" tabindex="0" role="region" aria-label="Mathematical notation">arcs:  u→v   u→w   v→w   w→x   x→u   x→v
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two ingredients, one subtlety, and the memo</h2><div class="prose reading"><p>&ldquo;Whenever a problem exhibits optimal substructure, we have a good clue that dynamic programming might apply.&rdquo; The authors choose the words carefully: a clue, and <em>might</em>. Section 15.3 is about the two ingredients an optimization problem needs before dynamic programming is worth trying, and about how to check each one instead of hoping.</p><p>The first ingredient is optimal substructure, and the authors describe the pattern you will find yourself following to discover it. Show that a solution consists of a choice, a first piece or a split point, that leaves subproblems. Suppose you are handed the choice an optimal solution makes, without worrying yet how to find it. Work out which subproblems follow and how to describe their space. Then prove, by the cut-and-paste argument, that the parts of an optimal solution that solve those subproblems must be optimal for them.</p><p>Keep the subproblem space as simple as possible and widen it only when forced. For rod cutting, one length per subproblem was enough. For the matrix chain, subproblems of the form <span class="math" data-say="A sub 1 and so on A sub j">A₁⋯Aⱼ</span> are not: a split leaves a suffix <span class="math" data-say="A sub k plus 1 and so on A sub j">Aₖ₊₁⋯Aⱼ</span> that does not start at 1, so both ends must vary. Problems also differ in how many subproblems an optimal solution uses and how many choices are tried for each, and informally the running time is the product of the number of subproblems and the choices per subproblem: <span class="math" data-say="theta of n">Θ(n)</span> subproblems with n choices for rod cutting, <span class="math" data-say="theta of n squared">Θ(n²)</span> with <span class="math" data-say="n minus 1">n − 1</span> for the chain. The subproblem graph tells the same story with vertices and arcs.</p><p>The authors set greedy algorithms against this in a paragraph. Both rely on optimal substructure, but dynamic programming solves the subproblems first and then chooses with their answers in hand, while a greedy algorithm makes the choice that looks best now and solves only the one subproblem left. That it sometimes works is Chapter 16's subject.</p><p>Then the subtlety. Unweighted shortest paths have optimal substructure: if a shortest path from u to v passes through w, its two parts are shortest paths from u to w and from w to v, or one could be replaced by a shorter one. The longest simple path, the path with the most arcs and no repeated vertex, looks just as decomposable, and is not. Here is a small directed graph of this lesson's own, four vertices and six arcs, none of them two-way.</p><div class="mathblock" data-say="arcs, u to v, u to w, v to w, w to x, x to u, x to v. longest simple path u to v, u to w to x to v, 3 arcs, the only one. its prefix u goes to w has 1 arc, longest u to w, u to v to w, 2 arcs. its suffix w goes to x goes to v, 2 arcs, longest w to v, w to x to u to v, 3 arcs. splice the two longest pieces, u to v to w to x to u to v, repeats u and v" tabindex="0" role="region" aria-label="Mathematical notation">arcs:  u→v   u→w   v→w   w→x   x→u   x→v
 
 longest simple path u to v:   u → w → x → v    (3 arcs, the only one)
 its prefix u → w has 1 arc;   longest u to w:  u → v → w      (2 arcs)
 its suffix w → x → v, 2 arcs;  longest w to v:  w → x → u → v  (3 arcs)
 
-splice the two longest pieces:  u → v → w → x → u → v   repeats u and v</div><p>Neither part of the longest path is longest for its own endpoints, and gluing the longest parts together does not even give a simple path. The reason is that the subproblems are not independent: the longest path from u to w spends the vertex v, which the path from w to v must end at, and the longest path from w to v spends u. For shortest paths the authors prove the two parts can never share a vertex other than w, since a shared vertex would allow a shorter path. No efficient dynamic program for the longest simple path is known, and the problem is NP-complete, which Chapter 34 explains.</p><p>The second ingredient is <strong>overlapping subproblems</strong>. The authors return to the matrix chain and write RECURSIVE-MATRIX-CHAIN, which evaluates recurrence 15.7 with no table. Its running time obeys <span class="math" data-say="T of n is at least 2 times the sum of T of i plus n">T(n) ≥ 2·Σ T(i) + n</span> over i from 1 to <span class="math" data-say="n minus 1">n − 1</span>, and the substitution method gives <span class="math" data-say="T of n is at least 2 to the power n minus 1">T(n) ≥ 2ⁿ⁻¹</span>: at least exponential, although there are only <span class="math" data-say="theta of n squared">Θ(n²)</span> distinct subproblems. The bottom-up table solves each once. Divide-and-conquer problems, by contrast, usually generate new subproblems at every level, and a memo would never hit.</p><p>Two practical points follow. Store the choice as well as the value: without <span class="math" data-say="s at i, j">s[i, j]</span>, rebuilding a parenthesization means re-trying <span class="math" data-say="j minus i">j − i</span> splits at every step instead of reading one entry. And memoize when you prefer the recursion's shape. MEMOIZED-MATRIX-CHAIN fills its table through LOOKUP-CHAIN, which computes an entry on its first request and returns it on every later one, in <span class="math" data-say="big O of n cubed">O(n³)</span> like the bottom-up version. The authors' summary: if every subproblem must be solved, bottom-up usually wins by a constant factor; if some need never be solved, memoization solves only those that are needed.</p><p>Now the lab, the memo lab of the Algorithms Subject's lesson Overlapping Subproblems and the Memo. Its problem is making change with the fewest coins, which has rod cutting's shape: choose the first coin, solve the rest. It runs the recursion three ways, with no memo, with a memo and as a table, counts each, and checks that all three return the same answer. Its presets are the lab's own; <code>canonical</code>, coins 1, 2 and 5 for an amount of 18, makes 22,089 plain calls against 50 memoized.</p><p>Type this lesson's instance: coins <span class="math" data-say="1 4 6">1 4 6</span> and an amount of 20. The fewest coins is 4, from 6 + 6 + 4 + 4; taking the largest coin first would give 6 + 6 + 6 + 1 + 1, five coins, a first hint of why Chapter 16 needs proofs. The plain recursion makes 3,053 calls and the memoized one 53, while the memo holds only 20 distinct subproblems, the amounts 1 to 20 (amount 0 is the base case and is never stored). The lab prints the saving as <span class="math" data-say="3053 over 53">3053/53</span>, about 57.6 times fewer calls, and the table fills 84 cells. The ratio grows with the amount and the 53 barely does: raise the amount to 24 and the plain count jumps to 14,085 while the memoized one adds twelve calls, to 65.</p><h3>Exercise</h3><p>In the lesson's graph, add the <span data-say="arc w goes to u">arc w→u</span>. Find the longest simple path from u to v now, check whether its two parts at w are longest for their own endpoints, and say whether adding the arc repaired optimal substructure or only changed the instance.</p><p>With both ingredients named, the chapter returns to examples. The next lesson, Longest Common Subsequence, has a recurrence whose cases depend on the input, and a table whose arrows spell out the answer.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>One recurrence, three costs, one answer</h2></div><p>The same definition run without a memo, with one, and as a table</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+splice the two longest pieces:  u → v → w → x → u → v   repeats u and v</div><p>Neither part of the longest path is longest for its own endpoints, and gluing the longest parts together does not even give a simple path. The reason is that the subproblems are not independent: the longest path from u to w spends the vertex v, which the path from w to v must end at, and the longest path from w to v spends u. For shortest paths the authors prove the two parts can never share a vertex other than w, since a shared vertex would allow a shorter path. No efficient dynamic program for the longest simple path is known, and the problem is NP-complete, which Chapter 34 explains.</p><p>The second ingredient is <strong>overlapping subproblems</strong>. The authors return to the matrix chain and write RECURSIVE-MATRIX-CHAIN, which evaluates recurrence 15.7 with no table. Its running time obeys <span class="math" data-say="T of n is at least 2 times the sum of T of i plus n">T(n) ≥ 2·Σ T(i) + n</span> over i from 1 to <span class="math" data-say="n minus 1">n − 1</span>, and the substitution method gives <span class="math" data-say="T of n is at least 2 to the power n minus 1">T(n) ≥ 2ⁿ⁻¹</span>: at least exponential, although there are only <span class="math" data-say="theta of n squared">Θ(n²)</span> distinct subproblems. The bottom-up table solves each once. Divide-and-conquer problems, by contrast, usually generate new subproblems at every level, and a memo would never hit.</p><p>Two practical points follow. Store the choice as well as the value: without <span class="math" data-say="s at i, j">s[i, j]</span>, rebuilding a parenthesization means re-trying <span class="math" data-say="j minus i">j − i</span> splits at every step instead of reading one entry. And memoize when you prefer the recursion's shape. MEMOIZED-MATRIX-CHAIN fills its table through LOOKUP-CHAIN, which computes an entry on its first request and returns it on every later one, in <span class="math" data-say="big O of n cubed">O(n³)</span> like the bottom-up version. The authors' summary: if every subproblem must be solved, bottom-up usually wins by a constant factor; if some need never be solved, memoization solves only those that are needed.</p><p>Now the lab, the memo lab of the Algorithms Subject's lesson Overlapping Subproblems and the Memo. Its problem is making change with the fewest coins, which has rod cutting's shape: choose the first coin, solve the rest. It runs the recursion three ways, with no memo, with a memo and as a table, counts each, and checks that all three return the same answer. Its presets are the lab's own; <code>canonical</code>, coins 1, 2 and 5 for an amount of 18, makes 22,089 plain calls against 50 memoized.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>One recurrence, three costs, one answer</h2></div><p>The same definition run without a memo, with one, and as a table</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The same recurrence, three times</strong><span>no memo, a memo, and a table — one answer, three costs</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the cell being computed</span><span class="tone-amber"><i class="legend-swatch"></i>the cells it read</span><span class="tone-purple"><i class="legend-swatch"></i>the coins the answer uses</span></div>
@@ -1410,10 +1453,10 @@ splice the two longest pieces:  u → v → w → x → u → v   repeats u and 
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="mmGrid" viewBox="0 0 660 180" role="img" aria-label="The table, one row per coin type and one column per amount."></svg><svg id="mmPlot" viewBox="0 0 520 220" role="img" aria-label="Calls made by the plain recursion and by the memoised one, against the amount."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mmRoutes"></table></div>
       <div class="status-banner" id="mmStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One recursion with and without a memo, and the table</h3>
-          <p>Type the coin denominations and an amount. The lab finds the fewest coins three ways, counts the calls of the plain and the memoized recursion and the cells of the table, and checks that the three answers agree. Type the lesson's coins 1 4 6 and the amount 20.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One recursion with and without a memo, and the table</h3>
+            <p>Type the coin denominations and an amount. The lab finds the fewest coins three ways, counts the calls of the plain and the memoized recursion and the cells of the table, and checks that the three answers agree. Type the lesson's coins 1 4 6 and the amount 20.</p>
         <div class="field">
           <label for="mmPreset">Coins and amount</label>
           <select id="mmPreset"><option value="canonical" selected>coins 1, 2, 5 and an amount of 18</option><option value="awkward">coins 1, 3, 4 — where taking the largest first is wrong</option><option value="sparse">coins 4, 7 and an amount of 17</option><option value="wide">five coin types, amount 20</option></select>
@@ -1439,12 +1482,15 @@ splice the two longest pieces:  u → v → w → x → u → v   repeats u and 
           <div class="kpi"><span>All three agree</span><strong id="mmAgree">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="mmHint" style="margin:0;">The recurrence is the whole lesson: <em>the fewest coins for n is one more than the fewest for n minus some coin</em>. Run it as written and the same subproblem is solved thousands of times. Write each answer down the first time and it is solved once. Fill the answers bottom-up and there is no recursion at all. The three costs are wildly different and the three answers are the same number.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Type this lesson's instance: coins <span class="math" data-say="1 4 6">1 4 6</span> and an amount of 20. The fewest coins is 4, from 6 + 6 + 4 + 4; taking the largest coin first would give 6 + 6 + 6 + 1 + 1, five coins, a first hint of why Chapter 16 needs proofs. The plain recursion makes 3,053 calls and the memoized one 53, while the memo holds only 20 distinct subproblems, the amounts 1 to 20 (amount 0 is the base case and is never stored). The lab prints the saving as <span class="math" data-say="3053 over 53">3053/53</span>, about 57.6 times fewer calls, and the table fills 84 cells. The ratio grows with the amount and the 53 barely does: raise the amount to 24 and the plain count jumps to 14,085 while the memoized one adds twelve calls, to 65.</p><h3>Exercise</h3><p>In the lesson's graph, add the <span data-say="arc w goes to u">arc w→u</span>. Find the longest simple path from u to v now, check whether its two parts at w are longest for their own endpoints, and say whether adding the arc repaired optimal substructure or only changed the instance.</p><p>With both ingredients named, the chapter returns to examples. The next lesson, Longest Common Subsequence, has a recurrence whose cases depend on the input, and a table whose arrows spell out the answer.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking the two ingredients</h2></div><p>Four checks to make on a new problem; the fifth is a problem of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the choice and the subproblems it leaves</h3><p>Say what an optimal solution decides first, a piece, a split, a coin, and write the subproblems that remain once it is made.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Argue optimal substructure by cut and paste</h3><p>Suppose the part of an optimal solution that solves a subproblem were not optimal for it. Replace it with a better one and check that the result is still a valid solution; if it is, the whole improves and you have a contradiction.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check that the subproblems are independent</h3><p>Ask whether solving one subproblem can use up something another needs, a vertex, an item, a time slot. If it can, the paste step may produce an invalid solution and the argument fails.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count distinct subproblems against calls</h3><p>Count how many different subproblems the recursion can ever ask about, then count how many calls it makes on a small case. A large gap means overlap, and a memo or a table will pay.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a problem of your own</h3><p>Take the coin problem with coins of your choice, run the four checks, then type the coins and an amount into the lab and record the plain and memoized call counts and the number of distinct subproblems the lab says its memo holds.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking the two ingredients</h2>
+      <p class="lead-in">Four checks to make on a new problem; the fifth is a problem of your own.</p>
+      <ol class="key-ideas method"><li><strong>Name the choice and the subproblems it leaves.</strong> Say what an optimal solution decides first, a piece, a split, a coin, and write the subproblems that remain once it is made.</li><li><strong>Argue optimal substructure by cut and paste.</strong> Suppose the part of an optimal solution that solves a subproblem were not optimal for it. Replace it with a better one and check that the result is still a valid solution; if it is, the whole improves and you have a contradiction.</li><li><strong>Check that the subproblems are independent.</strong> Ask whether solving one subproblem can use up something another needs, a vertex, an item, a time slot. If it can, the paste step may produce an invalid solution and the argument fails.</li><li><strong>Count distinct subproblems against calls.</strong> Count how many different subproblems the recursion can ever ask about, then count how many calls it makes on a small case. A large gap means overlap, and a memo or a table will pay.</li><li><strong>Do it on a problem of your own.</strong> Take the coin problem with coins of your choice, run the four checks, then type the coins and an amount into the lab and record the plain and memoized call counts and the number of distinct subproblems the lab says its memo holds.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1464,17 +1510,16 @@ C(8) = 1 + C(7) + C(4) + C(2) = 31
 amounts the memo stores at 8: 1 to 8;  memoized calls: 17</div><p>The memoized count is the first call plus one call per coin that fits at each of the eight positive amounts: <span class="math" data-say="1 plus 1 plus 1 plus 1 plus 2 plus 2 plus 3 plus 3 plus 3 equals 17">1 + 1 + 1 + 1 + 2 + 2 + 3 + 3 + 3 = 17</span>. The same recurrence carried to 20 gives the lab's 3,053. The plain count grows by roughly half again with each unit of amount; the memoized count grows by at most three.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming optimal substructure because the problem looks decomposable</strong><span>A longest simple path from u to v through w looks like a longest path to w followed by a longest path from w, and it is not: in the lesson's four-vertex graph both pieces are longer on their own, and spliced together they repeat vertices. Optimal substructure has to survive the cut-and-paste argument, and here the paste produces a path that is not simple.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing independent with non-overlapping</strong><span>The two words sound like opposites and describe different things. Independent subproblems of one problem share no resources; overlapping subproblems are the same subproblem arising inside different problems. Dynamic programming needs both: the matrix chain's two halves share no matrix, and its subchains recur all over the recursion tree.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing memoization makes a recursion slower than a table</strong><span>A memoized recursion solves each subproblem once, as the table does, and has the same asymptotic running time; the difference is the constant for calls and table checks. When some subproblems are never needed, memoization does less work. On the lesson's coins at 20 the memo makes 53 calls and stores 20 amounts, and the table fills 84 cells.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test a problem for both ingredients.</strong><p>Given a small optimization problem, state its choice and subproblems, argue or refute optimal substructure with an instance, and compare the calls of a plain and a memoized recursion on a small case.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's problem is making change, not the matrix chain the section analyses; the two share the structure that matters, and the chain lab of the previous lesson covers the other. The lab counts calls on one instance. Whether a problem has optimal substructure is a proof, and no count can show it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming optimal substructure because the problem looks decomposable</strong><span>A longest simple path from u to v through w looks like a longest path to w followed by a longest path from w, and it is not: in the lesson's four-vertex graph both pieces are longer on their own, and spliced together they repeat vertices. Optimal substructure has to survive the cut-and-paste argument, and here the paste produces a path that is not simple.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing independent with non-overlapping</strong><span>The two words sound like opposites and describe different things. Independent subproblems of one problem share no resources; overlapping subproblems are the same subproblem arising inside different problems. Dynamic programming needs both: the matrix chain's two halves share no matrix, and its subchains recur all over the recursion tree.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing memoization makes a recursion slower than a table</strong><span>A memoized recursion solves each subproblem once, as the table does, and has the same asymptotic running time; the difference is the constant for calls and table checks. When some subproblems are never needed, memoization does less work. On the lesson's coins at 20 the memo makes 53 calls and stores 20 amounts, and the table fills 84 cells.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can test a problem for both ingredients.</strong><p>Given a small optimization problem, state its choice and subproblems, argue or refute optimal substructure with an instance, and compare the calls of a plain and a memoized recursion on a small case.</p></div></div><div class="note"><strong>Note:</strong> The lab's problem is making change, not the matrix chain the section analyses; the two share the structure that matters, and the chain lab of the previous lesson covers the other. The lab counts calls on one instance. Whether a problem has optimal substructure is a proof, and no count can show it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Optimal substructure</summary><p>A problem has optimal substructure when an optimal solution contains optimal solutions to subproblems. It is shown, not assumed: suppose a subproblem's part of an optimal solution were not optimal, cut it out, paste in a better one, and derive a better whole, a contradiction.</p></details><details class="recall"><summary>Independent subproblems</summary><p>Two subproblems of one problem are independent when solving one does not use up anything the other needs. The two halves of a matrix chain share no matrix. The two halves of a longest simple path can compete for the same vertices, and that is where optimal substructure breaks.</p></details><details class="recall"><summary>Overlapping subproblems</summary><p>The space of subproblems is small, typically polynomial in the input, and a natural recursion keeps meeting the same ones. The term is not the opposite of independent: overlap is one subproblem recurring across different problems, independence is two subproblems of one problem not sharing resources.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 15.3 steps back from the examples and asks when dynamic programming applies. Optimal substructure is found by a recurring pattern ending in a cut-and-paste argument, and its running time is roughly subproblems times choices. The longest simple path shows a problem whose subproblems are not independent, so the pattern fails. Overlapping subproblems are why a plain recursion is exponential and a memoized one is not. Check both ingredients on a small graph by hand, then count a plain and a memoized recursion in the lab.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Optimal substructure.</strong> A problem has optimal substructure when an optimal solution contains optimal solutions to subproblems. It is shown, not assumed: suppose a subproblem's part of an optimal solution were not optimal, cut it out, paste in a better one, and derive a better whole, a contradiction.</li><li><strong>Independent subproblems.</strong> Two subproblems of one problem are independent when solving one does not use up anything the other needs. The two halves of a matrix chain share no matrix. The two halves of a longest simple path can compete for the same vertices, and that is where optimal substructure breaks.</li><li><strong>Overlapping subproblems.</strong> The space of subproblems is small, typically polynomial in the input, and a natural recursion keeps meeting the same ones. The term is not the opposite of independent: overlap is one subproblem recurring across different problems, independence is two subproblems of one problem not sharing resources.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="first ingredient, optimal substructure. second, few subproblems, met often. prove substructure by cut and paste. time is approximately subproblems times choices each. longest simple path lacks substructure. memoize, top-down, still each once" tabindex="0" role="region" aria-label="Mathematical notation">first ingredient: optimal substructure
 second: few subproblems, met often
 prove substructure by cut and paste
@@ -3488,11 +3533,40 @@ memoize: top-down, still each once</div><figcaption>Section 15.3 in six lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3560,7 +3634,7 @@ memoize: top-down, still each once</div><figcaption>Section 15.3 in six lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

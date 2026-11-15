@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Large-Scale Structure and Strategy</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 16 · Large-Scale Structure</p>
       <h1>Knowledge Level</h1>
       <p class="lesson-lede">A set of ordinary domain objects that describes and constrains how another set may behave, so that a superuser can reconfigure the rules without new code.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Knowledge level</li><li>Operations level</li><li>A change landing in configuration</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, its costs, then the count</h2>
-      <article class="prose reading"><p>A knowledge level is &ldquo;a group of objects that describes how another group of objects should behave.&rdquo; Evans opens the third pattern of Chapter 16 with that definition, quoted from Martin Fowler's paper on accountability. Read the pattern in your own copy first.</p><p>The pattern is Fowler's. It appears in his Analysis Patterns, first in modelling accountability in organisations and later in posting rules for accounting, and it never has a chapter there, because unlike his other patterns it does not model a domain; it structures a model. Evans brings it into this chapter for software whose behaviour must be configurable, where the roles and relationships among entities have to change when the system is installed, or even while it runs.</p><p>The problem is easy to recognise. Organisations arrange their people in different ways: one has departments under directors, another units under managers, a third reports along two lines at once. An application that assumes one arrangement fails the rest, and Evans traces what follows: users bend data-entry fields to meanings they were not built for, the application's behaviour misfires, features get switched off, and years later anyone replacing the system finds that its fields mean different things to different users.</p><p>The book works the pattern on an employer's pay and retirement-plan model, which is summarised here only. A rule that one class of employee must have a particular plan leads the team to an explicit employee-type object, which only a superuser may edit. The next morning a developer notices that the restricted objects already form a knowledge level, and seeing them that way lets a colleague spot a second concept hidden in the type and factor it out.</p><p>The general argument sits between two failures. A static model forces workarounds; a fully flexible one, allowing any relationship, is hard to use and cannot enforce the organisation's own rules. Adding options to the operational objects makes them unwieldy: they gain references to types to cover many cases, attributes that mean different things in different situations, and classes that differ only in how they may be assembled. Inside such a model, Evans says, is another model about the model. A knowledge level separates it out and makes its constraints explicit.</p><p>He relates it to Reflection, as Buschmann and his co-authors describe it in Pattern-Oriented Software Architecture: a base level that does the work and a meta level that describes the software's structure. Two differences matter. A knowledge level is about the business, not the language, so it is built from ordinary objects, never from the language's reflection tools. And it does not aim at full generality: like a Specification beside a general predicate, a narrow set of constraints says more about what the designer meant. It is not called a layer, because dependencies run both ways between the levels, which is also why it is not a special case of the Policy layer of the previous lesson.</p><p>The warnings are as strong as the pattern. Evans calls Reflection and knowledge levels intoxicating and says to use them sparingly. The indirection brings back some of the obscurity it removes; if the knowledge level grows complex, the people who configure it need a programmer's skills, and a meta-level programmer's at that, and their mistakes make the application behave wrongly. Data migration does not vanish, since operations-level objects must be dealt with when the knowledge level changes. And the design must hold up for every configuration a user might later choose. Applied where customisation is crucial, he concludes, it solves problems that are very hard to solve any other way; and like the other structures it is optional and can sit alongside them.</p><p>Now the count. A library lends to students, staff and the public, and each category has its own loan period and fines. Written with a subclass per category, a new category is a new class, a new case in the registration form, and a new branch in the fine calculator where its fines differ. Written with a knowledge level, each category is a <code>BorrowerCategory</code> object held in a table a superuser edits, and every borrower points to one:</p><pre class="codeblock" data-say="line 1, comment, Knowledge level what one kind of borrower may do.. line 2, comment, Instances are rows a superuser edits the class rarely changes.. line 3, class borrower category. line 4, private final string name. line 5, private final int loan days. line 6, private final fine policy fines. line 8, int loan days return loan days. line 9, fine policy fines return fines. line 12, comment, Operations level a real borrower, constrained by its category.. line 13, class borrower. line 14, private borrower category category. line 16, local date due date of local date borrowed. line 17, return borrowed dot plus days of category dot loan days" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Knowledge level: what one kind of borrower may do.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, its costs, then the count</h2><div class="prose reading"><p>A knowledge level is &ldquo;a group of objects that describes how another group of objects should behave.&rdquo; Evans opens the third pattern of Chapter 16 with that definition, quoted from Martin Fowler's paper on accountability. Read the pattern in your own copy first.</p><p>The pattern is Fowler's. It appears in his Analysis Patterns, first in modelling accountability in organisations and later in posting rules for accounting, and it never has a chapter there, because unlike his other patterns it does not model a domain; it structures a model. Evans brings it into this chapter for software whose behaviour must be configurable, where the roles and relationships among entities have to change when the system is installed, or even while it runs.</p><p>The problem is easy to recognise. Organisations arrange their people in different ways: one has departments under directors, another units under managers, a third reports along two lines at once. An application that assumes one arrangement fails the rest, and Evans traces what follows: users bend data-entry fields to meanings they were not built for, the application's behaviour misfires, features get switched off, and years later anyone replacing the system finds that its fields mean different things to different users.</p><p>The book works the pattern on an employer's pay and retirement-plan model, which is summarised here only. A rule that one class of employee must have a particular plan leads the team to an explicit employee-type object, which only a superuser may edit. The next morning a developer notices that the restricted objects already form a knowledge level, and seeing them that way lets a colleague spot a second concept hidden in the type and factor it out.</p><p>The general argument sits between two failures. A static model forces workarounds; a fully flexible one, allowing any relationship, is hard to use and cannot enforce the organisation's own rules. Adding options to the operational objects makes them unwieldy: they gain references to types to cover many cases, attributes that mean different things in different situations, and classes that differ only in how they may be assembled. Inside such a model, Evans says, is another model about the model. A knowledge level separates it out and makes its constraints explicit.</p><p>He relates it to Reflection, as Buschmann and his co-authors describe it in Pattern-Oriented Software Architecture: a base level that does the work and a meta level that describes the software's structure. Two differences matter. A knowledge level is about the business, not the language, so it is built from ordinary objects, never from the language's reflection tools. And it does not aim at full generality: like a Specification beside a general predicate, a narrow set of constraints says more about what the designer meant. It is not called a layer, because dependencies run both ways between the levels, which is also why it is not a special case of the Policy layer of the previous lesson.</p><p>The warnings are as strong as the pattern. Evans calls Reflection and knowledge levels intoxicating and says to use them sparingly. The indirection brings back some of the obscurity it removes; if the knowledge level grows complex, the people who configure it need a programmer's skills, and a meta-level programmer's at that, and their mistakes make the application behave wrongly. Data migration does not vanish, since operations-level objects must be dealt with when the knowledge level changes. And the design must hold up for every configuration a user might later choose. Applied where customisation is crucial, he concludes, it solves problems that are very hard to solve any other way; and like the other structures it is optional and can sit alongside them.</p><p>Now the count. A library lends to students, staff and the public, and each category has its own loan period and fines. Written with a subclass per category, a new category is a new class, a new case in the registration form, and a new branch in the fine calculator where its fines differ. Written with a knowledge level, each category is a <code>BorrowerCategory</code> object held in a table a superuser edits, and every borrower points to one:</p><pre class="codeblock" data-say="line 1, comment, Knowledge level what one kind of borrower may do.. line 2, comment, Instances are rows a superuser edits the class rarely changes.. line 3, class borrower category. line 4, private final string name. line 5, private final int loan days. line 6, private final fine policy fines. line 8, int loan days return loan days. line 9, fine policy fines return fines. line 12, comment, Operations level a real borrower, constrained by its category.. line 13, class borrower. line 14, private borrower category category. line 16, local date due date of local date borrowed. line 17, return borrowed dot plus days of category dot loan days" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Knowledge level: what one kind of borrower may do.</span>
 <span class="cl">// Instances are rows a superuser edits; the class rarely changes.</span>
 <span class="cl">class BorrowerCategory {</span>
 <span class="cl">    private final String name;</span>
@@ -1463,12 +1507,11 @@
 <span class="cl">    LocalDate dueDate(LocalDate borrowed) {</span>
 <span class="cl">        return borrowed.plusDays(category.loanDays());</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Four requirements arrive: a visitor category with its own fines, an alumni category with the public's fines, longer loans for staff, and an amnesty on students' fines during exams. On the preset <code>subclass-per-category</code> they touch 3, 2, 1 and 2 modules, 8 in all; 1 change stays in one module, and the largest is add-visitor, which reaches <code>borrowers</code>, <code>accounts</code> and <code>fines</code>. On the preset <code>knowledge-level</code> the first three each touch only the category table in <code>configuration</code>, 1 module apiece, with no code written.</p><p>The fourth is the instructive one. An exam-time amnesty is a kind of rule the fine policy was never built to express, so it reaches <code>knowledge</code>, where FinePolicy and BorrowerCategory must learn about dates, and <code>configuration</code>, where the amnesty is set up: 2 modules, the largest, and 5 touches in all with 3 changes confined. The subclass design also needed 2 modules for this change, so the knowledge level does not make the amnesty harder. It just does not make it easier: a new kind of rule is still new code, now in the knowledge level itself. Evans's warnings cover what the count leaves out: the superuser who must now configure amnesties correctly, the loans already out when the rule changes, and a design that must hold up for any configuration users later choose.</p><h3>Exercise</h3><ul><li>A gym, written with a subclass per kind of class: Session, Yoga, Spin and Swim are in booking; Reminder is in notices; StudioPlanner is in rooms.</li><li>Changes to it: add-pilates touches Pilates (a new class in booking), Reminder and StudioPlanner; longer-spin touches Spin and StudioPlanner; swim-reminder-days touches Swim and Reminder; follow-up-booking, which books the next session automatically, touches Session and Yoga.</li><li>The same gym with a knowledge level: Session is in operations, SessionType in knowledge, TypeTable in configuration. add-pilates, longer-spin and swim-reminder-days each touch TypeTable; follow-up-booking touches SessionType, Session and TypeTable.</li></ul><p>By hand, find the modules each change touches in each design, the total touches, and the changes confined to one module, and say which change the knowledge level makes harder. Then type both designs into the lab to check.</p><p>A knowledge level lets users reconfigure a model; the last structure of the chapter lets whole applications be assembled from parts. The next lesson, Pluggable Component Framework, reads it with the sections on how restrictive a structure should be.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Modules and dependencies</h2></div><p>the modules each change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Four requirements arrive: a visitor category with its own fines, an alumni category with the public's fines, longer loans for staff, and an amnesty on students' fines during exams. On the preset <code>subclass-per-category</code> they touch 3, 2, 1 and 2 modules, 8 in all; 1 change stays in one module, and the largest is add-visitor, which reaches <code>borrowers</code>, <code>accounts</code> and <code>fines</code>. On the preset <code>knowledge-level</code> the first three each touch only the category table in <code>configuration</code>, 1 module apiece, with no code written.</p><p>The fourth is the instructive one. An exam-time amnesty is a kind of rule the fine policy was never built to express, so it reaches <code>knowledge</code>, where FinePolicy and BorrowerCategory must learn about dates, and <code>configuration</code>, where the amnesty is set up: 2 modules, the largest, and 5 touches in all with 3 changes confined. The subclass design also needed 2 modules for this change, so the knowledge level does not make the amnesty harder. It just does not make it easier: a new kind of rule is still new code, now in the knowledge level itself. Evans's warnings cover what the count leaves out: the superuser who must now configure amnesties correctly, the loans already out when the rule changes, and a design that must hold up for any configuration users later choose.</p><h3>Exercise</h3><ul><li>A gym, written with a subclass per kind of class: Session, Yoga, Spin and Swim are in booking; Reminder is in notices; StudioPlanner is in rooms.</li><li>Changes to it: add-pilates touches Pilates (a new class in booking), Reminder and StudioPlanner; longer-spin touches Spin and StudioPlanner; swim-reminder-days touches Swim and Reminder; follow-up-booking, which books the next session automatically, touches Session and Yoga.</li><li>The same gym with a knowledge level: Session is in operations, SessionType in knowledge, TypeTable in configuration. add-pilates, longer-spin and swim-reminder-days each touch TypeTable; follow-up-booking touches SessionType, Session and TypeTable.</li></ul><p>By hand, find the modules each change touches in each design, the total touches, and the changes confined to one module, and say which change the knowledge level makes harder. Then type both designs into the lab to check.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Modules and dependencies</h2></div><p>the modules each change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Modules and dependencies</strong><span>the modules each change reaches</span></div>
       </div>
@@ -1476,10 +1519,10 @@
       <div class="table-wrap" id="dmoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dmoTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each element sits in one module of each packaging; with a third column (module2) the view counts a second packaging of the same elements and prints its tiles second. A change touches every element it lists, and through them every module those elements sit in, each module counted once per change however many of its elements the change touches. The total adds those counts over the changes. Changes are listed in the order first given; the largest is the change touching the most modules, a tie going to the first given (the status line names the others).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where four new requirements land</h3>
-          <p>A count over the small model the lesson states. Each element is assigned to a module, and each change lists the elements it touches; the lab counts the modules each change reaches. The packagings and changes are the lesson's, not the book's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where four new requirements land</h3>
+            <p>A count over the small model the lesson states. Each element is assigned to a module, and each change lists the elements it touches; the lab counts the modules each change reaches. The packagings and changes are the lesson's, not the book's.</p>
         <div class="field">
           <label for="dmoPreset">Worked example</label>
           <select id="dmoPreset"><option value="subclass-per-category" selected>A library with a subclass per borrower category</option><option value="knowledge-level">The same library with a knowledge level</option></select>
@@ -1500,12 +1543,15 @@
           <div class="kpi"><span>The largest change</span><strong id="dmoLargest">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>A knowledge level lets users reconfigure a model; the last structure of the chapter lets whole applications be assembled from parts. The next lesson, Pluggable Component Framework, reads it with the sections on how restrictive a structure should be.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding where a requirement lands</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Separate the two levels</h3><p>List the objects that say what kinds of thing exist and what each may do, and the objects that record what is happening. The first group is the knowledge level, whether or not anyone has called it that.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Trace each requirement</h3><p>For each requirement, write the elements it touches in each design and the modules they sit in, counting a change to configuration data as a module touched.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the change it was not built for</h3><p>Look for a requirement that adds a new kind of rule rather than a new value of an existing one. It is the requirement a knowledge level does not absorb.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Find a type code or a family of subclasses in a system you know that users keep asking to extend. List three recent requests, count the modules each touched, and say which would have been configuration under a knowledge level.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding where a requirement lands</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Separate the two levels.</strong> List the objects that say what kinds of thing exist and what each may do, and the objects that record what is happening. The first group is the knowledge level, whether or not anyone has called it that.</li><li><strong>Trace each requirement.</strong> For each requirement, write the elements it touches in each design and the modules they sit in, counting a change to configuration data as a module touched.</li><li><strong>Find the change it was not built for.</strong> Look for a requirement that adds a new kind of rule rather than a new value of an existing one. It is the requirement a knowledge level does not absorb.</li><li><strong>Do it on your own system.</strong> Find a type code or a family of subclasses in a system you know that users keep asking to extend. List three recent requests, count the modules each touched, and say which would have been configuration under a knowledge level.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1524,17 +1570,16 @@ exam-amnesty: fines, borrowers
 only longer-staff-loans is confined</div><p>With the knowledge level the same four give 1, 1, 1 and 2, which is 5. The three ones are rows a superuser edits; the two is new code in the knowledge level itself.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Implementing a knowledge level with the language&#x27;s reflection facilities</strong><span>Evans is explicit that the language's meta-objects describe the language's own constructs, and that a knowledge level must be built of ordinary domain objects. What it borrows from Reflection is the split into two levels, applied to the business.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making the knowledge level as general as possible</strong><span>The pattern deliberately does not aim at full generality. Evans compares it to a Specification, which says more than a general predicate: a narrow set of constraints communicates the designer's intent, while a fully flexible model cannot enforce the organisation's own rules. On the lesson's illustration, a level general enough to express any rule would make every configuration a programming task.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing a knowledge level makes every future change mere configuration</strong><span>It absorbs the changes its designer foresaw. A new kind of rule reaches into the knowledge level itself, as the exam amnesty does on the lesson's illustration, and Evans warns that the design must hold up for every configuration users may later choose and that existing operational objects still need migrating when the knowledge changes.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say where a requirement lands in each design.</strong><p>Given a model with subclasses and the same model with a knowledge level, count the modules each requirement touches in each, and name the requirement a knowledge level does not absorb.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts modules touched, and a row in a configuration table counts the same as a new class. It cannot weigh what Evans weighs: the indirection a reader must follow, the skill a superuser needs, or the migration of objects created under the old rules.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Implementing a knowledge level with the language&#x27;s reflection facilities</strong><span>Evans is explicit that the language's meta-objects describe the language's own constructs, and that a knowledge level must be built of ordinary domain objects. What it borrows from Reflection is the split into two levels, applied to the business.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making the knowledge level as general as possible</strong><span>The pattern deliberately does not aim at full generality. Evans compares it to a Specification, which says more than a general predicate: a narrow set of constraints communicates the designer's intent, while a fully flexible model cannot enforce the organisation's own rules. On the lesson's illustration, a level general enough to express any rule would make every configuration a programming task.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing a knowledge level makes every future change mere configuration</strong><span>It absorbs the changes its designer foresaw. A new kind of rule reaches into the knowledge level itself, as the exam amnesty does on the lesson's illustration, and Evans warns that the design must hold up for every configuration users may later choose and that existing operational objects still need migrating when the knowledge changes.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say where a requirement lands in each design.</strong><p>Given a model with subclasses and the same model with a knowledge level, count the modules each requirement touches in each, and name the requirement a knowledge level does not absorb.</p></div></div><div class="note"><strong>Note:</strong> The lab counts modules touched, and a row in a configuration table counts the same as a new class. It cannot weigh what Evans weighs: the indirection a reader must follow, the skill a superuser needs, or the migration of objects created under the old rules.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Knowledge level</summary><p>Objects that describe how other objects may behave: the kinds of thing the business recognises, and the rules each kind brings. A user with the right to do so changes them as the business's policies change.</p></details><details class="recall"><summary>Operations level</summary><p>The objects that record what is actually happening, each constrained by the knowledge-level object it points to. Evans compares the pair to the base level and meta level of the Reflection pattern.</p></details><details class="recall"><summary>A change landing in configuration</summary><p>In the lab, a change that touches only the data a superuser edits. It still counts as a module touched; the prose says what the count cannot, that no code was written.</p></details></div>
+      <h3>Summary</h3>
       <p>Knowledge Level, a pattern Evans takes from Martin Fowler's Analysis Patterns, separates the objects that say what kinds of thing are allowed from the objects that are those things. Read why it untangles configurable models, how it differs from a layer, and Evans's warnings about using it; then count the modules four new requirements reach in a library written with a subclass per borrower category and with a knowledge level.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Knowledge level.</strong> Objects that describe how other objects may behave: the kinds of thing the business recognises, and the rules each kind brings. A user with the right to do so changes them as the business's policies change.</li><li><strong>Operations level.</strong> The objects that record what is actually happening, each constrained by the knowledge-level object it points to. Evans compares the pair to the base level and meta level of the Reflection pattern.</li><li><strong>A change landing in configuration.</strong> In the lab, a change that touches only the data a superuser edits. It still counts as a module touched; the prose says what the count cannot, that no code was written.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="objects that describe other objects. rules a superuser can reconfigure. a knowledge level and an operations level. dependencies run both ways, not a layer. built of ordinary domain objects. use it sparingly, where change is crucial" tabindex="0" role="region" aria-label="Mathematical notation">objects that describe other objects
 rules a superuser can reconfigure
 a knowledge level and an operations level
@@ -2320,11 +2365,40 @@ use it sparingly, where change is crucial</div><figcaption>Knowledge Level in si
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2392,7 +2466,7 @@ use it sparingly, where change is crucial</div><figcaption>Knowledge Level in si
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

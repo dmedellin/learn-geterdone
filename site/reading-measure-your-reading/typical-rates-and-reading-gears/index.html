@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Measure Your Reading</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Reading your numbers</p>
       <h1>Typical Rates and Reading Gears</h1>
       <p class="lesson-lede">Place your baseline against Brysbaert&#x27;s averages in words and Carver&#x27;s five gears in standard-length words, and name what each gear is for.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Two references in two units</li><li>A gear is a purpose</li><li>Most readers stay in one gear</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Your rate against the published figures</h2>
-      <article class="prose reading"><p>Begin with the warm-up above the lab, “The Night Train”, at your natural pace. It is logged as practice and does not change your baselines. Then press “Use my baseline median”: the lab takes the median of your three baselines, in words a minute and, from the characters you read, in standard-length words.</p><p>Carver (1990) described reading as five processes, each with its own typical rate for college students, measured in standard-length words a minute:</p><ul><li><strong>Scanning</strong>, about 600: looking for a particular word or number, without reading the rest.</li><li><strong>Skimming</strong>, about 450: getting the drift of a text without understanding every sentence.</li><li><strong>Rauding</strong>, about 300: ordinary reading, understanding each sentence as you go. The word is Carver's, from reading and auding.</li><li><strong>Learning</strong>, about 200: reading to take in and keep what a text says, slowing and going back where needed.</li><li><strong>Memorising</strong>, about 138: reading until you could recall the text, with rehearsal.</li></ul><p>The average preset is a reader at Brysbaert's 238 words a minute on text whose words average 6.6 characters with their space. In standard words that is <span data-say="238 times 6.6 over 6 equals 261.8">238 × 6.6 / 6 = 261.8</span>, which is 38.2 from rauding's 300 and 61.8 from learning's 200, so the nearest gear is rauding; against the average of 238 it is 100%.</p><p>The short-words preset is the same 238 words a minute on text like this course's passages, about 5.4 characters a word with the space: <span data-say="238 times 5.4 over 6 equals 214.2">238 × 5.4 / 6 = 214.2</span> standard words a minute, and the nearest gear becomes learning. Nothing about the reading changed. The unit did, and Carver's figures are for college students, while Brysbaert argues that the familiar 300 overstates ordinary silent reading. So read the nearest gear as a comparison of numbers, not as a description of what you were doing: if you were reading each sentence for its sense, you were rauding, at your own rate.</p><p>The slower preset is 190 words a minute on the long-word text, 209 standard: nearest gear learning, and 95/119, about 79.8% of the average. The claim preset is 1,000 words a minute, 1,100 standard: above every gear, and about 420.2% of the average. No gear in Carver's table runs that fast, and Testing a Speed Claim shows how to check a figure like that with the questions it needs.</p><p>If there are five gears, the natural thought is that a good reader moves between them. Carver (1992) found that most readers do not: they hold a relatively constant rauding rate across what they read and seldom shift gear, and he recommended shifting deliberately, by purpose. Shifting Gears, in Skimming, Scanning and Previewing, practises it.</p><p>Your own number may well land nearer learning than rauding on these passages, because their words are short: below about 278 words a minute, 5.4 characters a word puts you under 250 standard words, the halfway point. That is the unit at work. The comparison that will matter from here on is with your own baselines.</p><p>Next, Keeping a Practice Log: which readings count, and how the log turns them into a verdict.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Typical rates and reading gears</h2></div><p>your own numbers, compared with themselves</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Your rate against the published figures</h2><div class="prose reading"><p>Begin with the warm-up above the lab, “The Night Train”, at your natural pace. It is logged as practice and does not change your baselines. Then press “Use my baseline median”: the lab takes the median of your three baselines, in words a minute and, from the characters you read, in standard-length words.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Typical rates and reading gears</h2></div><p>your own numbers, compared with themselves</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Typical rates and reading gears</strong><span>your own numbers, compared with themselves</span></div>
       </div>
@@ -1417,10 +1460,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="lgTable"></table></div>
       <div class="status-banner" id="lgStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Your log, in numbers</h3>
-          <p>Your measurement, from your log (only readings logged as baseline or test count), or a worked example until you have one. Nothing leaves your browser.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Your log, in numbers</h3>
+            <p>Your measurement, from your log (only readings logged as baseline or test count), or a worked example until you have one. Nothing leaves your browser.</p>
         <div class="field">
           <label for="lgPreset">Worked example</label>
           <select id="lgPreset"><option value="average" selected>238 words a minute, long words</option><option value="short-words">238 words a minute, short words</option><option value="slower">190 words a minute</option><option value="claim">A claimed 1,000 words a minute</option></select>
@@ -1438,12 +1481,15 @@
           <div class="kpi"><span>Against the average of 238 wpm</span><strong id="lgVsAverage">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Carver (1990) described reading as five processes, each with its own typical rate for college students, measured in standard-length words a minute:</p><ul><li><strong>Scanning</strong>, about 600: looking for a particular word or number, without reading the rest.</li><li><strong>Skimming</strong>, about 450: getting the drift of a text without understanding every sentence.</li><li><strong>Rauding</strong>, about 300: ordinary reading, understanding each sentence as you go. The word is Carver's, from reading and auding.</li><li><strong>Learning</strong>, about 200: reading to take in and keep what a text says, slowing and going back where needed.</li><li><strong>Memorising</strong>, about 138: reading until you could recall the text, with rehearsal.</li></ul><p>The average preset is a reader at Brysbaert's 238 words a minute on text whose words average 6.6 characters with their space. In standard words that is <span data-say="238 times 6.6 over 6 equals 261.8">238 × 6.6 / 6 = 261.8</span>, which is 38.2 from rauding's 300 and 61.8 from learning's 200, so the nearest gear is rauding; against the average of 238 it is 100%.</p><p>The short-words preset is the same 238 words a minute on text like this course's passages, about 5.4 characters a word with the space: <span data-say="238 times 5.4 over 6 equals 214.2">238 × 5.4 / 6 = 214.2</span> standard words a minute, and the nearest gear becomes learning. Nothing about the reading changed. The unit did, and Carver's figures are for college students, while Brysbaert argues that the familiar 300 overstates ordinary silent reading. So read the nearest gear as a comparison of numbers, not as a description of what you were doing: if you were reading each sentence for its sense, you were rauding, at your own rate.</p><p>The slower preset is 190 words a minute on the long-word text, 209 standard: nearest gear learning, and 95/119, about 79.8% of the average. The claim preset is 1,000 words a minute, 1,100 standard: above every gear, and about 420.2% of the average. No gear in Carver's table runs that fast, and Testing a Speed Claim shows how to check a figure like that with the questions it needs.</p><p>If there are five gears, the natural thought is that a good reader moves between them. Carver (1992) found that most readers do not: they hold a relatively constant rauding rate across what they read and seldom shift gear, and he recommended shifting deliberately, by purpose. Shifting Gears, in Skimming, Scanning and Previewing, practises it.</p><p>Your own number may well land nearer learning than rauding on these passages, because their words are short: below about 278 words a minute, 5.4 characters a word puts you under 250 standard words, the halfway point. That is the unit at work. The comparison that will matter from here on is with your own baselines.</p><p>Next, Keeping a Practice Log: which readings count, and how the log turns them into a verdict.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Placing a rate against the references</h2></div><p>Four moves, the first two of which are about the unit.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the characters</h3><p>Note the characters, spaces included, as well as the words. Without them a rate in words cannot be put into Carver's unit.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Convert before you compare with a gear</h3><p>Standard rate = characters <span data-say="over 6 times 60 over">/ 6 × 60 /</span> seconds. Compare that, not the rate in words, with Carver's figures.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare words with words</h3><p>Set the rate in words beside Brysbaert's 238 for nonfiction or 260 for fiction, whichever the text was.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Name the purpose</h3><p>Say what you were reading for. The gear is the purpose; the nearest number is a comparison with college students' figures.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Placing a rate against the references</h2>
+      <p class="lead-in">Four moves, the first two of which are about the unit.</p>
+      <ol class="key-ideas method"><li><strong>Count the characters.</strong> Note the characters, spaces included, as well as the words. Without them a rate in words cannot be put into Carver's unit.</li><li><strong>Convert before you compare with a gear.</strong> Standard rate = characters <span data-say="over 6 times 60 over">/ 6 × 60 /</span> seconds. Compare that, not the rate in words, with Carver's figures.</li><li><strong>Compare words with words.</strong> Set the rate in words beside Brysbaert's 238 for nonfiction or 260 for fiction, whichever the text was.</li><li><strong>Name the purpose.</strong> Say what you were reading for. The gear is the purpose; the nearest number is a comparison with college students' figures.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1506,16 @@ distance to learning = 261.8 − 200 = 61.8
 nearest gear: rauding</div><p>On text averaging 5.4 characters a word the same 238 is 214.2 standard words a minute, 14.2 from learning and 85.8 from rauding. The gear a number lands nearest depends on the text's word length as well as on the reader.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“There is one right speed, and faster is always better”</strong><span>Carver's gears are five processes with different goals, and the slowest, memorising, is the right one when you need to recall a text. Carver also found that most readers seldom shift gear at all; his advice was to shift on purpose, which Shifting Gears practises.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a rate in words beside Carver&#x27;s gears</strong><span>His figures are in six-character standard words. Brysbaert's 238 words a minute, set against them unconverted, lands nearest learning, which would call ordinary reading studying. Convert first, as the average preset does.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the nearest gear as a diagnosis</strong><span>Carver's figures are typical rates for college students on his materials. A natural reading nearest learning, as in the short-words preset, is a comparison of numbers; what you were doing is what you were reading for.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a rate in the right unit.</strong><p>Given 260 words a minute on a passage of 500 words and 3,300 characters, convert to standard-length words without the lab (3,300 / 500 = 6.6 characters a word, so 286), name the nearest gear (rauding, 14 away) and its purpose, and compare the rate in words with Brysbaert's 238 for nonfiction.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The gears are typical rates for college students on Carver's materials, and the average is an estimate over many studies; neither is a target. The lab finds the nearest number, with ties going to the slower gear, and cannot know what you were reading for.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“There is one right speed, and faster is always better”</strong><span>Carver's gears are five processes with different goals, and the slowest, memorising, is the right one when you need to recall a text. Carver also found that most readers seldom shift gear at all; his advice was to shift on purpose, which Shifting Gears practises.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a rate in words beside Carver&#x27;s gears</strong><span>His figures are in six-character standard words. Brysbaert's 238 words a minute, set against them unconverted, lands nearest learning, which would call ordinary reading studying. Convert first, as the average preset does.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the nearest gear as a diagnosis</strong><span>Carver's figures are typical rates for college students on his materials. A natural reading nearest learning, as in the short-words preset, is a comparison of numbers; what you were doing is what you were reading for.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can place a rate in the right unit.</strong><p>Given 260 words a minute on a passage of 500 words and 3,300 characters, convert to standard-length words without the lab (3,300 / 500 = 6.6 characters a word, so 286), name the nearest gear (rauding, 14 away) and its purpose, and compare the rate in words with Brysbaert's 238 for nonfiction.</p></div></div><div class="note"><strong>Note:</strong> The gears are typical rates for college students on Carver's materials, and the average is an estimate over many studies; neither is a target. The lab finds the nearest number, with ties going to the slower gear, and cannot know what you were reading for.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Two references in two units</summary><p>Brysbaert's average of about 238 is in words, for adults reading English nonfiction silently. Carver's gears are in six-character standard words, for college students on his materials. A rate is compared with each in that one's own unit.</p></details><details class="recall"><summary>A gear is a purpose</summary><p>Carver's five gears are five ways of reading with five goals: finding a word, getting the drift, understanding each sentence, learning, and memorising. The rate goes with the goal.</p></details><details class="recall"><summary>Most readers stay in one gear</summary><p>Carver (1992) found that most readers hold a fairly constant rate, their rauding rate, whatever they read, and seldom shift gear. He recommended shifting deliberately.</p></details></div>
+      <h3>Summary</h3>
       <p>Your baseline median is compared twice: in words with Brysbaert's average for silent reading, and in standard-length words with Carver's five gears, from scanning to memorising. The gears are purposes with typical rates, measured on college students, and the unit decides which one a number lands nearest.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Two references in two units.</strong> Brysbaert's average of about 238 is in words, for adults reading English nonfiction silently. Carver's gears are in six-character standard words, for college students on his materials. A rate is compared with each in that one's own unit.</li><li><strong>A gear is a purpose.</strong> Carver's five gears are five ways of reading with five goals: finding a word, getting the drift, understanding each sentence, learning, and memorising. The rate goes with the goal.</li><li><strong>Most readers stay in one gear.</strong> Carver (1992) found that most readers hold a fairly constant rate, their rauding rate, whatever they read, and seldom shift gear. He recommended shifting deliberately.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="standard rate equals rate times the quantity chars over word, over 6. scanning 600, skimming 450. rauding 300, learning 200. memorising 138 standard words. Brysbaert, about 238 words, nonfiction" tabindex="0" role="region" aria-label="Mathematical notation">standard rate = rate × (chars/word) / 6
 scanning 600, skimming 450
 rauding 300, learning 200
@@ -2561,11 +2606,40 @@ Brysbaert: about 238 words, nonfiction</div><figcaption>Two references, two unit
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2633,7 +2707,7 @@ Brysbaert: about 238 words, nonfiction</div><figcaption>Two references, two unit
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

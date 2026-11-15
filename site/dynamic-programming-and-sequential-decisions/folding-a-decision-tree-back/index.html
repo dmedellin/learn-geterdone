@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,42 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Dynamic Programming and Sequential Decisions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; When the next step is uncertain</p>
       <h1>Folding a Decision Tree Back</h1>
       <p class="lesson-lede">A chance node is an average and a decision node is a maximum; fold both back and the difference between them prices information before you buy it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The fold is the same recursion with two rules instead of one</li><li>Perfect information is a ceiling, and it is computed differently</li><li>A signal&#x27;s value comes from the joint distribution, not from the shape of the tree</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Folding back, and then pricing what you did not know</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A decision tree, and the two values around it</span><p>Given <strong>acts</strong> <span class="math" data-say="A">a</span>, <strong>states</strong> <span class="math" data-say="s">s</span>, a <strong>payoff</strong> <span class="math" data-say="pi of A and s">π(a, s)</span> and a <strong>prior</strong> <span class="math" data-say="p of s">p(s)</span>, the <strong>prior value</strong> is <span class="math" data-say="the max over a of the sum over s of p of s times pi of A and s">max over a of Σₛ p(s) π(a, s)</span> and the <strong>perfect-information value</strong> is <span class="math" data-say="the sum over s of p of s times the max over a of pi of A and s">Σₛ p(s) max over a of π(a, s)</span>. Their difference is <strong>EVPI</strong>.</p><p>A <strong>signal</strong> is a likelihood <span class="math" data-say="P of g given s">P(g | s)</span>. For each signal <span class="math" data-say="g">g</span>, <span class="math" data-say="P of g equals the sum over s of p of s times P of g given s">P(g) = Σₛ p(s) P(g | s)</span> and the posterior is <span class="math" data-say="p of s times P of g given s, over P of g">p(s) P(g | s) / P(g)</span>. The <strong>value with the signal</strong> is <span class="math" data-say="the sum over g of P of g times the max over a of the sum over s of posterior times pi of A and s">Σ_g P(g) max over a of Σₛ posterior × π(a, s)</span>, and <strong>EVSI</strong> is that minus the prior value.</p></div><p>The lab builds the tree from the payoff table rather than asking you to type one, because typing a tree is harder than typing the thing a tree is drawn from and the tree is not the model. With no signal it is one decision node over a chance node per act. With a signal it is a chance node over the signals, and inside each branch of it the same decision again, now over the posterior.</p><h3>A signal that tells you nothing</h3><div class="mathblock" data-say="acts, go, stop, states, up, down, prior, 1 over 2, 1 over 2. payoff, up, down, on the prior. go, 60, negative 40, the quantity 1 over 2, times 60 plus the quantity 1 over 2, times the quantity negative 40, equals, 10. a table, shown on the page. decide now, best act go, worth, 10. know the state first, the quantity 1 over 2, times 60 plus the quantity 1 over 2, times 0, equals, 30. EVPI, 30 minus 10, equals, 20. the signal, P of g 1 given up equals 1 over 2, P of g 1 given down equals 1 over 2. P of g 2 given up equals 1 over 2, P of g 2 given down equals 1 over 2. P of g 1 equals the quantity 1 over 2, times the quantity 1 over 2, plus the quantity 1 over 2, times the quantity 1 over 2, equals 1 over 2, posterior, up 1 over 2, down 1 over 2. P of g 2 equals 1 over 2, posterior, up 1 over 2, down 1 over 2. after g 1 the best act is go, worth 10, after g 2, go, worth 10. with the signal, the quantity 1 over 2, times 10 plus the quantity 1 over 2, times 10, equals, 10. EVSI, equals, 10 minus 10, equals, 0" tabindex="0" role="region" aria-label="Mathematical notation">acts   go  stop          states  up  down          prior  1/2  1/2
-
-   payoff        up    down              on the prior
-      go          60     -40             (1/2)(60) + (1/2)(-40)  =  10
-      stop         0       0                                        0
-
-   decide now                  best act go, worth  10
-   know the state first        (1/2)(60) + (1/2)(0)  =  30
-   EVPI                        30 - 10  =  20
-
-the signal:   P(g1 | up) = 1/2    P(g1 | down) = 1/2
-              P(g2 | up) = 1/2    P(g2 | down) = 1/2
-
-   P(g1) = (1/2)(1/2) + (1/2)(1/2) = 1/2      posterior  up 1/2  down 1/2
-   P(g2) = 1/2                                posterior  up 1/2  down 1/2
-
-   after g1 the best act is go, worth 10;  after g2, go, worth 10
-   with the signal  (1/2)(10) + (1/2)(10)  =  10
-   EVSI  =  10 - 10  =  0</div><p>Twenty and nothing. Perfect information here is worth 20, which is a great deal against a decision currently worth 10, and this signal captures none of it. The reason is visible in the likelihood: the two rows are identical, so the signal is as likely in one state as in the other, the posterior comes out equal to the prior, and no decision changes. A signal has to <em>discriminate</em> to be worth anything, and looking informative is not the same thing.</p><p>The lab also enumerates strategies. A strategy here is a choice of act for each signal, and the best it finds is worth 10, which is what the fold says. That enumeration prices each strategy straight from the joint distribution with no tree, no posterior and no fold anywhere in it, so it is an independent witness rather than a restatement.</p><h3>A signal that is worth something, and how much</h3><div class="example"><span class="label">Example &middot; Build or wait, with a survey you could buy</span><p>Payoffs: building returns 100 if things turn out good and loses 20 if they do not; waiting returns nothing either way. The prior is 3/10 good. So building is worth 16 on the prior, waiting 0, and the best act is to build. Knowing the state first is worth 30, so EVPI is 14.</p><p>The survey is right four times in five when things are good and three times in four when they are not. A favourable survey then has probability 83/200 and leaves a posterior of 48/83 good, under which building is worth 4100/83; an unfavourable one has probability 117/200 and a posterior of 4/39 good, under which waiting at 0 beats building. The whole thing is worth 41/2, so EVSI is 9/2 &mdash; which is 9/28 of EVPI, and no more than EVPI, as it must be.</p></div><p>Notice what the survey buys. Without it you build whatever happens; with it you build after a favourable reading and wait after an unfavourable one. A signal is worth something exactly when it changes what you do, and 9/2 is the price of that change. If both readings had left building as the best act, <span class="math" data-say="EVSI">EVSI</span> would have been zero however sharply the posteriors moved &mdash; which is a strange and useful fact, and it is why information has to be priced against a decision and never in the abstract.</p><div class="example"><span class="label">Example &middot; Three acts, three states, and the middling one</span><p>A payoff table with a cautious act paying 20 whatever happens, a middle act paying 0, 40 and 45, and a bold one paying -30, 20 and 80, against a prior of 1/4, 1/2, 1/4. On the prior the three are worth 20, 125/4 and 45/2, so the middle act wins. Perfect information is worth 45 and EVPI is 55/4.</p><p>With the signal the whole thing is worth 257/8, so EVSI is 7/8 &mdash; a genuine but small fraction of a large EVPI. The signal is informative and mostly fails to change the act: only the weaker of the two readings moves the decision, and it moves it to the cautious act rather than the bold one.</p></div><h3>What the tree left out</h3><p>The payoffs are known exactly and are in one currency. The prior is known exactly, which is the assumption a reader should be least comfortable with: <span class="math" data-say="EVSI">EVSI</span> depends on it, and a prior that was really a guess produces a price for information that is also a guess, stated to the last fraction. The likelihood is known exactly too, which is to say somebody has measured how often this signal is right in each state &mdash; and if they have not, the number on the page is the value of an imagined instrument.</p><p>And the objective is still the expectation. A payoff of <span class="math" data-say="negative 40">-40</span> with probability one half sits in the average as comfortably as anything else, which is fine if the decision is one of many and ruinous if it is not. Nothing in the fold can raise that question; the fold will happily return a precise expected value for a gamble nobody should take.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Folding a decision tree back</h2></div><p>EVPI bounds what any signal can be worth; EVSI says what this one is worth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Folding back, and then pricing what you did not know</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A decision tree, and the two values around it</span><p>Given <strong>acts</strong> <span class="math" data-say="A">a</span>, <strong>states</strong> <span class="math" data-say="s">s</span>, a <strong>payoff</strong> <span class="math" data-say="pi of A and s">π(a, s)</span> and a <strong>prior</strong> <span class="math" data-say="p of s">p(s)</span>, the <strong>prior value</strong> is <span class="math" data-say="the max over a of the sum over s of p of s times pi of A and s">max over a of Σₛ p(s) π(a, s)</span> and the <strong>perfect-information value</strong> is <span class="math" data-say="the sum over s of p of s times the max over a of pi of A and s">Σₛ p(s) max over a of π(a, s)</span>. Their difference is <strong>EVPI</strong>.</p><p>A <strong>signal</strong> is a likelihood <span class="math" data-say="P of g given s">P(g | s)</span>. For each signal <span class="math" data-say="g">g</span>, <span class="math" data-say="P of g equals the sum over s of p of s times P of g given s">P(g) = Σₛ p(s) P(g | s)</span> and the posterior is <span class="math" data-say="p of s times P of g given s, over P of g">p(s) P(g | s) / P(g)</span>. The <strong>value with the signal</strong> is <span class="math" data-say="the sum over g of P of g times the max over a of the sum over s of posterior times pi of A and s">Σ_g P(g) max over a of Σₛ posterior × π(a, s)</span>, and <strong>EVSI</strong> is that minus the prior value.</p></div><p>The lab builds the tree from the payoff table rather than asking you to type one, because typing a tree is harder than typing the thing a tree is drawn from and the tree is not the model. With no signal it is one decision node over a chance node per act. With a signal it is a chance node over the signals, and inside each branch of it the same decision again, now over the posterior.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Folding a decision tree back</h2></div><p>EVPI bounds what any signal can be worth; EVSI says what this one is worth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Folding a decision tree back</strong><span>a chance node is an expectation and a decision node is a maximum, and the order matters</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the branch the fold chose</span><span class="tone-purple"><i class="legend-swatch"></i>what each node is worth</span><span class="tone-green"><i class="legend-swatch"></i>a payoff on the chosen path</span><span class="tone-line-strong"><i class="legend-swatch"></i>a branch not taken</span></div>
@@ -1423,10 +1448,10 @@ the signal:   P(g1 | up) = 1/2    P(g1 | down) = 1/2
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="trPayoff"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="trValue"></table></div>
       <div class="status-banner" id="trStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Fold the tree, then price every strategy it could have chosen</h3>
-          <p>The tree is built from the payoff table rather than typed, folded back node by node, and then checked against every mapping from what you see to what you do &mdash; each priced straight from the joint distribution with no tree involved. The selector switches between deciding on the prior and seeing the signal first. This example is the one where perfect information is worth 20 and the signal is worth exactly 0; the examples above it in the list are the ones where a signal is worth something.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Fold the tree, then price every strategy it could have chosen</h3>
+            <p>The tree is built from the payoff table rather than typed, folded back node by node, and then checked against every mapping from what you see to what you do &mdash; each priced straight from the joint distribution with no tree involved. The selector switches between deciding on the prior and seeing the signal first. This example is the one where perfect information is worth 20 and the signal is worth exactly 0; the examples above it in the list are the ones where a signal is worth something.</p>
         <div class="field">
           <label for="trPreset">Worked example</label>
           <select id="trPreset"><option value="build">build or wait, with a survey you could buy</option><option value="three">three acts, three states</option><option value="useless" selected>a signal that tells you nothing</option></select>
@@ -1464,12 +1489,33 @@ the signal:   P(g1 | up) = 1/2    P(g1 | down) = 1/2
           <div class="kpi"><span>EVSI</span><strong id="trEvsi">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="trHint" style="margin:0;">EVPI is what you would pay to be told the state before deciding, and it is an upper bound on what any signal can be worth. EVSI is what this particular signal is worth, and it is computed from the joint distribution rather than from the shape of the tree &mdash; which is why a tree with no likelihood in it reports EVSI as nothing rather than as a number.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>A signal that tells you nothing</h3><div class="mathblock" data-say="acts, go, stop, states, up, down, prior, 1 over 2, 1 over 2. payoff, up, down, on the prior. go, 60, negative 40, the quantity 1 over 2, times 60 plus the quantity 1 over 2, times the quantity negative 40, equals, 10. a table, shown on the page. decide now, best act go, worth, 10. know the state first, the quantity 1 over 2, times 60 plus the quantity 1 over 2, times 0, equals, 30. EVPI, 30 minus 10, equals, 20. the signal, P of g 1 given up equals 1 over 2, P of g 1 given down equals 1 over 2. P of g 2 given up equals 1 over 2, P of g 2 given down equals 1 over 2. P of g 1 equals the quantity 1 over 2, times the quantity 1 over 2, plus the quantity 1 over 2, times the quantity 1 over 2, equals 1 over 2, posterior, up 1 over 2, down 1 over 2. P of g 2 equals 1 over 2, posterior, up 1 over 2, down 1 over 2. after g 1 the best act is go, worth 10, after g 2, go, worth 10. with the signal, the quantity 1 over 2, times 10 plus the quantity 1 over 2, times 10, equals, 10. EVSI, equals, 10 minus 10, equals, 0" tabindex="0" role="region" aria-label="Mathematical notation">acts   go  stop          states  up  down          prior  1/2  1/2
+
+   payoff        up    down              on the prior
+      go          60     -40             (1/2)(60) + (1/2)(-40)  =  10
+      stop         0       0                                        0
+
+   decide now                  best act go, worth  10
+   know the state first        (1/2)(60) + (1/2)(0)  =  30
+   EVPI                        30 - 10  =  20
+
+the signal:   P(g1 | up) = 1/2    P(g1 | down) = 1/2
+              P(g2 | up) = 1/2    P(g2 | down) = 1/2
+
+   P(g1) = (1/2)(1/2) + (1/2)(1/2) = 1/2      posterior  up 1/2  down 1/2
+   P(g2) = 1/2                                posterior  up 1/2  down 1/2
+
+   after g1 the best act is go, worth 10;  after g2, go, worth 10
+   with the signal  (1/2)(10) + (1/2)(10)  =  10
+   EVSI  =  10 - 10  =  0</div><p>Twenty and nothing. Perfect information here is worth 20, which is a great deal against a decision currently worth 10, and this signal captures none of it. The reason is visible in the likelihood: the two rows are identical, so the signal is as likely in one state as in the other, the posterior comes out equal to the prior, and no decision changes. A signal has to <em>discriminate</em> to be worth anything, and looking informative is not the same thing.</p><p>The lab also enumerates strategies. A strategy here is a choice of act for each signal, and the best it finds is worth 10, which is what the fold says. That enumeration prices each strategy straight from the joint distribution with no tree, no posterior and no fold anywhere in it, so it is an independent witness rather than a restatement.</p><h3>A signal that is worth something, and how much</h3><div class="example"><span class="label">Example &middot; Build or wait, with a survey you could buy</span><p>Payoffs: building returns 100 if things turn out good and loses 20 if they do not; waiting returns nothing either way. The prior is 3/10 good. So building is worth 16 on the prior, waiting 0, and the best act is to build. Knowing the state first is worth 30, so EVPI is 14.</p><p>The survey is right four times in five when things are good and three times in four when they are not. A favourable survey then has probability 83/200 and leaves a posterior of 48/83 good, under which building is worth 4100/83; an unfavourable one has probability 117/200 and a posterior of 4/39 good, under which waiting at 0 beats building. The whole thing is worth 41/2, so EVSI is 9/2 &mdash; which is 9/28 of EVPI, and no more than EVPI, as it must be.</p></div><p>Notice what the survey buys. Without it you build whatever happens; with it you build after a favourable reading and wait after an unfavourable one. A signal is worth something exactly when it changes what you do, and 9/2 is the price of that change. If both readings had left building as the best act, <span class="math" data-say="EVSI">EVSI</span> would have been zero however sharply the posteriors moved &mdash; which is a strange and useful fact, and it is why information has to be priced against a decision and never in the abstract.</p><div class="example"><span class="label">Example &middot; Three acts, three states, and the middling one</span><p>A payoff table with a cautious act paying 20 whatever happens, a middle act paying 0, 40 and 45, and a bold one paying -30, 20 and 80, against a prior of 1/4, 1/2, 1/4. On the prior the three are worth 20, 125/4 and 45/2, so the middle act wins. Perfect information is worth 45 and EVPI is 55/4.</p><p>With the signal the whole thing is worth 257/8, so EVSI is 7/8 &mdash; a genuine but small fraction of a large EVPI. The signal is informative and mostly fails to change the act: only the weaker of the two readings moves the decision, and it moves it to the cautious act rather than the bold one.</p></div><h3>What the tree left out</h3><p>The payoffs are known exactly and are in one currency. The prior is known exactly, which is the assumption a reader should be least comfortable with: <span class="math" data-say="EVSI">EVSI</span> depends on it, and a prior that was really a guess produces a price for information that is also a guess, stated to the last fraction. The likelihood is known exactly too, which is to say somebody has measured how often this signal is right in each state &mdash; and if they have not, the number on the page is the value of an imagined instrument.</p><p>And the objective is still the expectation. A payoff of <span class="math" data-say="negative 40">-40</span> with probability one half sits in the average as comfortably as anything else, which is fine if the decision is one of many and ruinous if it is not. Nothing in the fold can raise that question; the fold will happily return a precise expected value for a gamble nobody should take.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Pricing information before buying it</h2></div><p>Five steps, and the order matters: two of them are cheap and rule out the third entirely.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute what each act is worth on the prior, and take the best</h3><p>One weighted average per act. This is what you would do knowing nothing more, and every price below is measured against it &mdash; so getting it wrong shifts both EVPI and EVSI by the same amount and neither looks odd.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the perfect-information value, with the maximum inside</h3><p>For each state take the best act in that state, then average over the prior. It is the same numbers in the other order and it is never smaller. The difference is EVPI, and it is the ceiling.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Stop here if the signal costs more than EVPI</h3><p>No signal can be worth more than knowing the state outright. If the asking price is above EVPI the answer is no, and it took two weighted averages to find out. This is the cheapest useful thing on the page.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Otherwise work out each signal&#x27;s probability and posterior</h3><p><span class="math" data-say="P of g equals the sum over s of p of s times P of g given s">P(g) = Σₛ p(s) P(g|s)</span>, then the posterior by Bayes. Check that the posteriors are distributions before going on; the lab checks that each state's column of the likelihood sums to 1, because a column is a distribution over what you might see.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Take the best act under each posterior, average over the signals, subtract</h3><p>That is EVSI. Then ask the question the arithmetic cannot: does the best act actually differ between signals? If it does not, EVSI is zero no matter how sharply the posteriors moved, and the signal is not worth buying at any price.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Pricing information before buying it</h2>
+      <p class="lead-in">Five steps, and the order matters: two of them are cheap and rule out the third entirely.</p>
+      <ol class="key-ideas method"><li><strong>Compute what each act is worth on the prior, and take the best.</strong> One weighted average per act. This is what you would do knowing nothing more, and every price below is measured against it &mdash; so getting it wrong shifts both EVPI and EVSI by the same amount and neither looks odd.</li><li><strong>Compute the perfect-information value, with the maximum inside.</strong> For each state take the best act in that state, then average over the prior. It is the same numbers in the other order and it is never smaller. The difference is EVPI, and it is the ceiling.</li><li><strong>Stop here if the signal costs more than EVPI.</strong> No signal can be worth more than knowing the state outright. If the asking price is above EVPI the answer is no, and it took two weighted averages to find out. This is the cheapest useful thing on the page.</li><li><strong>Otherwise work out each signal&#x27;s probability and posterior.</strong> <span class="math" data-say="P of g equals the sum over s of p of s times P of g given s">P(g) = Σₛ p(s) P(g|s)</span>, then the posterior by Bayes. Check that the posteriors are distributions before going on; the lab checks that each state's column of the likelihood sums to 1, because a column is a distribution over what you might see.</li><li><strong>Take the best act under each posterior, average over the signals, subtract.</strong> That is EVSI. Then ask the question the arithmetic cannot: does the best act actually differ between signals? If it does not, EVSI is zero no matter how sharply the posteriors moved, and the signal is not worth buying at any price.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1507,17 +1553,16 @@ THE ZERO, in full
    strategies priced from the joint distribution:  best 10, agrees</div><p>The middle column is the one that repays a second look. EVPI is 55/4, which is large next to a decision worth 125/4, and the signal captures 7/8 of it &mdash; under a tenth. It is a perfectly informative signal in the ordinary sense: the posteriors move a long way. It is nearly worthless because the act it recommends is almost always the one you would have chosen anyway.</p><p>For a rehearsal, take the build-or-wait instance and make the survey perfect &mdash; a likelihood of <span class="math" data-say="1 0">1 0</span> in the first row and <span class="math" data-say="0 1">0 1</span> in the second. EVSI should rise to exactly EVPI, 14, and not a fraction more. Then make it perfectly wrong, <span class="math" data-say="0 1">0 1</span> and <span class="math" data-say="1 0">1 0</span>, and predict the answer before running it: a signal that is always backwards is just as informative as one that is always right.</p><p>The harder rehearsal: hold the likelihood fixed and move the prior. There is a prior at which building and waiting are equally good, and EVSI is largest somewhere near it. Find it, and then say in words why information is worth most when the decision is closest &mdash; and worth nothing when the decision is not in doubt, however uncertain the state is.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating EVPI as the value of the information you are being offered</strong><span>It is the value of being told the state outright, which nobody is offering. It is useful precisely because it is a ceiling: it costs two weighted averages and it can rule out a purchase without any Bayes at all. Quoting it as the worth of a survey overstates the case by whatever the survey's noise costs, which in the instance in the lab is all of it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging a signal by how much it moves the posterior</strong><span>A signal is worth something when it changes the act. Those are different properties and the three-act instance separates them: the posteriors move substantially and EVSI is 7/8 against an EVPI of 55/4. Conversely, a signal that barely moves the posterior can be worth a great deal if the decision was finely balanced.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting EVSI to the last fraction from a prior that was a guess</strong><span>Every number here is exact arithmetic on the inputs, and one of the inputs is usually somebody's judgement about how likely the states are. <span class="math" data-say="9 over 2">9/2</span> is the value of the survey given that the prior is exactly 3/10; it is not the value of the survey. Move the prior in the lab and watch EVSI move with it, and quote the range rather than the point.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fold a two-level tree by hand, compute EVPI in two weighted averages, and say without computing anything whether a given signal can possibly be worth buying.</strong><p>You should be able to apply the two node rules from the leaves back, compute the prior value and the perfect-information value and know which has the maximum on the inside, use EVPI as a ceiling before touching Bayes, compute posteriors and EVSI when the ceiling does not settle it, and explain why a signal that never changes the act is worth nothing however sharp it looks.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both halves of the course so far have decided everything at once and then watched it play out. The next lesson, &ldquo;Thresholds and When to Stop Looking&rdquo;, is the first where the decision is repeated and the only question is when to stop: offers arrive one at a time, refusing one costs something, and the rule turns out to be a threshold that falls as the deadline nears. That the rule has that shape is usually asserted. On that page it is measured against every other rule there is.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating EVPI as the value of the information you are being offered</strong><span>It is the value of being told the state outright, which nobody is offering. It is useful precisely because it is a ceiling: it costs two weighted averages and it can rule out a purchase without any Bayes at all. Quoting it as the worth of a survey overstates the case by whatever the survey's noise costs, which in the instance in the lab is all of it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging a signal by how much it moves the posterior</strong><span>A signal is worth something when it changes the act. Those are different properties and the three-act instance separates them: the posteriors move substantially and EVSI is 7/8 against an EVPI of 55/4. Conversely, a signal that barely moves the posterior can be worth a great deal if the decision was finely balanced.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting EVSI to the last fraction from a prior that was a guess</strong><span>Every number here is exact arithmetic on the inputs, and one of the inputs is usually somebody's judgement about how likely the states are. <span class="math" data-say="9 over 2">9/2</span> is the value of the survey given that the prior is exactly 3/10; it is not the value of the survey. Move the prior in the lab and watch EVSI move with it, and quote the range rather than the point.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fold a two-level tree by hand, compute EVPI in two weighted averages, and say without computing anything whether a given signal can possibly be worth buying.</strong><p>You should be able to apply the two node rules from the leaves back, compute the prior value and the perfect-information value and know which has the maximum on the inside, use EVPI as a ceiling before touching Bayes, compute posteriors and EVSI when the ceiling does not settle it, and explain why a signal that never changes the act is worth nothing however sharp it looks.</p></div></div><div class="note"><strong>Note:</strong> Both halves of the course so far have decided everything at once and then watched it play out. The next lesson, &ldquo;Thresholds and When to Stop Looking&rdquo;, is the first where the decision is repeated and the only question is when to stop: offers arrive one at a time, refusing one costs something, and the rule turns out to be a threshold that falls as the deadline nears. That the rule has that shape is usually asserted. On that page it is measured against every other rule there is.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The fold is the same recursion with two rules instead of one</summary><p>Work from the leaves back. A chance node takes the probability-weighted average of what its branches fold to; a decision node takes the largest, and remembers which branch that was. Nothing else changes: values are written only once everything below them is settled, and the tree is filled from the ends. The branch a decision node remembers is the plan, and the number it holds is not.</p></details><details class="recall"><summary>Perfect information is a ceiling, and it is computed differently</summary><p>Knowing the state before choosing lets you pick the best act in each state separately, so its value is <span class="math" data-say="the sum of P of state times the max over acts">Σ P(state) × max over acts</span>. That has the maximum inside the average, which is the swap &ldquo;The Stochastic Recursion&rdquo; warned about &mdash; and here the swap is the point rather than a mistake, because it is describing a different and better-informed decision-maker. The difference between the two orders is <span class="math" data-say="EVPI">EVPI</span>, and no signal can be worth more.</p></details><details class="recall"><summary>A signal&#x27;s value comes from the joint distribution, not from the shape of the tree</summary><p><span class="math" data-say="EVSI">EVSI</span> is computed by finding, for each signal, how likely that signal is and what the posterior over states becomes; then taking the best act under each posterior; then averaging those over the signals. A tree with no likelihood in it has no <span class="math" data-say="EVSI">EVSI</span> at all, and the lab reports it as absent rather than producing a number from the branches &mdash; a shape can always be given a number, and that is precisely the danger.</p></details></div>
+      <h3>Summary</h3>
       <p>Put a payoff table beside a prior and the whole of a one-shot decision under uncertainty is a tree two levels deep. Folding it back is the recursion again, with two kinds of node instead of one. What the fold makes possible is a question the table alone cannot answer: what would it be worth to know the state before deciding, and what is this particular noisy signal worth? The first is a ceiling that no signal can exceed. The second can be exactly nothing, for a signal that looks perfectly respectable.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The fold is the same recursion with two rules instead of one.</strong> Work from the leaves back. A chance node takes the probability-weighted average of what its branches fold to; a decision node takes the largest, and remembers which branch that was. Nothing else changes: values are written only once everything below them is settled, and the tree is filled from the ends. The branch a decision node remembers is the plan, and the number it holds is not.</li><li><strong>Perfect information is a ceiling, and it is computed differently.</strong> Knowing the state before choosing lets you pick the best act in each state separately, so its value is <span class="math" data-say="the sum of P of state times the max over acts">Σ P(state) × max over acts</span>. That has the maximum inside the average, which is the swap &ldquo;The Stochastic Recursion&rdquo; warned about &mdash; and here the swap is the point rather than a mistake, because it is describing a different and better-informed decision-maker. The difference between the two orders is <span class="math" data-say="EVPI">EVPI</span>, and no signal can be worth more.</li><li><strong>A signal&#x27;s value comes from the joint distribution, not from the shape of the tree.</strong> <span class="math" data-say="EVSI">EVSI</span> is computed by finding, for each signal, how likely that signal is and what the posterior over states becomes; then taking the best act under each posterior; then averaging those over the signals. A tree with no likelihood in it has no <span class="math" data-say="EVSI">EVSI</span> at all, and the lab reports it as absent rather than producing a number from the branches &mdash; a shape can always be given a number, and that is precisely the danger.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="chance node, equals the average of its branches, weighted by their probabilities. decision node equals the largest of its branches, and it records which one. EVPI equals E of best act once the state is known minus best act on the prior. EVSI equals E of best act after seeing the signal minus best act on the prior. 0 is at most EVSI is at most EVPI always, and both ends of that are reached in the lab. g o over stop, up over down, payoff 60 and negative 40, prior 1 over 2, EVPI 20, and, EVSI 0" tabindex="0" role="region" aria-label="Mathematical notation">chance node   = the average of its branches, weighted by their probabilities
 decision node = the largest of its branches, and it records which one
 EVPI = E[ best act once the state is known ] - [ best act on the prior ]
@@ -3142,11 +3187,40 @@ go/stop, up/down, payoff 60 and -40, prior 1/2:  EVPI 20  and  EVSI 0</div><figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3214,7 +3288,7 @@ go/stop, up/down, payoff 60 and -40, prior 1/2:  EVPI 20  and  EVSI 0</div><figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

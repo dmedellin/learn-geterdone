@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Linear Programming Models</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The four model families</p>
       <h1>Multiperiod Planning and Balance Constraints</h1>
       <p class="lesson-lede">Link periods with one balance equation each, and read the production and inventory paths off the solution.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Inventory is a decision variable, not a formula</li><li>One equation per period, the same shape every time</li><li>The link is what forbids producing too late</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Balance equations, and the aggregate row that is not equivalent</h2>
-      <article class="prose reading"><p>A plant makes one product over four periods. Demand is 20, 35, 30 and 25 units; making one unit costs 9, 8, 7 and 6 as the periods go on; at most 60 units can be made in a period; carrying a unit into the next period costs 1; and there are 5 units in the store before the first period begins.</p><div class="defbox"><span class="label">Definition &middot; Balance constraint</span><p>For each period <span class="math" data-say="t">t</span>, with <span class="math" data-say="P sub t">Pₜ</span> made, <span class="math" data-say="D sub t">Dₜ</span> demanded and <span class="math" data-say="I sub t">Iₜ</span> left in the store at the end, the <strong>balance constraint</strong> is <span class="math" data-say="I sub t equals I sub t minus 1 plus P sub t minus D sub t">Iₜ = Iₜ₋₁ + Pₜ − Dₜ</span>, where <span class="math" data-say="I sub 0">I₀</span> is the opening stock. Rearranged for a solver, with the data on the right, it is <span class="math" data-say="P sub t plus I sub t minus 1 minus I sub t equals D sub t">Pₜ + Iₜ₋₁ − Iₜ = Dₜ</span>.</p><p>With <span class="math" data-say="I sub t is at least 0">Iₜ ≥ 0</span> for every <span class="math" data-say="t">t</span>, the family of equations says exactly that demand is met in the period it occurs, out of stock that exists by then. Allowing <span class="math" data-say="I sub t">Iₜ</span> to go negative is a modelling decision with a name &mdash; a backorder &mdash; and it has to be made deliberately.</p></div><div class="mathblock" data-say="period 1, period 2, period 3, period 4. a table, shown on the page. opening stock 5, capacity 60 a period, 1 to carry a unit onward. minimise, 9 P sub 1 plus 8 P sub 2 plus 7 P sub 3 plus 6 P sub 4 plus I sub 1 plus I sub 2 plus I sub 3 plus I sub 4. P sub 1, minus I sub 1, equals, 15, 20 demanded, 5 already in the store. P sub 2 plus I sub 1, minus I sub 2, equals, 35. P sub 3 plus I sub 2, minus I sub 3, equals, 30. P sub 4 plus I sub 3, minus I sub 4, equals, 25. P sub 1, and so on, P sub 4, is at most, 60. every P and every I, is at least, 0" tabindex="0" role="region" aria-label="Mathematical notation">                        period 1   period 2   period 3   period 4
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Balance equations, and the aggregate row that is not equivalent</h2><div class="prose reading"><p>A plant makes one product over four periods. Demand is 20, 35, 30 and 25 units; making one unit costs 9, 8, 7 and 6 as the periods go on; at most 60 units can be made in a period; carrying a unit into the next period costs 1; and there are 5 units in the store before the first period begins.</p><div class="defbox"><span class="label">Definition &middot; Balance constraint</span><p>For each period <span class="math" data-say="t">t</span>, with <span class="math" data-say="P sub t">Pₜ</span> made, <span class="math" data-say="D sub t">Dₜ</span> demanded and <span class="math" data-say="I sub t">Iₜ</span> left in the store at the end, the <strong>balance constraint</strong> is <span class="math" data-say="I sub t equals I sub t minus 1 plus P sub t minus D sub t">Iₜ = Iₜ₋₁ + Pₜ − Dₜ</span>, where <span class="math" data-say="I sub 0">I₀</span> is the opening stock. Rearranged for a solver, with the data on the right, it is <span class="math" data-say="P sub t plus I sub t minus 1 minus I sub t equals D sub t">Pₜ + Iₜ₋₁ − Iₜ = Dₜ</span>.</p><p>With <span class="math" data-say="I sub t is at least 0">Iₜ ≥ 0</span> for every <span class="math" data-say="t">t</span>, the family of equations says exactly that demand is met in the period it occurs, out of stock that exists by then. Allowing <span class="math" data-say="I sub t">Iₜ</span> to go negative is a modelling decision with a name &mdash; a backorder &mdash; and it has to be made deliberately.</p></div><div class="mathblock" data-say="period 1, period 2, period 3, period 4. a table, shown on the page. opening stock 5, capacity 60 a period, 1 to carry a unit onward. minimise, 9 P sub 1 plus 8 P sub 2 plus 7 P sub 3 plus 6 P sub 4 plus I sub 1 plus I sub 2 plus I sub 3 plus I sub 4. P sub 1, minus I sub 1, equals, 15, 20 demanded, 5 already in the store. P sub 2 plus I sub 1, minus I sub 2, equals, 35. P sub 3 plus I sub 2, minus I sub 3, equals, 30. P sub 4 plus I sub 3, minus I sub 4, equals, 25. P sub 1, and so on, P sub 4, is at most, 60. every P and every I, is at least, 0" tabindex="0" role="region" aria-label="Mathematical notation">                        period 1   period 2   period 3   period 4
   demand                   20         35         30         25
   cost to make one          9          8          7          6
 
@@ -1404,12 +1448,11 @@ minimise  9P₁ + 8P₂ + 7P₃ + 6P₄ + I₁ + I₂ + I₃ + I₄
   P₃ + I₂      − I₃       =  30
   P₄ + I₃      − I₄       =  25
   P₁, …, P₄               ≤  60
-  every P and every I     ≥   0</div><p>The cheapest plan makes 15, 35, 30 and 25 and carries nothing at any point, at a cost of 775. That is worth reading rather than accepting: making a unit gets cheaper every period and carrying one costs money, so there is no reason to build stock and every reason to make each unit as late as the balance rows allow &mdash; which is the period it is sold in.</p><div class="example"><span class="label">Example &middot; When the store earns its keep</span><p>Cut the capacity to 30 a period and raise the second period's demand to 40. Now the second period cannot make what it sells, so the plan makes 25 in the first period, carries 10 units forward, and makes 30, 30 and 25 after that, at a cost of 835. The first inventory variable is 10, and it is the only thing in the model that could have made the second period feasible at all.</p></div><h3>The aggregate row, and the plan it prefers</h3><p>The tempting simplification is one row instead of four: total production at least total demand. With 110 units demanded and 5 in the store that is <span class="math" data-say="P sub 1 plus P sub 2 plus P sub 3 plus P sub 4 is at least 105">P₁ + P₂ + P₃ + P₄ ≥ 105</span>, and the inventory variables disappear along with the balance equations.</p><p>It solves, and it is cheaper: 675 against 775. The plan it prefers makes nothing at all in the first two periods and then 45 and 60 in the last two, because production is cheapest at the end and nothing in the model any longer says when a unit has to exist. Run that plan through the periods and 15 units of demand go unmet in the first period and 35 in the second: fifty units of demand unserved, by a plan the objective calls better.</p><p>This is the sharpest example on the course of a model being exactly wrong. Nothing is infeasible, no arithmetic is off, and the reported cost is a real number about a plan nobody would run. The aggregate row is a true statement about the plan; it is simply a much weaker one than the four rows it replaced, and the cost cannot show what was lost.</p><p>The same weakening is available inside the balance rows themselves. Drop <span class="math" data-say="I sub 2 is at least 0">I₂ ≥ 0</span> and the second period's row is satisfied by <span class="math" data-say="I sub 2 equals negative 35">I₂ = −35</span> with nothing made, which reads as thirty-five units promised and not delivered. If backorders are what the situation allows, that is a variable to introduce and price on purpose; if they are not, the sign restriction is the row that says so.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Planning over periods, linked by one balance equation</h2></div><p>Inventory is the variable that carries one period into the next</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  every P and every I     ≥   0</div><p>The cheapest plan makes 15, 35, 30 and 25 and carries nothing at any point, at a cost of 775. That is worth reading rather than accepting: making a unit gets cheaper every period and carrying one costs money, so there is no reason to build stock and every reason to make each unit as late as the balance rows allow &mdash; which is the period it is sold in.</p><div class="example"><span class="label">Example &middot; When the store earns its keep</span><p>Cut the capacity to 30 a period and raise the second period's demand to 40. Now the second period cannot make what it sells, so the plan makes 25 in the first period, carries 10 units forward, and makes 30, 30 and 25 after that, at a cost of 835. The first inventory variable is 10, and it is the only thing in the model that could have made the second period feasible at all.</p></div><h3>The aggregate row, and the plan it prefers</h3><p>The tempting simplification is one row instead of four: total production at least total demand. With 110 units demanded and 5 in the store that is <span class="math" data-say="P sub 1 plus P sub 2 plus P sub 3 plus P sub 4 is at least 105">P₁ + P₂ + P₃ + P₄ ≥ 105</span>, and the inventory variables disappear along with the balance equations.</p><p>It solves, and it is cheaper: 675 against 775. The plan it prefers makes nothing at all in the first two periods and then 45 and 60 in the last two, because production is cheapest at the end and nothing in the model any longer says when a unit has to exist. Run that plan through the periods and 15 units of demand go unmet in the first period and 35 in the second: fifty units of demand unserved, by a plan the objective calls better.</p><p>This is the sharpest example on the course of a model being exactly wrong. Nothing is infeasible, no arithmetic is off, and the reported cost is a real number about a plan nobody would run. The aggregate row is a true statement about the plan; it is simply a much weaker one than the four rows it replaced, and the cost cannot show what was lost.</p><p>The same weakening is available inside the balance rows themselves. Drop <span class="math" data-say="I sub 2 is at least 0">I₂ ≥ 0</span> and the second period's row is satisfied by <span class="math" data-say="I sub 2 equals negative 35">I₂ = −35</span> with nothing made, which reads as thirty-five units promised and not delivered. If backorders are what the situation allows, that is a variable to introduce and price on purpose; if they are not, the sign restriction is the row that says so.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Planning over periods, linked by one balance equation</h2></div><p>Inventory is the variable that carries one period into the next</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Planning over periods, linked by one balance equation</strong><span>Inventory is the variable that carries one period into the next</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>made in the period</span><span class="tone-purple"><i class="legend-swatch"></i>carried into the next</span><span class="tone-red"><i class="legend-swatch"></i>demand that went unmet</span></div>
@@ -1418,10 +1461,10 @@ minimise  9P₁ + 8P₂ + 7P₃ + 6P₄ + I₁ + I₂ + I₃ + I₄
       <div id="mdTable" style="margin-top:12px;"></div>
       <div id="mdExtra" style="margin-top:12px;"></div>
       <div class="status-banner" id="mdStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the demands, then replace the balance rows with one aggregate row</h3>
-          <p>One balance equation per period says stock carried out is stock carried in plus what was made minus what was sold. The selector swaps all of them for the single row “total made is at least total demand”, and the table beside it shows the plan that then becomes optimal and the demand that plan misses.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the demands, then replace the balance rows with one aggregate row</h3>
+            <p>One balance equation per period says stock carried out is stock carried in plus what was made minus what was sold. The selector swaps all of them for the single row “total made is at least total demand”, and the table beside it shows the plan that then becomes optimal and the demand that plan misses.</p>
         <div class="field" id="mdAggField">
           <label for="mdAgg">How the periods are linked</label>
           <select id="mdAgg"><option value="balance" selected>a balance equation in every period</option><option value="aggregate">one aggregate row for the whole horizon</option></select>
@@ -1465,12 +1508,14 @@ minimise  9P₁ + 8P₂ + 7P₃ + 6P₄ + I₁ + I₂ + I₃ + I₄
           <div class="kpi"><span id="mdK4Lab">&mdash;</span><strong id="mdK4">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Writing a plan over periods</h2></div><p>The variables come in two families and the rows come one per period. Doing the first period separately is what keeps the opening stock honest.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Two variables per period, with units</h3><p><span class="math" data-say="P sub t">Pₜ</span> is units made in period <span class="math" data-say="t">t</span> and <span class="math" data-say="I sub t">Iₜ</span> is units in the store at the end of it. A four-period plan therefore has eight decisions, not four, and the second family is the one that carries the link.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the balance equation for a middle period first</h3><p><span class="math" data-say="P sub t plus I sub t minus 1 minus I sub t equals D sub t">Pₜ + Iₜ₋₁ − Iₜ = Dₜ</span>. Get the signs right where the pattern is plain: what was carried in is added, what is carried out is subtracted, and the demand is on the right with the data.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Then do the first period by hand</h3><p>There is no <span class="math" data-say="I sub 0">I₀</span> variable: the opening stock is data, so the first row is <span class="math" data-say="P sub 1 minus I sub 1 equals D sub 1 minus opening stock">P₁ − I₁ = D₁ − (opening stock)</span>. Copying the middle pattern into the first period is the error this step exists to prevent.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve, then read both paths and the store</h3><p>Report <span class="math" data-say="P sub t">Pₜ</span> and <span class="math" data-say="I sub t">Iₜ</span> for every period, not just the total cost. A plan is a path through the horizon, and whether it ever holds stock is the thing the balance rows were written to decide.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Writing a plan over periods</h2>
+      <p class="lead-in">The variables come in two families and the rows come one per period. Doing the first period separately is what keeps the opening stock honest.</p>
+      <ol class="key-ideas method"><li><strong>Two variables per period, with units.</strong> <span class="math" data-say="P sub t">Pₜ</span> is units made in period <span class="math" data-say="t">t</span> and <span class="math" data-say="I sub t">Iₜ</span> is units in the store at the end of it. A four-period plan therefore has eight decisions, not four, and the second family is the one that carries the link.</li><li><strong>Write the balance equation for a middle period first.</strong> <span class="math" data-say="P sub t plus I sub t minus 1 minus I sub t equals D sub t">Pₜ + Iₜ₋₁ − Iₜ = Dₜ</span>. Get the signs right where the pattern is plain: what was carried in is added, what is carried out is subtracted, and the demand is on the right with the data.</li><li><strong>Then do the first period by hand.</strong> There is no <span class="math" data-say="I sub 0">I₀</span> variable: the opening stock is data, so the first row is <span class="math" data-say="P sub 1 minus I sub 1 equals D sub 1 minus opening stock">P₁ − I₁ = D₁ − (opening stock)</span>. Copying the middle pattern into the first period is the error this step exists to prevent.</li><li><strong>Solve, then read both paths and the store.</strong> Report <span class="math" data-say="P sub t">Pₜ</span> and <span class="math" data-say="I sub t">Iₜ</span> for every period, not just the total cost. A plan is a path through the horizon, and whether it ever holds stock is the thing the balance rows were written to decide.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1497,17 +1542,16 @@ balance rows       P = (15, 35, 30, 25),  I = (0, 0, 0, 0)     cost 775
 demand unserved    0</div><p>The aggregate plan satisfies its one row exactly &mdash; 105 units made &mdash; and misses fifty units of demand, then finishes with fifty units in the store. Both facts follow from the same thing: the row counts units over the whole horizon and says nothing about when they exist.</p><p>For a faded rehearsal, keep the balance rows and cut the capacity to 30 a period. The supplied first move is where the trouble must be: the second period demands 35 and can make at most 30, so its row can only be satisfied with stock carried in. Predict <span class="math" data-say="P sub 1">P₁</span> and <span class="math" data-say="I sub 1">I₁</span>, then the rest of both paths and the cost, and check them against the lab &mdash; and say what happens to the model when the capacity goes to 20.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Replacing the balance rows with one aggregate row</strong><span>“Total production at least total demand” sounds equivalent and is strictly weaker: it is satisfied by making everything in the last period, after every earlier demand has already gone unmet. Here it is 100 pounds cheaper and misses fifty units, and the objective cannot show either fact.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Copying the middle-period pattern into the first period</strong><span>The first row has no <span class="math" data-say="I sub t minus 1">Iₜ₋₁</span> variable in it, because the opening stock is data. Writing <span class="math" data-say="P sub 1 plus I sub 0 minus I sub 1 equals D sub 1">P₁ + I₀ − I₁ = D₁</span> with <span class="math" data-say="I sub 0">I₀</span> as a variable hands the plan a free store to draw on, and the symptom is a first period that makes suspiciously little.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the store as something that can go negative</strong><span>Without <span class="math" data-say="I sub t is at least 0">Iₜ ≥ 0</span>, a balance equation is satisfied by unmet demand recorded as negative stock, and the plan that results looks cheap. Backorders may well be what the situation allows &mdash; then they get their own variable and their own cost, on purpose.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you write the middle period first and the first period by hand.</strong><p>You should be able to declare two variables per period with units, write one balance equality per period with the opening stock handled separately, read the production and inventory paths off the solution, and say what an aggregate row would fail to say.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the four families, and every row in them was linear as written or after one multiplication. The rest of the course is about requirements that are not: an absolute value, a largest-of-several cost, a price that changes at a break point, a variable allowed to go negative. One of the four is legal whichever way the objective is pushed and the other three are not, which is what “Reformulations That Keep Linearity” is about.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Replacing the balance rows with one aggregate row</strong><span>“Total production at least total demand” sounds equivalent and is strictly weaker: it is satisfied by making everything in the last period, after every earlier demand has already gone unmet. Here it is 100 pounds cheaper and misses fifty units, and the objective cannot show either fact.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Copying the middle-period pattern into the first period</strong><span>The first row has no <span class="math" data-say="I sub t minus 1">Iₜ₋₁</span> variable in it, because the opening stock is data. Writing <span class="math" data-say="P sub 1 plus I sub 0 minus I sub 1 equals D sub 1">P₁ + I₀ − I₁ = D₁</span> with <span class="math" data-say="I sub 0">I₀</span> as a variable hands the plan a free store to draw on, and the symptom is a first period that makes suspiciously little.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the store as something that can go negative</strong><span>Without <span class="math" data-say="I sub t is at least 0">Iₜ ≥ 0</span>, a balance equation is satisfied by unmet demand recorded as negative stock, and the plan that results looks cheap. Backorders may well be what the situation allows &mdash; then they get their own variable and their own cost, on purpose.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you write the middle period first and the first period by hand.</strong><p>You should be able to declare two variables per period with units, write one balance equality per period with the opening stock handled separately, read the production and inventory paths off the solution, and say what an aggregate row would fail to say.</p></div></div><div class="note"><strong>Note:</strong> That is the four families, and every row in them was linear as written or after one multiplication. The rest of the course is about requirements that are not: an absolute value, a largest-of-several cost, a price that changes at a break point, a variable allowed to go negative. One of the four is legal whichever way the objective is pushed and the other three are not, which is what “Reformulations That Keep Linearity” is about.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Inventory is a decision variable, not a formula</summary><p><span class="math" data-say="I sub t">Iₜ</span> is the stock in the store at the end of period <span class="math" data-say="t">t</span>, in units. The plan chooses it, subject to the balance equation and to <span class="math" data-say="I sub t is at least 0">Iₜ ≥ 0</span>. Substituting a formula for it collapses the link into the objective and makes the constraint that forbids a negative store impossible to write.</p></details><details class="recall"><summary>One equation per period, the same shape every time</summary><p><span class="math" data-say="P sub t plus I sub t minus 1 minus I sub t equals D sub t">Pₜ + Iₜ₋₁ − Iₜ = Dₜ</span> for each <span class="math" data-say="t">t</span>, with the first period taking the opening stock as data. The rows are equalities: the stock does not merely satisfy an inequality, it is determined by where it came from, and it appears in exactly two of the rows &mdash; the period that carries it out and the period that carries it in.</p></details><details class="recall"><summary>The link is what forbids producing too late</summary><p>Demand in the second period must be met by stock that exists in the second period. The balance rows say so, period by period. A single row about total production over the horizon says something strictly weaker and cannot see the difference.</p></details></div>
+      <h3>Summary</h3>
       <p>One equation per period, <span class="math" data-say="I sub t equals I sub t minus 1 plus P sub t minus D sub t">Iₜ = Iₜ₋₁ + Pₜ − Dₜ</span>, is what ties a plan together: the stock carried out of a period is the stock carried in, plus what was made, minus what was sold. The inventory variable is the thing that carries the link, so it is a decision of the model rather than a formula, and one aggregate row about total production is not the same statement.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Inventory is a decision variable, not a formula.</strong> <span class="math" data-say="I sub t">Iₜ</span> is the stock in the store at the end of period <span class="math" data-say="t">t</span>, in units. The plan chooses it, subject to the balance equation and to <span class="math" data-say="I sub t is at least 0">Iₜ ≥ 0</span>. Substituting a formula for it collapses the link into the objective and makes the constraint that forbids a negative store impossible to write.</li><li><strong>One equation per period, the same shape every time.</strong> <span class="math" data-say="P sub t plus I sub t minus 1 minus I sub t equals D sub t">Pₜ + Iₜ₋₁ − Iₜ = Dₜ</span> for each <span class="math" data-say="t">t</span>, with the first period taking the opening stock as data. The rows are equalities: the stock does not merely satisfy an inequality, it is determined by where it came from, and it appears in exactly two of the rows &mdash; the period that carries it out and the period that carries it in.</li><li><strong>The link is what forbids producing too late.</strong> Demand in the second period must be met by stock that exists in the second period. The balance rows say so, period by period. A single row about total production over the horizon says something strictly weaker and cannot see the difference.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="I sub t equals I sub t minus 1 plus P sub t minus D sub t, one equation for each period. written for a solver, P sub t plus I sub t minus 1 minus I sub t equals D sub t. period 1 carries the opening stock, P sub 1 minus I sub 1 equals 20 minus 5. P sub t is at most capacity, P sub t is at least 0, I sub t is at least 0. one aggregate row instead, P sub 1 plus P sub 2 plus P sub 3 plus P sub 4 is at least 105" tabindex="0" role="region" aria-label="Mathematical notation">Iₜ = Iₜ₋₁ + Pₜ − Dₜ            one equation for each period
 written for a solver:   Pₜ + Iₜ₋₁ − Iₜ = Dₜ
 
@@ -3474,11 +3518,40 @@ one aggregate row instead:   P₁ + P₂ + P₃ + P₄ ≥ 105</div><figcaption>
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3546,7 +3619,7 @@ one aggregate row instead:   P₁ + P₂ + P₃ + P₄ ≥ 105</div><figcaption>
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,63 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Variables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Using Variables</p>
       <h1>Scope, Span and Live Time</h1>
       <p class="lesson-lede">Keeping each variable&#x27;s references close together and its life short shrinks the code a reader has to hold in mind, and the book measures both with line numbers.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Scope</li><li>Span</li><li>Live time</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Section 10.4&#x27;s two measures, then one routine measured twice</h2>
-      <article class="prose reading"><p>&ldquo;Minimize the scope of each variable. Keep references to a variable close together. Keep it local to a routine or class. Avoid global data.&rdquo; That is the second of Chapter 10's Key Points, on page 258. This lesson reads Sections 10.4 to 10.8, pages 244 to 258; read them in your own copy first.</p><p>Section 10.4 begins with a variable's celebrity: how many places know it. In Java a variable can be known to a block, a routine, a class or a whole package, and the section's argument is that the less of the program that knows a variable, the less of it you need to read to understand that variable. The code between two references to a variable is what McConnell calls a &ldquo;window of vulnerability&rdquo;: new code can be added there that changes the variable by mistake, and a reader can forget what it holds.</p><p>He then makes the idea measurable. A variable's span is the number of lines between two consecutive references to it, and its average span is the mean of those; its live time is the number of lines from its first reference to its last, both included. The two differ: a variable used on every line from 1 to 25 has spans of 0 and a live time of 25, and one used only on lines 1 and 25 has a span of 23 and the same live time. The section's own example measures a listing whose three variables are initialised at the top and averages a live time of about 54 lines; with the initialisations moved down beside their loops, the average is about 7. McConnell is candid that no one has found the number that separates a good live time from a bad one, and he takes it that smaller is better.</p><p>The section's guidelines follow. Initialise a loop's variables just before the loop, not at the top of the routine. Do not give a variable its value until just before the value is used. Group the statements that work on the same variables. Break a group out into a routine of its own, where its variables cannot live long. And begin with the most restricted visibility, widening it only when you must, because it is much harder to make a global variable local than the reverse. He frames the disagreement fairly: programmers who make variables global value convenience in writing, and those who keep them local value being able to understand one routine at a time; his own conclusion is that a program in which any routine can use any variable is harder to understand, debug and modify, so each variable should be visible to the smallest part of the program that needs it.</p><p>The four shorter sections each add a point. Section 10.5, on persistence, warns against assuming a variable lasts longer than it does, and compares it to the milk in your refrigerator, which is supposed to keep for a week. Section 10.6, on binding time, asks when a variable is tied to its value, from coding time with a literal, through compile time with a named constant, to the moment of use, and notes that later binding buys flexibility at the price of complexity. Section 10.7 matches kinds of data to control structures: sequential data to a sequence of statements, selective data to an <span class="math" data-say="if">if</span> or a <span class="math" data-say="case">case</span>, iterative data to a loop. Section 10.8 asks for each variable to have exactly one purpose, and not, for instance, to be a page count that means an error when it is &minus;1.</p><p>You have probably written a routine like <span class="math" data-say="audit shipments">auditShipments</span>: three declarations at the top, set to zero, and then the work, a screen further down. It is the <code>declared-at-top</code> preset in the lab below.</p><pre class="codeblock" data-say="line 1, void audit shipments of array of shipment shipments, int limit kg. line 2, int scanned is set to 0. line 3, int heaviest kg is set to 0. line 4, int over limit is set to 0. line 5, print title. line 6, print legend. line 7, for shipment s in shipments. line 8, s dot verify. line 9, scanned is set to scanned plus 1. line 11, print count of scanned. line 12, for shipment s in shipments. line 13, heaviest kg is set to math dot max of heaviest kg, s dot weight kg. line 14, if s dot weight kg is greater than limit kg. line 15, over limit is set to over limit plus 1. line 18, print summary of heaviest kg, over limit" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void auditShipments(Shipment[] shipments, int limitKg) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Section 10.4&#x27;s two measures, then one routine measured twice</h2><div class="prose reading"><p>&ldquo;Minimize the scope of each variable. Keep references to a variable close together. Keep it local to a routine or class. Avoid global data.&rdquo; That is the second of Chapter 10's Key Points, on page 258. This lesson reads Sections 10.4 to 10.8, pages 244 to 258; read them in your own copy first.</p><p>Section 10.4 begins with a variable's celebrity: how many places know it. In Java a variable can be known to a block, a routine, a class or a whole package, and the section's argument is that the less of the program that knows a variable, the less of it you need to read to understand that variable. The code between two references to a variable is what McConnell calls a &ldquo;window of vulnerability&rdquo;: new code can be added there that changes the variable by mistake, and a reader can forget what it holds.</p><p>He then makes the idea measurable. A variable's span is the number of lines between two consecutive references to it, and its average span is the mean of those; its live time is the number of lines from its first reference to its last, both included. The two differ: a variable used on every line from 1 to 25 has spans of 0 and a live time of 25, and one used only on lines 1 and 25 has a span of 23 and the same live time. The section's own example measures a listing whose three variables are initialised at the top and averages a live time of about 54 lines; with the initialisations moved down beside their loops, the average is about 7. McConnell is candid that no one has found the number that separates a good live time from a bad one, and he takes it that smaller is better.</p><p>The section's guidelines follow. Initialise a loop's variables just before the loop, not at the top of the routine. Do not give a variable its value until just before the value is used. Group the statements that work on the same variables. Break a group out into a routine of its own, where its variables cannot live long. And begin with the most restricted visibility, widening it only when you must, because it is much harder to make a global variable local than the reverse. He frames the disagreement fairly: programmers who make variables global value convenience in writing, and those who keep them local value being able to understand one routine at a time; his own conclusion is that a program in which any routine can use any variable is harder to understand, debug and modify, so each variable should be visible to the smallest part of the program that needs it.</p><p>The four shorter sections each add a point. Section 10.5, on persistence, warns against assuming a variable lasts longer than it does, and compares it to the milk in your refrigerator, which is supposed to keep for a week. Section 10.6, on binding time, asks when a variable is tied to its value, from coding time with a literal, through compile time with a named constant, to the moment of use, and notes that later binding buys flexibility at the price of complexity. Section 10.7 matches kinds of data to control structures: sequential data to a sequence of statements, selective data to an <span class="math" data-say="if">if</span> or a <span class="math" data-say="case">case</span>, iterative data to a loop. Section 10.8 asks for each variable to have exactly one purpose, and not, for instance, to be a page count that means an error when it is &minus;1.</p><p>You have probably written a routine like <span class="math" data-say="audit shipments">auditShipments</span>: three declarations at the top, set to zero, and then the work, a screen further down. It is the <code>declared-at-top</code> preset in the lab below.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>lines between references, and live time</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>lines between references, and live time</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>A name's references are the lines it appears on; a span is the number of lines strictly between two consecutive references; its live time is the last reference's line minus the first's, plus one.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Span and live time</h3>
+            <p>A count over code, by the rules stated below the listing. The lab finds every line on which each named variable appears, computes the spans between consecutive references and each live time, and averages them. Leave the Variables box empty to measure every variable the routine sets.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="declared-at-top" selected>Declared at the top</option><option value="declared-near-use">Declared near their use</option></select>
+        </div>
+        <div class="field">
+          <label for="coInVars">Variables (space-separated; empty for every one set)</label>
+          <input id="coInVars" type="text" value="scanned heaviestKg overLimit" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Average span (lines)</span><strong id="coAvgSpan">&mdash;</strong></div>
+          <div class="kpi"><span>Average live time (lines)</span><strong id="coAvgLive">&mdash;</strong></div>
+          <div class="kpi"><span>Longest live time</span><strong id="coLongest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, void audit shipments of array of shipment shipments, int limit kg. line 2, int scanned is set to 0. line 3, int heaviest kg is set to 0. line 4, int over limit is set to 0. line 5, print title. line 6, print legend. line 7, for shipment s in shipments. line 8, s dot verify. line 9, scanned is set to scanned plus 1. line 11, print count of scanned. line 12, for shipment s in shipments. line 13, heaviest kg is set to math dot max of heaviest kg, s dot weight kg. line 14, if s dot weight kg is greater than limit kg. line 15, over limit is set to over limit plus 1. line 18, print summary of heaviest kg, over limit" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">void auditShipments(Shipment[] shipments, int limitKg) {</span>
 <span class="cl">    int scanned = 0;</span>
 <span class="cl">    int heaviestKg = 0;</span>
 <span class="cl">    int overLimit = 0;</span>
@@ -1493,55 +1582,12 @@
 <span class="cl">        count = count + 1;</span>
 <span class="cl">    }</span>
 <span class="cl">    printTotals(total, count);</span>
-<span class="cl">}</span></code></pre><p>For <span class="math" data-say="total">total</span> and <span class="math" data-say="count">count</span>, write down every span, the average span over the four spans and each live time. Then move both declarations below the four <span class="math" data-say="print">print</span> calls, so that they become lines 6 and 7, and compute the same figures again. You can check both versions in the lab afterwards, with <span class="math" data-say="total count">total count</span> in its Variables box.</p><p>A variable that stays live for few lines is easy to follow only if its name says what it holds. The next lesson, &ldquo;The Power of Variable Names&rdquo;, reads Chapter 11.</p></article>
+<span class="cl">}</span></code></pre><p>For <span class="math" data-say="total">total</span> and <span class="math" data-say="count">count</span>, write down every span, the average span over the four spans and each live time. Then move both declarations below the four <span class="math" data-say="print">print</span> calls, so that they become lines 6 and 7, and compute the same figures again. You can check both versions in the lab afterwards, with <span class="math" data-say="total count">total count</span> in its Variables box.</p><p>A variable that stays live for few lines is easy to follow only if its name says what it holds. The next lesson, &ldquo;The Power of Variable Names&rdquo;, reads Chapter 11.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>lines between references, and live time</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>lines between references, and live time</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>A name's references are the lines it appears on; a span is the number of lines strictly between two consecutive references; its live time is the last reference's line minus the first's, plus one.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Span and live time</h3>
-          <p>A count over code, by the rules stated below the listing. The lab finds every line on which each named variable appears, computes the spans between consecutive references and each live time, and averages them. Leave the Variables box empty to measure every variable the routine sets.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="declared-at-top" selected>Declared at the top</option><option value="declared-near-use">Declared near their use</option></select>
-        </div>
-        <div class="field">
-          <label for="coInVars">Variables (space-separated; empty for every one set)</label>
-          <input id="coInVars" type="text" value="scanned heaviestKg overLimit" inputmode="text" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Average span (lines)</span><strong id="coAvgSpan">&mdash;</strong></div>
-          <div class="kpi"><span>Average live time (lines)</span><strong id="coAvgLive">&mdash;</strong></div>
-          <div class="kpi"><span>Longest live time</span><strong id="coLongest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring span and live time</h2></div><p>Four steps; the last is yours.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List each variable&#x27;s lines</h3><p>Number every line from 1 and write down, for each variable, the lines on which it appears, its declaration included.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the spans</h3><p>For each pair of consecutive lines, the span is the later minus the earlier minus one: the lines strictly between. Average them for the variable, or over all the variables, as the lab does.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the live times</h3><p>For each variable, its last line minus its first line plus one. Note which is longest and how many of its lines come before the first real use.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Shorten a live time of your own</h3><p>Paste a routine of your own into the lab with the Variables box empty and find the local variable with the longest live time (the table lists parameters and loop variables too; a parameter's live time is the routine's). Move its declaration down to just before its first use, paste again, and note how far its live time fell.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring span and live time</h2>
+      <p class="lead-in">Four steps; the last is yours.</p>
+      <ol class="key-ideas method"><li><strong>List each variable&#x27;s lines.</strong> Number every line from 1 and write down, for each variable, the lines on which it appears, its declaration included.</li><li><strong>Compute the spans.</strong> For each pair of consecutive lines, the span is the later minus the earlier minus one: the lines strictly between. Average them for the variable, or over all the variables, as the lab does.</li><li><strong>Compute the live times.</strong> For each variable, its last line minus its first line plus one. Note which is longest and how many of its lines come before the first real use.</li><li><strong>Shorten a live time of your own.</strong> Paste a routine of your own into the lab with the Variables box empty and find the local variable with the longest live time (the table lists parameters and loop variables too; a parameter's live time is the routine's). Move its declaration down to just before its first use, paste again, and note how far its live time fell.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1559,17 +1605,16 @@ live time: 18 - 3 + 1 is 16
 declared near use, on line 10: 18 - 10 + 1 is 9</div><p>Moving the declaration cuts seven lines from its live time, all of them lines on which <span class="math" data-say="heaviest kg">heaviestKg</span> held 0 and did nothing.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Declaring every variable at the top so it is easy to find</strong><span>It is a common habit and has a real reason: one place to look. The chapter's measure says what it costs. Every line between a declaration and the variable's first use is a line on which it is live and doing nothing; on the lesson's illustration the average live time is 41/3, about 13.7 lines, against 23/3, about 7.7, for the same statements with each declaration moved down beside its loop.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking span and live time for the same measure</strong><span>A variable used on every line from 1 to 25 has spans of 0 and a live time of 25; one used only on lines 1 and 25 has a span of 23 and the same live time. Span says how far apart the references are; live time says how long the variable is in play. Section 10.4 asks for both to be small.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reusing a temporary variable for a second job</strong><span>It saves a declaration and costs a reader. Section 10.8 asks for one purpose per variable: a <span class="math" data-say="temp">temp</span> used for two unrelated values makes them look related, and a count that means an error when it is &minus;1 is, in the book's words for it, an integer &ldquo;moonlighting as a boolean&rdquo;.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute spans and live times by hand.</strong><p>Given the lines on which two variables are referenced, compute every span, the average span and each live time, and say which declaration to move to shrink them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts listing lines where the book counts statements, and its pooled average over several variables is its own extension of the book's per-variable measure. It reads names, not meanings: a variable reused for two purposes is one name to the lab, and a short live time says nothing about whether the variable's scope is wider than it needs to be.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Declaring every variable at the top so it is easy to find</strong><span>It is a common habit and has a real reason: one place to look. The chapter's measure says what it costs. Every line between a declaration and the variable's first use is a line on which it is live and doing nothing; on the lesson's illustration the average live time is 41/3, about 13.7 lines, against 23/3, about 7.7, for the same statements with each declaration moved down beside its loop.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking span and live time for the same measure</strong><span>A variable used on every line from 1 to 25 has spans of 0 and a live time of 25; one used only on lines 1 and 25 has a span of 23 and the same live time. Span says how far apart the references are; live time says how long the variable is in play. Section 10.4 asks for both to be small.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reusing a temporary variable for a second job</strong><span>It saves a declaration and costs a reader. Section 10.8 asks for one purpose per variable: a <span class="math" data-say="temp">temp</span> used for two unrelated values makes them look related, and a count that means an error when it is &minus;1 is, in the book's words for it, an integer &ldquo;moonlighting as a boolean&rdquo;.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute spans and live times by hand.</strong><p>Given the lines on which two variables are referenced, compute every span, the average span and each live time, and say which declaration to move to shrink them.</p></div></div><div class="note"><strong>Note:</strong> The lab counts listing lines where the book counts statements, and its pooled average over several variables is its own extension of the book's per-variable measure. It reads names, not meanings: a variable reused for two purposes is one name to the lab, and a short live time says nothing about whether the variable's scope is wider than it needs to be.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Scope</summary><p>How widely a variable is known: within one block, one routine, one class, one package or the whole program. McConnell's advice is to start with the smallest scope that works and widen it only when you must.</p></details><details class="recall"><summary>Span</summary><p>The number of lines between two consecutive references to a variable. A variable referenced on lines 3, 13 and 18 has spans of 9 and 4; its average span is the mean of its spans.</p></details><details class="recall"><summary>Live time</summary><p>The stretch from a variable's first reference to its last, both lines included: last minus first plus one. It does not care how often the variable is used in between, only how long a reader has to keep it in mind.</p></details></div>
+      <h3>Summary</h3>
       <p>The second half of Chapter 10 asks how widely a variable is known and how long it is in play. McConnell measures the distance between a variable's references, its span, and the stretch from first reference to last, its live time, and asks for both to be kept small. Compute both for a routine that declares its variables at the top, move each declaration to the loop that uses it, and compute them again.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Scope.</strong> How widely a variable is known: within one block, one routine, one class, one package or the whole program. McConnell's advice is to start with the smallest scope that works and widen it only when you must.</li><li><strong>Span.</strong> The number of lines between two consecutive references to a variable. A variable referenced on lines 3, 13 and 18 has spans of 9 and 4; its average span is the mean of its spans.</li><li><strong>Live time.</strong> The stretch from a variable's first reference to its last, both lines included: last minus first plus one. It does not care how often the variable is used in between, only how long a reader has to keep it in mind.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="span, lines strictly between two references. live time, last line minus first line plus 1. declare each variable just before its use. start with the smallest scope that works. one variable, one purpose" tabindex="0" role="region" aria-label="Mathematical notation">span: lines strictly between two references
 live time: last line - first line + 1
 declare each variable just before its use
@@ -2569,11 +2614,40 @@ one variable, one purpose</div><figcaption>Scope in five lines</figcaption></fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2641,7 +2715,7 @@ one variable, one purpose</div><figcaption>Scope in five lines</figcaption></fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

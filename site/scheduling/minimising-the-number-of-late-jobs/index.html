@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,41 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Scheduling</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Due dates, and which question you asked</p>
       <h1>Minimising the Number of Late Jobs</h1>
       <p class="lesson-lede">Offer the jobs in due-date order, and whenever the accepted set runs past a due date throw out the longest job accepted so far, not the one that went late.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Counting late jobs throws away how late they are</li><li>The discard is the longest accepted job, not the one that was late</li><li>The answer is a set, and the order is what makes the set work</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The algorithm, step by step, and the discard that surprises people</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The number of late jobs</span><p><span class="math" data-say="U sub j">U_j</span> is <span class="math" data-say="1">1</span> when <span class="math" data-say="C sub j is greater than d sub j">C_j > d_j</span> and <span class="math" data-say="0">0</span> otherwise, and the objective <span class="math" data-say="sum U">sum U</span> counts the late jobs. A schedule is measured by how many promises it broke, not by how far.</p></div><div class="defbox"><span class="label">Definition &middot; The Moore–Hodgson algorithm</span><p>Sort the jobs by due date ascending. Keep a set <span class="math" data-say="S">S</span>, initially empty, and a running finish time. Offer the jobs in that order: add the next job to <span class="math" data-say="S">S</span> and advance the finish time by its processing time. If the finish time now exceeds the due date of the job just added, remove from <span class="math" data-say="S">S</span> the job with the <strong>largest processing time</strong> and reduce the finish time by it.</p><p>At the end, <span class="math" data-say="S">S</span> is a largest set of jobs that can all be on time. Schedule <span class="math" data-say="S">S</span> in due-date order, then the discarded jobs in any order. The number of late jobs is the number discarded.</p></div><p>The algorithm is offered the jobs in due-date order and it is not the due-date rule. That distinction is the whole reason it works, and the lab prints both figures side by side so it cannot be blurred: due-date order alone leaves four jobs late on the instance where the algorithm leaves two.</p><h3>Five jobs, five steps, two discards</h3><div class="mathblock" data-say="jobs offered in due-date order, B 4, 4, D 3, 6, A 6, 8, C 5, 12, E 7, 20. 1, B joins, set B, finish 4, against due 4, on time. 2, D joins, set B D, finish 7, against due 6, LATE. discard the longest in the set, B at 4. set D, finish drops to 3. 3, A joins, set D A, finish 9, against due 8, LATE. discard the longest in the set, A at 6. set D, finish drops to 3. 4, C joins, set D C, finish 8, against due 12, on time. 5, E joins, set D C E, finish 15, against due 20, on time. kept D C E, discarded B, A, late 2. schedule, D C E B A, C equals 3, 8, 15, 19, 25. enumerated minimum over all 120 orders, 2, the algorithm attains it" tabindex="0" role="region" aria-label="Mathematical notation">jobs offered in due-date order   B 4:4,  D 3:6,  A 6:8,  C 5:12,  E 7:20
-
-  1   B joins    set B        finish 4   against due 4    on time
-  2   D joins    set B D      finish 7   against due 6    LATE
-         discard the longest in the set: B at 4
-         set D,  finish drops to 3
-  3   A joins    set D A      finish 9   against due 8    LATE
-         discard the longest in the set: A at 6
-         set D,  finish drops to 3
-  4   C joins    set D C      finish 8   against due 12   on time
-  5   E joins    set D C E    finish 15  against due 20   on time
-
-  kept D C E      discarded B, A      late 2
-  schedule  D C E B A      C = 3, 8, 15, 19, 25
-  enumerated minimum over all 120 orders: 2      the algorithm attains it</div><div class="example"><span class="label">Example &middot; Step 2, and why B goes rather than D</span><p><span class="math" data-say="D">D</span> is the job that pushed the set past a due date: adding it took the finish from <span class="math" data-say="4">4</span> to <span class="math" data-say="7">7</span> against <span class="math" data-say="D">D</span>'s due date of <span class="math" data-say="6">6</span>. The instinct is to discard <span class="math" data-say="D">D</span>. Either choice leaves exactly one job late at this point, so the two are tied on the objective and the tie is broken by what is left behind.</p><p>Discarding <span class="math" data-say="D">D</span> frees three hours; discarding <span class="math" data-say="B">B</span> frees four. The algorithm takes the four, and the extra hour is what lets <span class="math" data-say="C">C</span> and <span class="math" data-say="E">E</span> both join later without another discard. <span class="math" data-say="B">B</span> had been comfortably on time at step 1 and is thrown out at step 2 without ever having been the problem.</p></div><h3>The two rules it beats, measured</h3><div class="mathblock" data-say="due-date order alone, B D A C E, late 4. Moore to Hodgson, D C E B A, late 2. shortest-first, D B C A E, late 3. the enumerated minimum, late 2, attained by 10 of the 120 orders" tabindex="0" role="region" aria-label="Mathematical notation">  due-date order alone      B D A C E     late 4
-  Moore–Hodgson             D C E B A     late 2
-  shortest-first            D B C A E     late 3
-  the enumerated minimum                  late 2,  attained by 10 of the 120 orders</div><p>Due-date order leaves four late, and it is not a bad rule &mdash; it is the optimal rule for maximum lateness on this very instance. It loses here because it never gives up on anything: it keeps trying to run <span class="math" data-say="B">B</span> and <span class="math" data-say="A">A</span> on time and fails at both, and the hours spent failing make <span class="math" data-say="C">C</span> late as well. Writing two jobs off at the start is what buys the other three.</p><p>That is the difference between a sorting rule and an algorithm, and it is why this lesson is not a fourth exchange argument. There is no key you can sort the jobs by that produces <span class="math" data-say="D C E B A">D C E B A</span>; the answer depends on a set being built and repaired, and the repair looks at jobs that were accepted several steps earlier.</p><h3>What the algorithm does not do</h3><p>It does not minimise total tardiness, and it does not try to. Its output on the lab's instance runs the two discarded jobs at the very end, where <span class="math" data-say="B">B</span> finishes at <span class="math" data-say="19">19</span> against a due date of <span class="math" data-say="4">4</span> and <span class="math" data-say="A">A</span> at <span class="math" data-say="25">25</span> against <span class="math" data-say="8">8</span>. That is <span class="math" data-say="15 plus 17 equals 32">15 + 17 = 32</span> hours of tardiness against the <span class="math" data-say="17">17</span> due-date order costs, and the algorithm is indifferent to all of it, because the objective counts jobs.</p><p>It also does not weight the jobs. The weighted version &mdash; minimise <span class="math" data-say="sum w U">sum w U</span>, the value of the work that misses its date &mdash; is a genuinely harder problem, and no version of this argument reaches it: the tie that let us discard the longest job was a tie because every discard cost one unit, and with weights the discards cost different amounts. The lab does not offer a weighted mode, and this is why.</p><p>One structural point worth keeping. The kept set finishes on time <em>in due-date order</em>, and the lab checks that job by job rather than trusting it: <span class="math" data-say="D">D</span> at <span class="math" data-say="3">3</span> against <span class="math" data-say="6">6</span>, <span class="math" data-say="C">C</span> at <span class="math" data-say="8">8</span> against <span class="math" data-say="12">12</span>, <span class="math" data-say="E">E</span> at <span class="math" data-say="15">15</span> against <span class="math" data-say="20">20</span>. If a set can be run on time at all, it can be run on time in due-date order &mdash; which is the exchange argument of &ldquo;Earliest Due Date and Maximum Lateness&rdquo;, used here as a tool rather than as a result.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Moore-Hodgson: fewest jobs late</h2></div><p>The job thrown out is the longest one accepted so far, not the one that was late</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The algorithm, step by step, and the discard that surprises people</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The number of late jobs</span><p><span class="math" data-say="U sub j">U_j</span> is <span class="math" data-say="1">1</span> when <span class="math" data-say="C sub j is greater than d sub j">C_j > d_j</span> and <span class="math" data-say="0">0</span> otherwise, and the objective <span class="math" data-say="sum U">sum U</span> counts the late jobs. A schedule is measured by how many promises it broke, not by how far.</p></div><div class="defbox"><span class="label">Definition &middot; The Moore–Hodgson algorithm</span><p>Sort the jobs by due date ascending. Keep a set <span class="math" data-say="S">S</span>, initially empty, and a running finish time. Offer the jobs in that order: add the next job to <span class="math" data-say="S">S</span> and advance the finish time by its processing time. If the finish time now exceeds the due date of the job just added, remove from <span class="math" data-say="S">S</span> the job with the <strong>largest processing time</strong> and reduce the finish time by it.</p><p>At the end, <span class="math" data-say="S">S</span> is a largest set of jobs that can all be on time. Schedule <span class="math" data-say="S">S</span> in due-date order, then the discarded jobs in any order. The number of late jobs is the number discarded.</p></div><p>The algorithm is offered the jobs in due-date order and it is not the due-date rule. That distinction is the whole reason it works, and the lab prints both figures side by side so it cannot be blurred: due-date order alone leaves four jobs late on the instance where the algorithm leaves two.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Moore-Hodgson: fewest jobs late</h2></div><p>The job thrown out is the longest one accepted so far, not the one that was late</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Moore-Hodgson: fewest jobs late</strong><span>when the schedule goes late, throw out the LONGEST job accepted so far</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>kept, and on time</span><span class="tone-red"><i class="legend-swatch"></i>discarded, and run at the end</span><span class="tone-amber"><i class="legend-swatch"></i>its due date</span><span class="tone-purple"><i class="legend-swatch"></i>the job thrown out at this step</span></div>
@@ -1422,10 +1448,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mhSteps"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mhCompare"></table></div>
       <div class="status-banner" id="mhStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Offer the jobs one at a time, and watch which one gets thrown out</h3>
-          <p>The slider stops the algorithm after a chosen number of jobs have been offered, so each discard can be watched as it happens. The panel names the job that went late and the job that was discarded separately, reports what due-date order alone would leave late on the same jobs, and checks the result against the fewest late jobs any order achieves.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Offer the jobs one at a time, and watch which one gets thrown out</h3>
+            <p>The slider stops the algorithm after a chosen number of jobs have been offered, so each discard can be watched as it happens. The panel names the job that went late and the job that was discarded separately, reports what due-date order alone would leave late on the same jobs, and checks the result against the fewest late jobs any order achieves.</p>
         <div class="field">
           <label for="mhPreset">Worked example</label>
           <select id="mhPreset"><option value="throws" selected>the five jobs of the due-date lesson</option><option value="onebad">one enormous job and four small ones</option><option value="allfit">four jobs, due at 3, 7, 9 and 14</option></select>
@@ -1447,12 +1473,32 @@
           <div class="kpi"><span>Is this the minimum?</span><strong id="mhVerdict">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="mhHint" style="margin:0;">The jobs are offered in due-date order. Each one joins, and the moment the accepted set runs past a due date the <em>longest</em> job accepted so far is thrown out &mdash; not the one that was late. Throwing out the late job is the obvious move and it is wrong: the longest job frees the most time for the same single unit of lateness.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Five jobs, five steps, two discards</h3><div class="mathblock" data-say="jobs offered in due-date order, B 4, 4, D 3, 6, A 6, 8, C 5, 12, E 7, 20. 1, B joins, set B, finish 4, against due 4, on time. 2, D joins, set B D, finish 7, against due 6, LATE. discard the longest in the set, B at 4. set D, finish drops to 3. 3, A joins, set D A, finish 9, against due 8, LATE. discard the longest in the set, A at 6. set D, finish drops to 3. 4, C joins, set D C, finish 8, against due 12, on time. 5, E joins, set D C E, finish 15, against due 20, on time. kept D C E, discarded B, A, late 2. schedule, D C E B A, C equals 3, 8, 15, 19, 25. enumerated minimum over all 120 orders, 2, the algorithm attains it" tabindex="0" role="region" aria-label="Mathematical notation">jobs offered in due-date order   B 4:4,  D 3:6,  A 6:8,  C 5:12,  E 7:20
+
+  1   B joins    set B        finish 4   against due 4    on time
+  2   D joins    set B D      finish 7   against due 6    LATE
+         discard the longest in the set: B at 4
+         set D,  finish drops to 3
+  3   A joins    set D A      finish 9   against due 8    LATE
+         discard the longest in the set: A at 6
+         set D,  finish drops to 3
+  4   C joins    set D C      finish 8   against due 12   on time
+  5   E joins    set D C E    finish 15  against due 20   on time
+
+  kept D C E      discarded B, A      late 2
+  schedule  D C E B A      C = 3, 8, 15, 19, 25
+  enumerated minimum over all 120 orders: 2      the algorithm attains it</div><div class="example"><span class="label">Example &middot; Step 2, and why B goes rather than D</span><p><span class="math" data-say="D">D</span> is the job that pushed the set past a due date: adding it took the finish from <span class="math" data-say="4">4</span> to <span class="math" data-say="7">7</span> against <span class="math" data-say="D">D</span>'s due date of <span class="math" data-say="6">6</span>. The instinct is to discard <span class="math" data-say="D">D</span>. Either choice leaves exactly one job late at this point, so the two are tied on the objective and the tie is broken by what is left behind.</p><p>Discarding <span class="math" data-say="D">D</span> frees three hours; discarding <span class="math" data-say="B">B</span> frees four. The algorithm takes the four, and the extra hour is what lets <span class="math" data-say="C">C</span> and <span class="math" data-say="E">E</span> both join later without another discard. <span class="math" data-say="B">B</span> had been comfortably on time at step 1 and is thrown out at step 2 without ever having been the problem.</p></div><h3>The two rules it beats, measured</h3><div class="mathblock" data-say="due-date order alone, B D A C E, late 4. Moore to Hodgson, D C E B A, late 2. shortest-first, D B C A E, late 3. the enumerated minimum, late 2, attained by 10 of the 120 orders" tabindex="0" role="region" aria-label="Mathematical notation">  due-date order alone      B D A C E     late 4
+  Moore–Hodgson             D C E B A     late 2
+  shortest-first            D B C A E     late 3
+  the enumerated minimum                  late 2,  attained by 10 of the 120 orders</div><p>Due-date order leaves four late, and it is not a bad rule &mdash; it is the optimal rule for maximum lateness on this very instance. It loses here because it never gives up on anything: it keeps trying to run <span class="math" data-say="B">B</span> and <span class="math" data-say="A">A</span> on time and fails at both, and the hours spent failing make <span class="math" data-say="C">C</span> late as well. Writing two jobs off at the start is what buys the other three.</p><p>That is the difference between a sorting rule and an algorithm, and it is why this lesson is not a fourth exchange argument. There is no key you can sort the jobs by that produces <span class="math" data-say="D C E B A">D C E B A</span>; the answer depends on a set being built and repaired, and the repair looks at jobs that were accepted several steps earlier.</p><h3>What the algorithm does not do</h3><p>It does not minimise total tardiness, and it does not try to. Its output on the lab's instance runs the two discarded jobs at the very end, where <span class="math" data-say="B">B</span> finishes at <span class="math" data-say="19">19</span> against a due date of <span class="math" data-say="4">4</span> and <span class="math" data-say="A">A</span> at <span class="math" data-say="25">25</span> against <span class="math" data-say="8">8</span>. That is <span class="math" data-say="15 plus 17 equals 32">15 + 17 = 32</span> hours of tardiness against the <span class="math" data-say="17">17</span> due-date order costs, and the algorithm is indifferent to all of it, because the objective counts jobs.</p><p>It also does not weight the jobs. The weighted version &mdash; minimise <span class="math" data-say="sum w U">sum w U</span>, the value of the work that misses its date &mdash; is a genuinely harder problem, and no version of this argument reaches it: the tie that let us discard the longest job was a tie because every discard cost one unit, and with weights the discards cost different amounts. The lab does not offer a weighted mode, and this is why.</p><p>One structural point worth keeping. The kept set finishes on time <em>in due-date order</em>, and the lab checks that job by job rather than trusting it: <span class="math" data-say="D">D</span> at <span class="math" data-say="3">3</span> against <span class="math" data-say="6">6</span>, <span class="math" data-say="C">C</span> at <span class="math" data-say="8">8</span> against <span class="math" data-say="12">12</span>, <span class="math" data-say="E">E</span> at <span class="math" data-say="15">15</span> against <span class="math" data-say="20">20</span>. If a set can be run on time at all, it can be run on time in due-date order &mdash; which is the exchange argument of &ldquo;Earliest Due Date and Maximum Lateness&rdquo;, used here as a tool rather than as a result.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running Moore–Hodgson by hand</h2></div><p>Five steps, and the fourth is the one people get wrong.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort the jobs by due date and keep them in that order</h3><p>This is the order they will be <em>offered</em> in, not the answer. The answer is the set that survives, and the algorithm is not finished until every job has been offered once.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Add the next job and advance the running finish time</h3><p>The finish time is the sum of the processing times of the jobs currently in the set, so adding a job advances it by that job's <span class="math" data-say="p">p</span>. Keep the number in front of you; it is the only state the algorithm has besides the set.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare the finish time with the due date of the job just added</h3><p>Not with any other job's due date. Because the set is kept in due-date order and every earlier job was on time when it was checked, the newest job is the only one that can have gone late.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If it is late, discard the longest job in the set</h3><p>The longest in the whole set, which may be a job accepted several steps ago and may be the job just added. Reduce the finish time by that job's processing time. Discarding the job that went late is the natural move and it is not the algorithm: on the lab's instance it would free three hours where four were available.</p></article><article class="card concept-card"><div class="icon">5</div><h3>At the end, schedule the survivors in due-date order and the rest after</h3><p>The survivors all finish on time, and the count of late jobs is the count of discards. The order among the discarded jobs is free &mdash; they are late however they run, and this objective does not price how late.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running Moore–Hodgson by hand</h2>
+      <p class="lead-in">Five steps, and the fourth is the one people get wrong.</p>
+      <ol class="key-ideas method"><li><strong>Sort the jobs by due date and keep them in that order.</strong> This is the order they will be <em>offered</em> in, not the answer. The answer is the set that survives, and the algorithm is not finished until every job has been offered once.</li><li><strong>Add the next job and advance the running finish time.</strong> The finish time is the sum of the processing times of the jobs currently in the set, so adding a job advances it by that job's <span class="math" data-say="p">p</span>. Keep the number in front of you; it is the only state the algorithm has besides the set.</li><li><strong>Compare the finish time with the due date of the job just added.</strong> Not with any other job's due date. Because the set is kept in due-date order and every earlier job was on time when it was checked, the newest job is the only one that can have gone late.</li><li><strong>If it is late, discard the longest job in the set.</strong> The longest in the whole set, which may be a job accepted several steps ago and may be the job just added. Reduce the finish time by that job's processing time. Discarding the job that went late is the natural move and it is not the algorithm: on the lab's instance it would free three hours where four were available.</li><li><strong>At the end, schedule the survivors in due-date order and the rest after.</strong> The survivors all finish on time, and the count of late jobs is the count of discards. The order among the discarded jobs is free &mdash; they are late however they run, and this objective does not price how late.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1491,17 +1537,16 @@ offered in due-date order:  B (4), D (6), A (8), C (12), E (20)
      the minimum over all 120 orders   2</div><p>Step 2 is the step to reread. The job that went late was <span class="math" data-say="D">D</span>; the job thrown out was <span class="math" data-say="B">B</span>. Both choices leave one job late at that moment, so the objective cannot distinguish them, and the algorithm breaks the tie on the only thing that matters afterwards &mdash; how much machine time the discard returns. Four hours rather than three is the whole reason <span class="math" data-say="C">C</span> and <span class="math" data-say="E">E</span> both fit later on.</p><p>The bottom block is the reason this lesson exists. Due-date order is the optimal rule for maximum lateness on these same jobs, and it is twice as bad here. There is no ordering of the five jobs by any key that produces <span class="math" data-say="D C E B A">D C E B A</span>; the answer came from a set that was built and repaired, and the repair reached back to a job accepted two steps earlier.</p><p>For a rehearsal, switch to the preset with one twelve-hour job and four small ones and predict the run before starting it. The supplied first move is that the four small jobs <span class="math" data-say="B 2, 5, C 3, 7, D 2, 9, E 4, 13">B 2:5, C 3:7, D 2:9, E 4:13</span> are offered first and all fit, reaching a finish of <span class="math" data-say="11">11</span>. Say what happens when the twelve-hour job arrives, which job is discarded, and how many end up late &mdash; and then check whether the big job could have been kept alongside any of the others.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Discarding the job that went late</strong><span>It is the obvious move and it is not the algorithm. Both discards cost one unit of <span class="math" data-say="sum U">sum U</span>, so the choice is decided by how much time is freed, and the longest job frees the most. On the lab's instance the difference is one hour at step 2 and it changes the final answer from three late jobs to two.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the offer order as the answer</strong><span>The jobs are offered in due-date order and the schedule produced is <span class="math" data-say="D C E B A">D C E B A</span>, which is not due-date order and is not sorted by anything. Reporting the due-date order as though it were the algorithm's output gives four late jobs instead of two, and the lab prints both figures so the confusion has somewhere to die.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using it when the late jobs are not all worth the same</strong><span>The whole argument rests on every discard costing one unit. Put weights on the jobs and minimising <span class="math" data-say="sum w U">sum w U</span> is a different and genuinely harder problem, which nothing on this course solves. If a missed date on one job costs ten times what it costs on another, this algorithm is answering the wrong question and will answer it confidently.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run the algorithm by hand and say, at each discard, why that job and not the late one.</strong><p>You should be able to offer the jobs in due-date order, maintain the set and the running finish time, compare against the due date of the job just added, discard the longest job in the set when the set runs late, check the surviving set job by job, report the schedule as the kept set followed by the discards, and say what the same jobs cost under due-date order alone.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes the single machine: four objectives with rules, one without, and every rule proved or run rather than asserted. What changes next is the machine. With two machines in series the makespan stops being a constant and becomes the whole problem &mdash; the second machine has gaps in it, and the gaps depend on the order. &ldquo;Two Machines in Series and Johnson&rsquo;s Rule&rdquo; is the last exact sequencing rule on the course.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Discarding the job that went late</strong><span>It is the obvious move and it is not the algorithm. Both discards cost one unit of <span class="math" data-say="sum U">sum U</span>, so the choice is decided by how much time is freed, and the longest job frees the most. On the lab's instance the difference is one hour at step 2 and it changes the final answer from three late jobs to two.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the offer order as the answer</strong><span>The jobs are offered in due-date order and the schedule produced is <span class="math" data-say="D C E B A">D C E B A</span>, which is not due-date order and is not sorted by anything. Reporting the due-date order as though it were the algorithm's output gives four late jobs instead of two, and the lab prints both figures so the confusion has somewhere to die.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using it when the late jobs are not all worth the same</strong><span>The whole argument rests on every discard costing one unit. Put weights on the jobs and minimising <span class="math" data-say="sum w U">sum w U</span> is a different and genuinely harder problem, which nothing on this course solves. If a missed date on one job costs ten times what it costs on another, this algorithm is answering the wrong question and will answer it confidently.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run the algorithm by hand and say, at each discard, why that job and not the late one.</strong><p>You should be able to offer the jobs in due-date order, maintain the set and the running finish time, compare against the due date of the job just added, discard the longest job in the set when the set runs late, check the surviving set job by job, report the schedule as the kept set followed by the discards, and say what the same jobs cost under due-date order alone.</p></div></div><div class="note"><strong>Note:</strong> That closes the single machine: four objectives with rules, one without, and every rule proved or run rather than asserted. What changes next is the machine. With two machines in series the makespan stops being a constant and becomes the whole problem &mdash; the second machine has gaps in it, and the gaps depend on the order. &ldquo;Two Machines in Series and Johnson&rsquo;s Rule&rdquo; is the last exact sequencing rule on the course.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Counting late jobs throws away how late they are</summary><p><span class="math" data-say="sum U">sum U</span> adds one for each job that misses its date and nothing for how badly. A job one minute late and a job three weeks late contribute the same. That makes the objective coarse and makes it the right one surprisingly often &mdash; a shipment either made the sailing or did not &mdash; and it changes the problem completely, because now a job can be written off entirely and pushed to the very end at no further cost.</p></details><details class="recall"><summary>The discard is the longest accepted job, not the one that was late</summary><p>When the set runs past a due date, exactly one job has to go, and every candidate costs the same one unit of <span class="math" data-say="sum U">sum U</span>. So take the one that frees the most machine time, which is the longest job accepted so far. On the lab's instance the job that goes late at the second step is <span class="math" data-say="D">D</span>, taking three hours, and the job discarded is <span class="math" data-say="B">B</span>, taking four: the same one late job either way, and one extra hour of room for everything after it.</p></details><details class="recall"><summary>The answer is a set, and the order is what makes the set work</summary><p>What the algorithm computes is the largest set of jobs that can all finish on time. Once that set is known, running it in due-date order is what makes it feasible, and the discarded jobs go afterwards in any order at all &mdash; they are late whatever happens and no objective here prices how late. So the output is <span class="math" data-say="kept, then discarded">kept, then discarded</span>, and only the first half is a scheduling decision.</p></details></div>
+      <h3>Summary</h3>
       <p>Counting late jobs is a different objective again, and it has an exact algorithm rather than a sorting rule. Moore&ndash;Hodgson offers the jobs in due-date order, and the moment the accepted set runs past a due date it discards the <em>longest</em> job accepted so far. The job discarded is usually not the job that went late, and on the lab's five jobs the algorithm leaves two late where due-date order alone leaves four.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Counting late jobs throws away how late they are.</strong> <span class="math" data-say="sum U">sum U</span> adds one for each job that misses its date and nothing for how badly. A job one minute late and a job three weeks late contribute the same. That makes the objective coarse and makes it the right one surprisingly often &mdash; a shipment either made the sailing or did not &mdash; and it changes the problem completely, because now a job can be written off entirely and pushed to the very end at no further cost.</li><li><strong>The discard is the longest accepted job, not the one that was late.</strong> When the set runs past a due date, exactly one job has to go, and every candidate costs the same one unit of <span class="math" data-say="sum U">sum U</span>. So take the one that frees the most machine time, which is the longest job accepted so far. On the lab's instance the job that goes late at the second step is <span class="math" data-say="D">D</span>, taking three hours, and the job discarded is <span class="math" data-say="B">B</span>, taking four: the same one late job either way, and one extra hour of room for everything after it.</li><li><strong>The answer is a set, and the order is what makes the set work.</strong> What the algorithm computes is the largest set of jobs that can all finish on time. Once that set is known, running it in due-date order is what makes it feasible, and the discarded jobs go afterwards in any order at all &mdash; they are late whatever happens and no objective here prices how late. So the output is <span class="math" data-say="kept, then discarded">kept, then discarded</span>, and only the first half is a scheduling decision.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="objective, sum U, equals, the NUMBER of late jobs, how late they are does not count. offer the jobs in due-date order, keeping a set that finishes on time. when the set runs past a due date, discard the LONGEST job in the set. not the job that just went late, the longest one frees the most room. A 6, 8, B 4, 4, C 5, 12, D 3, 6, E 7, 20, keeps D C E, discards B then A, 2 late. due-date order alone leaves 4 late, the enumerated minimum is 2" tabindex="0" role="region" aria-label="Mathematical notation">objective  sum U  =  the NUMBER of late jobs;  how late they are does not count
 offer the jobs in due-date order, keeping a set that finishes on time
 when the set runs past a due date, discard the LONGEST job in the set
@@ -3072,11 +3117,40 @@ due-date order alone leaves 4 late;  the enumerated minimum is 2</div><figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3144,7 +3218,7 @@ due-date order alone leaves 4 late;  the enumerated minimum is 2</div><figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

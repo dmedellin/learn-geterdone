@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,24 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings, Geometry and Hardness</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 32 · String Matching</p>
       <h1>Finite Automata and Knuth-Morris-Pratt</h1>
       <p class="lesson-lede">A matcher that remembers how much of the pattern it has seen never re-reads the text: an automaton stores every move in a table, and KMP computes each move from the prefix function.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The suffix function <span data-say="sigma">σ</span></li><li>The transition function <span data-say="delta">δ</span></li><li>The prefix function <span data-say="pi">π</span></li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The naive string-matcher is inefficient because it entirely ignores information gained about the text for one value of s when it considers other values of s.&rdquo; That sentence comes in the last paragraph of section 32.1, and sections 32.3 and 32.4 are two answers to it. Both keep one number while they scan, how much of the pattern the text has just matched, and both use it to decide the next move without looking back. This lesson reads both sections and then builds the second answer's table by hand and in the lab.</p><p>Section 32.3 begins with finite automata in general: a set of states, a start state, accepting states, an alphabet and a transition function. The string-matching automaton for P has states 0 to m, starts at 0 and accepts at m. Its transition function is defined through the suffix function <span data-say="sigma">σ</span>: from state q on character a it moves to <span data-say="sigma of the quantity P sub q times A">σ(P_q·a)</span>, the longest prefix of P that ends the string the automaton has effectively seen. Scanning the text is then one table lookup per character, and the matching time is <span class="math" data-say="theta of n">Θ(n)</span> with no character read twice.</p><p>The correctness argument is an invariant about <span data-say="sigma">σ</span>. The authors prove that the state after reading the first i characters of the text is <span data-say="sigma of T sub i">σ(T_i)</span>, using two lemmas: <span data-say="sigma of x A">σ(xa)</span> is at most <span data-say="sigma of x plus 1">σ(x) + 1</span>, and if <span data-say="q equals sigma of x">q = σ(x)</span> then <span data-say="sigma of x A equals sigma of the quantity P sub q times A">σ(xa) = σ(P_q·a)</span>. The second is what lets the automaton forget everything about the text except q. The price is the table. Their straightforward construction, COMPUTE-TRANSITION-FUNCTION, takes <span class="math" data-say="big O of m cubed times the size of the alphabet">O(m³·|Σ|)</span> time; the section notes that it can be brought to <span class="math" data-say="big O of m times the size of the alphabet">O(m·|Σ|)</span>, and that is still a factor of <span data-say="the absolute value of the sum of">|Σ|</span> per state.</p><p>Section 32.4 removes that factor. Suppose q characters of the pattern have matched at some shift and the next one fails. The q text characters just read are known: they are <span data-say="P sub q">P_q</span>. The next shift worth trying is the one that lines up the longest proper prefix of <span data-say="P sub q">P_q</span> that is also a suffix of <span data-say="P sub q">P_q</span>, and its length is <span data-say="pi q">π[q]</span>. Because <span data-say="pi">π</span> depends only on the pattern, it can be computed once, in an array of m entries, before the text is read. KMP-MATCHER scans the text with a counter q, falling back from q to <span data-say="pi q">π[q]</span> on each mismatch until the next character fits or q reaches 0.</p><p>The running time is an aggregate argument (section 17.1), and it is the chapter's most instructive count. In COMPUTE-PREFIX-FUNCTION the counter k starts at 0, rises by at most 1 per pattern character, and every iteration of the inner while loop lowers it by at least 1 without taking it below 0. So the total number of decreases cannot exceed the total number of increases, which is at most m − 1. One step can fall back many times; all of them together cannot. The same argument with the text in place of the pattern gives KMP-MATCHER its <span class="math" data-say="theta of n">Θ(n)</span> matching time.</p><p>Correctness takes the rest of the section. The prefix-function iteration lemma says that following <span data-say="pi">π</span> from q, to <span data-say="pi q">π[q]</span>, to <span data-say="pi pi q">π[π[q]]</span> and so on down to 0, lists every k for which <span data-say="P sub k">P_k</span> is a proper suffix of <span data-say="P sub q">P_q</span>, and nothing else. From it the authors show that the procedure computes <span data-say="pi">π</span> correctly and that the matcher simulates the automaton. The Algorithms lesson Borders, and the Failure Function Built runs the same construction under the name the failure function.</p><p>Now the lab. Type a pattern and a text, and it builds <span data-say="pi">π</span> one prefix at a time, beside the longest border of each prefix found by trying every length, so the linear construction is checked against the definition. Its tiles are m, the inner-loop iterations, a bound of 2m (looser than the book's m − 1, and printed so the two can be compared), the longest border of the whole pattern, KMP's comparisons on the text beside the naive matcher's, the bound 2n, and the matches beside the matches by definition.</p><p>The presets are the lab's. <code>aabaaab</code> takes 2 inner iterations against 14, ends on the border aab of length 3, and finds 3 matches with 19 comparisons where naive takes 42. <code>aaaa</code> has the longest possible border, 4, and no inner iterations at all; KMP takes 20 comparisons on its text of 20 a's against naive's 80. <code>abcabcabd</code> builds a border of 5 and then loses it at the final d, ending at 0 after 2 iterations. <code>abcdefg</code> has no border, and KMP's 23 comparisons beat naive's 34 only narrowly.</p><p>Then type the lesson's pattern <span class="math" data-say="abaabab">abaabab</span> and the text <span class="math" data-say="abaababaabaababab">abaababaabaababab</span>. The table reads <span data-say="pi equals 0">π = 0</span>, 0, 1, 1, 2, 3, 2, agreeing with the definition on all seven prefixes, and the inner loop ran 2 times against the book's bound of m − 1 = 6. The fallback chain from the whole pattern is 7, 2, 0. On the 17-character text KMP made 19 comparisons and found the 2 valid shifts, 0 and 8; the naive matcher made 35. The bound 2n is 34, and 19 is under it on this text, as the proof says it must be on every text.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, pattern abacabab" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">pattern  abacabab</span></code></pre><p>Compute <span data-say="pi 1">π[1]</span> to <span data-say="pi 8">π[8]</span> by the procedure's rule, and count the iterations of the inner loop as you go, saying at which q each one happens. Give the longest border of the whole pattern and the fallback chain from 8. Then type the pattern into the lab, with any text, and compare.</p><p>Strings are sequences; the next chapter's objects are points in the plane. The next lesson, Line-Segment Properties and Intersection, shows how far one cross product goes.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The failure function, built character by character</h2></div><p>Every border found twice: in linear time, and by trying every length</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;The naive string-matcher is inefficient because it entirely ignores information gained about the text for one value of s when it considers other values of s.&rdquo; That sentence comes in the last paragraph of section 32.1, and sections 32.3 and 32.4 are two answers to it. Both keep one number while they scan, how much of the pattern the text has just matched, and both use it to decide the next move without looking back. This lesson reads both sections and then builds the second answer's table by hand and in the lab.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The failure function, built character by character</h2></div><p>Every border found twice: in linear time, and by trying every length</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The failure function, one character at a time</strong><span>built in linear time, checked against every border length</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the prefix being extended</span><span class="tone-purple"><i class="legend-swatch"></i>its longest proper border</span><span class="tone-amber"><i class="legend-swatch"></i>the fallback chain from the full pattern</span></div>
@@ -1459,10 +1502,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="kmFail"></table></div>
       <p class="tt" id="kmChain" style="margin:8px 0 0;word-break:break-all;line-height:1.7;"></p>
       <div class="status-banner" id="kmStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Build the prefix function one prefix at a time</h3>
-          <p>Each bar is one prefix of the pattern and its height is the length of that prefix's longest proper border. The table sets the linear-time construction beside the border found by trying every length. Type the lesson's pattern abaabab and its text, then the exercise's pattern.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Build the prefix function one prefix at a time</h3>
+            <p>Each bar is one prefix of the pattern and its height is the length of that prefix's longest proper border. The table sets the linear-time construction beside the border found by trying every length. Type the lesson's pattern abaabab and its text, then the exercise's pattern.</p>
         <div class="field">
           <label for="kmPreset">Worked example</label>
           <select id="kmPreset"><option value="ababaca">the standard example</option><option value="aaaa">every prefix is a border of the next</option><option value="abcabcabd">a long border that then collapses</option><option value="aabaaab" selected>where the inner loop actually iterates</option><option value="abcdefg">no two characters alike: no borders at all</option></select>
@@ -1490,12 +1533,15 @@
           <div class="kpi"><span>Matches, and matches by definition</span><strong id="kmHits">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="kmHint" style="margin:0;">A BORDER of a string is a proper prefix that is also a suffix. fail[k] is the length of the longest border of the first k characters, and it is the whole of KMP: on a mismatch after k matched characters the pattern slides so that those fail[k] characters line up again, and the text pointer never moves back. The third column is that length found by trying every one of the k − 1 possible lengths and comparing two substrings, which is how you check a linear-time construction.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Section 32.3 begins with finite automata in general: a set of states, a start state, accepting states, an alphabet and a transition function. The string-matching automaton for P has states 0 to m, starts at 0 and accepts at m. Its transition function is defined through the suffix function <span data-say="sigma">σ</span>: from state q on character a it moves to <span data-say="sigma of the quantity P sub q times A">σ(P_q·a)</span>, the longest prefix of P that ends the string the automaton has effectively seen. Scanning the text is then one table lookup per character, and the matching time is <span class="math" data-say="theta of n">Θ(n)</span> with no character read twice.</p><p>The correctness argument is an invariant about <span data-say="sigma">σ</span>. The authors prove that the state after reading the first i characters of the text is <span data-say="sigma of T sub i">σ(T_i)</span>, using two lemmas: <span data-say="sigma of x A">σ(xa)</span> is at most <span data-say="sigma of x plus 1">σ(x) + 1</span>, and if <span data-say="q equals sigma of x">q = σ(x)</span> then <span data-say="sigma of x A equals sigma of the quantity P sub q times A">σ(xa) = σ(P_q·a)</span>. The second is what lets the automaton forget everything about the text except q. The price is the table. Their straightforward construction, COMPUTE-TRANSITION-FUNCTION, takes <span class="math" data-say="big O of m cubed times the size of the alphabet">O(m³·|Σ|)</span> time; the section notes that it can be brought to <span class="math" data-say="big O of m times the size of the alphabet">O(m·|Σ|)</span>, and that is still a factor of <span data-say="the absolute value of the sum of">|Σ|</span> per state.</p><p>Section 32.4 removes that factor. Suppose q characters of the pattern have matched at some shift and the next one fails. The q text characters just read are known: they are <span data-say="P sub q">P_q</span>. The next shift worth trying is the one that lines up the longest proper prefix of <span data-say="P sub q">P_q</span> that is also a suffix of <span data-say="P sub q">P_q</span>, and its length is <span data-say="pi q">π[q]</span>. Because <span data-say="pi">π</span> depends only on the pattern, it can be computed once, in an array of m entries, before the text is read. KMP-MATCHER scans the text with a counter q, falling back from q to <span data-say="pi q">π[q]</span> on each mismatch until the next character fits or q reaches 0.</p><p>The running time is an aggregate argument (section 17.1), and it is the chapter's most instructive count. In COMPUTE-PREFIX-FUNCTION the counter k starts at 0, rises by at most 1 per pattern character, and every iteration of the inner while loop lowers it by at least 1 without taking it below 0. So the total number of decreases cannot exceed the total number of increases, which is at most m − 1. One step can fall back many times; all of them together cannot. The same argument with the text in place of the pattern gives KMP-MATCHER its <span class="math" data-say="theta of n">Θ(n)</span> matching time.</p><p>Correctness takes the rest of the section. The prefix-function iteration lemma says that following <span data-say="pi">π</span> from q, to <span data-say="pi q">π[q]</span>, to <span data-say="pi pi q">π[π[q]]</span> and so on down to 0, lists every k for which <span data-say="P sub k">P_k</span> is a proper suffix of <span data-say="P sub q">P_q</span>, and nothing else. From it the authors show that the procedure computes <span data-say="pi">π</span> correctly and that the matcher simulates the automaton. The Algorithms lesson Borders, and the Failure Function Built runs the same construction under the name the failure function.</p><p>Now the lab. Type a pattern and a text, and it builds <span data-say="pi">π</span> one prefix at a time, beside the longest border of each prefix found by trying every length, so the linear construction is checked against the definition. Its tiles are m, the inner-loop iterations, a bound of 2m (looser than the book's m − 1, and printed so the two can be compared), the longest border of the whole pattern, KMP's comparisons on the text beside the naive matcher's, the bound 2n, and the matches beside the matches by definition.</p><p>The presets are the lab's. <code>aabaaab</code> takes 2 inner iterations against 14, ends on the border aab of length 3, and finds 3 matches with 19 comparisons where naive takes 42. <code>aaaa</code> has the longest possible border, 4, and no inner iterations at all; KMP takes 20 comparisons on its text of 20 a's against naive's 80. <code>abcabcabd</code> builds a border of 5 and then loses it at the final d, ending at 0 after 2 iterations. <code>abcdefg</code> has no border, and KMP's 23 comparisons beat naive's 34 only narrowly.</p><p>Then type the lesson's pattern <span class="math" data-say="abaabab">abaabab</span> and the text <span class="math" data-say="abaababaabaababab">abaababaabaababab</span>. The table reads <span data-say="pi equals 0">π = 0</span>, 0, 1, 1, 2, 3, 2, agreeing with the definition on all seven prefixes, and the inner loop ran 2 times against the book's bound of m − 1 = 6. The fallback chain from the whole pattern is 7, 2, 0. On the 17-character text KMP made 19 comparisons and found the 2 valid shifts, 0 and 8; the naive matcher made 35. The bound 2n is 34, and 19 is under it on this text, as the proof says it must be on every text.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, pattern abacabab" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">pattern  abacabab</span></code></pre><p>Compute <span data-say="pi 1">π[1]</span> to <span data-say="pi 8">π[8]</span> by the procedure's rule, and count the iterations of the inner loop as you go, saying at which q each one happens. Give the longest border of the whole pattern and the fallback chain from 8. Then type the pattern into the lab, with any text, and compare.</p><p>Strings are sequences; the next chapter's objects are points in the plane. The next lesson, Line-Segment Properties and Intersection, shows how far one cross product goes.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing <span data-say="pi">π</span> by hand</h2></div><p>Four steps compute the table; the fifth checks the aggregate bound on a pattern of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start with <span data-say="pi 1 equals 0">π[1] = 0</span> and k = 0</h3><p>A single character has no proper border. The counter k always holds the length of the border being extended.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Try to extend the border</h3><p>For q from 2 to m, compare P[k + 1] with P[q]. If they are equal, the border grows: k becomes k + 1 and <span data-say="pi q equals k">π[q] = k</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Fall back on a mismatch</h3><p>If they differ and k > 0, set k to <span data-say="pi k">π[k]</span> and compare again; each such step is one inner-loop iteration. Stop when the characters match or k is 0, and then set <span data-say="pi q">π[q]</span> as before.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the count against m − 1</h3><p>Add up the inner-loop iterations. They can never exceed the number of times k rose, and k rises at most once per character after the first.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find a pattern that makes the loop work</h3><p>Type a pattern of your own of about ten characters into the lab and change it until the inner-loop count is at least 4. Write down the pattern, the count and the bound m − 1, and say at which prefixes k fell.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing <span data-say="pi">π</span> by hand</h2>
+      <p class="lead-in">Four steps compute the table; the fifth checks the aggregate bound on a pattern of your own.</p>
+      <ol class="key-ideas method"><li><strong>Start with <span data-say="pi 1 equals 0">π[1] = 0</span> and k = 0.</strong> A single character has no proper border. The counter k always holds the length of the border being extended.</li><li><strong>Try to extend the border.</strong> For q from 2 to m, compare P[k + 1] with P[q]. If they are equal, the border grows: k becomes k + 1 and <span data-say="pi q equals k">π[q] = k</span>.</li><li><strong>Fall back on a mismatch.</strong> If they differ and k > 0, set k to <span data-say="pi k">π[k]</span> and compare again; each such step is one inner-loop iteration. Stop when the characters match or k is 0, and then set <span data-say="pi q">π[q]</span> as before.</li><li><strong>Check the count against m − 1.</strong> Add up the inner-loop iterations. They can never exceed the number of times k rose, and k rises at most once per character after the first.</li><li><strong>Find a pattern that makes the loop work.</strong> Type a pattern of your own of about ten characters into the lab and change it until the inner-loop count is at least 4. Write down the pattern, the count and the bound m − 1, and say at which prefixes k fell.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1517,17 +1563,16 @@ q = 7   b vs a, no: k = π[3] = 1
         b vs b, yes  k = 2, π = 2   (1 fall)</div><p>Two falls in all, against an increase of k on five occasions and the book's bound of m − 1 = 6. The table also says what an automaton for this pattern would do. In state 6, reading a, the automaton goes to <span data-say="delta of 6 and A equals sigma of abaabaa equals 4">δ(6, a) = σ(abaabaa) = 4</span>. KMP reaches the same state by falling from 6 to <span data-say="pi 6 equals 3">π[6] = 3</span> and then matching the a: it computes the table entry when it needs it instead of storing it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking one mismatch costs constant time in KMP</strong><span>A single mismatch can make the matcher fall back several times. The linear bound is not a bound on each step; it is a bound on all of them together, from the fact that q cannot fall further in total than it has risen. On the lesson's pattern two falls happen at two different prefixes, and the pattern aaaab against the text aaaac puts four at the c: from 4 to 3, 2, 1 and 0. (The lab's inner-loop tile counts the construction of <span data-say="pi">π</span>, which for aaaab is three falls at the b.)</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing <span data-say="pi q">π[q]</span> with a shift</strong><span><span data-say="pi q">π[q]</span> is a length: the longest proper border of the first q characters. The shift KMP moves the pattern by is <span data-say="q minus pi q">q − π[q]</span>. On the lesson's pattern, after 6 characters match and the 7th fails, <span data-say="pi 6 equals 3">π[6] = 3</span>, so the pattern slides by 3 and the first 3 characters are already known to match.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the automaton as always the better choice</strong><span>Its matching is a single lookup per character, but its table has <span data-say="the quantity m plus 1, times the absolute value of the sum of">(m + 1)·|Σ|</span> entries. For a long pattern over a large alphabet that is the dominant cost, and KMP pays only <span class="math" data-say="theta of m">Θ(m)</span> for <span data-say="pi">π</span>. Section 32.4 presents KMP as the way around exactly this.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute <span data-say="pi">π</span> and justify its linear bound.</strong><p>For a pattern of up to ten characters, compute <span data-say="pi">π</span> by the procedure's rule, count the inner-loop iterations and say where they happen, give the fallback chain from m, and explain in two sentences why the total iterations never exceed m − 1.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab builds <span data-say="pi">π</span> for the pattern you type and checks it against the definition; it does not build the automaton's table (the Algorithms lesson The Matcher as a Machine does). Its bound of 2m is looser than the book's m − 1. A small count on one pattern is the common case and not the bound; the aggregate argument is what covers every pattern.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking one mismatch costs constant time in KMP</strong><span>A single mismatch can make the matcher fall back several times. The linear bound is not a bound on each step; it is a bound on all of them together, from the fact that q cannot fall further in total than it has risen. On the lesson's pattern two falls happen at two different prefixes, and the pattern aaaab against the text aaaac puts four at the c: from 4 to 3, 2, 1 and 0. (The lab's inner-loop tile counts the construction of <span data-say="pi">π</span>, which for aaaab is three falls at the b.)</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Confusing <span data-say="pi q">π[q]</span> with a shift</strong><span><span data-say="pi q">π[q]</span> is a length: the longest proper border of the first q characters. The shift KMP moves the pattern by is <span data-say="q minus pi q">q − π[q]</span>. On the lesson's pattern, after 6 characters match and the 7th fails, <span data-say="pi 6 equals 3">π[6] = 3</span>, so the pattern slides by 3 and the first 3 characters are already known to match.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the automaton as always the better choice</strong><span>Its matching is a single lookup per character, but its table has <span data-say="the quantity m plus 1, times the absolute value of the sum of">(m + 1)·|Σ|</span> entries. For a long pattern over a large alphabet that is the dominant cost, and KMP pays only <span class="math" data-say="theta of m">Θ(m)</span> for <span data-say="pi">π</span>. Section 32.4 presents KMP as the way around exactly this.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute <span data-say="pi">π</span> and justify its linear bound.</strong><p>For a pattern of up to ten characters, compute <span data-say="pi">π</span> by the procedure's rule, count the inner-loop iterations and say where they happen, give the fallback chain from m, and explain in two sentences why the total iterations never exceed m − 1.</p></div></div><div class="note"><strong>Note:</strong> The lab builds <span data-say="pi">π</span> for the pattern you type and checks it against the definition; it does not build the automaton's table (the Algorithms lesson The Matcher as a Machine does). Its bound of 2m is looser than the book's m − 1. A small count on one pattern is the common case and not the bound; the aggregate argument is what covers every pattern.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The suffix function <span data-say="sigma">σ</span></summary><p>For a string <span data-say="x, sigma of x">x, σ(x)</span> measures the longest pattern prefix that is also a suffix of x. The string-matching automaton's state after reading part of the text is <span data-say="sigma">σ</span> of what it has read, and it accepts exactly when that state is m.</p></details><details class="recall"><summary>The transition function <span data-say="delta">δ</span></summary><p>The automaton's move from state q on character a is <span data-say="delta of q and a equals sigma of P sub q followed by a">δ(q, a) = σ(P_q·a)</span>: append a to the q characters already matched and ask how much of the pattern is still in play. The table has one entry per state and character, <span data-say="the quantity m plus 1, times the absolute value of the sum of">(m + 1)·|Σ|</span> in all.</p></details><details class="recall"><summary>The prefix function <span data-say="pi">π</span></summary><p><span data-say="pi q">π[q]</span> measures the longest pattern prefix that is also a proper suffix of <span data-say="P sub q">P_q</span>, the first q characters. Such a string is called a border. <span data-say="pi">π</span> has only m entries and does not depend on the next character, which is the saving KMP makes over <span data-say="delta">δ</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 32.3 and 32.4: the string-matching automaton, whose state counts how much of the pattern, from its start, ends the text read so far, and the Knuth-Morris-Pratt matcher, which replaces the automaton's table with the prefix function <span data-say="pi">π</span>. Build <span data-say="pi">π</span> for a pattern written for the lesson, count the inner-loop iterations against the aggregate bound, and see where the automaton and <span data-say="pi">π</span> agree.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The suffix function <span data-say="sigma">σ</span>.</strong> For a string <span data-say="x, sigma of x">x, σ(x)</span> measures the longest pattern prefix that is also a suffix of x. The string-matching automaton's state after reading part of the text is <span data-say="sigma">σ</span> of what it has read, and it accepts exactly when that state is m.</li><li><strong>The transition function <span data-say="delta">δ</span>.</strong> The automaton's move from state q on character a is <span data-say="delta of q and a equals sigma of P sub q followed by a">δ(q, a) = σ(P_q·a)</span>: append a to the q characters already matched and ask how much of the pattern is still in play. The table has one entry per state and character, <span data-say="the quantity m plus 1, times the absolute value of the sum of">(m + 1)·|Σ|</span> in all.</li><li><strong>The prefix function <span data-say="pi">π</span>.</strong> <span data-say="pi q">π[q]</span> measures the longest pattern prefix that is also a proper suffix of <span data-say="P sub q">P_q</span>, the first q characters. Such a string is called a border. <span data-say="pi">π</span> has only m entries and does not depend on the next character, which is the saving KMP makes over <span data-say="delta">δ</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="state q, longest prefix of P ending here. delta of q and a equals sigma of P sub q followed by a. automaton, theta of n matching, a table to build. pi of q, the longest proper border of P sub q. on a mismatch, fall back from q to pi of q. k rises at most m minus 1 times in all. so the while loop runs at most m minus 1 times" tabindex="0" role="region" aria-label="Mathematical notation">state q: longest prefix of P ending here
 δ(q, a) = σ(P_q·a)
 automaton: Θ(n) matching, a table to build
@@ -2450,11 +2495,40 @@ so the while loop runs at most m − 1 times</div><figcaption>Sections 32.3 and 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2522,7 +2596,7 @@ so the while loop runs at most m − 1 times</div><figcaption>Sections 32.3 and 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

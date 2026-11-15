@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,37 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Data Structures</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Hash tables</p>
       <h1>Open Addressing and Linear Probing</h1>
       <p class="lesson-lede">Insert, search and delete in a probing table leaving tombstones correctly, and read the counted probes against Knuth’s curve.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The probe sequence is the structure</li><li>A deletion must leave a mark, not a hole</li><li>Clustering is why linear probing costs more than the load factor suggests</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Probing, deleting, and the one curve on this course that is a model</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Open addressing</span><p>Every key is stored in a slot of the table itself; there are no chains. A key <span class="math" data-say="k">k</span> has a <strong>probe sequence</strong> <span class="math" data-say="h of k and 0, h of k and 1, and so on">h(k, 0), h(k, 1), …</span> covering all <span class="math" data-say="m">m</span> slots. Insert walks it to the first free slot. Search walks it and stops when it finds <span class="math" data-say="k">k</span> or reaches an empty slot. Since every key occupies a slot, <span class="math" data-say="n is at most m">n ≤ m</span> and so <span class="math" data-say="alpha is at most 1">α ≤ 1</span>.</p><p><strong>Linear probing</strong> is <span class="math" data-say="h of k and i equals h of k plus i mod m">h(k, i) = (h(k) + i) mod m</span>: try the next slot, and the next. <strong>Double hashing</strong> uses a second hash function for the step, which breaks up the runs.</p></div><p>The lab offers only power-of-two table sizes, and the reason is worth knowing: the double-hashing step it computes is always odd, and an odd step is coprime with <span class="math" data-say="m">m</span> &mdash; so the probe sequence reaches every slot &mdash; exactly when <span class="math" data-say="m">m</span> is a power of two. At <span class="math" data-say="m equals 13">m = 13</span> a step could share a factor with the table size and the sequence would miss slots, which is a silently broken table rather than a slow one.</p><h3>Deletion, and the keys that disappear</h3><p>Search stops at the first empty slot. So consider a key <span class="math" data-say="k">k</span> whose probe sequence is <span class="math" data-say="5, 6, 7">5, 6, 7</span> and which ended up in slot <span class="math" data-say="7">7</span> because <span class="math" data-say="5">5</span> and <span class="math" data-say="6">6</span> were taken. Delete the key in slot <span class="math" data-say="6">6</span> by emptying it, and now a search for <span class="math" data-say="k">k</span> probes slot <span class="math" data-say="5">5</span>, probes slot <span class="math" data-say="6">6</span>, finds it empty, and reports that <span class="math" data-say="k">k</span> is not in the table. <span class="math" data-say="k">k</span> is in slot <span class="math" data-say="7">7</span>. It will never be found again.</p><div class="defbox"><span class="label">Definition &middot; Tombstone</span><p>A slot may be <strong>empty</strong>, <strong>occupied</strong>, or <strong>dead</strong> &mdash; a tombstone left by a deletion. A search treats a dead slot as occupied by something else and keeps going; an insertion treats it as free and may reuse it. Only an empty slot stops a search.</p><p>The cost is that tombstones accumulate: they lengthen searches without holding keys, so a table with many deletions eventually needs rebuilding even though its load factor looks healthy.</p></div><div class="example"><span class="label">Example &middot; Three keys, lost and recovered</span><p>The lab fills a table of <span class="math" data-say="32">32</span> slots with <span class="math" data-say="22">22</span> keys, deletes eight of them and then searches for the fourteen that remain. With tombstones, all fourteen are found. Deleting by emptying the slot instead loses <strong>three</strong> of them, and the panel prints their keys. Nothing about the table looks wrong: the load factor is right, the slots are consistent, and three records are gone.</p></div><h3>Clustering, and a number that is a model rather than a count</h3><p>Now the cost. A table of <span class="math" data-say="32">32</span> slots aimed at seven tenths full ends up with <span class="math" data-say="22">22</span> keys, so <span class="math" data-say="alpha equals 11 over 16 equals 0.6875">α = 11/16 = 0.6875</span>. The lab then searches for twelve keys that are not present and for all <span class="math" data-say="22">22</span> that are, counting probes, and prints the standard curves beside the counts:</p><div class="mathblock" data-say="m equals 32, linear probing, n equals 22, alpha equals 11 over 16 equals 0.6875. counted, Knuth&#x27;s curve approximate. a table, shown on the page. longest run of n o n-empty slots, 12 of 32. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">m = 32,  linear probing,  n = 22        α = 11/16 = 0.6875
-
-                          counted     Knuth&#x27;s curve (approximate)
-unsuccessful search         5.000                       5.62
-successful search           2.318                       2.10
-
-longest run of non-empty slots     12 of 32
-clusters                           1  2  12  1  1  5</div><p>Those two right-hand numbers are the one approximation this lesson prints, and what is approximate is the <em>model</em>, not the arithmetic. Knuth&rsquo;s curves assume a uniform hash function and the idealised distribution of cluster lengths the analysis derives, and this library proves neither. The numbers beside them were produced by walking <span class="math" data-say="32">32</span> slots and incrementing a counter. The lab labels the column, and the reason to keep the two apart is visible one row down the load curve.</p><div class="mathblock" data-say="m equals 32, linear probing, same keys, aimed at nine tenths, n equals 28. alpha equals 7 over 8 equals 0.875, counted 8.417 probes unsuccessful. Knuth&#x27;s curve, 32.50. the curve is above the table&#x27;s own ceiling, a 32-slot table. cannot cost more than 32 probes, because there are only 32 slots" tabindex="0" role="region" aria-label="Mathematical notation">m = 32,  linear probing,  same keys, aimed at nine tenths       n = 28
-
-α = 7/8 = 0.875           counted 8.417 probes unsuccessful
-                          Knuth&#x27;s curve            32.50
-
-  the curve is above the table&#x27;s own ceiling:  a 32-slot table
-  cannot cost more than 32 probes, because there are only 32 slots</div><p>At <span class="math" data-say="alpha equals 7 over 8">α = 7/8</span> the curve says <span class="math" data-say="32.5">32.5</span> and the table counted <span class="math" data-say="8.4">8.4</span>. Neither number is wrong. The curve describes a table large enough for the idealised cluster distribution to hold; a <span class="math" data-say="32">32</span>-slot table at <span class="math" data-say="alpha equals 7 over 8">α = 7/8</span> has four empty slots, and an unsuccessful search stops at one of them after about eight probes. The curve is asymptotic in <span class="math" data-say="m">m</span> as well as in the load, and the lab prints the difference in its own column so the parting of the two is on the page rather than in a footnote.</p><p>Above <span class="math" data-say="alpha equals 0.98">α = 0.98</span> the lab refuses to print the curve at all, and says so where the number would have been. The reason is that the curve is effectively vertical there: <span class="math" data-say="1 over the quantity 1 minus alpha, squared">1/(1−α)²</span> is <span class="math" data-say="2500">2500</span> at <span class="math" data-say="alpha equals 0.98">α = 0.98</span> and <span class="math" data-say="10000">10 000</span> at <span class="math" data-say="0.99">0.99</span>, so a figure read off it is a statement about the formula rather than about any table. That refusal is the honest behaviour for a model outside its range, and it is why <span class="math" data-say="alpha">α</span> in a probing table is kept well below <span class="math" data-say="1">1</span> &mdash; at <span class="math" data-say="alpha equals 1">α = 1</span> there is no empty slot left to stop any search at all.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Open addressing, clustering and the tombstone</h2></div><p>Every probe is counted; the curve beside the count is an approximation</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Probing, deleting, and the one curve on this course that is a model</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Open addressing</span><p>Every key is stored in a slot of the table itself; there are no chains. A key <span class="math" data-say="k">k</span> has a <strong>probe sequence</strong> <span class="math" data-say="h of k and 0, h of k and 1, and so on">h(k, 0), h(k, 1), …</span> covering all <span class="math" data-say="m">m</span> slots. Insert walks it to the first free slot. Search walks it and stops when it finds <span class="math" data-say="k">k</span> or reaches an empty slot. Since every key occupies a slot, <span class="math" data-say="n is at most m">n ≤ m</span> and so <span class="math" data-say="alpha is at most 1">α ≤ 1</span>.</p><p><strong>Linear probing</strong> is <span class="math" data-say="h of k and i equals h of k plus i mod m">h(k, i) = (h(k) + i) mod m</span>: try the next slot, and the next. <strong>Double hashing</strong> uses a second hash function for the step, which breaks up the runs.</p></div><p>The lab offers only power-of-two table sizes, and the reason is worth knowing: the double-hashing step it computes is always odd, and an odd step is coprime with <span class="math" data-say="m">m</span> &mdash; so the probe sequence reaches every slot &mdash; exactly when <span class="math" data-say="m">m</span> is a power of two. At <span class="math" data-say="m equals 13">m = 13</span> a step could share a factor with the table size and the sequence would miss slots, which is a silently broken table rather than a slow one.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Open addressing, clustering and the tombstone</h2></div><p>Every probe is counted; the curve beside the count is an approximation</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Slots, clusters and tombstones</strong><span>probes counted against a curve that is an approximation and says so</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>occupied</span><span class="tone-red"><i class="legend-swatch"></i>tombstone</span><span class="tone-amber"><i class="legend-swatch"></i>the approximate curve</span></div>
@@ -1419,10 +1449,10 @@ clusters                           1  2  12  1  1  5</div><p>Those two right-han
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hpTable"></table></div>
       <div class="status-banner" id="hpStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Slots, clusters, tombstones, and the curve beside the counts</h3>
-          <p>Choose the probe rule, the table size and the load to aim at. The slot strip shows what is occupied, what is dead and where the clusters are; probes are counted for present and absent keys and plotted against Knuth&rsquo;s curve, which is labelled an approximation and is not quoted at all above <span class="math" data-say="alpha equals 0.98">α = 0.98</span>. The panel also reports how many live keys a delete-by-emptying loses.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Slots, clusters, tombstones, and the curve beside the counts</h3>
+            <p>Choose the probe rule, the table size and the load to aim at. The slot strip shows what is occupied, what is dead and where the clusters are; probes are counted for present and absent keys and plotted against Knuth&rsquo;s curve, which is labelled an approximation and is not quoted at all above <span class="math" data-say="alpha equals 0.98">α = 0.98</span>. The panel also reports how many live keys a delete-by-emptying loses.</p>
         <div class="field" id="hpPresetField">
           <label for="hpPreset">Worked example</label>
           <select id="hpPreset"><option value="linear-seventy" selected>linear probing, aiming at seven tenths</option><option value="clustered">linear probing, nearly full</option><option value="double">double hashing at the same load</option></select>
@@ -1454,12 +1484,28 @@ clusters                           1  2  12  1  1  5</div><p>Those two right-han
         </div>
         <p class="small-copy" id="hpHint" style="margin:0;">Only powers of two are offered as table sizes: the double-hashing rule makes its second hash odd, which is coprime with m only when m is a power of two. Knuth's two curves are floating point and are labelled &mdash; above &alpha; = 0.98 they are not quoted at all, because the curve is vertical there.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>Deletion, and the keys that disappear</h3><p>Search stops at the first empty slot. So consider a key <span class="math" data-say="k">k</span> whose probe sequence is <span class="math" data-say="5, 6, 7">5, 6, 7</span> and which ended up in slot <span class="math" data-say="7">7</span> because <span class="math" data-say="5">5</span> and <span class="math" data-say="6">6</span> were taken. Delete the key in slot <span class="math" data-say="6">6</span> by emptying it, and now a search for <span class="math" data-say="k">k</span> probes slot <span class="math" data-say="5">5</span>, probes slot <span class="math" data-say="6">6</span>, finds it empty, and reports that <span class="math" data-say="k">k</span> is not in the table. <span class="math" data-say="k">k</span> is in slot <span class="math" data-say="7">7</span>. It will never be found again.</p><div class="defbox"><span class="label">Definition &middot; Tombstone</span><p>A slot may be <strong>empty</strong>, <strong>occupied</strong>, or <strong>dead</strong> &mdash; a tombstone left by a deletion. A search treats a dead slot as occupied by something else and keeps going; an insertion treats it as free and may reuse it. Only an empty slot stops a search.</p><p>The cost is that tombstones accumulate: they lengthen searches without holding keys, so a table with many deletions eventually needs rebuilding even though its load factor looks healthy.</p></div><div class="example"><span class="label">Example &middot; Three keys, lost and recovered</span><p>The lab fills a table of <span class="math" data-say="32">32</span> slots with <span class="math" data-say="22">22</span> keys, deletes eight of them and then searches for the fourteen that remain. With tombstones, all fourteen are found. Deleting by emptying the slot instead loses <strong>three</strong> of them, and the panel prints their keys. Nothing about the table looks wrong: the load factor is right, the slots are consistent, and three records are gone.</p></div><h3>Clustering, and a number that is a model rather than a count</h3><p>Now the cost. A table of <span class="math" data-say="32">32</span> slots aimed at seven tenths full ends up with <span class="math" data-say="22">22</span> keys, so <span class="math" data-say="alpha equals 11 over 16 equals 0.6875">α = 11/16 = 0.6875</span>. The lab then searches for twelve keys that are not present and for all <span class="math" data-say="22">22</span> that are, counting probes, and prints the standard curves beside the counts:</p><div class="mathblock" data-say="m equals 32, linear probing, n equals 22, alpha equals 11 over 16 equals 0.6875. counted, Knuth&#x27;s curve approximate. a table, shown on the page. longest run of n o n-empty slots, 12 of 32. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">m = 32,  linear probing,  n = 22        α = 11/16 = 0.6875
+
+                          counted     Knuth&#x27;s curve (approximate)
+unsuccessful search         5.000                       5.62
+successful search           2.318                       2.10
+
+longest run of non-empty slots     12 of 32
+clusters                           1  2  12  1  1  5</div><p>Those two right-hand numbers are the one approximation this lesson prints, and what is approximate is the <em>model</em>, not the arithmetic. Knuth&rsquo;s curves assume a uniform hash function and the idealised distribution of cluster lengths the analysis derives, and this library proves neither. The numbers beside them were produced by walking <span class="math" data-say="32">32</span> slots and incrementing a counter. The lab labels the column, and the reason to keep the two apart is visible one row down the load curve.</p><div class="mathblock" data-say="m equals 32, linear probing, same keys, aimed at nine tenths, n equals 28. alpha equals 7 over 8 equals 0.875, counted 8.417 probes unsuccessful. Knuth&#x27;s curve, 32.50. the curve is above the table&#x27;s own ceiling, a 32-slot table. cannot cost more than 32 probes, because there are only 32 slots" tabindex="0" role="region" aria-label="Mathematical notation">m = 32,  linear probing,  same keys, aimed at nine tenths       n = 28
+
+α = 7/8 = 0.875           counted 8.417 probes unsuccessful
+                          Knuth&#x27;s curve            32.50
+
+  the curve is above the table&#x27;s own ceiling:  a 32-slot table
+  cannot cost more than 32 probes, because there are only 32 slots</div><p>At <span class="math" data-say="alpha equals 7 over 8">α = 7/8</span> the curve says <span class="math" data-say="32.5">32.5</span> and the table counted <span class="math" data-say="8.4">8.4</span>. Neither number is wrong. The curve describes a table large enough for the idealised cluster distribution to hold; a <span class="math" data-say="32">32</span>-slot table at <span class="math" data-say="alpha equals 7 over 8">α = 7/8</span> has four empty slots, and an unsuccessful search stops at one of them after about eight probes. The curve is asymptotic in <span class="math" data-say="m">m</span> as well as in the load, and the lab prints the difference in its own column so the parting of the two is on the page rather than in a footnote.</p><p>Above <span class="math" data-say="alpha equals 0.98">α = 0.98</span> the lab refuses to print the curve at all, and says so where the number would have been. The reason is that the curve is effectively vertical there: <span class="math" data-say="1 over the quantity 1 minus alpha, squared">1/(1−α)²</span> is <span class="math" data-say="2500">2500</span> at <span class="math" data-say="alpha equals 0.98">α = 0.98</span> and <span class="math" data-say="10000">10 000</span> at <span class="math" data-say="0.99">0.99</span>, so a figure read off it is a statement about the formula rather than about any table. That refusal is the honest behaviour for a model outside its range, and it is why <span class="math" data-say="alpha">α</span> in a probing table is kept well below <span class="math" data-say="1">1</span> &mdash; at <span class="math" data-say="alpha equals 1">α = 1</span> there is no empty slot left to stop any search at all.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working a probing table</h2></div><p>Insert, search, delete, in that order, and keep the three slot states straight throughout &mdash; the whole lesson lives in the difference between empty and dead.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the probe sequence, not just the home slot</h3><p><span class="math" data-say="h of k">h(k)</span>, then <span class="math" data-say="h of k plus 1">h(k)+1</span>, then <span class="math" data-say="h of k plus 2">h(k)+2</span>, modulo <span class="math" data-say="m">m</span>. A key is at the first free slot along that walk, which is often not its home slot, and a search that only checks the home slot finds almost nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Search by walking until you find the key or a TRUE empty</h3><p>Occupied and not the key: keep going. Dead: keep going. Empty: stop and report absent. Those three rules are the structure&rsquo;s entire correctness argument, and confusing the last two is the bug.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Delete by marking, and count your tombstones</h3><p>Set the slot dead. Then look at what a search for the keys after it now does &mdash; it walks past, as it must. Keep a count of the dead slots: they cost search time and hold nothing, so past a few they are a reason to rebuild the table.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the counted probes and the curve as two different quantities</h3><p>The counts come from the table on screen. The curve comes from a model of an idealised large table, and the lab says so. When they disagree by a lot, ask which assumption of the model this table violates before suspecting either number.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working a probing table</h2>
+      <p class="lead-in">Insert, search, delete, in that order, and keep the three slot states straight throughout &mdash; the whole lesson lives in the difference between empty and dead.</p>
+      <ol class="key-ideas method"><li><strong>Write the probe sequence, not just the home slot.</strong> <span class="math" data-say="h of k">h(k)</span>, then <span class="math" data-say="h of k plus 1">h(k)+1</span>, then <span class="math" data-say="h of k plus 2">h(k)+2</span>, modulo <span class="math" data-say="m">m</span>. A key is at the first free slot along that walk, which is often not its home slot, and a search that only checks the home slot finds almost nothing.</li><li><strong>Search by walking until you find the key or a TRUE empty.</strong> Occupied and not the key: keep going. Dead: keep going. Empty: stop and report absent. Those three rules are the structure&rsquo;s entire correctness argument, and confusing the last two is the bug.</li><li><strong>Delete by marking, and count your tombstones.</strong> Set the slot dead. Then look at what a search for the keys after it now does &mdash; it walks past, as it must. Keep a count of the dead slots: they cost search time and hold nothing, so past a few they are a reason to rebuild the table.</li><li><strong>Read the counted probes and the curve as two different quantities.</strong> The counts come from the table on screen. The curve comes from a model of an idealised large table, and the lab says so. When they disagree by a lot, ask which assumption of the model this table violates before suspecting either number.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1493,17 +1539,16 @@ search 26   probes 2, 3 (dead, walk on), 4      found
 search 11   probes 3, 4, 5, 6                   found</div><p>Three keys lost from a five-key table by one deletion, and every one of them is still sitting in the slot it was put in. This is the failure the tombstone exists to prevent, and it is worth doing by hand once because the bug it produces in a real system is a record that cannot be found rather than a crash.</p><p>The marked version walks past slot <span class="math" data-say="3">3</span> and finds everything. It also shows the cost: searching for <span class="math" data-say="26">26</span> now costs three probes forever, one of them spent on a slot that holds nothing. Tombstones trade a correctness bug for a slow leak, and the leak is fixed by rebuilding, which is the next lesson&rsquo;s subject.</p><p>For a faded rehearsal, use the lab at <span class="math" data-say="m equals 32">m = 32</span> with double hashing at the same load. The supplied observation is that the load factor is identical to linear probing&rsquo;s &mdash; <span class="math" data-say="11 over 16">11/16</span> &mdash; and Knuth&rsquo;s linear-probing curve is therefore unchanged at <span class="math" data-say="5.62">5.62</span>. Count the probes: the lab reports <span class="math" data-say="3.000">3.000</span> unsuccessful against linear probing&rsquo;s <span class="math" data-say="5.000">5.000</span>, and the longest cluster drops from <span class="math" data-say="12">12</span> to <span class="math" data-say="8">8</span>. Then say which of those four numbers are counts and which is a model.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Deleting by emptying the slot</strong><span>It is the natural thing to write and it breaks every probe chain that ran through that slot. The lab loses three of fourteen live keys to one round of deletions on a table of thirty-two, and the keys are still there. The rule is that in an open-addressed table a deletion marks and never empties, and the cost of that rule is a table that must eventually be rebuilt.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting <span class="math" data-say="1 plus alpha">1 + α</span> to price a probing search</strong><span>That is chaining&rsquo;s bound, and it holds because chains are independent. Probing clusters: a long run of occupied slots catches more keys and grows. The standard figure for an unsuccessful search is about <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span>, which at <span class="math" data-say="alpha equals 0.9">α = 0.9</span> is <span class="math" data-say="50.5">50.5</span> against chaining&rsquo;s <span class="math" data-say="1.9">1.9</span>, and the difference is the clustering.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the curve as the measurement or the measurement as the bound</strong><span>They are two different kinds of number printed side by side on purpose. The curve is a model whose assumptions this library does not prove; the probe count is an execution on the table in front of you. Reading the curve as the answer ignores that a <span class="math" data-say="32">32</span>-slot table cannot cost <span class="math" data-say="32.5">32.5</span> probes; reading the count as the answer ignores that one table at one load is not a bound.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a deletion in a probing table feels like an operation that needs an argument.</strong><p>You should be able to insert and search along a probe sequence by hand, name the keys a delete-by-emptying loses on a small table, state the three slot states and what each does to a search, and say of any figure on the page whether it was counted or read off a model whose assumptions are not proved here.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Tombstones accumulate and a table fills up, so both kinds of hash table need to change size while running. &ldquo;Resizing and the Load Factor&rdquo; is about the two thresholds that make that cheap: growing and shrinking at the same load thrashes, and the lab produces the sequence that rehashes on thirty-nine of forty operations.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Deleting by emptying the slot</strong><span>It is the natural thing to write and it breaks every probe chain that ran through that slot. The lab loses three of fourteen live keys to one round of deletions on a table of thirty-two, and the keys are still there. The rule is that in an open-addressed table a deletion marks and never empties, and the cost of that rule is a table that must eventually be rebuilt.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting <span class="math" data-say="1 plus alpha">1 + α</span> to price a probing search</strong><span>That is chaining&rsquo;s bound, and it holds because chains are independent. Probing clusters: a long run of occupied slots catches more keys and grows. The standard figure for an unsuccessful search is about <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span>, which at <span class="math" data-say="alpha equals 0.9">α = 0.9</span> is <span class="math" data-say="50.5">50.5</span> against chaining&rsquo;s <span class="math" data-say="1.9">1.9</span>, and the difference is the clustering.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the curve as the measurement or the measurement as the bound</strong><span>They are two different kinds of number printed side by side on purpose. The curve is a model whose assumptions this library does not prove; the probe count is an execution on the table in front of you. Reading the curve as the answer ignores that a <span class="math" data-say="32">32</span>-slot table cannot cost <span class="math" data-say="32.5">32.5</span> probes; reading the count as the answer ignores that one table at one load is not a bound.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a deletion in a probing table feels like an operation that needs an argument.</strong><p>You should be able to insert and search along a probe sequence by hand, name the keys a delete-by-emptying loses on a small table, state the three slot states and what each does to a search, and say of any figure on the page whether it was counted or read off a model whose assumptions are not proved here.</p></div></div><div class="note"><strong>Note:</strong> Tombstones accumulate and a table fills up, so both kinds of hash table need to change size while running. &ldquo;Resizing and the Load Factor&rdquo; is about the two thresholds that make that cheap: growing and shrinking at the same load thrashes, and the lab produces the sequence that rehashes on thirty-nine of forty operations.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The probe sequence is the structure</summary><p>A key does not live at <span class="math" data-say="h of k">h(k)</span>; it lives at the first slot in its probe sequence <span class="math" data-say="h of k, h of k plus 1, h of k plus 2, and so on">h(k), h(k)+1, h(k)+2, …</span> that was free when it arrived. A search re-walks that sequence and stops at the first empty slot, because an empty slot means the key would have been put there. Everything about probing follows from that stopping rule, including the deletion problem.</p></details><details class="recall"><summary>A deletion must leave a mark, not a hole</summary><p>Emptying a slot creates a stopping point in the middle of other keys&rsquo; probe sequences, and every key beyond it becomes unreachable &mdash; still in the table, never found again. The fix is a <strong>tombstone</strong>: a slot marked dead, which a search walks past and an insertion may reuse. The lab deletes eight keys from a table of twenty-two and reports which three of the survivors go missing when the mark is omitted.</p></details><details class="recall"><summary>Clustering is why linear probing costs more than the load factor suggests</summary><p>Occupied slots gather into runs, and a long run is more likely to catch the next key, which makes it longer. Chaining has no such effect: its chains are independent. So the expected unsuccessful search is not <span class="math" data-say="1 plus alpha">1 + α</span>; the standard analysis gives about <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span>, which blows up as <span class="math" data-say="alpha">α</span> approaches <span class="math" data-say="1">1</span> &mdash; and with everything inside the table, <span class="math" data-say="alpha">α</span> cannot exceed <span class="math" data-say="1">1</span> at all.</p></details></div>
+      <h3>Summary</h3>
       <p>With every key inside the table, a search stops at the first empty slot &mdash; so a deletion that empties a slot cuts every probe chain running through it, and keys already in the table become unreachable. The lab names them. Linear probing also clusters, which makes an unsuccessful search cost about <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span> rather than <span class="math" data-say="1 plus alpha">1 + α</span>: an approximation, printed beside probes that were counted.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The probe sequence is the structure.</strong> A key does not live at <span class="math" data-say="h of k">h(k)</span>; it lives at the first slot in its probe sequence <span class="math" data-say="h of k, h of k plus 1, h of k plus 2, and so on">h(k), h(k)+1, h(k)+2, …</span> that was free when it arrived. A search re-walks that sequence and stops at the first empty slot, because an empty slot means the key would have been put there. Everything about probing follows from that stopping rule, including the deletion problem.</li><li><strong>A deletion must leave a mark, not a hole.</strong> Emptying a slot creates a stopping point in the middle of other keys&rsquo; probe sequences, and every key beyond it becomes unreachable &mdash; still in the table, never found again. The fix is a <strong>tombstone</strong>: a slot marked dead, which a search walks past and an insertion may reuse. The lab deletes eight keys from a table of twenty-two and reports which three of the survivors go missing when the mark is omitted.</li><li><strong>Clustering is why linear probing costs more than the load factor suggests.</strong> Occupied slots gather into runs, and a long run is more likely to catch the next key, which makes it longer. Chaining has no such effect: its chains are independent. So the expected unsuccessful search is not <span class="math" data-say="1 plus alpha">1 + α</span>; the standard analysis gives about <span class="math" data-say="one half 1 plus 1 over the quantity 1 minus alpha, squared">½(1 + 1/(1−α)²)</span>, which blows up as <span class="math" data-say="alpha">α</span> approaches <span class="math" data-say="1">1</span> &mdash; and with everything inside the table, <span class="math" data-say="alpha">α</span> cannot exceed <span class="math" data-say="1">1</span> at all.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="open addressing, every key in a slot, on collision, probe the next one. linear probing, h of k and i equals h of k plus i mod m. delete, mark the slot DEAD, do not empty it. search stops at a TRUE empty, walks past a dead one. Knuth, unsuccessful, one half 1 plus 1 over the quantity 1 minus alpha, squared, an approximation, not a count. alpha equals 11 over 16, counted 5 probes, curve 5.62, alpha must stay below 1" tabindex="0" role="region" aria-label="Mathematical notation">open addressing    every key in a slot;  on collision, probe the next one
 linear probing     h(k, i) = (h(k) + i) mod m
 
@@ -3084,11 +3129,40 @@ Knuth, unsuccessful   ½(1 + 1/(1−α)²)     an approximation, not a count
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3156,7 +3230,7 @@ Knuth, unsuccessful   ½(1 + 1/(1−α)²)     an approximation, not a count
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

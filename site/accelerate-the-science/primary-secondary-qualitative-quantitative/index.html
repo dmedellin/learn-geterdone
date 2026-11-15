@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Science Behind the Book</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 12 · The Science Behind This Book</p>
       <h1>Primary and Secondary, Qualitative and Quantitative Research</h1>
       <p class="lesson-lede">Who collected the data, what form it takes, and what a handful of summary numbers can and cannot tell you.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Primary and secondary research</li><li>Quantitative data and the Likert-type scale</li><li>Descriptive summary</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two ways of sorting research, and the first rung of the ladder</h2>
-      <article class="prose reading"><p>&ldquo;Research falls into two broad classes: primary and secondary research. The key difference between these two types is who collects the data.&rdquo; That is Forsgren, Humble and Kim at the start of Chapter 12, The Science Behind This Book. The chapter answers a question that follows any claim about what makes teams perform: how do you tell the actions that merely coincide with a change from the ones that bring it about? Part II of the book is their account of how they went about it, and this course reads its first two chapters.</p><p>The first sorting is by who gathered the data. Secondary research summarises what someone else collected, as a school report or a market study does; it is generally faster and cheaper, and the authors add its limit, that the researcher is bound by whatever data exists. Primary research collects new data; their example is the national census taken every ten years. It can report what is not already known and lets the team choose its questions, at greater cost in money and time. They place their own work here, the book and the State of DevOps Reports alike.</p><p>The second sorting is by the form of the data. Qualitative research is any whose data is not in numerical form, such as interviews, blog posts, long-form log data and an ethnographer's observations. It is rich and can reveal behaviour the researcher did not expect, but it is harder and dearer to analyse, and automated analysis usually turns it into numbers, which makes it quantitative. Quantitative research is any with numbers in its data, whether system data such as logs in numerical form or survey data that asks for answers on a scale. Because a survey need not be qualitative, the authors point out, what matters is what the questions ask. Their own research is quantitative, since it was collected with a Likert-type instrument.</p><p>Quantitative research allows statistical analysis, and here the chapter borrows a framework from Jeffrey Leek, a biostatistician at Johns Hopkins: six types of analysis in order of increasing complexity, where complexity means the knowledge the analyst needs, the cost and the time. They are descriptive, exploratory, inferential predictive, predictive, causal and mechanistic. The authors say the analyses in their book fall into the first three, and they add one more kind that does not fit the ladder cleanly, classification. The next three lessons read those rungs in turn, and the fourth reads classification.</p><p>Descriptive analysis is the first rung. The data is summarised and reported, as in a census, and the work takes the least effort. It is often the first step of a longer analysis, to help a team understand the data in hand and the sample behind it; a report may also stop there. Two words matter before you read any summary. The population is the whole group you want to learn about, and the sample is the carefully defined portion of it whose data you actually have. The authors' warning is that a description is worth no more than the research design and the way the sample was drawn behind it. Their own descriptive analysis in the book is the profile of who answered, taken up in Chapter 10.</p><p>Now describe a sample. The lab takes a list of values and prints the count, the mean, the median, the mode or modes, the smallest and largest value, the range, and the standard deviation twice. The first sample is invented: ten people on a team answered one statement on the seven-point scale. On the preset <code>team-a</code>, with answers 1, 3, 4, 5, 5, 6, 6, 6, 7, 7, it reports 10 answers, a mean of 5, a median of 5.5, a mode of 6, a range of 6 and standard deviations of 1.789 and 1.886.</p><div class="mathblock" data-say="mean equals the sum of the values, divided by n. median equals the middle value, or the mean of the two middle values. mode equals the value that appears most often. range equals the largest value minus the smallest value. population standard deviation equals the square root of the sum of the squared distances from the mean, divided by n. sample standard deviation equals the square root of the sum of the squared distances from the mean, divided by n minus 1" tabindex="0" role="region" aria-label="Mathematical notation">mean  =  (sum of the values) / n
-median  =  the middle value, or the mean of the two middle values
-mode  =  the value that appears most often
-range  =  largest value − smallest value
-population standard deviation  =  √( Σ(x − mean)² / n )
-sample standard deviation  =  √( Σ(x − mean)² / (n − 1) )</div><p>The two standard deviations answer slightly different questions. Divide the sum of squared distances from the mean by n and you have described the ten people as they are, a population of ten. Divide by n − 1 and you have estimated the spread of a larger group these ten were drawn from, which is the sample reading and comes out a little larger. Chapter 12 does not print either formula; they are standard statistics, and the lab shows both so that neither is a surprise.</p><p>Compare a second invented team. On <code>team-b</code>, with answers 3, 4, 4, 4, 5, 6, 6, 6, 6, 6, the mean is again 5, the median is again 5.5 and the mode is again 6. The range is 3 instead of 6, and the standard deviations fall to 1.095 and 1.155. Three summaries are identical and two are not. The first team contains a 1 and two 7s; the second is gathered between 3 and 6. One mean cannot tell you which team you are looking at, and neither can any number the lab prints say why the first team is more spread out: a disagreement about the statement, a reorganisation, a misread scale. That is a limit of the first rung, and the reason the chapter has five more.</p><p>One caution is the lesson's own, not the chapter's. A mean treats the steps between 1 and 2, and between 6 and 7, as the same size, which a Likert-type scale only assumes. The median and the mode ask less of the numbers, so a summary that shows all three is harder to over-read than a mean alone.</p><h3>Exercise</h3><ul><li>Eight answers on the seven-point scale: <span class="math" data-say="1, 5, 5, 5, 6, 6, 6, 6">1, 5, 5, 5, 6, 6, 6, 6</span>.</li><li>Type them into the lab and note the mean, median, mode, range and both standard deviations.</li><li>Then change the 1 to a 5 and type them in again.</li></ul><p>Say which summaries moved and which stayed put, and why the median is the steadier of the two centres here. Work the first set by hand before you type it, then check the lab.</p><p>The first rung describes a sample and stops. The next lesson, Descriptive and Exploratory Analysis, goes up to the second rung, where the question becomes whether two things move together.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Describing and relating measures</h2></div><p>centre and spread of one measure</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two ways of sorting research, and the first rung of the ladder</h2><div class="prose reading"><p>&ldquo;Research falls into two broad classes: primary and secondary research. The key difference between these two types is who collects the data.&rdquo; That is Forsgren, Humble and Kim at the start of Chapter 12, The Science Behind This Book. The chapter answers a question that follows any claim about what makes teams perform: how do you tell the actions that merely coincide with a change from the ones that bring it about? Part II of the book is their account of how they went about it, and this course reads its first two chapters.</p><p>The first sorting is by who gathered the data. Secondary research summarises what someone else collected, as a school report or a market study does; it is generally faster and cheaper, and the authors add its limit, that the researcher is bound by whatever data exists. Primary research collects new data; their example is the national census taken every ten years. It can report what is not already known and lets the team choose its questions, at greater cost in money and time. They place their own work here, the book and the State of DevOps Reports alike.</p><p>The second sorting is by the form of the data. Qualitative research is any whose data is not in numerical form, such as interviews, blog posts, long-form log data and an ethnographer's observations. It is rich and can reveal behaviour the researcher did not expect, but it is harder and dearer to analyse, and automated analysis usually turns it into numbers, which makes it quantitative. Quantitative research is any with numbers in its data, whether system data such as logs in numerical form or survey data that asks for answers on a scale. Because a survey need not be qualitative, the authors point out, what matters is what the questions ask. Their own research is quantitative, since it was collected with a Likert-type instrument.</p><p>Quantitative research allows statistical analysis, and here the chapter borrows a framework from Jeffrey Leek, a biostatistician at Johns Hopkins: six types of analysis in order of increasing complexity, where complexity means the knowledge the analyst needs, the cost and the time. They are descriptive, exploratory, inferential predictive, predictive, causal and mechanistic. The authors say the analyses in their book fall into the first three, and they add one more kind that does not fit the ladder cleanly, classification. The next three lessons read those rungs in turn, and the fourth reads classification.</p><p>Descriptive analysis is the first rung. The data is summarised and reported, as in a census, and the work takes the least effort. It is often the first step of a longer analysis, to help a team understand the data in hand and the sample behind it; a report may also stop there. Two words matter before you read any summary. The population is the whole group you want to learn about, and the sample is the carefully defined portion of it whose data you actually have. The authors' warning is that a description is worth no more than the research design and the way the sample was drawn behind it. Their own descriptive analysis in the book is the profile of who answered, taken up in Chapter 10.</p><p>Now describe a sample. The lab takes a list of values and prints the count, the mean, the median, the mode or modes, the smallest and largest value, the range, and the standard deviation twice. The first sample is invented: ten people on a team answered one statement on the seven-point scale. On the preset <code>team-a</code>, with answers 1, 3, 4, 5, 5, 6, 6, 6, 7, 7, it reports 10 answers, a mean of 5, a median of 5.5, a mode of 6, a range of 6 and standard deviations of 1.789 and 1.886.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Describing and relating measures</h2></div><p>centre and spread of one measure</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Describing and relating measures</strong><span>centre and spread of one measure</span></div>
       </div>
@@ -1409,10 +1447,10 @@ sample standard deviation  =  √( Σ(x − mean)² / (n − 1) )</div><p>The tw
       <div class="table-wrap" id="astTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="astTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> The mean is the sum over n; the median is the middle value in order, or the mean of the two middle ones; the modes are the values that occur most often, listed in increasing order, and there is none when every value occurs equally often. The range is the maximum less the minimum. The population variance divides the sum of squared deviations from the mean by n, the sample variance by n − 1, and each standard deviation is its square root. A square root is printed to 3 places from the exact rational under it by an integer square root, rounded half up, so the digits depend on the inputs alone; it is shown without ≈ only when it is exact. </p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Describing a set of answers</h3>
-          <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Describing a set of answers</h3>
+            <p>A figure computed from the small sample the lesson states. It shows what one measure says about that sample; the book's findings are its survey's, and a correlation is not a cause.</p>
         <div class="field">
           <label for="astPreset">Worked example</label>
           <select id="astPreset"><option value="team-a" selected>Ten invented answers on a seven-point scale</option><option value="team-b">A second team with the same mean, median and mode</option></select>
@@ -1433,12 +1471,20 @@ sample standard deviation  =  √( Σ(x − mean)² / (n − 1) )</div><p>The tw
           <div class="kpi"><span>Sample standard deviation (÷ (n − 1))</span><strong id="astSampleSd">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="mean equals the sum of the values, divided by n. median equals the middle value, or the mean of the two middle values. mode equals the value that appears most often. range equals the largest value minus the smallest value. population standard deviation equals the square root of the sum of the squared distances from the mean, divided by n. sample standard deviation equals the square root of the sum of the squared distances from the mean, divided by n minus 1" tabindex="0" role="region" aria-label="Mathematical notation">mean  =  (sum of the values) / n
+median  =  the middle value, or the mean of the two middle values
+mode  =  the value that appears most often
+range  =  largest value − smallest value
+population standard deviation  =  √( Σ(x − mean)² / n )
+sample standard deviation  =  √( Σ(x − mean)² / (n − 1) )</div><p>The two standard deviations answer slightly different questions. Divide the sum of squared distances from the mean by n and you have described the ten people as they are, a population of ten. Divide by n − 1 and you have estimated the spread of a larger group these ten were drawn from, which is the sample reading and comes out a little larger. Chapter 12 does not print either formula; they are standard statistics, and the lab shows both so that neither is a surprise.</p><p>Compare a second invented team. On <code>team-b</code>, with answers 3, 4, 4, 4, 5, 6, 6, 6, 6, 6, the mean is again 5, the median is again 5.5 and the mode is again 6. The range is 3 instead of 6, and the standard deviations fall to 1.095 and 1.155. Three summaries are identical and two are not. The first team contains a 1 and two 7s; the second is gathered between 3 and 6. One mean cannot tell you which team you are looking at, and neither can any number the lab prints say why the first team is more spread out: a disagreement about the statement, a reorganisation, a misread scale. That is a limit of the first rung, and the reason the chapter has five more.</p><p>One caution is the lesson's own, not the chapter's. A mean treats the steps between 1 and 2, and between 6 and 7, as the same size, which a Likert-type scale only assumes. The median and the mode ask less of the numbers, so a summary that shows all three is harder to over-read than a mean alone.</p><h3>Exercise</h3><ul><li>Eight answers on the seven-point scale: <span class="math" data-say="1, 5, 5, 5, 6, 6, 6, 6">1, 5, 5, 5, 6, 6, 6, 6</span>.</li><li>Type them into the lab and note the mean, median, mode, range and both standard deviations.</li><li>Then change the 1 to a 5 and type them in again.</li></ul><p>Say which summaries moved and which stayed put, and why the median is the steadier of the two centres here. Work the first set by hand before you type it, then check the lab.</p><p>The first rung describes a sample and stops. The next lesson, Descriptive and Exploratory Analysis, goes up to the second rung, where the question becomes whether two things move together.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Describing a set of values</h2></div><p>Five steps, the last of them on answers of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the values and count them</h3><p>Write the values in order from smallest to largest and count them. That count is n, and the order is what the median and the range read from.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Find the three centres</h3><p>Add the values and divide by n for the mean; take the middle value, or the mean of the middle two, for the median; find the value that appears most often for the mode, and write down every value that ties.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the spread</h3><p>Subtract the smallest from the largest for the range. Then square each value's distance from the mean, add the squares, divide by n for the population figure or n − 1 for the sample figure, and take the square root.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Say what the numbers leave out</h3><p>Write one question the summary cannot answer about the group, such as why the answers spread as they do or whether the people who answered stand for everyone.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on answers of your own</h3><p>Take ten answers to one rating question from a survey you can see, type them into the lab, and compare the mean with the median. Write down which of the two you would trust more for that group.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Describing a set of values</h2>
+      <p class="lead-in">Five steps, the last of them on answers of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the values and count them.</strong> Write the values in order from smallest to largest and count them. That count is n, and the order is what the median and the range read from.</li><li><strong>Find the three centres.</strong> Add the values and divide by n for the mean; take the middle value, or the mean of the middle two, for the median; find the value that appears most often for the mode, and write down every value that ties.</li><li><strong>Find the spread.</strong> Subtract the smallest from the largest for the range. Then square each value's distance from the mean, add the squares, divide by n for the population figure or n − 1 for the sample figure, and take the square root.</li><li><strong>Say what the numbers leave out.</strong> Write one question the summary cannot answer about the group, such as why the answers spread as they do or whether the people who answered stand for everyone.</li><li><strong>Do it on answers of your own.</strong> Take ten answers to one rating question from a survey you can see, type them into the lab, and compare the mean with the median. Write down which of the two you would trust more for that group.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1460,17 +1506,16 @@ population: 32 / 10 = 3.2, root ≈ 1.789
 sample: 32 / 9 ≈ 3.556, root ≈ 1.886</div><p>Every line uses the line before it, and nothing in them asks who the ten people are. That is why the same arithmetic is as easy to do on a poor sample as on a good one.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling a survey qualitative because it does not come from a machine</strong><span>Chapter 12 says this assumption is common and untrue. A survey is qualitative or quantitative according to the questions it asks. A survey whose answers are recorded on a numerical scale, as the authors' is, produces quantitative data, which is why the statistical analyses of the next lessons can be run on it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a mean as what the group thinks</strong><span>A mean is one number made from many. Two teams can share a mean, a median and a mode, as the two presets do, and still differ by a factor of two in range. Look at the spread, and at the values, before you say anything about the group.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a description to explain</strong><span>A summary says what the values are, never why. Chapter 12 puts description at the foot of its ladder because it asks the least; the questions of why two things go together, and whether one moves the other, belong to the rungs above it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can describe a set of answers.</strong><p>Given ten answers on the seven-point scale, find the mean, median, mode, range and both standard deviations, and name one question those numbers cannot answer.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes six summaries of the numbers you type. It cannot tell whether those numbers are a fair sample of any population, which the chapter says every descriptive claim depends on, or whether a one-to-seven code may be averaged at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling a survey qualitative because it does not come from a machine</strong><span>Chapter 12 says this assumption is common and untrue. A survey is qualitative or quantitative according to the questions it asks. A survey whose answers are recorded on a numerical scale, as the authors' is, produces quantitative data, which is why the statistical analyses of the next lessons can be run on it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a mean as what the group thinks</strong><span>A mean is one number made from many. Two teams can share a mean, a median and a mode, as the two presets do, and still differ by a factor of two in range. Look at the spread, and at the values, before you say anything about the group.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting a description to explain</strong><span>A summary says what the values are, never why. Chapter 12 puts description at the foot of its ladder because it asks the least; the questions of why two things go together, and whether one moves the other, belong to the rungs above it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can describe a set of answers.</strong><p>Given ten answers on the seven-point scale, find the mean, median, mode, range and both standard deviations, and name one question those numbers cannot answer.</p></div></div><div class="note"><strong>Note:</strong> The lab computes six summaries of the numbers you type. It cannot tell whether those numbers are a fair sample of any population, which the chapter says every descriptive claim depends on, or whether a one-to-seven code may be averaged at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Primary and secondary research</summary><p>The difference is who collects the data. Secondary research works from data someone else collected, which is quicker and cheaper but bound by what already exists; primary research collects new data, which gives the researchers control over the questions and costs more. The authors place their own work in this class.</p></details><details class="recall"><summary>Quantitative data and the Likert-type scale</summary><p>Quantitative research uses data that includes numbers, whether from a system or from a survey that asks for answers on a scale. A Likert-type scale gives each answer a number: on the seven-point version the authors describe, strongly disagree is 1, neutral is 4 and strongly agree is 7.</p></details><details class="recall"><summary>Descriptive summary</summary><p>A handful of numbers that summarise a set of values: how many, where the middle is (mean, median, mode) and how far the values spread (range, standard deviation). The lab prints all of them for the values you type.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 12 opens Part II by asking how the authors know that what they report is more than a coincidence. Read its two ways of sorting research, who collects the data and what form the data takes; its ladder of six kinds of analysis; and the first rung, description. Then describe two invented teams' answers to one survey statement and see which numbers tell them apart.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Primary and secondary research.</strong> The difference is who collects the data. Secondary research works from data someone else collected, which is quicker and cheaper but bound by what already exists; primary research collects new data, which gives the researchers control over the questions and costs more. The authors place their own work in this class.</li><li><strong>Quantitative data and the Likert-type scale.</strong> Quantitative research uses data that includes numbers, whether from a system or from a survey that asks for answers on a scale. A Likert-type scale gives each answer a number: on the seven-point version the authors describe, strongly disagree is 1, neutral is 4 and strongly agree is 7.</li><li><strong>Descriptive summary.</strong> A handful of numbers that summarise a set of values: how many, where the middle is (mean, median, mode) and how far the values spread (range, standard deviation). The lab prints all of them for the values you type.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="primary, the team collects new data. secondary, someone else collected it. qualitative, data not in numbers. quantitative, data that includes numbers. describe first, centre, spread, range. a summary says what, never why" tabindex="0" role="region" aria-label="Mathematical notation">primary: the team collects new data
 secondary: someone else collected it
 qualitative: data not in numbers
@@ -2345,11 +2390,40 @@ a summary says what, never why</div><figcaption>Chapter 12&#x27;s first sections
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2417,7 +2491,7 @@ a summary says what, never why</div><figcaption>Chapter 12&#x27;s first sections
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

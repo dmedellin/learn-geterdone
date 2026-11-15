@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Identity, Modality and Freedom</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Modality</p>
       <h1>Frames, Axioms and What Necessity Obeys</h1>
       <p class="lesson-lede">Each of the modal axioms T, D, B, 4 and 5 is the fingerprint of one property of the arcs.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A frame is worlds and arcs</li><li>Each axiom asks for one property of the arcs</li><li>The axioms are chosen by choosing the frame</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From arcs to axioms</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Frame and validity on a frame</span><p>A <strong>frame</strong> is a set of worlds and an accessibility relation. A formula is <strong>valid on the frame</strong> if it is true at every world under every valuation. The formula <span class="math" data-say="necessarily the quantity p implies q, implies the quantity necessarily p implies necessarily q">□(p → q) → (□p → □q)</span>, called <strong>K</strong>, is valid on every frame and is not listed in the lab.</p></div><div class="mathblock" data-say="axiom, formula, what the arcs must do. D, necessarily p implies possibly p, serial, every world sees some world. T, necessarily p implies p, reflexive, every world sees itself. B, p implies necessarily possibly p, symmetric, if w sees v, then v sees w. 4, necessarily p implies necessarily necessarily p, transitive, if w sees v and v sees u, then w sees u. 5, possibly p implies necessarily possibly p, euclidean, if w sees v and u, then v sees u" tabindex="0" role="region" aria-label="Mathematical notation">axiom   formula       what the arcs must do
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From arcs to axioms</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Frame and validity on a frame</span><p>A <strong>frame</strong> is a set of worlds and an accessibility relation. A formula is <strong>valid on the frame</strong> if it is true at every world under every valuation. The formula <span class="math" data-say="necessarily the quantity p implies q, implies the quantity necessarily p implies necessarily q">□(p → q) → (□p → □q)</span>, called <strong>K</strong>, is valid on every frame and is not listed in the lab.</p></div><div class="mathblock" data-say="axiom, formula, what the arcs must do. D, necessarily p implies possibly p, serial, every world sees some world. T, necessarily p implies p, reflexive, every world sees itself. B, p implies necessarily possibly p, symmetric, if w sees v, then v sees w. 4, necessarily p implies necessarily necessarily p, transitive, if w sees v and v sees u, then w sees u. 5, possibly p implies necessarily possibly p, euclidean, if w sees v and u, then v sees u" tabindex="0" role="region" aria-label="Mathematical notation">axiom   formula       what the arcs must do
 D       □p → ◇p       serial: every world sees some world
 T       □p → p        reflexive: every world sees itself
 B       p → □◇p       symmetric: if w sees v, then v sees w
 4       □p → □□p      transitive: if w sees v and v sees u, then w sees u
-5       ◇p → □◇p      euclidean: if w sees v and u, then v sees u</div><p>The table is not a list of facts to memorise, because each row can be reasoned out. Suppose a world w does not see itself. Make <span class="math" data-say="p">p</span> true at every world w sees and false at w. Then <span class="math" data-say="necessarily p">□p</span> is true at w and <span class="math" data-say="p">p</span> is false at w, so T fails at w. The other direction is as direct: if every world sees itself, then <span class="math" data-say="necessarily p">□p</span> includes <span class="math" data-say="p">p</span> at the world itself, so T holds. Transitivity is the same argument one step longer. If w sees v, v sees u and w does not see u, make <span class="math" data-say="p">p</span> true at everything w sees and false at u. Then <span class="math" data-say="necessarily p">□p</span> is true at w, and <span class="math" data-say="necessarily necessarily p">□□p</span> is false at w, because v sees u.</p><p>B is easy to misread. It does not say that what is true is necessarily true, which would be <span class="math" data-say="p implies necessarily p">p → □p</span>. It says that what is true is necessarily possible: at a world w where <span class="math" data-say="p">p</span> holds, every world v that w sees must itself see a world with <span class="math" data-say="p">p</span>, and symmetry supplies one, since v sees w.</p><h3>Which logic is which</h3><p>The frames people reach for have names. A frame that is reflexive and transitive validates the system called S4. A frame that is an equivalence relation, reflexive, symmetric and transitive, validates S5, and in S5 every world in a group sees every other. Each step up the list adds a property, so each adds axioms. What the lab does is compute the list for the frame you build, so you can add one arc and see the first axiom that appears.</p><p>That is also its limit. A frame that validates all five axioms is a frame, and whether it is the right model of logical necessity, of metaphysical necessity or of what a person can know is not computed. The next lessons use S5 for one argument and ask whether it was a fair choice.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Possible worlds</h2></div><p>Modal formulas at every world, and the axioms the frame validates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+5       ◇p → □◇p      euclidean: if w sees v and u, then v sees u</div><p>The table is not a list of facts to memorise, because each row can be reasoned out. Suppose a world w does not see itself. Make <span class="math" data-say="p">p</span> true at every world w sees and false at w. Then <span class="math" data-say="necessarily p">□p</span> is true at w and <span class="math" data-say="p">p</span> is false at w, so T fails at w. The other direction is as direct: if every world sees itself, then <span class="math" data-say="necessarily p">□p</span> includes <span class="math" data-say="p">p</span> at the world itself, so T holds. Transitivity is the same argument one step longer. If w sees v, v sees u and w does not see u, make <span class="math" data-say="p">p</span> true at everything w sees and false at u. Then <span class="math" data-say="necessarily p">□p</span> is true at w, and <span class="math" data-say="necessarily necessarily p">□□p</span> is false at w, because v sees u.</p><p>B is easy to misread. It does not say that what is true is necessarily true, which would be <span class="math" data-say="p implies necessarily p">p → □p</span>. It says that what is true is necessarily possible: at a world w where <span class="math" data-say="p">p</span> holds, every world v that w sees must itself see a world with <span class="math" data-say="p">p</span>, and symmetry supplies one, since v sees w.</p><h3>Which logic is which</h3><p>The frames people reach for have names. A frame that is reflexive and transitive validates the system called S4. A frame that is an equivalence relation, reflexive, symmetric and transitive, validates S5, and in S5 every world in a group sees every other. Each step up the list adds a property, so each adds axioms. What the lab does is compute the list for the frame you build, so you can add one arc and see the first axiom that appears.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Possible worlds</h2></div><p>Modal formulas at every world, and the axioms the frame validates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Worlds and what they can see</strong><span>□ holds where every visible world agrees; ◇ where one does</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the formula holds</span><span class="tone-amber"><i class="legend-swatch"></i>the world evaluated</span></div>
@@ -1409,10 +1452,10 @@ B       p → □◇p       symmetric: if w sees v, then v sees w
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="krSvg" viewBox="0 0 520 290" role="img" aria-label="The worlds as circles with arrows for accessibility; the atoms true at each world are written inside it, and the worlds where the formula holds are filled."></svg></div>
       <div class="status-banner" id="krStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Add an arc and read the axiom list</h3>
-          <p>Each preset is a frame, and the two tiles on the right of the model read off that frame alone: the properties it has, and the axioms it validates. The formula box tests one valuation at one world. Start with the last model and add <span class="math" data-say="1 minus 1 2 minus 2 3 minus 3">1-1 2-2 3-3</span> to its arcs to watch T appear.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Add an arc and read the axiom list</h3>
+            <p>Each preset is a frame, and the two tiles on the right of the model read off that frame alone: the properties it has, and the axioms it validates. The formula box tests one valuation at one world. Start with the last model and add <span class="math" data-say="1 minus 1 2 minus 2 3 minus 3">1-1 2-2 3-3</span> to its arcs to watch T appear.</p>
         <div class="field">
           <label for="krPreset">Model</label>
           <select id="krPreset"><option value="reflexive" selected>each world sees itself; w1 sees w2, w2 sees w3</option><option value="s4">reflexive, and w1 also sees w3</option><option value="s5">every world sees every world</option><option value="serial-only">w1 sees w2, w2 sees w3, w3 sees w1</option></select>
@@ -1449,12 +1492,15 @@ B       p → □◇p       symmetric: if w sees v, then v sees w
         </div>
         <p class="small-copy" style="margin:0;">Type [] for the box and &lt;&gt; for the diamond, or use the symbols, with ~ &amp; | -&gt; &lt;-&gt; as usual.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>That is also its limit. A frame that validates all five axioms is a frame, and whether it is the right model of logical necessity, of metaphysical necessity or of what a person can know is not computed. The next lessons use S5 for one argument and ask whether it was a fair choice.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading the axioms off a frame</h2></div><p>Five moves. The first four need only the arcs.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the arcs and nothing else</h3><p>Forget the valuation. A frame is judged by who sees whom.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Check each property by its definition</h3><p>Reflexive: every world has an arc to itself. Serial: every world has an arc out. Symmetric: every arc has its reverse. Transitive: every two-step path has a shortcut. Euclidean: every two arcs leaving the same world are joined by an arc from the first target to the second.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Pair each property with its axiom</h3><p>Serial with D, reflexive with T, symmetric with B, transitive with 4, euclidean with 5. A frame validates an axiom exactly when it has the matching property.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Name the logic if there is one</h3><p>Reflexive and transitive is S4. Reflexive, symmetric and transitive is S5.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Test one valuation if you want a case</h3><p>To see an axiom fail, type it as the formula, choose the valuation that breaks it, and read the value at the world the proof used.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading the axioms off a frame</h2>
+      <p class="lead-in">Five moves. The first four need only the arcs.</p>
+      <ol class="key-ideas method"><li><strong>Write the arcs and nothing else.</strong> Forget the valuation. A frame is judged by who sees whom.</li><li><strong>Check each property by its definition.</strong> Reflexive: every world has an arc to itself. Serial: every world has an arc out. Symmetric: every arc has its reverse. Transitive: every two-step path has a shortcut. Euclidean: every two arcs leaving the same world are joined by an arc from the first target to the second.</li><li><strong>Pair each property with its axiom.</strong> Serial with D, reflexive with T, symmetric with B, transitive with 4, euclidean with 5. A frame validates an axiom exactly when it has the matching property.</li><li><strong>Name the logic if there is one.</strong> Reflexive and transitive is S4. Reflexive, symmetric and transitive is S5.</li><li><strong>Test one valuation if you want a case.</strong> To see an axiom fail, type it as the formula, choose the valuation that breaks it, and read the value at the world the proof used.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1471,17 +1517,16 @@ add: w1 sees w3, the shortcut:        D, T, 4
 add: every reverse arc:               D, T, B, 4, 5</div><p>Each line was read off the tile, and each new axiom appeared when its property did. Nothing about necessity was consulted: the axioms followed from the arcs.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the axioms as truths about necessity that every frame obeys</strong><span>On the serial-only frame the lab lists D and nothing else: T fails at w1, 4 fails because w1 does not see w3, and so on. Which of the axioms hold is a fact about the arcs, and the arcs are what you chose. To claim that necessity obeys T is to claim that the right frame for it is reflexive, which can be argued for or against.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading B as “what is true is necessarily true”</strong><span>B is <span class="math" data-say="p implies necessarily possibly p">p → □◇p</span>, which says what is true is necessarily possible. On the frame where every world sees every world, B is valid, yet <span class="math" data-say="p implies necessarily p">p → □p</span> is false at a world where <span class="math" data-say="p">p</span> is true and another seen world lacks it. Symmetry brings the world back into view; it does not fix its truth values.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the frame that validates more axioms is the better model of necessity</strong><span>The s5 frame validates all five and the serial-only frame only one. That is a difference in the arcs and not a difference in correctness. Whether the necessity at issue, in a particular argument, has arcs that are symmetric and transitive is the question the next lessons ask.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read the axiom list off a set of arcs, and add one arc to make a chosen axiom appear.</strong><p>Given three or four worlds and their arcs, you should be able to state which of reflexive, serial, symmetric, transitive and euclidean the frame has, name the axioms it therefore validates, and say which single arc must be added for a named axiom to be valid. A match stated without the pair of arcs that produces it has not been checked.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The axiom tile checks every assignment of <span class="math" data-say="p">p</span> to the worlds, which is why a frame of six worlds is the limit of the lab. The formula tile shows one assignment, so a formula that is true at w1 is not thereby valid on the frame, and the tiles can differ.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the axioms as truths about necessity that every frame obeys</strong><span>On the serial-only frame the lab lists D and nothing else: T fails at w1, 4 fails because w1 does not see w3, and so on. Which of the axioms hold is a fact about the arcs, and the arcs are what you chose. To claim that necessity obeys T is to claim that the right frame for it is reflexive, which can be argued for or against.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading B as “what is true is necessarily true”</strong><span>B is <span class="math" data-say="p implies necessarily possibly p">p → □◇p</span>, which says what is true is necessarily possible. On the frame where every world sees every world, B is valid, yet <span class="math" data-say="p implies necessarily p">p → □p</span> is false at a world where <span class="math" data-say="p">p</span> is true and another seen world lacks it. Symmetry brings the world back into view; it does not fix its truth values.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming the frame that validates more axioms is the better model of necessity</strong><span>The s5 frame validates all five and the serial-only frame only one. That is a difference in the arcs and not a difference in correctness. Whether the necessity at issue, in a particular argument, has arcs that are symmetric and transitive is the question the next lessons ask.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can read the axiom list off a set of arcs, and add one arc to make a chosen axiom appear.</strong><p>Given three or four worlds and their arcs, you should be able to state which of reflexive, serial, symmetric, transitive and euclidean the frame has, name the axioms it therefore validates, and say which single arc must be added for a named axiom to be valid. A match stated without the pair of arcs that produces it has not been checked.</p></div></div><div class="note"><strong>Note:</strong> The axiom tile checks every assignment of <span class="math" data-say="p">p</span> to the worlds, which is why a frame of six worlds is the limit of the lab. The formula tile shows one assignment, so a formula that is true at w1 is not thereby valid on the frame, and the tiles can differ.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A frame is worlds and arcs</summary><p>A frame has no valuation. An axiom is <strong>valid on a frame</strong> when it is true at every world of the frame for every way of assigning <span class="math" data-say="p">p</span> to the worlds. The lab tests every assignment.</p></details><details class="recall"><summary>Each axiom asks for one property of the arcs</summary><p>T asks that every world see itself. D asks that every world see some world. B asks that seeing be symmetric, 4 that it be transitive, and 5 that it be euclidean. The lab lists the properties a frame has beside the axioms it validates.</p></details><details class="recall"><summary>The axioms are chosen by choosing the frame</summary><p>No axiom is a discovery about necessity in general. To say that necessity obeys T is to say that the arcs of the kind of necessity you mean are reflexive, which is a claim about that kind of necessity.</p></details></div>
+      <h3>Summary</h3>
       <p>Drop the valuation and keep only the worlds and arcs: that is a frame. An axiom is valid on a frame when it is true at every world under every valuation. The lab computes which of five axioms a frame validates and which of five properties it has, so the match between them is something you read off a tile and not something you are told.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A frame is worlds and arcs.</strong> A frame has no valuation. An axiom is <strong>valid on a frame</strong> when it is true at every world of the frame for every way of assigning <span class="math" data-say="p">p</span> to the worlds. The lab tests every assignment.</li><li><strong>Each axiom asks for one property of the arcs.</strong> T asks that every world see itself. D asks that every world see some world. B asks that seeing be symmetric, 4 that it be transitive, and 5 that it be euclidean. The lab lists the properties a frame has beside the axioms it validates.</li><li><strong>The axioms are chosen by choosing the frame.</strong> No axiom is a discovery about necessity in general. To say that necessity obeys T is to say that the arcs of the kind of necessity you mean are reflexive, which is a claim about that kind of necessity.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="T, necessarily p implies p, every world sees itself. D, necessarily p implies possibly p, every world sees a world. B, p implies necessarily possibly p, seeing goes both ways. 4, necessarily p implies necessarily necessarily p, seeing passes through. 5, possibly p implies necessarily possibly p, worlds seen share a view" tabindex="0" role="region" aria-label="Mathematical notation">T  □p → p     every world sees itself
 D  □p → ◇p    every world sees a world
 B  p → □◇p    seeing goes both ways
@@ -2208,11 +2253,40 @@ B  p → □◇p    seeing goes both ways
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2280,7 +2354,7 @@ B  p → □◇p    seeing goes both ways
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

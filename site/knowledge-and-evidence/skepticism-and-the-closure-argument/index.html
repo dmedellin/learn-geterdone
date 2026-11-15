@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,28 +1424,24 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Knowledge and Evidence</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Justification</p>
       <h1>Skepticism and the Closure Argument</h1>
       <p class="lesson-lede">The brain-in-a-vat argument as modus tollens, Moore’s reply as modus ponens, and what validity cannot choose.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Closure</li><li>Modus tollens and modus ponens run one conditional both ways</li><li>Denying closure is a third option</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two valid arguments with opposite conclusions</h2>
-      <article class="prose reading"><p>Let <span class="math" data-say="h">h</span> stand for “I know I have hands” and <span class="math" data-say="b">b</span> for “I know I am not a brain in a vat being fed experiences”. The skeptic argues in three lines.</p><div class="mathblock" data-say="h goes to b, if I know I have hands, I know I am not envatted. not b, I do not know I am not envatted. therefore not h, so I do not know I have hands" tabindex="0" role="region" aria-label="Mathematical notation">h → b      if I know I have hands, I know I am not envatted
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two valid arguments with opposite conclusions</h2><div class="prose reading"><p>Let <span class="math" data-say="h">h</span> stand for “I know I have hands” and <span class="math" data-say="b">b</span> for “I know I am not a brain in a vat being fed experiences”. The skeptic argues in three lines.</p><div class="mathblock" data-say="h goes to b, if I know I have hands, I know I am not envatted. not b, I do not know I am not envatted. therefore not h, so I do not know I have hands" tabindex="0" role="region" aria-label="Mathematical notation">h → b      if I know I have hands, I know I am not envatted
 ¬b         I do not know I am not envatted
-∴ ¬h       so I do not know I have hands</div><p>The first premise is the closure principle applied to a case. The second is the skeptic’s claim that nothing in your experience could rule the vat out, since the vat is built to make your experience exactly what it is. The lab reads this argument as valid, with the form modus tollens, and that verdict is the whole of what the lab contributes.</p><p>Moore answered by reading the argument backwards. He was more certain that he had hands than he could be of any philosophical premise, so he took the same conditional and went the other way.</p><div class="mathblock" data-say="h, I know I have hands. h goes to b, if I know that, I know I am not envatted. therefore b, so I know I am not envatted" tabindex="0" role="region" aria-label="Mathematical notation">h          I know I have hands
-h → b      if I know that, I know I am not envatted
-∴ b        so I know I am not envatted</div><p>This is modus ponens, also valid. Put the two side by side and what stands out is that they share a conditional and a disagreement. The skeptic is more sure of <span class="math" data-say="not b">¬b</span> than of <span class="math" data-say="h">h</span>, and Moore is more sure of <span class="math" data-say="h">h</span> than of <span class="math" data-say="not b">¬b</span>. The three sentences <span class="math" data-say="h goes to b">h → b</span>, <span class="math" data-say="not b">¬b</span> and <span class="math" data-say="h">h</span> cannot all be true together, which is the sort of fact the consistency lab reports, and it means one has to go.</p><h3>The third option</h3><p>Dretske and others keep both <span class="math" data-say="not b">¬b</span> and <span class="math" data-say="h">h</span> and give up the conditional: you can know there is a zebra in the pen without knowing it is not a cleverly painted mule. The preset for this has only <span class="math" data-say="not b">¬b</span> as a premise and <span class="math" data-say="not h">¬h</span> as the conclusion, and the lab finds it invalid, with the counterexample row <span class="math" data-say="h equals T">h = T</span>, <span class="math" data-say="b equals F">b = F</span>. That row is the denier’s position written as an assignment: knows hands, does not know about the vat.</p><p>What each choice costs deserves to be said plainly. The skeptic accepts that nobody knows much of anything about the external world. Moore accepts that a philosopher can claim to know the vat is not there without any evidence that settles it. The denier accepts that “I know I have hands but I do not know I am not a handless brain in a vat” is true, which sounds absurd when said aloud. The lab can tell you none of this is inconsistent with the logic and nothing more.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Validity by cases</h2></div><p>Every row, every counterexample, and the form</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+∴ ¬h       so I do not know I have hands</div><p>The first premise is the closure principle applied to a case. The second is the skeptic’s claim that nothing in your experience could rule the vat out, since the vat is built to make your experience exactly what it is. The lab reads this argument as valid, with the form modus tollens, and that verdict is the whole of what the lab contributes.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Validity by cases</h2></div><p>Every row, every counterexample, and the form</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Every row, and the rows that refute</strong><span>a counterexample row makes every premise true and the conclusion false</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>T</span><span class="tone-red"><i class="legend-swatch"></i>F</span><span class="tone-amber"><i class="legend-swatch"></i>counterexample row</span></div>
@@ -1408,10 +1449,10 @@ h → b      if I know that, I know I am not envatted
       <div class="lab-stage"><div class="table-wrap" id="vaTable" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="vaStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Check each argument for a counterexample row</h3>
-          <p>The lab builds every row of the truth table for <span class="math" data-say="h">h</span> and <span class="math" data-say="b">b</span>. A counterexample row makes every premise true and the conclusion false. Type the arrow as a hyphen followed by a greater-than sign, and not as a tilde.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Check each argument for a counterexample row</h3>
+            <p>The lab builds every row of the truth table for <span class="math" data-say="h">h</span> and <span class="math" data-say="b">b</span>. A counterexample row makes every premise true and the conclusion false. Type the arrow as a hyphen followed by a greater-than sign, and not as a tilde.</p>
         <div class="field">
           <label for="vaPreset">Argument</label>
           <select id="vaPreset"><option value="closure" selected>the skeptic’s argument</option><option value="moore">Moore’s reply</option><option value="deny-closure">closure denied</option></select>
@@ -1436,12 +1477,17 @@ h → b      if I know that, I know I am not envatted
         </div>
         <p class="small-copy" style="margin:0;">Sentence letters are words such as p or q; type ~ for not, &amp; for and, | for or, -&gt; for if-then and &lt;-&gt; for if and only if, or use the symbols.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Moore answered by reading the argument backwards. He was more certain that he had hands than he could be of any philosophical premise, so he took the same conditional and went the other way.</p><div class="mathblock" data-say="h, I know I have hands. h goes to b, if I know that, I know I am not envatted. therefore b, so I know I am not envatted" tabindex="0" role="region" aria-label="Mathematical notation">h          I know I have hands
+h → b      if I know that, I know I am not envatted
+∴ b        so I know I am not envatted</div><p>This is modus ponens, also valid. Put the two side by side and what stands out is that they share a conditional and a disagreement. The skeptic is more sure of <span class="math" data-say="not b">¬b</span> than of <span class="math" data-say="h">h</span>, and Moore is more sure of <span class="math" data-say="h">h</span> than of <span class="math" data-say="not b">¬b</span>. The three sentences <span class="math" data-say="h goes to b">h → b</span>, <span class="math" data-say="not b">¬b</span> and <span class="math" data-say="h">h</span> cannot all be true together, which is the sort of fact the consistency lab reports, and it means one has to go.</p><h3>The third option</h3><p>Dretske and others keep both <span class="math" data-say="not b">¬b</span> and <span class="math" data-say="h">h</span> and give up the conditional: you can know there is a zebra in the pen without knowing it is not a cleverly painted mule. The preset for this has only <span class="math" data-say="not b">¬b</span> as a premise and <span class="math" data-say="not h">¬h</span> as the conclusion, and the lab finds it invalid, with the counterexample row <span class="math" data-say="h equals T">h = T</span>, <span class="math" data-say="b equals F">b = F</span>. That row is the denier’s position written as an assignment: knows hands, does not know about the vat.</p><p>What each choice costs deserves to be said plainly. The skeptic accepts that nobody knows much of anything about the external world. Moore accepts that a philosopher can claim to know the vat is not there without any evidence that settles it. The denier accepts that “I know I have hands but I do not know I am not a handless brain in a vat” is true, which sounds absurd when said aloud. The lab can tell you none of this is inconsistent with the logic and nothing more.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Formalising a skeptical argument</h2></div><p>How to turn a paragraph of epistemology into something the lab can check.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Pick one letter for each knowledge claim</h3><p>Let the letter stand for the whole claim, including “I know”. The lab does not see inside it, and the argument is about how the claims relate.</p></article><article class="card concept-card"><div class="icon">2</div><h3>State the closure premise as a conditional</h3><p>Write it as <span class="math" data-say="h goes to b">h → b</span>. This is the step on which the skeptic and Moore agree, and the step that the denier rejects.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the argument in each direction</h3><p>One has the negated consequent as a premise, the other has the antecedent. Run both and note the form the lab names.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the counterexample rows</h3><p>A valid argument has none. An invalid one has at least one, and the row tells you which combination of truth values the argument fails to exclude.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what is left to decide</h3><p>Name the premise that each side holds more firmly than the other. That judgement is not a truth-table fact, and the lesson is not finished until you have said it in words.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Formalising a skeptical argument</h2>
+      <p class="lead-in">How to turn a paragraph of epistemology into something the lab can check.</p>
+      <ol class="key-ideas method"><li><strong>Pick one letter for each knowledge claim.</strong> Let the letter stand for the whole claim, including “I know”. The lab does not see inside it, and the argument is about how the claims relate.</li><li><strong>State the closure premise as a conditional.</strong> Write it as <span class="math" data-say="h goes to b">h → b</span>. This is the step on which the skeptic and Moore agree, and the step that the denier rejects.</li><li><strong>Write the argument in each direction.</strong> One has the negated consequent as a premise, the other has the antecedent. Run both and note the form the lab names.</li><li><strong>Read the counterexample rows.</strong> A valid argument has none. An invalid one has at least one, and the row tells you which combination of truth values the argument fails to exclude.</li><li><strong>Say what is left to decide.</strong> Name the premise that each side holds more firmly than the other. That judgement is not a truth-table fact, and the lesson is not finished until you have said it in words.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1458,17 +1504,16 @@ h, h → b   ∴ b     valid, modus ponens
 {h → b, ¬b, h}     cannot all be true</div><p>The first two arguments are both valid and their conclusions cannot both be accepted along with all their premises. The disagreement is therefore a disagreement about whether <span class="math" data-say="not b">¬b</span> or <span class="math" data-say="h">h</span> is the one to keep, and about nothing in the logic.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a valid argument compels you to accept its conclusion</strong><span>Validity says only that if the premises are true the conclusion is. Here the skeptic’s argument and Moore’s are both valid, yet <span class="math" data-say="h goes to b">h → b</span>, <span class="math" data-say="not b">¬b</span> and <span class="math" data-say="h">h</span> cannot all be true, so no one can accept every premise of both. A person who is more sure that they have hands than that <span class="math" data-say="not b">¬b</span> is true should reject <span class="math" data-say="not b">¬b</span>, and that is not a mistake of logic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Hearing Moore’s reply as a refutation</strong><span>Moore’s argument is valid, but the skeptic can accuse it of begging the question: whoever doubts <span class="math" data-say="b">b</span> will doubt <span class="math" data-say="h">h</span> for the same reason. Whether that charge is fair depends on how premises earn their credibility, which the lab does not model. Moore’s reply tells you what rejecting the skeptic costs; it does not make the cost zero.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating closure as obviously true</strong><span>The conditional <span class="math" data-say="h goes to b">h → b</span> looks like plain common sense, and that is why both sides use it. It is also the premise whose denial gives the third position, and the invalid argument in the lab is the shape of that position. Closure is a principle about knowledge, not a theorem of logic.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what the lab has not decided.</strong><p>You should be able to formalise the skeptic’s argument and Moore’s reply over one conditional, name their forms, find the counterexample row that closure denial exposes, and state in a sentence which premise each position holds more firmly. The validity verdict is the easy half.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The same structure reappears whenever an argument has a premise that its opponent finds less credible than the denial of the conclusion. Learning to see the shared conditional is worth more than any one version of the vat.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a valid argument compels you to accept its conclusion</strong><span>Validity says only that if the premises are true the conclusion is. Here the skeptic’s argument and Moore’s are both valid, yet <span class="math" data-say="h goes to b">h → b</span>, <span class="math" data-say="not b">¬b</span> and <span class="math" data-say="h">h</span> cannot all be true, so no one can accept every premise of both. A person who is more sure that they have hands than that <span class="math" data-say="not b">¬b</span> is true should reject <span class="math" data-say="not b">¬b</span>, and that is not a mistake of logic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Hearing Moore’s reply as a refutation</strong><span>Moore’s argument is valid, but the skeptic can accuse it of begging the question: whoever doubts <span class="math" data-say="b">b</span> will doubt <span class="math" data-say="h">h</span> for the same reason. Whether that charge is fair depends on how premises earn their credibility, which the lab does not model. Moore’s reply tells you what rejecting the skeptic costs; it does not make the cost zero.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating closure as obviously true</strong><span>The conditional <span class="math" data-say="h goes to b">h → b</span> looks like plain common sense, and that is why both sides use it. It is also the premise whose denial gives the third position, and the invalid argument in the lab is the shape of that position. Closure is a principle about knowledge, not a theorem of logic.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what the lab has not decided.</strong><p>You should be able to formalise the skeptic’s argument and Moore’s reply over one conditional, name their forms, find the counterexample row that closure denial exposes, and state in a sentence which premise each position holds more firmly. The validity verdict is the easy half.</p></div></div><div class="note"><strong>Note:</strong> The same structure reappears whenever an argument has a premise that its opponent finds less credible than the denial of the conclusion. Learning to see the shared conditional is worth more than any one version of the vat.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Closure</summary><p>If you know something and you know that it brings another claim with it, you know the other claim. Here: if you know you have hands, you know you are not a handless brain in a vat.</p></details><details class="recall"><summary>Modus tollens and modus ponens run one conditional both ways</summary><p>From <span class="math" data-say="h goes to b">h → b</span> and <span class="math" data-say="not b">¬b</span> you may conclude <span class="math" data-say="not h">¬h</span>. From <span class="math" data-say="h goes to b">h → b</span> and <span class="math" data-say="h">h</span> you may conclude <span class="math" data-say="b">b</span>. Both are valid forms, so the quarrel is over the premises that are not shared.</p></details><details class="recall"><summary>Denying closure is a third option</summary><p>Drop the conditional and neither argument goes through. The cost is that you must say a person can know one thing without knowing something it plainly implies.</p></details></div>
+      <h3>Summary</h3>
       <p>The skeptic and Moore share one premise, that knowing you have hands brings with it knowing you are not a brain in a vat, and disagree about which of two other claims is more certain. The lab shows that both arguments are valid. Choosing between them takes a judgement that no truth table supplies.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Closure.</strong> If you know something and you know that it brings another claim with it, you know the other claim. Here: if you know you have hands, you know you are not a handless brain in a vat.</li><li><strong>Modus tollens and modus ponens run one conditional both ways.</strong> From <span class="math" data-say="h goes to b">h → b</span> and <span class="math" data-say="not b">¬b</span> you may conclude <span class="math" data-say="not h">¬h</span>. From <span class="math" data-say="h goes to b">h → b</span> and <span class="math" data-say="h">h</span> you may conclude <span class="math" data-say="b">b</span>. Both are valid forms, so the quarrel is over the premises that are not shared.</li><li><strong>Denying closure is a third option.</strong> Drop the conditional and neither argument goes through. The cost is that you must say a person can know one thing without knowing something it plainly implies.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="skeptic, h implies b, not b, so not h. Moore, h, h to b, so b. both arguments are valid. the shared premise is closure" tabindex="0" role="region" aria-label="Mathematical notation">skeptic: h → b, ¬b, so ¬h
 Moore: h, h → b, so b
 both arguments are valid
@@ -2163,11 +2208,40 @@ the shared premise is closure</div><figcaption>One conditional, two directions</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2235,7 +2309,7 @@ the shared premise is closure</div><figcaption>One conditional, two directions</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

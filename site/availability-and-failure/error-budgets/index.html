@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Availability and Failure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Budgets and retries</p>
       <h1>Error Budgets</h1>
       <p class="lesson-lede">Compute a period&#x27;s error budget in failed requests and the share one incident burns.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The budget is a count of failures</li><li>An incident spends duration times severity</li><li>The same budget as time is a different number</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Budgets, burn, and the difference between uptime and success</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Service level objective and error budget</span><p>A <strong>service level objective</strong> fixes a target value for an indicator over a period &mdash; here, the fraction of requests that succeed. The <strong>error budget</strong> is the failure the objective permits: <span class="math" data-say="the quantity 1 minus SLO, times N">(1 − SLO) × N</span>, where <span class="math" data-say="N">N</span> is the number of requests in the period. It is a count, it is fixed when the period begins, and it is spent by incidents until it is gone.</p></div><div class="mathblock" data-say="SLO equals 999 over 1000, rate equals 1000 rps, month equals 2628000 seconds. N, equals 1000 times 2628000, equals 2628000000 requests. budget equals the quantity 1 over 1000, times N, equals, 2628000 failures. the same budget expressed as a complete outage. the quantity 1 minus SLO, times period equals the quantity 1 over 1000, times 2628000 seconds equals 2628 seconds equals 43 minutes 48 seconds" tabindex="0" role="region" aria-label="Mathematical notation">SLO = 999/1000,  rate = 1000 rps,  month = 2 628 000 s
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Budgets, burn, and the difference between uptime and success</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Service level objective and error budget</span><p>A <strong>service level objective</strong> fixes a target value for an indicator over a period &mdash; here, the fraction of requests that succeed. The <strong>error budget</strong> is the failure the objective permits: <span class="math" data-say="the quantity 1 minus SLO, times N">(1 − SLO) × N</span>, where <span class="math" data-say="N">N</span> is the number of requests in the period. It is a count, it is fixed when the period begins, and it is spent by incidents until it is gone.</p></div><div class="mathblock" data-say="SLO equals 999 over 1000, rate equals 1000 rps, month equals 2628000 seconds. N, equals 1000 times 2628000, equals 2628000000 requests. budget equals the quantity 1 over 1000, times N, equals, 2628000 failures. the same budget expressed as a complete outage. the quantity 1 minus SLO, times period equals the quantity 1 over 1000, times 2628000 seconds equals 2628 seconds equals 43 minutes 48 seconds" tabindex="0" role="region" aria-label="Mathematical notation">SLO = 999/1000,  rate = 1000 rps,  month = 2 628 000 s
 
 N      = 1000 × 2 628 000      = 2 628 000 000 requests
 budget = (1/1000) × N          =     2 628 000 failures
@@ -1403,12 +1447,11 @@ severity   failed requests   share of budget   minutes that spend it all
  10%           180 000            6.85%              438.0
  25%           450 000           17.12%              175.2
  50%           900 000           34.25%               87.6
-100%         1 800 000           68.49%               43.8</div><p>The last column is the budget in minutes at each severity, and the bottom row is the familiar <span class="math" data-say="43.8">43.8</span> &mdash; which is the point. The &ldquo;43.8 minutes a month&rdquo; figure is the special case of a full outage, and quoting it as though it were the budget itself understates by a factor of ten what a long partial degradation is allowed to cost.</p><h3>Where the arithmetic stops</h3><p>Everything above is computation. What to do when the budget is spent &mdash; freeze releases, divert the team to reliability work, revise the objective, accept the overrun &mdash; is a policy decision that the arithmetic informs and does not make. The value of separating them is that the argument about policy then happens over an agreed number rather than over whose impression of last month is right.</p><div class="example"><span class="label">Example &middot; One incident, and what is left</span><p>A thirty-minute total outage at <span class="math" data-say="1000">1000</span> rps against a three-nines monthly objective burns <span class="math" data-say="1800000">1 800 000</span> of <span class="math" data-say="2628000">2 628 000</span> failures: <span class="math" data-say="68.49 percent">68.49%</span> of the month, gone, on day three. <span class="math" data-say="828000">828 000</span> failures remain, which is another <span class="math" data-say="13.8">13.8</span> minutes of full outage or <span class="math" data-say="138">138</span> minutes at ten per cent severity. That is a concrete statement about what the rest of the month can afford, and it is available within minutes of the incident ending.</p></div><div class="example"><span class="label">Example &middot; The objective that was already impossible</span><p>Set the lab's objective to four nines and leave the incident at thirty minutes: the budget is <span class="math" data-say="262800">262 800</span> failures and the single incident burns <span class="math" data-say="684.93 percent">684.93%</span> of it. A month's budget at four nines is <span class="math" data-say="4 minutes 22.8 seconds">4 min 22.8 s</span> of full outage, so one half-hour incident overruns the whole month&rsquo;s budget nearly seven times over. An objective that a single ordinary incident cannot fit inside is not a target, and the arithmetic says so before anyone has to argue about it.</p></div><p>One measurement caution. The budget is defined against the requests in the period, so a traffic-weighted objective forgives failures during quiet hours and punishes them at peak, which may or may not match what users experience. If ten customers each send a thousand requests and one sends a million, a request-weighted objective is mostly about that one customer. The arithmetic here is exact; what it is exact about is a choice that has to be made deliberately.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Error budgets</h2></div><p>What an incident actually spends, in failed requests</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+100%         1 800 000           68.49%               43.8</div><p>The last column is the budget in minutes at each severity, and the bottom row is the familiar <span class="math" data-say="43.8">43.8</span> &mdash; which is the point. The &ldquo;43.8 minutes a month&rdquo; figure is the special case of a full outage, and quoting it as though it were the budget itself understates by a factor of ten what a long partial degradation is allowed to cost.</p><h3>Where the arithmetic stops</h3><p>Everything above is computation. What to do when the budget is spent &mdash; freeze releases, divert the team to reliability work, revise the objective, accept the overrun &mdash; is a policy decision that the arithmetic informs and does not make. The value of separating them is that the argument about policy then happens over an agreed number rather than over whose impression of last month is right.</p><div class="example"><span class="label">Example &middot; One incident, and what is left</span><p>A thirty-minute total outage at <span class="math" data-say="1000">1000</span> rps against a three-nines monthly objective burns <span class="math" data-say="1800000">1 800 000</span> of <span class="math" data-say="2628000">2 628 000</span> failures: <span class="math" data-say="68.49 percent">68.49%</span> of the month, gone, on day three. <span class="math" data-say="828000">828 000</span> failures remain, which is another <span class="math" data-say="13.8">13.8</span> minutes of full outage or <span class="math" data-say="138">138</span> minutes at ten per cent severity. That is a concrete statement about what the rest of the month can afford, and it is available within minutes of the incident ending.</p></div><div class="example"><span class="label">Example &middot; The objective that was already impossible</span><p>Set the lab's objective to four nines and leave the incident at thirty minutes: the budget is <span class="math" data-say="262800">262 800</span> failures and the single incident burns <span class="math" data-say="684.93 percent">684.93%</span> of it. A month's budget at four nines is <span class="math" data-say="4 minutes 22.8 seconds">4 min 22.8 s</span> of full outage, so one half-hour incident overruns the whole month&rsquo;s budget nearly seven times over. An objective that a single ordinary incident cannot fit inside is not a target, and the arithmetic says so before anyone has to argue about it.</p></div><p>One measurement caution. The budget is defined against the requests in the period, so a traffic-weighted objective forgives failures during quiet hours and punishes them at peak, which may or may not match what users experience. If ten customers each send a thousand requests and one sends a million, a request-weighted objective is mostly about that one customer. The arithmetic here is exact; what it is exact about is a choice that has to be made deliberately.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Error budgets</h2></div><p>What an incident actually spends, in failed requests</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The error budget</strong><span>(1 &minus; SLO) &times; requests, spent in failed requests and not in minutes</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>budget left</span><span class="tone-red"><i class="legend-swatch"></i>burned</span><span class="tone-amber"><i class="legend-swatch"></i>over budget</span></div>
@@ -1416,10 +1459,10 @@ severity   failed requests   share of budget   minutes that spend it all
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="ebBar" viewBox="0 0 520 150" role="img" aria-label="The month's error budget as a bar, drained by each incident."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ebTable"></table></div>
       <div class="status-banner" id="ebStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the SLO and the incident</h3>
-          <p>Three nines at a thousand requests a second, with one thirty-minute total outage. The budget prints in failed requests and in the minutes of complete outage it buys; the severity column shows the same incident costing ten different amounts. Move the severity slider before you move anything else.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the SLO and the incident</h3>
+            <p>Three nines at a thousand requests a second, with one thirty-minute total outage. The budget prints in failed requests and in the minutes of complete outage it buys; the severity column shows the same incident costing ten different amounts. Move the severity slider before you move anything else.</p>
         <div class="field">
           <label for="ebSlo">The SLO (successful requests)</label>
           <select id="ebSlo"><option value="9/10">90% &mdash; one nine</option><option value="99/100">99% &mdash; two nines</option><option value="995/1000">99.5%</option><option value="999/1000" selected>99.9% &mdash; three nines</option><option value="9995/10000">99.95%</option><option value="9999/10000">99.99% &mdash; four nines</option><option value="99999/100000">99.999% &mdash; five nines</option><option value="999999/1000000">99.9999% &mdash; six nines</option></select>
@@ -1449,12 +1492,14 @@ severity   failed requests   share of budget   minutes that spend it all
           <div class="kpi"><span>Full outage the budget pays for</span><strong id="ebFull">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="ebHint" style="margin:0;">An SLO is a ratio of requests, so an incident costs duration &times; failed fraction. Measuring it on uptime instead makes a half-broken hour look identical to a dead one, and they differ by a factor of two in what they actually spend.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing and spending a budget</h2></div><p>The first step is the one that gets skipped, and skipping it is what turns an objective into an argument.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Say what the indicator counts, and over what period</h3><p>Successful requests out of total requests, over a calendar month, measured at a named place. Each of those choices changes the number: measured at the load balancer or in the client, counting all endpoints or the ones users care about, a rolling window or a calendar one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Multiply to get the budget as a count</h3><p><span class="math" data-say="budget equals the quantity 1 minus SLO, times N">budget = (1 − SLO) × N</span>, where <span class="math" data-say="N">N</span> is the requests in the period. At <span class="math" data-say="1000">1000</span> rps over a month that is <span class="math" data-say="the quantity 1 over 1000, times 2628000000 equals 2628000">(1/1000) × 2 628 000 000 = 2 628 000</span> failures. Keep it as a count; converting to minutes too early is what loses the severity.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Price each incident as duration times severity</h3><p><span class="math" data-say="burn equals rate times duration times failed fraction">burn = rate × duration × failed fraction</span>. Use the rate that actually applied during the incident rather than the monthly average, and use the measured failed fraction rather than the fact that an alert fired.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Report the share spent and what remains</h3><p>A percentage of the budget consumed, and the remainder expressed both as failures and as the minutes of outage it would buy. Then, separately, the policy question &mdash; the arithmetic has nothing to say about that and should not pretend to.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing and spending a budget</h2>
+      <p class="lead-in">The first step is the one that gets skipped, and skipping it is what turns an objective into an argument.</p>
+      <ol class="key-ideas method"><li><strong>Say what the indicator counts, and over what period.</strong> Successful requests out of total requests, over a calendar month, measured at a named place. Each of those choices changes the number: measured at the load balancer or in the client, counting all endpoints or the ones users care about, a rolling window or a calendar one.</li><li><strong>Multiply to get the budget as a count.</strong> <span class="math" data-say="budget equals the quantity 1 minus SLO, times N">budget = (1 − SLO) × N</span>, where <span class="math" data-say="N">N</span> is the requests in the period. At <span class="math" data-say="1000">1000</span> rps over a month that is <span class="math" data-say="the quantity 1 over 1000, times 2628000000 equals 2628000">(1/1000) × 2 628 000 000 = 2 628 000</span> failures. Keep it as a count; converting to minutes too early is what loses the severity.</li><li><strong>Price each incident as duration times severity.</strong> <span class="math" data-say="burn equals rate times duration times failed fraction">burn = rate × duration × failed fraction</span>. Use the rate that actually applied during the incident rather than the monthly average, and use the measured failed fraction rather than the fact that an alert fired.</li><li><strong>Report the share spent and what remains.</strong> A percentage of the budget consumed, and the remainder expressed both as failures and as the minutes of outage it would buy. Then, separately, the policy question &mdash; the arithmetic has nothing to say about that and should not pretend to.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1485,17 +1530,16 @@ downtime = 8 min against a 43 min 48 s allowance = 18.26%
 verdict: comfortably inside the objective</div><p>The two verdicts disagree completely, and the second one is wrong. Incident B failed one request in seven for six hours and never took the service down, so every binary uptime check passed throughout; it spent more than the entire month's budget on its own. The request-weighted measure sees it because severity is one of its factors and is not one of uptime's.</p><p>Notice also that <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> appears here as an illustration and is not what was measured. The measurement is <span class="math" data-say="7440000">7 440 000</span> failed requests against <span class="math" data-say="5256000">5 256 000</span> allowed. The minutes are useful for explaining the size of the budget to someone and are the wrong instrument for spending it.</p><p>For a faded rehearsal, keep the same objective and rate and suppose the team wants to know how long a <span class="math" data-say="5 percent">5%</span>-severity degradation may run before it exhausts the month. The supplied first move is that severity enters the burn as a multiplier, so the answer is the budget divided by <span class="math" data-say="rate times severity">rate × severity</span>. Compute the minutes, check them against the lab's severity table, and then state what that duration implies about how quickly a partial degradation has to be detected.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Measuring the objective on uptime when it is a success ratio</strong><span>Uptime has no severity factor, so a long partial degradation registers as a perfect month. Six hours at <span class="math" data-say="15 percent">15%</span> failure can spend more than the whole budget while every availability check stays green. If the objective is about requests, the measurement has to count requests.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the budget only as minutes</strong><span>&ldquo;43.8 minutes a month&rdquo; is the budget on the assumption that every request fails throughout, which is the least likely incident shape there is. Used as the measurement it understates a partial outage by the reciprocal of its severity &mdash; a factor of ten at <span class="math" data-say="10 percent">10%</span>. Quote the count; keep the minutes as an illustration of its size.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the arithmetic with the policy</strong><span>&ldquo;We have spent 68% of the budget&rdquo; is a computation and is not in dispute. &ldquo;Therefore we freeze releases&rdquo; is a decision that reasonable people can disagree about. Presenting the second as though it followed from the first makes the arithmetic contentious, which is the one thing it should never be.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would price an incident by its severity before asking how long it lasted.</strong><p>You should be able to compute a budget as a count of failures, convert it to an equivalent full outage and say why that conversion is an illustration rather than a measurement, price an incident as <span class="math" data-say="rate times duration times severity">rate × duration × severity</span>, and report the share spent without attaching a policy to it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every lesson so far has treated the load on a system as given from outside. It is not: a failing service produces load of its own, because a client that does not get an answer asks again. &ldquo;Retries and Request Amplification&rdquo; puts a number on that extra load, and the number has an unpleasant property &mdash; it is largest exactly when the service is least able to carry it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Measuring the objective on uptime when it is a success ratio</strong><span>Uptime has no severity factor, so a long partial degradation registers as a perfect month. Six hours at <span class="math" data-say="15 percent">15%</span> failure can spend more than the whole budget while every availability check stays green. If the objective is about requests, the measurement has to count requests.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the budget only as minutes</strong><span>&ldquo;43.8 minutes a month&rdquo; is the budget on the assumption that every request fails throughout, which is the least likely incident shape there is. Used as the measurement it understates a partial outage by the reciprocal of its severity &mdash; a factor of ten at <span class="math" data-say="10 percent">10%</span>. Quote the count; keep the minutes as an illustration of its size.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Confusing the arithmetic with the policy</strong><span>&ldquo;We have spent 68% of the budget&rdquo; is a computation and is not in dispute. &ldquo;Therefore we freeze releases&rdquo; is a decision that reasonable people can disagree about. Presenting the second as though it followed from the first makes the arithmetic contentious, which is the one thing it should never be.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would price an incident by its severity before asking how long it lasted.</strong><p>You should be able to compute a budget as a count of failures, convert it to an equivalent full outage and say why that conversion is an illustration rather than a measurement, price an incident as <span class="math" data-say="rate times duration times severity">rate × duration × severity</span>, and report the share spent without attaching a policy to it.</p></div></div><div class="note"><strong>Note:</strong> Every lesson so far has treated the load on a system as given from outside. It is not: a failing service produces load of its own, because a client that does not get an answer asks again. &ldquo;Retries and Request Amplification&rdquo; puts a number on that extra load, and the number has an unpleasant property &mdash; it is largest exactly when the service is least able to carry it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The budget is a count of failures</summary><p>An objective of <span class="math" data-say="99.9 percent">99.9%</span> successful requests does not forbid failure; it permits one request in a thousand to fail. Over a month at <span class="math" data-say="1000">1000</span> requests a second that is <span class="math" data-say="2628000000">2 628 000 000</span> requests and a budget of <span class="math" data-say="2628000">2 628 000</span> failures. The budget is a quantity that can be spent, measured, and reported as a fraction consumed, which is what makes it useful.</p></details><details class="recall"><summary>An incident spends duration times severity</summary><p><span class="math" data-say="burn equals rate times duration times failed fraction">burn = rate × duration × failed fraction</span>. A thirty-minute total outage at <span class="math" data-say="1000">1000</span> rps burns <span class="math" data-say="1800000">1 800 000</span> failed requests, which is <span class="math" data-say="68.49 percent">68.49%</span> of the month's budget. The same thirty minutes with only a tenth of requests failing burns <span class="math" data-say="180000">180 000</span>, or <span class="math" data-say="6.85 percent">6.85%</span>. Two incidents of identical length can differ tenfold in what they cost.</p></details><details class="recall"><summary>The same budget as time is a different number</summary><p><span class="math" data-say="the quantity 1 minus SLO, times period">(1 − SLO) × period</span> converts the budget into the length of a complete outage that would spend all of it: <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> a month at three nines. That figure is useful for intuition and dangerous as a measurement, because it is only the right cost when every single request is failing. Measure on requests; quote the minutes as an illustration.</p></details></div>
+      <h3>Summary</h3>
       <p>An objective of <span class="math" data-say="99.9 percent">99.9%</span> successful requests over a month permits <span class="math" data-say="the quantity 1 minus SLO, times requests">(1 − SLO) × requests</span> failures, and at a thousand requests a second that is <span class="math" data-say="2628000">2 628 000</span> of them &mdash; the same budget as <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> of complete outage. An incident spends <span class="math" data-say="duration times failed fraction">duration × failed fraction</span> of it, so a half-broken hour costs half of what a dead hour costs. That last sentence is the whole difference between an objective measured on requests and one measured on the clock.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The budget is a count of failures.</strong> An objective of <span class="math" data-say="99.9 percent">99.9%</span> successful requests does not forbid failure; it permits one request in a thousand to fail. Over a month at <span class="math" data-say="1000">1000</span> requests a second that is <span class="math" data-say="2628000000">2 628 000 000</span> requests and a budget of <span class="math" data-say="2628000">2 628 000</span> failures. The budget is a quantity that can be spent, measured, and reported as a fraction consumed, which is what makes it useful.</li><li><strong>An incident spends duration times severity.</strong> <span class="math" data-say="burn equals rate times duration times failed fraction">burn = rate × duration × failed fraction</span>. A thirty-minute total outage at <span class="math" data-say="1000">1000</span> rps burns <span class="math" data-say="1800000">1 800 000</span> failed requests, which is <span class="math" data-say="68.49 percent">68.49%</span> of the month's budget. The same thirty minutes with only a tenth of requests failing burns <span class="math" data-say="180000">180 000</span>, or <span class="math" data-say="6.85 percent">6.85%</span>. Two incidents of identical length can differ tenfold in what they cost.</li><li><strong>The same budget as time is a different number.</strong> <span class="math" data-say="the quantity 1 minus SLO, times period">(1 − SLO) × period</span> converts the budget into the length of a complete outage that would spend all of it: <span class="math" data-say="43 minutes 48 seconds">43 min 48 s</span> a month at three nines. That figure is useful for intuition and dangerous as a measurement, because it is only the right cost when every single request is failing. Measure on requests; quote the minutes as an illustration.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="budget equals the quantity 1 minus SLO, times requests in the period, a count of failures. burn, equals rate times duration times failed fraction, what one incident spends. 99.9 percent at 1000 rps over a month, 2628000 failures allowed. the same budget as time equals the quantity 1 minus SLO, times period equals 43 minutes 48 seconds" tabindex="0" role="region" aria-label="Mathematical notation">budget = (1 − SLO) × requests in the period          a count of failures
 burn   = rate × duration × failed fraction           what one incident spends
 99.9% at 1000 rps over a month: 2 628 000 failures allowed
@@ -2670,11 +2714,40 @@ the same budget as time = (1 − SLO) × period = 43 min 48 s</div><figcaption>A
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2742,7 +2815,7 @@ the same budget as time = (1 − SLO) × period = 43 min 48 s</div><figcaption>A
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,29 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Accumulation and the Integral</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The exact total</p>
       <h1>The Antiderivative and the Fundamental Theorem</h1>
       <p class="lesson-lede">An antiderivative of a rate gives the total change as its value at the right end minus its value at the left, with no pieces to add.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>An antiderivative undoes the derivative</li><li>Differentiating the answer is the check</li><li>The two end values of F give the total change</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From a sum of pieces to two end values</h2>
-      <article class="prose reading"><p>The earlier lessons added a rate piece by piece and compared every sum with an exact total printed beside it. That total came from a different method, and this lesson is the method. It runs the derivative backwards: given the rate <span class="math" data-say="f">f</span>, find a function <span class="math" data-say="F">F</span> whose rate of change <em>is</em> <span class="math" data-say="f">f</span>. If you can, the total change the rate <span class="math" data-say="f">f</span> produces over an interval is read from the two ends of <span class="math" data-say="F">F</span>.</p><div class="defbox"><span class="label">Definition &middot; Antiderivative</span><p>A function <span class="math" data-say="F">F</span> is an <strong>antiderivative</strong> of <span class="math" data-say="f">f</span> when <span class="math" data-say="F prime equals f">F′ = f</span>. For a polynomial it is found term by term: a term <span class="math" data-say="c times t to the power n">c·tⁿ</span> becomes <span class="math" data-say="c times t to the power n plus 1 over the quantity n plus 1">c·tⁿ⁺¹/(n + 1)</span>, and a constant term <span class="math" data-say="c">c</span> becomes <span class="math" data-say="c times t">c·t</span>.</p><p>The power rule of “The Derivative as a Function” is the same rule read from right to left.</p></div><p>Take the rate <span class="math" data-say="t squared">t²</span>. Raise the power to get <span class="math" data-say="t cubed">t³</span>, divide by the new power to get <span class="math" data-say="t cubed over 3">t³/3</span>, and check: <span class="math" data-say="the derivative of t cubed over 3 equals 3 t squared over 3, which is t squared">(t³/3)′ = 3t²/3 = t²</span>. Then <span class="math" data-say="F of 1 minus F of 0 equals 1 over 3 minus 0 equals 1 over 3">F(1) − F(0) = 1/3 − 0 = 1/3</span>. The sums of “Refining the Partition” were <span class="math" data-say="7 over 32, 35 over 128, 155 over 512">7/32, 35/128, 155/512</span>, each a little nearer a third, and none of them equal to it.</p><div class="mathblock" data-say="t squared on 0, 1, L sub n, R sub n. n equals 4, 7 over 32, 15 over 32. n equals 8, 35 over 128, 51 over 128. n equals 16, 155 over 512, 187 over 512. n equals 32, 651 over 2048, 715 over 2048. F of 1 minus F of 0 equals 1 over 3, between every pair" tabindex="0" role="region" aria-label="Mathematical notation">t² on [0, 1]        Lₙ          Rₙ
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From a sum of pieces to two end values</h2><div class="prose reading"><p>The earlier lessons added a rate piece by piece and compared every sum with an exact total printed beside it. That total came from a different method, and this lesson is the method. It runs the derivative backwards: given the rate <span class="math" data-say="f">f</span>, find a function <span class="math" data-say="F">F</span> whose rate of change <em>is</em> <span class="math" data-say="f">f</span>. If you can, the total change the rate <span class="math" data-say="f">f</span> produces over an interval is read from the two ends of <span class="math" data-say="F">F</span>.</p><div class="defbox"><span class="label">Definition &middot; Antiderivative</span><p>A function <span class="math" data-say="F">F</span> is an <strong>antiderivative</strong> of <span class="math" data-say="f">f</span> when <span class="math" data-say="F prime equals f">F′ = f</span>. For a polynomial it is found term by term: a term <span class="math" data-say="c times t to the power n">c·tⁿ</span> becomes <span class="math" data-say="c times t to the power n plus 1 over the quantity n plus 1">c·tⁿ⁺¹/(n + 1)</span>, and a constant term <span class="math" data-say="c">c</span> becomes <span class="math" data-say="c times t">c·t</span>.</p><p>The power rule of “The Derivative as a Function” is the same rule read from right to left.</p></div><p>Take the rate <span class="math" data-say="t squared">t²</span>. Raise the power to get <span class="math" data-say="t cubed">t³</span>, divide by the new power to get <span class="math" data-say="t cubed over 3">t³/3</span>, and check: <span class="math" data-say="the derivative of t cubed over 3 equals 3 t squared over 3, which is t squared">(t³/3)′ = 3t²/3 = t²</span>. Then <span class="math" data-say="F of 1 minus F of 0 equals 1 over 3 minus 0 equals 1 over 3">F(1) − F(0) = 1/3 − 0 = 1/3</span>. The sums of “Refining the Partition” were <span class="math" data-say="7 over 32, 35 over 128, 155 over 512">7/32, 35/128, 155/512</span>, each a little nearer a third, and none of them equal to it.</p><div class="mathblock" data-say="t squared on 0, 1, L sub n, R sub n. n equals 4, 7 over 32, 15 over 32. n equals 8, 35 over 128, 51 over 128. n equals 16, 155 over 512, 187 over 512. n equals 32, 651 over 2048, 715 over 2048. F of 1 minus F of 0 equals 1 over 3, between every pair" tabindex="0" role="region" aria-label="Mathematical notation">t² on [0, 1]        Lₙ          Rₙ
 
 n = 4              7/32       15/32
 n = 8             35/128      51/128
 n = 16           155/512     187/512
 n = 32          651/2048    715/2048
 
-F(1) − F(0) = 1/3, between every pair</div><h3>Why the claim is plausible</h3><p>Cut the interval into pieces. The change of <span class="math" data-say="F">F</span> across one piece is <span class="math" data-say="F of the quantity t plus h, minus F of t">F(t + h) − F(t)</span>, and those changes add up to <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> exactly, because every interior value is added once and subtracted once. For the ramp <span class="math" data-say="2 t">2t</span>, with <span class="math" data-say="F equals t squared">F = t²</span> and four pieces of width <span class="math" data-say="1 over 2">1/2</span>, the piece changes are <span class="math" data-say="1 over 4, 3 over 4, 5 over 4, 7 over 4">1/4, 3/4, 5/4, 7/4</span>, and they add to <span class="math" data-say="4">4</span>.</p><p>The left sum charges each piece at the rate at its left end, <span class="math" data-say="0, 1, 2, 3">0, 1, 2, 3</span>, so the pieces contribute <span class="math" data-say="0, 1 over 2, 1, 3 over 2">0, 1/2, 1, 3/2</span>, adding to the <span class="math" data-say="3">3</span> of “Total Change from a Rate”. Each of those contributions is a flat guess at the matching change of <span class="math" data-say="F">F</span>, and it is a good guess because <span class="math" data-say="F prime equals f">F′ = f</span>: over a short piece, <span class="math" data-say="F">F</span> changes by about its rate times the width. Shorter pieces make each guess better. That is the whole argument, and it is an argument, not a proof.</p><div class="thm"><span class="label">Theorem &middot; The fundamental theorem, as the lab demonstrates it</span><p>If <span class="math" data-say="F prime equals f">F′ = f</span> on the interval from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span>, the left and right sums of <span class="math" data-say="f">f</span> approach <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> as the number of pieces grows, and <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> is the total change, over the interval, of the quantity whose rate is <span class="math" data-say="f">f</span>.</p></div><p>The identity that the piece changes of <span class="math" data-say="F">F</span> telescope to <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> is algebra and holds exactly. The claim that the sums approach that number is what the tables of the earlier lessons show for particular rates and particular piece counts. Neither the tables nor the lab prove it for every rate; a first analysis course does, and this Subject states it and uses it.</p><p>A constant added to <span class="math" data-say="F">F</span> changes nothing here. If <span class="math" data-say="G equals F plus 5">G = F + 5</span> then <span class="math" data-say="G of b minus G of A equals F of b plus 5 minus the quantity F of A plus 5, equals F of b minus F of A">G(b) − G(a) = (F(b) + 5) − (F(a) + 5) = F(b) − F(a)</span>, so the total does not depend on which antiderivative was chosen. Where a constant does matter is the subject of the next lesson.</p><div class="example"><span class="label">Example &middot; A rate with three terms</span><p>The rate <span class="math" data-say="3 t squared minus 4 t plus 1">3t² − 4t + 1</span> on the interval from <span class="math" data-say="1">1</span> to <span class="math" data-say="3">3</span>. Term by term, <span class="math" data-say="F equals t cubed minus 2 t squared plus t">F = t³ − 2t² + t</span>, and the check <span class="math" data-say="F prime equals 3 t squared minus 4 t plus 1">F′ = 3t² − 4t + 1</span> passes. Then <span class="math" data-say="F of 3 equals 27 minus 18 plus 3 equals 12">F(3) = 27 − 18 + 3 = 12</span> and <span class="math" data-say="F of 1 equals 1 minus 2 plus 1 equals 0">F(1) = 1 − 2 + 1 = 0</span>.</p><p>The total change is <span class="math" data-say="12 minus 0 equals 12">12 − 0 = 12</span>. The lab prints <span class="math" data-say="12">12</span> on the mixed preset, and the same value would appear however many pieces you chose, because no pieces were used.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Antiderivatives</h2></div><p>F, its constant, and F(b) − F(a)</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+F(1) − F(0) = 1/3, between every pair</div><h3>Why the claim is plausible</h3><p>Cut the interval into pieces. The change of <span class="math" data-say="F">F</span> across one piece is <span class="math" data-say="F of the quantity t plus h, minus F of t">F(t + h) − F(t)</span>, and those changes add up to <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> exactly, because every interior value is added once and subtracted once. For the ramp <span class="math" data-say="2 t">2t</span>, with <span class="math" data-say="F equals t squared">F = t²</span> and four pieces of width <span class="math" data-say="1 over 2">1/2</span>, the piece changes are <span class="math" data-say="1 over 4, 3 over 4, 5 over 4, 7 over 4">1/4, 3/4, 5/4, 7/4</span>, and they add to <span class="math" data-say="4">4</span>.</p><p>The left sum charges each piece at the rate at its left end, <span class="math" data-say="0, 1, 2, 3">0, 1, 2, 3</span>, so the pieces contribute <span class="math" data-say="0, 1 over 2, 1, 3 over 2">0, 1/2, 1, 3/2</span>, adding to the <span class="math" data-say="3">3</span> of “Total Change from a Rate”. Each of those contributions is a flat guess at the matching change of <span class="math" data-say="F">F</span>, and it is a good guess because <span class="math" data-say="F prime equals f">F′ = f</span>: over a short piece, <span class="math" data-say="F">F</span> changes by about its rate times the width. Shorter pieces make each guess better. That is the whole argument, and it is an argument, not a proof.</p><div class="thm"><span class="label">Theorem &middot; The fundamental theorem, as the lab demonstrates it</span><p>If <span class="math" data-say="F prime equals f">F′ = f</span> on the interval from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span>, the left and right sums of <span class="math" data-say="f">f</span> approach <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> as the number of pieces grows, and <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> is the total change, over the interval, of the quantity whose rate is <span class="math" data-say="f">f</span>.</p></div><p>The identity that the piece changes of <span class="math" data-say="F">F</span> telescope to <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> is algebra and holds exactly. The claim that the sums approach that number is what the tables of the earlier lessons show for particular rates and particular piece counts. Neither the tables nor the lab prove it for every rate; a first analysis course does, and this Subject states it and uses it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Antiderivatives</h2></div><p>F, its constant, and F(b) − F(a)</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Antiderivatives</strong><span>the reverse power rule, and the constant one value fixes</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the rate f</span><span class="tone-green"><i class="legend-swatch"></i>the member through the value</span><span class="tone-muted"><i class="legend-swatch"></i>the family F + C</span></div>
@@ -1411,10 +1454,10 @@ F(1) − F(0) = 1/3, between every pair</div><h3>Why the claim is plausible</h3>
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="adPlot" viewBox="0 0 660 420" role="img" aria-label="the antiderivative family"></svg></div>
       <div class="status-banner" id="adStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Type a polynomial rate and read its antiderivative</h3>
-          <p>The first tile is the antiderivative the reverse power rule gives, with the constant left open. With the limits filled in, the definite tile is F(b) − F(a) as an exact fraction. Change the rate, predict F on paper, then compare.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Type a polynomial rate and read its antiderivative</h3>
+            <p>The first tile is the antiderivative the reverse power rule gives, with the constant left open. With the limits filled in, the definite tile is F(b) − F(a) as an exact fraction. Change the rate, predict F on paper, then compare.</p>
         <div class="field">
           <label for="adPreset">Rate</label>
           <select id="adPreset"><option value="square" selected>Square: t² from 0 to 1</option><option value="ramp">Ramp: 2t from 0 to 2</option><option value="mixed">Mixed: 3t² − 4t + 1 from 1 to 3</option></select>
@@ -1456,12 +1499,15 @@ F(1) − F(0) = 1/3, between every pair</div><h3>Why the claim is plausible</h3>
         </div>
         <p class="small-copy" style="margin:0;">Polynomials in t: 3t^2 - 4t + 1. Two numbers are typed with a space between them.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>A constant added to <span class="math" data-say="F">F</span> changes nothing here. If <span class="math" data-say="G equals F plus 5">G = F + 5</span> then <span class="math" data-say="G of b minus G of A equals F of b plus 5 minus the quantity F of A plus 5, equals F of b minus F of A">G(b) − G(a) = (F(b) + 5) − (F(a) + 5) = F(b) − F(a)</span>, so the total does not depend on which antiderivative was chosen. Where a constant does matter is the subject of the next lesson.</p><div class="example"><span class="label">Example &middot; A rate with three terms</span><p>The rate <span class="math" data-say="3 t squared minus 4 t plus 1">3t² − 4t + 1</span> on the interval from <span class="math" data-say="1">1</span> to <span class="math" data-say="3">3</span>. Term by term, <span class="math" data-say="F equals t cubed minus 2 t squared plus t">F = t³ − 2t² + t</span>, and the check <span class="math" data-say="F prime equals 3 t squared minus 4 t plus 1">F′ = 3t² − 4t + 1</span> passes. Then <span class="math" data-say="F of 3 equals 27 minus 18 plus 3 equals 12">F(3) = 27 − 18 + 3 = 12</span> and <span class="math" data-say="F of 1 equals 1 minus 2 plus 1 equals 0">F(1) = 1 − 2 + 1 = 0</span>.</p><p>The total change is <span class="math" data-say="12 minus 0 equals 12">12 − 0 = 12</span>. The lab prints <span class="math" data-say="12">12</span> on the mixed preset, and the same value would appear however many pieces you chose, because no pieces were used.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Totalling a rate by an antiderivative</h2></div><p>Five moves, and the third is the one that catches a wrong answer before it is used.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the rate as a sum of terms <span data-say="c times t to the power n">c·tⁿ</span></h3><p>Expand first if you must. A constant is the term with <span class="math" data-say="n equals 0">n = 0</span>. Each term is handled alone and the results are added.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Raise each power by one and divide by the new power</h3><p><span class="math" data-say="c times t to the power n">c·tⁿ</span> becomes <span class="math" data-say="c times t to the power n plus 1 over the quantity n plus 1">c·tⁿ⁺¹/(n + 1)</span>. The division is the step that is easy to drop, because for <span class="math" data-say="2 t">2t</span> it is invisible: <span class="math" data-say="2 t squared over 2 equals t squared">2t²/2 = t²</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Differentiate F and compare with f</h3><p>Apply the power rule to your <span class="math" data-say="F">F</span>. If the result is not exactly <span class="math" data-say="f">f</span>, term by term, there is an error in the second move; do not go on.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Evaluate at the two ends and subtract</h3><p>Compute <span class="math" data-say="F of b">F(b)</span> and <span class="math" data-say="F of A">F(a)</span> as fractions, then <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span>. Keep the order: the right end first.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what the number is</h3><p>It is the total change over the interval of the quantity whose rate is <span class="math" data-say="f">f</span>. It is exact, and it is the number the sums of the earlier lessons approach, by a claim this course demonstrates and does not prove.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Totalling a rate by an antiderivative</h2>
+      <p class="lead-in">Five moves, and the third is the one that catches a wrong answer before it is used.</p>
+      <ol class="key-ideas method"><li><strong>Write the rate as a sum of terms <span data-say="c times t to the power n">c·tⁿ</span>.</strong> Expand first if you must. A constant is the term with <span class="math" data-say="n equals 0">n = 0</span>. Each term is handled alone and the results are added.</li><li><strong>Raise each power by one and divide by the new power.</strong> <span class="math" data-say="c times t to the power n">c·tⁿ</span> becomes <span class="math" data-say="c times t to the power n plus 1 over the quantity n plus 1">c·tⁿ⁺¹/(n + 1)</span>. The division is the step that is easy to drop, because for <span class="math" data-say="2 t">2t</span> it is invisible: <span class="math" data-say="2 t squared over 2 equals t squared">2t²/2 = t²</span>.</li><li><strong>Differentiate F and compare with f.</strong> Apply the power rule to your <span class="math" data-say="F">F</span>. If the result is not exactly <span class="math" data-say="f">f</span>, term by term, there is an error in the second move; do not go on.</li><li><strong>Evaluate at the two ends and subtract.</strong> Compute <span class="math" data-say="F of b">F(b)</span> and <span class="math" data-say="F of A">F(a)</span> as fractions, then <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span>. Keep the order: the right end first.</li><li><strong>Say what the number is.</strong> It is the total change over the interval of the quantity whose rate is <span class="math" data-say="f">f</span>. It is exact, and it is the number the sums of the earlier lessons approach, by a claim this course demonstrates and does not prove.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1481,17 +1527,16 @@ left sums, n = 4, 8, 16:  7/32, 35/128, 155/512
 their gaps from 1/3:  11/96, 23/384, 47/1536</div><p>One subtraction gives the number the sums were closing in on, and the gaps shrink the way “Refining the Partition” found, by a factor near two each time the pieces doubled. The antiderivative has no such gap: it is the total, not an estimate of it.</p><p>For a rehearsal, take the mixed preset. The supplied first move is that the three terms become <span class="math" data-say="t cubed">t³</span>, <span class="math" data-say="negative 2 t squared">−2t²</span> and <span class="math" data-say="t">t</span>. Differentiate your result to see <span class="math" data-say="3 t squared minus 4 t plus 1">3t² − 4t + 1</span> come back, then evaluate at <span class="math" data-say="3">3</span> and at <span class="math" data-say="1">1</span> and subtract.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Raising the power and forgetting to divide</strong><span>The antiderivative of <span class="math" data-say="t squared">t²</span> is written <span class="math" data-say="t cubed">t³</span>, because the rule seemed to say only “add one to the power”. Differentiating gives <span class="math" data-say="3 t squared">3t²</span>, three times the rate. The division by the new power is half of the rule. It hides on <span class="math" data-say="2 t">2t</span>, where <span class="math" data-say="2 t squared over 2 equals t squared">2t²/2 = t²</span> looks like no division at all, which is how the habit survives until the first rate that exposes it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking F(b) − F(a) depends on which constant was chosen</strong><span><span class="math" data-say="t cubed over 3">t³/3</span>, <span class="math" data-say="t cubed over 3 plus 4">t³/3 + 4</span> and <span class="math" data-say="t cubed over 3 minus 100">t³/3 − 100</span> all have derivative <span class="math" data-say="t squared">t²</span>, and all give <span class="math" data-say="1 over 3">1/3</span> between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, because the constant is added at both ends and subtracted once. The total belongs to the rate, not to the antiderivative picked to compute it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the demonstration for a proof</strong><span>The sums <span class="math" data-say="7 over 32, 35 over 128, 155 over 512">7/32, 35/128, 155/512</span> approach <span class="math" data-say="1 over 3">1/3</span> for the square, and that is all the table says. That an antiderivative gives the total for every rate is the claim; the telescoping of <span class="math" data-say="F">F</span> is exact algebra, and the step from there to the sums is the part this course shows and leaves unproved.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find an antiderivative, check it, and use it to total a rate exactly.</strong><p>You should be able to reverse the power rule on every term of a polynomial, confirm the result by differentiating it, evaluate <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> as an exact fraction, and say why the answer does not depend on a constant added to <span class="math" data-say="F">F</span> and why it is a claim and not a proof that the sums approach it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The antiderivative came with a constant left open, and the total ignored it. &ldquo;The Constant of Integration&rdquo; asks when the constant matters and what fixes it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Raising the power and forgetting to divide</strong><span>The antiderivative of <span class="math" data-say="t squared">t²</span> is written <span class="math" data-say="t cubed">t³</span>, because the rule seemed to say only “add one to the power”. Differentiating gives <span class="math" data-say="3 t squared">3t²</span>, three times the rate. The division by the new power is half of the rule. It hides on <span class="math" data-say="2 t">2t</span>, where <span class="math" data-say="2 t squared over 2 equals t squared">2t²/2 = t²</span> looks like no division at all, which is how the habit survives until the first rate that exposes it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking F(b) − F(a) depends on which constant was chosen</strong><span><span class="math" data-say="t cubed over 3">t³/3</span>, <span class="math" data-say="t cubed over 3 plus 4">t³/3 + 4</span> and <span class="math" data-say="t cubed over 3 minus 100">t³/3 − 100</span> all have derivative <span class="math" data-say="t squared">t²</span>, and all give <span class="math" data-say="1 over 3">1/3</span> between <span class="math" data-say="0">0</span> and <span class="math" data-say="1">1</span>, because the constant is added at both ends and subtracted once. The total belongs to the rate, not to the antiderivative picked to compute it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the demonstration for a proof</strong><span>The sums <span class="math" data-say="7 over 32, 35 over 128, 155 over 512">7/32, 35/128, 155/512</span> approach <span class="math" data-say="1 over 3">1/3</span> for the square, and that is all the table says. That an antiderivative gives the total for every rate is the claim; the telescoping of <span class="math" data-say="F">F</span> is exact algebra, and the step from there to the sums is the part this course shows and leaves unproved.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can find an antiderivative, check it, and use it to total a rate exactly.</strong><p>You should be able to reverse the power rule on every term of a polynomial, confirm the result by differentiating it, evaluate <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span> as an exact fraction, and say why the answer does not depend on a constant added to <span class="math" data-say="F">F</span> and why it is a claim and not a proof that the sums approach it.</p></div></div><div class="note"><strong>Note:</strong> The antiderivative came with a constant left open, and the total ignored it. &ldquo;The Constant of Integration&rdquo; asks when the constant matters and what fixes it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>An antiderivative undoes the derivative</summary><p>A function <span class="math" data-say="F">F</span> is an antiderivative of the rate <span class="math" data-say="f">f</span> when <span class="math" data-say="F prime equals f">F′ = f</span>. The power rule sends <span class="math" data-say="t to the power n">tⁿ</span> to <span class="math" data-say="n times t to the power n minus 1">n·tⁿ⁻¹</span>; reversing it sends <span class="math" data-say="t to the power n">tⁿ</span> to <span class="math" data-say="t to the power n plus 1 over the quantity n plus 1">tⁿ⁺¹/(n + 1)</span>, one power higher and divided by the new power. For <span class="math" data-say="f equals t squared">f = t²</span> that is <span class="math" data-say="F equals t cubed over 3">F = t³/3</span>.</p></details><details class="recall"><summary>Differentiating the answer is the check</summary><p>Whatever <span class="math" data-say="F">F</span> you write down, differentiate it. <span class="math" data-say="the derivative of t cubed over 3 equals 3 t squared over 3, which is t squared">(t³/3)′ = 3t²/3 = t²</span> passes. <span class="math" data-say="t cubed prime equals 3 t squared">(t³)′ = 3t²</span> does not, and it fails by exactly the factor the division was meant to remove. The check needs no lab and no sum.</p></details><details class="recall"><summary>The two end values of F give the total change</summary><p>If <span class="math" data-say="F prime equals f">F′ = f</span>, the total change from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> of a quantity whose rate is <span class="math" data-say="f">f</span> is <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span>. For <span class="math" data-say="t squared">t²</span> on the interval from <span class="math" data-say="0">0</span> to <span class="math" data-say="1">1</span> it is <span class="math" data-say="1 over 3 minus 0 equals 1 over 3">1/3 − 0 = 1/3</span>, the number the left sums <span class="math" data-say="7 over 32, 35 over 128, 155 over 512">7/32, 35/128, 155/512</span> were closing in on.</p></details></div>
+      <h3>Summary</h3>
       <p>Reversing the power rule turns a polynomial rate into a function whose derivative is that rate. The total change over an interval of a quantity with that rate is then the value of that function at the right end minus its value at the left end, an exact fraction found without a single sum. The lesson states this as the claim the refining sums of the earlier lessons were supporting, shows why it is plausible, and says what the lab demonstrates and what it does not prove.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>An antiderivative undoes the derivative.</strong> A function <span class="math" data-say="F">F</span> is an antiderivative of the rate <span class="math" data-say="f">f</span> when <span class="math" data-say="F prime equals f">F′ = f</span>. The power rule sends <span class="math" data-say="t to the power n">tⁿ</span> to <span class="math" data-say="n times t to the power n minus 1">n·tⁿ⁻¹</span>; reversing it sends <span class="math" data-say="t to the power n">tⁿ</span> to <span class="math" data-say="t to the power n plus 1 over the quantity n plus 1">tⁿ⁺¹/(n + 1)</span>, one power higher and divided by the new power. For <span class="math" data-say="f equals t squared">f = t²</span> that is <span class="math" data-say="F equals t cubed over 3">F = t³/3</span>.</li><li><strong>Differentiating the answer is the check.</strong> Whatever <span class="math" data-say="F">F</span> you write down, differentiate it. <span class="math" data-say="the derivative of t cubed over 3 equals 3 t squared over 3, which is t squared">(t³/3)′ = 3t²/3 = t²</span> passes. <span class="math" data-say="t cubed prime equals 3 t squared">(t³)′ = 3t²</span> does not, and it fails by exactly the factor the division was meant to remove. The check needs no lab and no sum.</li><li><strong>The two end values of F give the total change.</strong> If <span class="math" data-say="F prime equals f">F′ = f</span>, the total change from <span class="math" data-say="A">a</span> to <span class="math" data-say="b">b</span> of a quantity whose rate is <span class="math" data-say="f">f</span> is <span class="math" data-say="F of b minus F of A">F(b) − F(a)</span>. For <span class="math" data-say="t squared">t²</span> on the interval from <span class="math" data-say="0">0</span> to <span class="math" data-say="1">1</span> it is <span class="math" data-say="1 over 3 minus 0 equals 1 over 3">1/3 − 0 = 1/3</span>, the number the left sums <span class="math" data-say="7 over 32, 35 over 128, 155 over 512">7/32, 35/128, 155/512</span> were closing in on.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="F is an antiderivative of f when F prime equals f. t to the power n becomes t to the power n plus 1 over the quantity n plus 1, always divide. check, differentiate F and get f back. total change equals F of b minus F of A. the sums close in on it, stated, not proved" tabindex="0" role="region" aria-label="Mathematical notation">F is an antiderivative of f when F′ = f
 tⁿ becomes tⁿ⁺¹/(n + 1): always divide
 check: differentiate F and get f back
@@ -3130,11 +3175,40 @@ the sums close in on it: stated, not proved</div><figcaption>Reversing the power
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3202,7 +3276,7 @@ the sums close in on it: stated, not proved</div><figcaption>Reversing the power
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

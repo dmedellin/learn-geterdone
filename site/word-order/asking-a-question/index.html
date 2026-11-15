@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,37 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Word Order</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Questions</p>
       <h1>Asking a Question</h1>
       <p class="lesson-lede">The rule for questions is real, it covers a little over half of the questions in a novel, and the rest are printed here.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The rule is real</li><li>A little over half of real questions open that way</li><li>A counted figure and a quoted one are different things</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What the rule did not catch</h2>
-      <article class="prose reading"><p>This is the lesson where the rule covers only a little over half of what is printed, and that is part of what it teaches.</p><h3>The rule</h3><p>Every learner is taught how to ask a question. A helping verb goes before the subject. If there is no helping verb, add <em>do</em>. If there is a question word, it goes first. <em>Can you go? Did you go? Where did you go?</em> It is a short rule. It matters most to a speaker of a language that asks with a small word at the end of the sentence, such as Mandarin or Japanese, or by the voice alone, and to a speaker of Spanish or Russian, where the subject and verb may swap with no help word at all.</p><h3>The score</h3><p>The lab holds 90 questions from <em>Pride and Prejudice</em>, each one starting where its sentence starts and ending at its question mark, and prints every one. The rule covers 52 of them, which is 57.8%. A run over the whole novel, quoted here because no page can carry it, gave 55.4%. For a rule that is taught first, that is a modest figure. It is worth asking why.</p><h3>What the misses looked like</h3><ul><li><strong>A joining word first, 16 of the 38 misses, 42.1%.</strong> <em>And what is your success? But why should you wish to persuade me?</em> A check for the helping verb at the front misses these. In most of them the question follows the rule after the joining word.</li><li><strong>A question word with no helping verb after it, 7.</strong> <em>What say you, Mary?</em> is a form older English used without <em>do</em>, and three of the seven are that. <em>What made you so shy of me?</em> has the question word as its subject, so nothing moves, and the rule itself says so. <em>What sort of girl is Miss King?</em> puts a longer question phrase first. The other two are a long phrase after <em>why</em> with the subject and verb in statement order, and <em>What, none of you?</em>, which has no verb.</li><li><strong>A pronoun first, 4.</strong> <em>I must ask whether you were surprised?</em> This is a statement with a question mark on it. Three of the four are a longer sentence that ends with the question.</li><li><strong>A small word of address first, 2.</strong> <em>Oh, why is not everybody as happy?</em> The <em>oh</em> stands in front, and the rule follows.</li><li><strong>Something else, 9.</strong> Two begin with a name, <em>Miss Bennet, do you know who I am?</em> One begins with a clause, <em>If she does not object to it, why should we?</em> Five are long sentences that end in a question. One is a statement with a question mark that starts with a noun: <em>Your father&rsquo;s estate is entailed on Mr. Collins, I think?</em></li></ul><p>The box called <em>no verb at all</em> reads 0 here, though two of the 38 have no verb: <em>But why all this secrecy?</em> and <em>What, none of you?</em> The lab sorts by the first word first, so each sits under its joining word or its question word. On the play, in the next lesson, that box fills.</p><p>The whole-novel run, quoted, found the joining word in 45% of its misses, and that is the only share it measured; the other kinds were named there without a number. On the 90 lines the share is 42.1%. The difference is what a sample of 90 looks like against a novel, and the lesson gives both so you can see that.</p><h3>Which figures are counted, and which are quoted</h3><p>Every box in the lab is counted in your browser from the 90 lines printed under it, and you can read any line and disagree with its verdict. The 55.4% and the 45% are quoted: they come from one run over the whole novel, and a page cannot hold a novel. Wherever this lesson gives a quoted figure it says so, because a number that looks counted and is not would claim more than we know.</p><h3>What the modern documents show</h3><p>The lab searches two modern public documents, printed in full under the table, for a question mark: the Supreme Court opinion <em>Stanley v. City of Sanford</em>, 606 U.S. 46 (2025), and the Census Bureau story &ldquo;U.S. Population Aging as Nation Turns 250&rdquo; of 9 April 2026. In 1,723 words they have none. Formal writing hardly holds a question at all.</p><p>That gap is the lesson in small. A learner who reads only reports and textbooks will almost never see the form they most need when they talk. The next lesson, How People Really Ask, scores the same rule on a play, which is the nearest thing to talk that can be printed.</p><h3>How to use this</h3><p>Use the rule. Expect to meet many questions that break it, and learn the kinds. Treat the 57.8% as a fact about this novel, not as a verdict on the rule.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Ninety real questions, and a rule that covers just over half</h2></div><p>The rule is stated, scored, and shown to fail -- which is the lesson</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What the rule did not catch</h2><div class="prose reading"><p>This is the lesson where the rule covers only a little over half of what is printed, and that is part of what it teaches.</p><h3>The rule</h3><p>Every learner is taught how to ask a question. A helping verb goes before the subject. If there is no helping verb, add <em>do</em>. If there is a question word, it goes first. <em>Can you go? Did you go? Where did you go?</em> It is a short rule. It matters most to a speaker of a language that asks with a small word at the end of the sentence, such as Mandarin or Japanese, or by the voice alone, and to a speaker of Spanish or Russian, where the subject and verb may swap with no help word at all.</p><h3>The score</h3><p>The lab holds 90 questions from <em>Pride and Prejudice</em>, each one starting where its sentence starts and ending at its question mark, and prints every one. The rule covers 52 of them, which is 57.8%. A run over the whole novel, quoted here because no page can carry it, gave 55.4%. For a rule that is taught first, that is a modest figure. It is worth asking why.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Ninety real questions, and a rule that covers just over half</h2></div><p>The rule is stated, scored, and shown to fail -- which is the lesson</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
 <div class="kpi-grid"><div class="kpi"><span>rule holds</span><strong id="quHit">&mdash;</strong></div><div class="kpi"><span>share</span><strong id="quPct">&mdash;</strong></div><div class="kpi"><span>starts with a joining word</span><strong id="quConn">&mdash;</strong></div><div class="kpi"><span>joining words, share of the misses</span><strong id="quConnPct">&mdash;</strong></div></div><div class="kpi-grid"><div class="kpi"><span>a wh-word, no helping verb after it</span><strong id="quWh">&mdash;</strong></div><div class="kpi"><span>a word of address first</span><strong id="quAddr">&mdash;</strong></div><div class="kpi"><span>a pronoun first: a statement</span><strong id="quStmt">&mdash;</strong></div><div class="kpi"><span>no verb at all</span><strong id="quFrag">&mdash;</strong></div><div class="kpi"><span>something else</span><strong id="quOther">&mdash;</strong></div></div><div class="kpi-grid"><div class="kpi"><span>questions in the modern documents</span><strong id="quModQ">&mdash;</strong></div><div class="kpi"><span>words in them</span><strong id="quModW">&mdash;</strong></div></div><p class="small-copy" id="quLimit"></p><div class="table-wrap" style="max-height:22rem;overflow-y:auto;" tabindex="0" role="region" aria-label="Data table"><table id="quTable"><thead><tr><th>question</th><th>verdict</th></tr></thead><tbody id="quBody"></tbody></table></div><details><summary>The two modern documents, printed in full</summary><div class="mathblock" id="quModern" style="font-size:0.8rem;" tabindex="0" role="region" aria-label="Mathematical notation"></div></details>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Score the rule on ninety real questions</h3>
-          <p>The table holds 90 questions from the novel, each starting where its sentence starts and ending at its question mark, and prints every one with its verdict. The rule holds when the first word is a helping verb, or a question word followed by one. The first two boxes are the hit rate. The next two count the misses that begin with a joining word such as <em>and</em> or <em>but</em>, and give that count as a share of all the misses. The next four boxes sort the rest by their first words: a question word with no helping verb after it, a small word of address first, a pronoun first, which makes a statement with a question mark on it, and no verb at all. The boxes are tried in that order, so a line is counted once, under the first that fits: <em>But why all this secrecy?</em> has no verb, and sits under the joining word. The box called <em>something else</em> holds what fits none of these; read those lines, because they are the part the count cannot name. The last two boxes search the two modern documents printed below the table for a question mark: the Supreme Court opinion <em>Stanley v. City of Sanford</em>, 606 U.S. 46 (2025), and the Census Bureau story &ldquo;U.S. Population Aging as Nation Turns 250&rdquo; (9 April 2026). The questions are 1810s English, and the way people ask questions has changed since.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Score the rule on ninety real questions</h3>
+            <p>The table holds 90 questions from the novel, each starting where its sentence starts and ending at its question mark, and prints every one with its verdict. The rule holds when the first word is a helping verb, or a question word followed by one. The first two boxes are the hit rate. The next two count the misses that begin with a joining word such as <em>and</em> or <em>but</em>, and give that count as a share of all the misses. The next four boxes sort the rest by their first words: a question word with no helping verb after it, a small word of address first, a pronoun first, which makes a statement with a question mark on it, and no verb at all. The boxes are tried in that order, so a line is counted once, under the first that fits: <em>But why all this secrecy?</em> has no verb, and sits under the joining word. The box called <em>something else</em> holds what fits none of these; read those lines, because they are the part the count cannot name. The last two boxes search the two modern documents printed below the table for a question mark: the Supreme Court opinion <em>Stanley v. City of Sanford</em>, 606 U.S. 46 (2025), and the Census Bureau story &ldquo;U.S. Population Aging as Nation Turns 250&rdquo; (9 April 2026). The questions are 1810s English, and the way people ask questions has changed since.</p>
 <label for="quPreset">Rule</label> <select id="quPreset"><option value="aux">a question starts with a helping verb, or a wh-word then one</option></select> <label for="quShow">Show</label> <select id="quShow"><option value="residue">only the ones it fails</option><option value="all">every question</option></select>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>What the misses looked like</h3><ul><li><strong>A joining word first, 16 of the 38 misses, 42.1%.</strong> <em>And what is your success? But why should you wish to persuade me?</em> A check for the helping verb at the front misses these. In most of them the question follows the rule after the joining word.</li><li><strong>A question word with no helping verb after it, 7.</strong> <em>What say you, Mary?</em> is a form older English used without <em>do</em>, and three of the seven are that. <em>What made you so shy of me?</em> has the question word as its subject, so nothing moves, and the rule itself says so. <em>What sort of girl is Miss King?</em> puts a longer question phrase first. The other two are a long phrase after <em>why</em> with the subject and verb in statement order, and <em>What, none of you?</em>, which has no verb.</li><li><strong>A pronoun first, 4.</strong> <em>I must ask whether you were surprised?</em> This is a statement with a question mark on it. Three of the four are a longer sentence that ends with the question.</li><li><strong>A small word of address first, 2.</strong> <em>Oh, why is not everybody as happy?</em> The <em>oh</em> stands in front, and the rule follows.</li><li><strong>Something else, 9.</strong> Two begin with a name, <em>Miss Bennet, do you know who I am?</em> One begins with a clause, <em>If she does not object to it, why should we?</em> Five are long sentences that end in a question. One is a statement with a question mark that starts with a noun: <em>Your father&rsquo;s estate is entailed on Mr. Collins, I think?</em></li></ul><p>The box called <em>no verb at all</em> reads 0 here, though two of the 38 have no verb: <em>But why all this secrecy?</em> and <em>What, none of you?</em> The lab sorts by the first word first, so each sits under its joining word or its question word. On the play, in the next lesson, that box fills.</p><p>The whole-novel run, quoted, found the joining word in 45% of its misses, and that is the only share it measured; the other kinds were named there without a number. On the 90 lines the share is 42.1%. The difference is what a sample of 90 looks like against a novel, and the lesson gives both so you can see that.</p><h3>Which figures are counted, and which are quoted</h3><p>Every box in the lab is counted in your browser from the 90 lines printed under it, and you can read any line and disagree with its verdict. The 55.4% and the 45% are quoted: they come from one run over the whole novel, and a page cannot hold a novel. Wherever this lesson gives a quoted figure it says so, because a number that looks counted and is not would claim more than we know.</p><h3>What the modern documents show</h3><p>The lab searches two modern public documents, printed in full under the table, for a question mark: the Supreme Court opinion <em>Stanley v. City of Sanford</em>, 606 U.S. 46 (2025), and the Census Bureau story &ldquo;U.S. Population Aging as Nation Turns 250&rdquo; of 9 April 2026. In 1,723 words they have none. Formal writing hardly holds a question at all.</p><p>That gap is the lesson in small. A learner who reads only reports and textbooks will almost never see the form they most need when they talk. The next lesson, How People Really Ask, scores the same rule on a play, which is the nearest thing to talk that can be printed.</p><h3>How to use this</h3><p>Use the rule. Expect to meet many questions that break it, and learn the kinds. Treat the 57.8% as a fact about this novel, not as a verdict on the rule.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Building a question</h2></div><p>To turn a statement into a question, do this.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Look for a helping verb</h3><p><em>Can, will, have, is, must</em> and their kind. If the sentence has one, move it in front of the subject: <em>she has gone</em> becomes <em>has she gone?</em></p></article><article class="card concept-card"><div class="icon">2</div><h3>If there is none, add do</h3><p><em>She went</em> becomes <em>did she go?</em> The main verb goes back to its bare form, as Helping Verbs calls it, and <em>do</em> takes the tense.</p></article><article class="card concept-card"><div class="icon">3</div><h3>If you need a question word, put it first</h3><p><em>Where, what, why, who, how.</em> Then the helping verb, then the subject: <em>why did she go?</em> When the question word is itself the subject, nothing moves: <em>who went?</em></p></article><article class="card concept-card"><div class="icon">4</div><h3>Leave the speech habits for later</h3><p>People in books and in life also ask questions by tone alone, or open with a name, or begin with <em>and</em> or <em>but</em>. Learn the rule first. Those forms are the misses, and the table below prints every one.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Building a question</h2>
+      <p class="lead-in">To turn a statement into a question, do this.</p>
+      <ol class="key-ideas method"><li><strong>Look for a helping verb.</strong> <em>Can, will, have, is, must</em> and their kind. If the sentence has one, move it in front of the subject: <em>she has gone</em> becomes <em>has she gone?</em></li><li><strong>If there is none, add do.</strong> <em>She went</em> becomes <em>did she go?</em> The main verb goes back to its bare form, as Helping Verbs calls it, and <em>do</em> takes the tense.</li><li><strong>If you need a question word, put it first.</strong> <em>Where, what, why, who, how.</em> Then the helping verb, then the subject: <em>why did she go?</em> When the question word is itself the subject, nothing moves: <em>who went?</em></li><li><strong>Leave the speech habits for later.</strong> People in books and in life also ask questions by tone alone, or open with a name, or begin with <em>and</em> or <em>but</em>. Learn the rule first. Those forms are the misses, and the table below prints every one.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1436,17 +1482,16 @@ the whole novel, quoted
 joining word first         45% of misses</div><p>The first kind is a question that begins with <em>and</em>, <em>but</em> or <em>or</em>. A check that looks for the helping verb at the front misses these, because a joining word stands first. In most of the sixteen the rest of the question follows the rule: <em>And do you really know all this?</em> In a few it does not: <em>But why all this secrecy?</em> has no verb at all.</p><p>The second kind is a question word with no helping verb after it. Three are a form older English used without <em>do</em>: <em>What say you, Mary?</em> One has the question word as its own subject, where nothing moves: <em>What made you so shy of me?</em> One is a longer question phrase, <em>what sort of girl is Miss King?</em>, where the helping verb comes after the phrase and the scan reads only the second word. One has a long phrase after <em>why</em> and then the subject and verb in statement order. One has no verb: <em>What, none of you?</em></p><p>The third kind starts with a pronoun, so it is a statement with a question mark on it. <em>I must ask whether you were surprised?</em> is one. Three of the four end a longer sentence with a question inside it. The fourth kind opens with a small word of address or feeling, <em>Oh</em> or <em>Well</em>, and then follows the rule.</p><p>The mixed bag has nine. Two start with a name, <em>Girls, can I do anything for you in Meryton?</em> and <em>Miss Bennet, do you know who I am?</em> One starts with a clause, <em>If she does not object to it, why should we?</em> Five are long sentences that end in a question. The last, <em>Your father&rsquo;s estate is entailed on Mr. Collins, I think?</em>, is a statement with a question mark that starts with a noun, not a pronoun, so the pronoun box could not catch it. The count had no name ready for any of these, and the table shows them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Asking by tone alone</strong><span><em>You know him?</em> is common in speech and fine between friends. If you use it for every question, you may sound as if you are always surprised. Learn <em>do you know him?</em> as the plain form.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding do with a helping verb</strong><span><em>Do you can go?</em> is a mistake. If the sentence has a helping verb, that verb moves. <em>Do</em> is added only when there is none: <em>can you go?</em> and <em>do you go?</em></span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing the number means the rule is wrong</strong><span>57.8% on 90 old questions is a fact about how people write questions, not about how English builds a question. Most of the misses that begin with <em>and</em> or <em>but</em> follow the rule after it. Do not drop the rule. Do not lean on the figure either.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a question in English, and say what the other four in ten of a novel&#x27;s questions look like.</strong><p>You should be able to put a helping verb before the subject, add do when there is no other helping verb, read the rule's score off the 90 questions printed with this lesson, name the kinds of question the rule did not catch, and say which figures on the page are counted and which are quoted.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The boxes are counted on the 90 lines in your browser. The 55.4% and the 45% are quoted from a single run over the whole novel and cannot be rebuilt here, and the lesson says so wherever they appear. The two sets of figures differ because 90 lines are a sample; the picture they give is the same.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Asking by tone alone</strong><span><em>You know him?</em> is common in speech and fine between friends. If you use it for every question, you may sound as if you are always surprised. Learn <em>do you know him?</em> as the plain form.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding do with a helping verb</strong><span><em>Do you can go?</em> is a mistake. If the sentence has a helping verb, that verb moves. <em>Do</em> is added only when there is none: <em>can you go?</em> and <em>do you go?</em></span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing the number means the rule is wrong</strong><span>57.8% on 90 old questions is a fact about how people write questions, not about how English builds a question. Most of the misses that begin with <em>and</em> or <em>but</em> follow the rule after it. Do not drop the rule. Do not lean on the figure either.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build a question in English, and say what the other four in ten of a novel&#x27;s questions look like.</strong><p>You should be able to put a helping verb before the subject, add do when there is no other helping verb, read the rule's score off the 90 questions printed with this lesson, name the kinds of question the rule did not catch, and say which figures on the page are counted and which are quoted.</p></div></div><div class="note"><strong>Note:</strong> The boxes are counted on the 90 lines in your browser. The 55.4% and the 45% are quoted from a single run over the whole novel and cannot be rebuilt here, and the lesson says so wherever they appear. The two sets of figures differ because 90 lines are a sample; the picture they give is the same.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The rule is real</summary><p>To ask a question with a helping verb, put that verb before the subject: <em>can she go?</em> If there is no helping verb, add <em>do</em> in the right form: <em>did she go?</em> It is the same <em>do</em> that arrives to carry <em>not</em> in Helping Verbs. With a question word, the question word comes first and the rest follows: <em>where did she go?</em> Many languages ask a question by tone, by a small word at the end, or by an ending on the verb. English moves a word, and that is why the rule is worth stating. The helping verbs are the ones that Helping Verbs lists, and the question word is also called a wh-word, after the letters most of them start with.</p></details><details class="recall"><summary>A little over half of real questions open that way</summary><p>On the 90 printed questions the rule covers 52, which is 57.8%; on the whole novel, quoted, 55.4%. Where the other lessons found a small set of named misses, this one finds a spread. Of the 38 misses here, 16 begin with a joining word such as <em>and</em> or <em>but</em>, 7 begin with a question word that has no helping verb after it, 4 begin with a pronoun and are statements with a question mark on them, 2 begin with a small word of address such as <em>oh</em>, and 9 the lab can only call something else. The largest kind is a result of how people write, not of how English builds questions.</p></details><details class="recall"><summary>A counted figure and a quoted one are different things</summary><p>The boxes are counted in your browser on the 90 lines you can read. The figures 55.4% and 45% come from a single run over the whole novel, which no page can carry, so they are quoted, and the page says so each time. The two sets are close, 57.8% against 55.4%, and 42.1% against 45%, and they differ a little because 90 lines are a sample. Each line on this page starts where its own sentence starts, or where quoted speech starts again after words such as <em>said she</em>, so its first word is the question's first word in all but one line: <em>But what, said she, can have been his motive?</em> is cut after <em>said she</em> and counted from <em>can</em>. The table lets you check any line.</p></details></div>
+      <h3>Summary</h3>
       <p>Every lesson in this course states a rule, scores it on printed text and shows what is left. The rule for questions is old and well known: a helping verb moves in front of the subject, and <em>do</em> is added if there is none. It is a real rule, and you should use it. Scored on 90 questions from <em>Pride and Prejudice</em>, printed with this lesson, it covers 52, which is 57.8%. A run over the whole novel, quoted here because no page can carry it, gave 55.4%. That is too low to call the rule good and too high to call it wrong, and the lesson is about the other four in ten: what questions look like when they do not open with a helping verb.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The rule is real.</strong> To ask a question with a helping verb, put that verb before the subject: <em>can she go?</em> If there is no helping verb, add <em>do</em> in the right form: <em>did she go?</em> It is the same <em>do</em> that arrives to carry <em>not</em> in Helping Verbs. With a question word, the question word comes first and the rest follows: <em>where did she go?</em> Many languages ask a question by tone, by a small word at the end, or by an ending on the verb. English moves a word, and that is why the rule is worth stating. The helping verbs are the ones that Helping Verbs lists, and the question word is also called a wh-word, after the letters most of them start with.</li><li><strong>A little over half of real questions open that way.</strong> On the 90 printed questions the rule covers 52, which is 57.8%; on the whole novel, quoted, 55.4%. Where the other lessons found a small set of named misses, this one finds a spread. Of the 38 misses here, 16 begin with a joining word such as <em>and</em> or <em>but</em>, 7 begin with a question word that has no helping verb after it, 4 begin with a pronoun and are statements with a question mark on them, 2 begin with a small word of address such as <em>oh</em>, and 9 the lab can only call something else. The largest kind is a result of how people write, not of how English builds questions.</li><li><strong>A counted figure and a quoted one are different things.</strong> The boxes are counted in your browser on the 90 lines you can read. The figures 55.4% and 45% come from a single run over the whole novel, which no page can carry, so they are quoted, and the page says so each time. The two sets are close, 57.8% against 55.4%, and 42.1% against 45%, and they differ a little because 90 lines are a sample. Each line on this page starts where its own sentence starts, or where quoted speech starts again after words such as <em>said she</em>, so its first word is the question's first word in all but one line: <em>But what, said she, can have been his motive?</em> is cut after <em>said she</em> and counted from <em>can</em>. The table lets you check any line.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="you know becomes do you know. she went becomes did she go. she can go becomes can she go. she went where becomes where did she go. 90 printed questions, 52 follow it, 57.8 percent. whole novel, quoted, 55.4 percent" tabindex="0" role="region" aria-label="Mathematical notation">you know       -&gt;  do you know?
 she went       -&gt;  did she go?
 she can go     -&gt;  can she go?
@@ -1973,11 +2018,40 @@ var perThousand = function (hits, words) {
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2045,7 +2119,7 @@ var perThousand = function (hits, words) {
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

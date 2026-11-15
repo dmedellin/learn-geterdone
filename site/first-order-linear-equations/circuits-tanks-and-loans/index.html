@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,30 +1424,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">First-Order Linear Equations</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Forcing</p>
       <h1>Circuits, Tanks and Loans</h1>
       <p class="lesson-lede">Write three situations as one equation <span data-say="y prime plus A times y equals b">y′ + a·y = b</span>, read the steady state in each, and compute when a loan balance reaches zero.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Write the rate as what comes in minus what goes out</li><li>The steady state is where gain equals loss</li><li>A negative a turns the steady state around</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three situations, one equation, one question each</h2>
-      <article class="prose reading"><p>All three situations on this page have the same skeleton. There is an unknown quantity, a constant source and a loss or gain proportional to the unknown. Once the equation is written as <span class="math" data-say="y prime plus A times y equals b">y′ + a·y = b</span> the solution and its steady state follow from &ldquo;Constant Coefficients and the Steady State&rdquo; with no new idea.</p><div class="mathblock" data-say="situation, unknown, a, b, steady state b over A. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">situation     unknown     a        b      steady state b/a
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three situations, one equation, one question each</h2><div class="prose reading"><p>All three situations on this page have the same skeleton. There is an unknown quantity, a constant source and a loss or gain proportional to the unknown. Once the equation is written as <span class="math" data-say="y prime plus A times y equals b">y′ + a·y = b</span> the solution and its steady state follow from &ldquo;Constant Coefficients and the Steady State&rdquo; with no new idea.</p><div class="mathblock" data-say="situation, unknown, a, b, steady state b over A. a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">situation     unknown     a        b      steady state b/a
 capacitor     q           2        5      5/2
 tank          y           1/20     10     200
 loan          B           −1/20    −6     120</div><h3>The capacitor</h3><p>A capacitor with capacitance <span class="math" data-say="C">C</span> is charged through a resistor <span class="math" data-say="R">R</span> from a source of voltage <span class="math" data-say="V">V</span>. The charge <span class="math" data-say="q">q</span> satisfies <span class="math" data-say="R times q prime plus q over C equals V">R·q′ + q/C = V</span>. With <span class="math" data-say="R equals 1">R = 1</span>, <span class="math" data-say="C equals 1 over 2">C = 1/2</span> and <span class="math" data-say="V equals 5">V = 5</span> in consistent units, dividing by <span class="math" data-say="R">R</span> gives <span class="math" data-say="q prime plus 2 q equals 5">q′ + 2q = 5</span>. The steady state is <span class="math" data-say="C times V equals 5 over 2">C·V = 5/2</span>, the charge at which the capacitor's voltage equals the source's. From an empty capacitor the charge approaches <span class="math" data-say="5 over 2">5/2</span> and is below it at every finite time.</p><h3>The tank</h3><p>A tank holds <span class="math" data-say="20">20</span> litres of well-mixed brine. Brine at <span class="math" data-say="10">10</span> units of salt per litre flows in at one litre per minute, and the mixture flows out at the same rate. The salt <span class="math" data-say="y">y</span> gains <span class="math" data-say="10">10</span> per minute and loses <span class="math" data-say="y over 20">y/20</span> per minute, since a twentieth of the tank leaves each minute. So <span class="math" data-say="y prime equals 10 minus y over 20">y′ = 10 − y/20</span>, which is <span class="math" data-say="y prime plus y over 20 equals 10">y′ + y/20 = 10</span>. The steady state is <span class="math" data-say="200">200</span>, the inflow concentration times the volume.</p><h3>The loan</h3><p>A balance of <span class="math" data-say="100">100</span> earns interest at <span class="math" data-say="5 percent">5%</span> a year, charged continuously, and is repaid at <span class="math" data-say="6">6</span> a year. The balance gains <span class="math" data-say="B over 20">B/20</span> and loses <span class="math" data-say="6">6</span>, so <span class="math" data-say="B prime equals B over 20 minus 6">B′ = B/20 − 6</span>. Moving the <span class="math" data-say="B">B</span> term to the left <em>changes its sign</em>: <span class="math" data-say="B prime minus B over 20 equals negative 6">B′ − B/20 = −6</span>, so <span class="math" data-say="A equals negative 1 over 20">a = −1/20</span> and <span class="math" data-say="b equals negative 6">b = −6</span>. The steady state is <span class="math" data-say="b over A equals the quantity negative 6, over the quantity negative 1 over 20, equals 120">b/a = (−6)/(−1/20) = 120</span>.</p><p>That number has a meaning. At a balance of <span class="math" data-say="120">120</span> the interest is <span class="math" data-say="120 over 20 equals 6">120/20 = 6</span> a year, exactly the payment, so the balance neither falls nor grows. It is a knife edge, not a destination: <span class="math" data-say="A is less than 0">a < 0</span> makes it repelling. The loan starts at <span class="math" data-say="100">100</span>, below it, so the gap is <span class="math" data-say="negative 20">−20</span> and grows.</p><div class="mathblock" data-say="B equals 120 plus the quantity 100 minus 120, times e to the power the quantity t over 20. B equals 120 minus 20 times e to the power the quantity t over 20. B equals 0, e to the power the quantity t over 20, equals 6. t equals 20 times the natural log of 6 is approximately 35.8352 years" tabindex="0" role="region" aria-label="Mathematical notation">B = 120 + (100 − 120)·e^(t/20)
 B = 120 − 20·e^(t/20)
 B = 0:   e^(t/20) = 6
-t = 20·ln 6 ≈ 35.8352 years</div><p>The payoff time is where the balance is zero. It needs a natural logarithm, <span class="math" data-say="the natural log of 6 is approximately 1.79176">ln 6 ≈ 1.79176</span>, which is irrational, so the figure <span class="math" data-say="is approximately 35.8352">≈ 35.8352</span> is rounded. The lab does not print a payoff time; it prints the closed form, and the number is yours to compute from it. You can check the sign change in the lab's Euler view with a step of one year and at least <span class="math" data-say="36">36</span> steps: the rounded closed-form column falls through zero between year <span class="math" data-say="35">35</span> and year <span class="math" data-say="36">36</span>.</p><p>Compare the naive estimate. A balance of <span class="math" data-say="100">100</span> repaid at <span class="math" data-say="6">6</span> a year would take <span class="math" data-say="100 over 6 is approximately 16.6667">100/6 ≈ 16.6667</span> years if no interest were charged. At year <span class="math" data-say="17">17</span> the closed form gives <span class="math" data-say="120 minus 20 times e to the power the quantity 17 over 20, is approximately 73.2071">120 − 20·e^(17/20) ≈ 73.2071</span>, rounded: more than seventy are still owed. The real payoff is more than twice as long, because the balance gains interest all the way down.</p><div class="example"><span class="label">Example &middot; The same loan starting just above the steady state</span><p>Start the same loan at <span class="math" data-say="B of 0 equals 130">B(0) = 130</span> instead. The gap to <span class="math" data-say="120">120</span> is <span class="math" data-say="plus 10">+10</span>, so <span class="math" data-say="B equals 120 plus 10 times e to the power the quantity t over 20">B = 120 + 10·e^(t/20)</span>, and the balance grows without limit: the interest on <span class="math" data-say="130">130</span> is <span class="math" data-say="6.5">6.5</span> a year and the payment is only <span class="math" data-say="6">6</span>.</p><p>The knife edge is exactly <span class="math" data-say="B equals 120">B = 120</span>. A payment of <span class="math" data-say="6">6</span> a year pays off a loan of <span class="math" data-say="100">100</span> but not a loan of <span class="math" data-say="130">130</span>, and the equation says so at once through the sign of the gap.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>First-order linear equations</h2></div><p>μ, y_h, y_p and the constant, exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+t = 20·ln 6 ≈ 35.8352 years</div><p>The payoff time is where the balance is zero. It needs a natural logarithm, <span class="math" data-say="the natural log of 6 is approximately 1.79176">ln 6 ≈ 1.79176</span>, which is irrational, so the figure <span class="math" data-say="is approximately 35.8352">≈ 35.8352</span> is rounded. The lab does not print a payoff time; it prints the closed form, and the number is yours to compute from it. You can check the sign change in the lab's Euler view with a step of one year and at least <span class="math" data-say="36">36</span> steps: the rounded closed-form column falls through zero between year <span class="math" data-say="35">35</span> and year <span class="math" data-say="36">36</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>First-order linear equations</h2></div><p>μ, y_h, y_p and the constant, exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A first-order linear equation</strong><span>y′ + p(t)·y = q(t), solved symbolically</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>solution</span><span class="tone-purple"><i class="legend-swatch"></i>y_p</span><span class="tone-muted"><i class="legend-swatch"></i>y_h</span><span class="tone-green"><i class="legend-swatch"></i>Euler's steps (exact)</span></div>
@@ -1411,10 +1454,10 @@ t = 20·ln 6 ≈ 35.8352 years</div><p>The payoff time is where the balance is z
       <div class="table-wrap" style="margin-top:12px;" id="lfTable" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="lfStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One equation, three situations</h3>
-          <p>Each preset is one of the situations, with its steady state and closed form in the tiles. Say what the unknown is, what comes in and what goes out, and whether the steady state attracts, then compare. The loan presets differ only in the starting balance. Switch the view to Euler's steps with a step of 1 and the step count raised to 36 or more to read the rounded balance year by year.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One equation, three situations</h3>
+            <p>Each preset is one of the situations, with its steady state and closed form in the tiles. Say what the unknown is, what comes in and what goes out, and whether the steady state attracts, then compare. The loan presets differ only in the starting balance. Switch the view to Euler's steps with a step of 1 and the step count raised to 36 or more to read the rounded balance year by year.</p>
         <div class="field">
           <label for="lfPreset">Equation</label>
           <select id="lfPreset"><option value="rc" selected>q′ + 2q = 5, q(0) = 0</option><option value="tank">y′ + y/20 = 10, y(0) = 0</option><option value="loan">B′ − B/20 = −6, B(0) = 100</option><option value="above">B′ − B/20 = −6, B(0) = 130</option></select>
@@ -1450,12 +1493,15 @@ t = 20·ln 6 ≈ 35.8352 years</div><p>The payoff time is where the balance is z
         </div>
         <p class="small-copy" style="margin:0;">Type the equation with a prime: 2y' + 6y = 4t, t y' - 2y = 0, y' + 2y = cos(t).</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Compare the naive estimate. A balance of <span class="math" data-say="100">100</span> repaid at <span class="math" data-say="6">6</span> a year would take <span class="math" data-say="100 over 6 is approximately 16.6667">100/6 ≈ 16.6667</span> years if no interest were charged. At year <span class="math" data-say="17">17</span> the closed form gives <span class="math" data-say="120 minus 20 times e to the power the quantity 17 over 20, is approximately 73.2071">120 − 20·e^(17/20) ≈ 73.2071</span>, rounded: more than seventy are still owed. The real payoff is more than twice as long, because the balance gains interest all the way down.</p><div class="example"><span class="label">Example &middot; The same loan starting just above the steady state</span><p>Start the same loan at <span class="math" data-say="B of 0 equals 130">B(0) = 130</span> instead. The gap to <span class="math" data-say="120">120</span> is <span class="math" data-say="plus 10">+10</span>, so <span class="math" data-say="B equals 120 plus 10 times e to the power the quantity t over 20">B = 120 + 10·e^(t/20)</span>, and the balance grows without limit: the interest on <span class="math" data-say="130">130</span> is <span class="math" data-say="6.5">6.5</span> a year and the payment is only <span class="math" data-say="6">6</span>.</p><p>The knife edge is exactly <span class="math" data-say="B equals 120">B = 120</span>. A payment of <span class="math" data-say="6">6</span> a year pays off a loan of <span class="math" data-say="100">100</span> but not a loan of <span class="math" data-say="130">130</span>, and the equation says so at once through the sign of the gap.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>From a situation to a steady state</h2></div><p>Name the unknown, write gain and loss, collect into standard form with the signs checked, and read the steady state before solving.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the unknown and the rate</h3><p>A charge, an amount of salt or a balance, and its rate of change per unit of time. Fix the unit of time once.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the rate as gain minus loss</h3><p><span class="math" data-say="y prime equals what comes in minus what goes out">y′ = (what comes in) − (what goes out)</span>. A flow in proportion to the unknown carries the unknown; a fixed flow does not.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Collect into <span data-say="y prime plus A times y equals b">y′ + a·y = b</span></h3><p>Move every term in <span class="math" data-say="y">y</span> to the left and change its sign as it crosses. A proportional gain, like interest, becomes a negative <span class="math" data-say="A">a</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the steady state b/a and its direction</h3><p><span class="math" data-say="A is greater than 0">a > 0</span> attracts and <span class="math" data-say="A is less than 0">a < 0</span> repels. Say what the number means in the situation: a charge, an amount of salt, a balance.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Solve, then answer the question asked</h3><p>Write <span class="math" data-say="y equals b over A plus the quantity y sub 0 minus b over A, times e to the power the quantity negative A times t">y = b/a + (y₀ − b/a)·e^(−a·t)</span>. For a payoff, set it to zero and take a logarithm; the answer is irrational and printed rounded.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>From a situation to a steady state</h2>
+      <p class="lead-in">Name the unknown, write gain and loss, collect into standard form with the signs checked, and read the steady state before solving.</p>
+      <ol class="key-ideas method"><li><strong>Name the unknown and the rate.</strong> A charge, an amount of salt or a balance, and its rate of change per unit of time. Fix the unit of time once.</li><li><strong>Write the rate as gain minus loss.</strong> <span class="math" data-say="y prime equals what comes in minus what goes out">y′ = (what comes in) − (what goes out)</span>. A flow in proportion to the unknown carries the unknown; a fixed flow does not.</li><li><strong>Collect into <span data-say="y prime plus A times y equals b">y′ + a·y = b</span>.</strong> Move every term in <span class="math" data-say="y">y</span> to the left and change its sign as it crosses. A proportional gain, like interest, becomes a negative <span class="math" data-say="A">a</span>.</li><li><strong>Read the steady state b/a and its direction.</strong> <span class="math" data-say="A is greater than 0">a > 0</span> attracts and <span class="math" data-say="A is less than 0">a < 0</span> repels. Say what the number means in the situation: a charge, an amount of salt, a balance.</li><li><strong>Solve, then answer the question asked.</strong> Write <span class="math" data-say="y equals b over A plus the quantity y sub 0 minus b over A, times e to the power the quantity negative A times t">y = b/a + (y₀ − b/a)·e^(−a·t)</span>. For a payoff, set it to zero and take a logarithm; the answer is irrational and printed rounded.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1522,16 @@ t = 20·ln 6 ≈ 35.8352 years
 naive estimate:  100/6 ≈ 16.6667 years</div><p>The payoff time is more than twice the naive estimate. The naive estimate assumes each payment of <span class="math" data-say="6">6</span> takes <span class="math" data-say="6">6</span> off the balance. It does not: interest of about <span class="math" data-say="5">5</span> a year on a balance near <span class="math" data-say="100">100</span> puts most of that back, so the balance falls by only about <span class="math" data-say="1">1</span> a year at first.</p><p>For a rehearsal, run the tank. Write <span class="math" data-say="y prime equals 10 minus y over 20">y′ = 10 − y/20</span>, collect it to <span class="math" data-say="y prime plus y over 20 equals 10">y′ + y/20 = 10</span>, read the steady state before the lab does, and check that it is <span class="math" data-say="200">200</span> and attracting.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking 100/6 as the payoff time</strong><span>A balance of <span class="math" data-say="100">100</span> repaid at <span class="math" data-say="6">6</span> a year is not paid off in <span class="math" data-say="100 over 6 is approximately 16.6667">100/6 ≈ 16.6667</span> years. At year <span class="math" data-say="17">17</span> the closed form still gives <span class="math" data-say="is approximately 73.2071">≈ 73.2071</span>, rounded, and the balance reaches zero only at <span class="math" data-say="20 times the natural log of 6 is approximately 35.8352">20·ln 6 ≈ 35.8352</span> years. The estimate ignores the interest that is charged on the way down.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the steady state of a loan as where the balance ends up</strong><span>The steady state <span class="math" data-say="120">120</span> repels, because <span class="math" data-say="A equals negative 1 over 20">a = −1/20</span>. Starting at <span class="math" data-say="100">100</span> the balance moves away from <span class="math" data-say="120">120</span>, downward, and through zero; starting at <span class="math" data-say="130">130</span> it moves away upward. A solution settles at the steady state only when <span class="math" data-say="A">a</span> is positive, as for the tank and the capacitor.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Moving the interest term without changing its sign</strong><span>From <span class="math" data-say="B prime equals B over 20 minus 6">B′ = B/20 − 6</span> the slip gives <span class="math" data-say="B prime plus B over 20 equals negative 6">B′ + B/20 = −6</span>, so <span class="math" data-say="A equals plus 1 over 20">a = +1/20</span> and the steady state <span class="math" data-say="negative 120">−120</span>, attracting. That is a different loan: from <span class="math" data-say="100">100</span> its balance is <span class="math" data-say="negative 120 plus 220 times e to the power the quantity negative t over 20">−120 + 220·e^(−t/20)</span>, which falls through zero at <span class="math" data-say="20 times the natural log of the quantity 11 over 6, is approximately 12.1227">20·ln(11/6) ≈ 12.1227</span> years, sooner than even the no-interest estimate, and then keeps falling toward <span class="math" data-say="negative 120">−120</span>. Interest cannot clear a loan faster than paying with no interest at all, and that impossibility is the sign that a term crossed the equals sign with its sign unchanged. Collecting the terms carefully gives <span class="math" data-say="B prime minus B over 20 equals negative 6">B′ − B/20 = −6</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write a charging capacitor, a flowing tank or a loan as <span data-say="y prime plus A times y equals b">y′ + a·y = b</span>, name the steady state, and find a payoff time.</strong><p>You should be able to write the rate as gain minus loss, collect it into standard form with the signs checked, read the steady state b/a and say whether it attracts or repels, write the closed form, and find when a loan balance reaches zero by setting the closed form to zero, giving the answer rounded.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The steady state in these models is the particular solution for a constant forcing. What the models do not show is how the equation behaves when it is solved by a computer, one step at a time. The last lesson of the course returns to Euler&rsquo;s method on the simplest decay, where the step size alone decides whether the answer follows the curve or leaves it.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking 100/6 as the payoff time</strong><span>A balance of <span class="math" data-say="100">100</span> repaid at <span class="math" data-say="6">6</span> a year is not paid off in <span class="math" data-say="100 over 6 is approximately 16.6667">100/6 ≈ 16.6667</span> years. At year <span class="math" data-say="17">17</span> the closed form still gives <span class="math" data-say="is approximately 73.2071">≈ 73.2071</span>, rounded, and the balance reaches zero only at <span class="math" data-say="20 times the natural log of 6 is approximately 35.8352">20·ln 6 ≈ 35.8352</span> years. The estimate ignores the interest that is charged on the way down.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the steady state of a loan as where the balance ends up</strong><span>The steady state <span class="math" data-say="120">120</span> repels, because <span class="math" data-say="A equals negative 1 over 20">a = −1/20</span>. Starting at <span class="math" data-say="100">100</span> the balance moves away from <span class="math" data-say="120">120</span>, downward, and through zero; starting at <span class="math" data-say="130">130</span> it moves away upward. A solution settles at the steady state only when <span class="math" data-say="A">a</span> is positive, as for the tank and the capacitor.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Moving the interest term without changing its sign</strong><span>From <span class="math" data-say="B prime equals B over 20 minus 6">B′ = B/20 − 6</span> the slip gives <span class="math" data-say="B prime plus B over 20 equals negative 6">B′ + B/20 = −6</span>, so <span class="math" data-say="A equals plus 1 over 20">a = +1/20</span> and the steady state <span class="math" data-say="negative 120">−120</span>, attracting. That is a different loan: from <span class="math" data-say="100">100</span> its balance is <span class="math" data-say="negative 120 plus 220 times e to the power the quantity negative t over 20">−120 + 220·e^(−t/20)</span>, which falls through zero at <span class="math" data-say="20 times the natural log of the quantity 11 over 6, is approximately 12.1227">20·ln(11/6) ≈ 12.1227</span> years, sooner than even the no-interest estimate, and then keeps falling toward <span class="math" data-say="negative 120">−120</span>. Interest cannot clear a loan faster than paying with no interest at all, and that impossibility is the sign that a term crossed the equals sign with its sign unchanged. Collecting the terms carefully gives <span class="math" data-say="B prime minus B over 20 equals negative 6">B′ − B/20 = −6</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write a charging capacitor, a flowing tank or a loan as <span data-say="y prime plus A times y equals b">y′ + a·y = b</span>, name the steady state, and find a payoff time.</strong><p>You should be able to write the rate as gain minus loss, collect it into standard form with the signs checked, read the steady state b/a and say whether it attracts or repels, write the closed form, and find when a loan balance reaches zero by setting the closed form to zero, giving the answer rounded.</p></div></div><div class="note"><strong>Note:</strong> The steady state in these models is the particular solution for a constant forcing. What the models do not show is how the equation behaves when it is solved by a computer, one step at a time. The last lesson of the course returns to Euler&rsquo;s method on the simplest decay, where the step size alone decides whether the answer follows the curve or leaves it.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Write the rate as what comes in minus what goes out</summary><p>Each equation starts as a sentence: the rate of change of the unknown is a gain minus a loss. A tank gains salt at a fixed rate and loses it in proportion to how much is there. A loan gains interest in proportion to the balance and loses a fixed payment. Collect the terms in <span class="math" data-say="y">y</span> on the left and the equation is <span class="math" data-say="y prime plus A times y equals b">y′ + a·y = b</span>, with <span class="math" data-say="A">a</span> taking its sign from what is on the right.</p></details><details class="recall"><summary>The steady state is where gain equals loss</summary><p>At <span class="math" data-say="y equals b over A">y = b/a</span> the rate is zero: the tank loses salt exactly as fast as it gains it, the capacitor draws no current, and the balance grows by interest exactly as fast as the payment removes it. The steady state is the particular solution for a constant forcing, from &ldquo;Homogeneous Plus Particular&rdquo;.</p></details><details class="recall"><summary>A negative a turns the steady state around</summary><p>For the tank and the capacitor, loss is in proportion to the unknown and <span class="math" data-say="A">a</span> is positive, so every solution is pulled toward the steady state. For the loan the proportional term is a <em>gain</em>, so <span class="math" data-say="A">a</span> is negative, and the steady state is where the balance stalls: start below it and the balance falls, start above it and the balance grows for ever.</p></details></div>
+      <h3>Summary</h3>
       <p>A capacitor charging through a resistor, salt flowing through a well-mixed tank and a balance growing with interest while it is paid down are the same equation with different letters. In each, the steady state is <span class="math" data-say="b over A">b/a</span>, and the sign of <span class="math" data-say="A">a</span> decides whether it attracts or repels. The loan has a negative <span class="math" data-say="A">a</span>, which is why the naive payoff time of balance divided by payment is wrong.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Write the rate as what comes in minus what goes out.</strong> Each equation starts as a sentence: the rate of change of the unknown is a gain minus a loss. A tank gains salt at a fixed rate and loses it in proportion to how much is there. A loan gains interest in proportion to the balance and loses a fixed payment. Collect the terms in <span class="math" data-say="y">y</span> on the left and the equation is <span class="math" data-say="y prime plus A times y equals b">y′ + a·y = b</span>, with <span class="math" data-say="A">a</span> taking its sign from what is on the right.</li><li><strong>The steady state is where gain equals loss.</strong> At <span class="math" data-say="y equals b over A">y = b/a</span> the rate is zero: the tank loses salt exactly as fast as it gains it, the capacitor draws no current, and the balance grows by interest exactly as fast as the payment removes it. The steady state is the particular solution for a constant forcing, from &ldquo;Homogeneous Plus Particular&rdquo;.</li><li><strong>A negative a turns the steady state around.</strong> For the tank and the capacitor, loss is in proportion to the unknown and <span class="math" data-say="A">a</span> is positive, so every solution is pulled toward the steady state. For the loan the proportional term is a <em>gain</em>, so <span class="math" data-say="A">a</span> is negative, and the steady state is where the balance stalls: start below it and the balance falls, start above it and the balance grows for ever.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="rate of change equals gain minus loss. collect, y prime plus A times y equals b, steady state b over A. capacitor, tank, A is greater than 0, steady state pulls. loan, interest is a gain, A is less than 0, it repels. payoff, closed form equals 0, then take ln" tabindex="0" role="region" aria-label="Mathematical notation">rate of change = gain − loss
 collect:  y′ + a·y = b,  steady state b/a
 capacitor, tank:  a &gt; 0, steady state pulls
@@ -3645,11 +3690,40 @@ payoff:  closed form = 0, then take ln</div><figcaption>Three situations, one eq
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3717,7 +3791,7 @@ payoff:  closed form = 0, then take ln</div><figcaption>Three situations, one eq
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

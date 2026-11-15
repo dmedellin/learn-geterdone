@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">How the Eyes Read</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Fixations and saccades</p>
       <h1>Looking Back</h1>
       <p class="lesson-lede">Find out what hiding the text behind your eyes does to comprehension at a fixed rate.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Regressions are ordinary</li><li>Masking makes looking back useless</li><li>A fixed rate turns the comparison into one of comprehension</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>What looking back is for</h2>
-      <article class="prose reading"><p>The lab has two readings. Reading A, The Dance in the Hive, runs with the pacer: a highlight moving line by line at the target rate. Reading B, Hearing in the Dark, runs with the mask: the same pacer, with each line above the highlight hidden as it goes. Put your hold target in both target boxes (the button fills them with your baseline median instead; type your hold target over it if you have one), do them in the order the lab names, and answer the six questions after each. Both are logged as condition readings, so neither counts towards your baseline or tests.</p><p>A reader who regresses a lot usually feels it as a fault: the eyes slip back, the line is read twice, time is lost. The tradition agrees, and many speed-reading courses teach readers to suppress it. The mask is a way of asking what those backward glances were doing, by making them find nothing.</p><p>The evidence comes from a study that did this far more precisely. Schotter, Tran and Rayner (2014) tracked readers' eyes and replaced each word with x's the moment the eyes left it, so that a reader could still look back but would find only x's. Comprehension fell, for ordinary sentences as well as for sentences built to be ambiguous. And in normal reading, sentences on which readers had regressed were understood about as well as ones on which they had not: the regressions came when they were needed.</p><p>The kit's mask is a coarser version of their method. It hides whole lines, not words, and only once the highlight has moved on, so you can still look back within the line you are on. It is a different manipulation, so its cost need not match theirs: it hides less of what you have read, but it hides lines on the pacer's schedule, not your eyes', so a reader who falls behind the highlight can lose the end of a line before finishing it.</p><p>Because both readings ran at the pacer's rate, their rates come out the same, and the difference lies in the questions. At 300 words a minute one question is worth 50 words a minute of effective rate, so a difference of 50 is a difference of one question, which is not a result.</p><p>The <strong>masked-costs</strong> preset is a reader at 300 words a minute both times: 447 words in 89.4 seconds with all six right, an effective rate of 300; then 436 words in 87.2 seconds with four right, 300 &times; 4/6 = 200. The difference is &minus;100 words a minute, two questions. The <strong>no-cost</strong> preset is a reader who got five of six on both, 250 and 250, a difference of nothing at all.</p><p>If your result looks like no-cost, you have not refuted the study, and the study has not refuted you. Your two readings were of different passages, one of them came first, and each is one reading; the study had many readers, many sentences and a tracker that knew where every word was. What you have learned is what the mask did to you on one day, which is worth knowing too.</p><p>What the study does not support is the idea that regressions are wasted time to be trained away. Some may be: the next lesson, Fewer Needless Regressions, separates the ones that repair understanding from the ones that only follow a wandering mind.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>What looking back is for</h2><div class="prose reading"><p>The lab has two readings. Reading A, The Dance in the Hive, runs with the pacer: a highlight moving line by line at the target rate. Reading B, Hearing in the Dark, runs with the mask: the same pacer, with each line above the highlight hidden as it goes. Put your hold target in both target boxes (the button fills them with your baseline median instead; type your hold target over it if you have one), do them in the order the lab names, and answer the six questions after each. Both are logged as condition readings, so neither counts towards your baseline or tests.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Timed reading drill</strong><span>rate, comprehension and the effective rate, measured on your own reading</span></div>
       </div>
@@ -1425,10 +1468,10 @@
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="drTable"></table></div>
       <div class="status-banner" id="drStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Your reading, in numbers</h3>
-          <p>Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way. One question is <span data-say="is approximately 16.7">≈ 16.7</span> points; a one-question difference is not a result.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Your reading, in numbers</h3>
+            <p>Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way. One question is <span data-say="is approximately 16.7">≈ 16.7</span> points; a one-question difference is not a result.</p>
         <div class="field">
           <label for="drPreset">Worked example</label>
           <select id="drPreset"><option value="masked-costs" selected>The mask costs two questions</option><option value="no-cost">No cost: five right both times</option></select>
@@ -1485,12 +1528,15 @@
           <div class="kpi"><span>Pacer time for a line of 12 words</span><strong id="drPacerLineMs">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>A reader who regresses a lot usually feels it as a fault: the eyes slip back, the line is read twice, time is lost. The tradition agrees, and many speed-reading courses teach readers to suppress it. The mask is a way of asking what those backward glances were doing, by making them find nothing.</p><p>The evidence comes from a study that did this far more precisely. Schotter, Tran and Rayner (2014) tracked readers' eyes and replaced each word with x's the moment the eyes left it, so that a reader could still look back but would find only x's. Comprehension fell, for ordinary sentences as well as for sentences built to be ambiguous. And in normal reading, sentences on which readers had regressed were understood about as well as ones on which they had not: the regressions came when they were needed.</p><p>The kit's mask is a coarser version of their method. It hides whole lines, not words, and only once the highlight has moved on, so you can still look back within the line you are on. It is a different manipulation, so its cost need not match theirs: it hides less of what you have read, but it hides lines on the pacer's schedule, not your eyes', so a reader who falls behind the highlight can lose the end of a line before finishing it.</p><p>Because both readings ran at the pacer's rate, their rates come out the same, and the difference lies in the questions. At 300 words a minute one question is worth 50 words a minute of effective rate, so a difference of 50 is a difference of one question, which is not a result.</p><p>The <strong>masked-costs</strong> preset is a reader at 300 words a minute both times: 447 words in 89.4 seconds with all six right, an effective rate of 300; then 436 words in 87.2 seconds with four right, 300 &times; 4/6 = 200. The difference is &minus;100 words a minute, two questions. The <strong>no-cost</strong> preset is a reader who got five of six on both, 250 and 250, a difference of nothing at all.</p><p>If your result looks like no-cost, you have not refuted the study, and the study has not refuted you. Your two readings were of different passages, one of them came first, and each is one reading; the study had many readers, many sentences and a tracker that knew where every word was. What you have learned is what the mask did to you on one day, which is worth knowing too.</p><p>What the study does not support is the idea that regressions are wasted time to be trained away. Some may be: the next lesson, Fewer Needless Regressions, separates the ones that repair understanding from the ones that only follow a wandering mind.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Doing it again on another day</h2></div><p>Five steps, about twelve minutes. Use a pair of passages you have not read.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Set one rate for both</h3><p>Put your current hold target in both target boxes, so that the only difference between the readings is whether the text behind you stays.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read in the order given</h3><p>The lab alternates which reading comes first from one comparison to the next. Do the first, answer its questions, then the second.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute both effective rates</h3><p>Multiply each rate by its comprehension, then work out what one question is worth at your rate: the rate divided by six.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Decide whether the difference is a result</h3><p>A difference of one question or less is not. Two or more is worth writing in your log beside the date, as one comparison.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Open The Daily Drill from Guided Practice and do today's session: one pool passage with the pacer at your hold target, or a test at natural pace when it says one is due.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Doing it again on another day</h2>
+      <p class="lead-in">Five steps, about twelve minutes. Use a pair of passages you have not read.</p>
+      <ol class="key-ideas method"><li><strong>Set one rate for both.</strong> Put your current hold target in both target boxes, so that the only difference between the readings is whether the text behind you stays.</li><li><strong>Read in the order given.</strong> The lab alternates which reading comes first from one comparison to the next. Do the first, answer its questions, then the second.</li><li><strong>Compute both effective rates.</strong> Multiply each rate by its comprehension, then work out what one question is worth at your rate: the rate divided by six.</li><li><strong>Decide whether the difference is a result.</strong> A difference of one question or less is not. Two or more is worth writing in your log beside the date, as one comparison.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Open The Daily Drill from Guided Practice and do today's session: one pool passage with the pacer at your hold target, or a test at natural pace when it says one is due.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1506,17 +1552,16 @@ B: 300 × 4/6 = 200 words a minute
 B − A = −100, and one question = 300 / 6 = 50</div><p>The difference is two questions' worth. On one pair of passages that is worth noting; it is not yet a finding about you.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling regressions a bad habit to eliminate</strong><span>They are about 10 to 15% of saccades in skilled readers. When Schotter, Tran and Rayner made going back useless &mdash; each word turned to x's as the eyes left it &mdash; comprehension fell, for ordinary sentences as well as ambiguous ones; in normal reading, regressions happen when they are needed. The kit's mask hides whole lines, a coarser version of their method.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a one-question difference as a result</strong><span>At 300 words a minute one question is 50 words a minute of effective rate. A reading with the mask that comes out 50 lower has lost one answer, which happens between any two passages.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing rates instead of scores</strong><span>Both readings ran at the pacer's rate, so their rates agree by design. The question this drill answers is in the comprehension, and so in the effective rate.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare two scores at one rate without the lab.</strong><p>Given two readings at one rate and their scores out of six, compute both effective rates and the value of one question at that rate, and say whether the difference exceeds one question.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two readings are two passages, and one of them came first; the lab alternates the order but cannot remove it. One comparison on one day cannot tell a cost of the mask from a harder second passage, and the kit's line mask is not the word-by-word mask of the study.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Calling regressions a bad habit to eliminate</strong><span>They are about 10 to 15% of saccades in skilled readers. When Schotter, Tran and Rayner made going back useless &mdash; each word turned to x's as the eyes left it &mdash; comprehension fell, for ordinary sentences as well as ambiguous ones; in normal reading, regressions happen when they are needed. The kit's mask hides whole lines, a coarser version of their method.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a one-question difference as a result</strong><span>At 300 words a minute one question is 50 words a minute of effective rate. A reading with the mask that comes out 50 lower has lost one answer, which happens between any two passages.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing rates instead of scores</strong><span>Both readings ran at the pacer's rate, so their rates agree by design. The question this drill answers is in the comprehension, and so in the effective rate.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compare two scores at one rate without the lab.</strong><p>Given two readings at one rate and their scores out of six, compute both effective rates and the value of one question at that rate, and say whether the difference exceeds one question.</p></div></div><div class="note"><strong>Note:</strong> Two readings are two passages, and one of them came first; the lab alternates the order but cannot remove it. One comparison on one day cannot tell a cost of the mask from a harder second passage, and the kit's line mask is not the word-by-word mask of the study.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Regressions are ordinary</summary><p>About 10 to 15% of saccades in skilled readers go backwards (Rayner 1998). They are part of normal reading, not a fault peculiar to slow readers.</p></details><details class="recall"><summary>Masking makes looking back useless</summary><p>The mask display hides every line above the highlight as the pacer moves on. You can still glance back, but there is nothing there to read, so any repair a regression would have made cannot happen.</p></details><details class="recall"><summary>A fixed rate turns the comparison into one of comprehension</summary><p>Both readings run with the pacer at one rate, so their rates come out the same. Whatever differs in the effective rate comes from the questions, and one question is a sixth of the score.</p></details></div>
+      <h3>Summary</h3>
       <p>Two readings at the same pacer rate: one with the passage left on the page, one with each line hidden once the highlight has passed it, so that looking back finds nothing. Because the rate is fixed, the comparison is a comparison of comprehension, read through the effective rate. It asks whether the regressions you make are a habit to cut or a repair you need.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Regressions are ordinary.</strong> About 10 to 15% of saccades in skilled readers go backwards (Rayner 1998). They are part of normal reading, not a fault peculiar to slow readers.</li><li><strong>Masking makes looking back useless.</strong> The mask display hides every line above the highlight as the pacer moves on. You can still glance back, but there is nothing there to read, so any repair a regression would have made cannot happen.</li><li><strong>A fixed rate turns the comparison into one of comprehension.</strong> Both readings run with the pacer at one rate, so their rates come out the same. Whatever differs in the effective rate comes from the questions, and one question is a sixth of the score.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="same pacer rate on both readings. effective rate equals rate times comprehension. one question equals 1 over 6 of comprehension. 300 times 4 over 6 equals 200, against 300 times 6 over 6 equals 300" tabindex="0" role="region" aria-label="Mathematical notation">same pacer rate on both readings
 effective rate = rate × comprehension
 one question = 1/6 of comprehension
@@ -2596,11 +2641,40 @@ one question = 1/6 of comprehension
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2668,7 +2742,7 @@ one question = 1/6 of comprehension
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

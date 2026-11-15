@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Induction and Recursion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Correctness</p>
       <h1>Loop Invariants and Program Correctness</h1>
       <p class="lesson-lede">Induction, applied to a loop instead of to a number.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Initialisation is the base case</li><li>Maintenance is the inductive step</li><li>Termination converts the invariant into the result</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Loop invariants</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Loop invariant</span><p>A <strong>loop invariant</strong> is a statement that is true immediately before the loop begins and remains true immediately before each subsequent iteration.</p></div><h3>Summing an array</h3><div class="mathblock" data-say="SUM of A, invariant, s equals A at 0, and so on, plus A at i minus 1. s equals 0. i equals 0. while i is less than n. s equals s plus A at i. i equals i plus 1. return s" tabindex="0" role="region" aria-label="Mathematical notation">SUM(A):                          invariant:  s = A[0] + … + A[i−1]
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Loop invariants</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Loop invariant</span><p>A <strong>loop invariant</strong> is a statement that is true immediately before the loop begins and remains true immediately before each subsequent iteration.</p></div><h3>Summing an array</h3><div class="mathblock" data-say="SUM of A, invariant, s equals A at 0, and so on, plus A at i minus 1. s equals 0. i equals 0. while i is less than n. s equals s plus A at i. i equals i plus 1. return s" tabindex="0" role="region" aria-label="Mathematical notation">SUM(A):                          invariant:  s = A[0] + … + A[i−1]
     s = 0
     i = 0
     while i &lt; n:
@@ -1406,12 +1450,11 @@
     A[i+1] = key
 
 invariant (outer loop):  A[0..j−1] contains the original first j
-                         elements, in sorted order</div><p>Initialisation: at <span class="math" data-say="j equals 1">j = 1</span> the subarray <span class="math" data-say="A at 0, 0">A[0..0]</span> is one element, trivially sorted. Maintenance: the inner loop shifts elements greater than <span class="math" data-say="key">key</span> one place right and inserts <span class="math" data-say="key">key</span> in the gap, so <span class="math" data-say="A at 0, j">A[0..j]</span> ends sorted and holds the same elements. Termination: the outer loop ends with <span class="math" data-say="j equals n">j = n</span>, so <span class="math" data-say="A at 0, n minus 1">A[0..n−1]</span> is sorted &mdash; which is the postcondition.</p><p>The invariant says two things: sorted, and the same elements. Dropping the second half would leave the proof compatible with an algorithm that sorts by replacing the array with zeros. Invariants that are too weak are the usual failure, and they fail at the termination step.</p><h3>Finding an invariant</h3><ul><li><strong>Start from the postcondition.</strong> What should be true at the end? The invariant is usually that statement with the loop variable in place of its final value.</li><li><strong>Include everything the proof needs.</strong> "Sorted" alone is not enough; "sorted and a permutation of the original" is.</li><li><strong>Check the boundaries.</strong> The invariant must hold when the loop has run zero times, which is where the vacuous cases live.</li></ul><div class="thm"><span class="label">Theorem &middot; Partial and total correctness</span><p><strong>Partial correctness</strong> is: if the loop terminates, the postcondition holds. <strong>Total correctness</strong> adds that it does terminate. An invariant gives the first; a decreasing bounded quantity gives the second.</p></div><p>The distinction matters. A loop with a correct invariant that never exits is partially correct and useless. Termination is proved the same way as for a recursion: exhibit a quantity that strictly decreases and cannot decrease forever.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                         elements, in sorted order</div><p>Initialisation: at <span class="math" data-say="j equals 1">j = 1</span> the subarray <span class="math" data-say="A at 0, 0">A[0..0]</span> is one element, trivially sorted. Maintenance: the inner loop shifts elements greater than <span class="math" data-say="key">key</span> one place right and inserts <span class="math" data-say="key">key</span> in the gap, so <span class="math" data-say="A at 0, j">A[0..j]</span> ends sorted and holds the same elements. Termination: the outer loop ends with <span class="math" data-say="j equals n">j = n</span>, so <span class="math" data-say="A at 0, n minus 1">A[0..n−1]</span> is sorted &mdash; which is the postcondition.</p><p>The invariant says two things: sorted, and the same elements. Dropping the second half would leave the proof compatible with an algorithm that sorts by replacing the array with zeros. Invariants that are too weak are the usual failure, and they fail at the termination step.</p><h3>Finding an invariant</h3><ul><li><strong>Start from the postcondition.</strong> What should be true at the end? The invariant is usually that statement with the loop variable in place of its final value.</li><li><strong>Include everything the proof needs.</strong> "Sorted" alone is not enough; "sorted and a permutation of the original" is.</li><li><strong>Check the boundaries.</strong> The invariant must hold when the loop has run zero times, which is where the vacuous cases live.</li></ul><div class="thm"><span class="label">Theorem &middot; Partial and total correctness</span><p><strong>Partial correctness</strong> is: if the loop terminates, the postcondition holds. <strong>Total correctness</strong> adds that it does terminate. An invariant gives the first; a decreasing bounded quantity gives the second.</p></div><p>The distinction matters. A loop with a correct invariant that never exits is partially correct and useless. Termination is proved the same way as for a recursion: exhibit a quantity that strictly decreases and cannot decrease forever.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
@@ -1419,10 +1462,10 @@ invariant (outer loop):  A[0..j−1] contains the original first j
       <div class="lab-stage" tabindex="0" role="region" aria-label="Operation counts plot, scroll horizontally for the complete chart"><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Insertion sort, counted</h3>
-          <p>This lab counts comparisons, which is Algorithms and Complexity's question and not a proof of anything &mdash; a wrong sort could make exactly as many. What it does show is the inner <span class="math" data-say="while">while</span> loop of the insertion sort above stopping at the gap: at <span class="math" data-say="n equals 20">n = 20</span> on the lab's fixed shuffle, bubble sort makes <span class="math" data-say="190 equals 20 times 19 over 2">190 = 20 · 19 / 2</span> comparisons, insertion sort 112 and merge sort 66, and only the middle figure would change on a different permutation. The invariant is indifferent to it: <span class="math" data-say="A at 0, j">A[0..j]</span> is sorted and holds the same elements however many comparisons the inner loop took to find the gap.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Insertion sort, counted</h3>
+            <p>This lab counts comparisons, which is Algorithms and Complexity's question and not a proof of anything &mdash; a wrong sort could make exactly as many. What it does show is the inner <span class="math" data-say="while">while</span> loop of the insertion sort above stopping at the gap: at <span class="math" data-say="n equals 20">n = 20</span> on the lab's fixed shuffle, bubble sort makes <span class="math" data-say="190 equals 20 times 19 over 2">190 = 20 · 19 / 2</span> comparisons, insertion sort 112 and merge sort 66, and only the middle figure would change on a different permutation. The invariant is indifferent to it: <span class="math" data-say="A at 0, j">A[0..j]</span> is sorted and holds the same elements however many comparisons the inner loop took to find the gap.</p>
         <div class="field">
           <label for="alMode">What to examine</label>
           <select id="alMode">
@@ -1483,12 +1526,14 @@ invariant (outer loop):  A[0..j−1] contains the original first j
           <div class="kpi"><span id="alK1L">measured</span><strong id="alK1">&mdash;</strong></div>
           <div class="kpi"><span id="alK2L">predicted</span><strong id="alK2">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Proving a loop correct</h2></div><p>State the invariant before writing anything else.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the postcondition</h3><p>What must be true when the loop finishes. Without it there is nothing to aim the invariant at.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Guess an invariant and test the boundaries</h3><p>Usually the postcondition with the loop variable substituted. Check it holds before any iteration has run.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Prove maintenance</h3><p>Assume the invariant at the top of an iteration, follow the body, and show it holds at the top of the next.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Prove termination and combine</h3><p>A decreasing bounded quantity ends the loop; the invariant plus the negated loop condition must give the postcondition. If it does not, strengthen the invariant.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Proving a loop correct</h2>
+      <p class="lead-in">State the invariant before writing anything else.</p>
+      <ol class="key-ideas method"><li><strong>Write the postcondition.</strong> What must be true when the loop finishes. Without it there is nothing to aim the invariant at.</li><li><strong>Guess an invariant and test the boundaries.</strong> Usually the postcondition with the loop variable substituted. Check it holds before any iteration has run.</li><li><strong>Prove maintenance.</strong> Assume the invariant at the top of an iteration, follow the body, and show it holds at the top of the next.</li><li><strong>Prove termination and combine.</strong> A decreasing bounded quantity ends the loop; the invariant plus the negated loop condition must give the postcondition. If it does not, strengthen the invariant.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1518,17 +1563,16 @@ TERMINATION     b strictly decreases and is a non-negative integer,
                 gcd(a₀, b₀).                                    ∎</div><p>The invariant is the entire proof: the algorithm works because the quantity it is computing never changes while the numbers get smaller. Every good invariant has that character &mdash; it names what the loop preserves, which is more informative than what the loop does.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>An invariant too weak to give the postcondition</strong><span>Test it at termination before doing any other work: substitute the exit condition and see whether the postcondition follows.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Checking maintenance and skipping initialisation</strong><span>The base case is where off-by-one errors live, and it is one line to check.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Proving partial correctness and calling it done</strong><span>Termination is the other half. A quantity that strictly decreases and is bounded below is all it takes to write.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state an invariant strong enough to close the argument.</strong><p>Write a loop computing <span class="math" data-say="x to the power n">xⁿ</span> by repeated multiplication and state its invariant. Then check that at exit the invariant plus the loop condition gives exactly <span class="math" data-say="result equals x to the power n">result = xⁿ</span> &mdash; if it needs an extra sentence, the invariant was too weak.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This is the whole of Hoare logic in miniature: preconditions, postconditions and invariants, with a proof rule for each construct. “Correctness and Termination” in Algorithms and Complexity returns to correctness as a property to be established before efficiency is worth measuring.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>An invariant too weak to give the postcondition</strong><span>Test it at termination before doing any other work: substitute the exit condition and see whether the postcondition follows.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Checking maintenance and skipping initialisation</strong><span>The base case is where off-by-one errors live, and it is one line to check.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Proving partial correctness and calling it done</strong><span>Termination is the other half. A quantity that strictly decreases and is bounded below is all it takes to write.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state an invariant strong enough to close the argument.</strong><p>Write a loop computing <span class="math" data-say="x to the power n">xⁿ</span> by repeated multiplication and state its invariant. Then check that at exit the invariant plus the loop condition gives exactly <span class="math" data-say="result equals x to the power n">result = xⁿ</span> &mdash; if it needs an extra sentence, the invariant was too weak.</p></div></div><div class="note"><strong>Note:</strong> This is the whole of Hoare logic in miniature: preconditions, postconditions and invariants, with a proof rule for each construct. “Correctness and Termination” in Algorithms and Complexity returns to correctness as a property to be established before efficiency is worth measuring.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Initialisation is the base case</summary><p>The invariant must hold before any iteration has run, which is usually immediate and is usually where an off-by-one hides.</p></details><details class="recall"><summary>Maintenance is the inductive step</summary><p>Assume the invariant before an iteration and prove it after. The loop body is what you reason about.</p></details><details class="recall"><summary>Termination converts the invariant into the result</summary><p>The invariant plus the negated loop condition should give exactly the postcondition. If it does not, the invariant is too weak.</p></details></div>
+      <h3>Summary</h3>
       <p>A loop invariant is a statement true before the loop and preserved by every iteration. Together with termination it proves the loop computes what it should &mdash; and the argument is exactly induction.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Initialisation is the base case.</strong> The invariant must hold before any iteration has run, which is usually immediate and is usually where an off-by-one hides.</li><li><strong>Maintenance is the inductive step.</strong> Assume the invariant before an iteration and prove it after. The loop body is what you reason about.</li><li><strong>Termination converts the invariant into the result.</strong> The invariant plus the negated loop condition should give exactly the postcondition. If it does not, the invariant is too weak.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="INITIALISATION, the invariant holds before the first iteration. MAINTENANCE, if it holds before an iteration, it holds after. TERMINATION, the loop stops, and the invariant then gives the result. This is induction, base case, step, conclusion" tabindex="0" role="region" aria-label="Mathematical notation">INITIALISATION  the invariant holds before the first iteration
 MAINTENANCE     if it holds before an iteration, it holds after
 TERMINATION     the loop stops, and the invariant then gives the result
@@ -2571,11 +2615,40 @@ This is induction: base case, step, conclusion.</div><figcaption>Three obligatio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2643,7 +2716,7 @@ This is induction: base case, step, conclusion.</div><figcaption>Three obligatio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

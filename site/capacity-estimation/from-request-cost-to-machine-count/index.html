@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Capacity Estimation</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Machines and memory</p>
       <h1>From a Request&#x27;s Cost to a Machine Count</h1>
       <p class="lesson-lede">Produce an integer machine count from a peak rate, a per-request cost and a stated target utilisation, and say what the headroom is for.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Capacity per machine is one over the cost of a request</li><li>N is a ceiling, and the ceiling is the point</li><li>The headroom is named, and it is not an error bar</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One request, one machine, one fleet</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Capacity and target utilisation</span><p>The <strong>capacity</strong> of a machine is the reciprocal of the scarce resource one request consumes. Its <strong>target utilisation</strong> <span class="math" data-say="rho">ρ</span> is the fraction of that capacity the design is willing to use, so <strong>usable capacity</strong> is <span class="math" data-say="capacity times rho">capacity · ρ</span>. The <strong>machine count</strong> is <span class="math" data-say="N equals the ceiling of peak over the quantity capacity times rho">N = ⌈peak / (capacity · ρ)⌉</span>.</p></div><p>Every term has to be a peak or none of them can be. The rate going in is the peak rate from &ldquo;Peak to Average&rdquo;, not the mean; a fleet sized from a mean rate is short for as long as the busy period lasts, and no amount of care about the ceiling rescues it.</p><div class="mathblock" data-say="cores per machine, 8. cost of one request, 40 milliseconds of one core. capacity, 8 times 1000 milliseconds per second over 40 milliseconds, equals, 200 req per second. target utilisation rho, 60 percent. usable, 200 times 0.6, equals, 120 req per second. peak rate, 20000 req per second. machines needed, 20000 over 120 equals 500 over 3, equals, 166.67. N equals the ceiling of 500 over 3, equals, 167. fleet capacity, 167 times 200, equals, 33400 req per second. the peak sits at 20000 over 33400 equals 100 over 167, equals, 59.88 percent. spare, 33400 minus 20000, equals, 13400 req per second" tabindex="0" role="region" aria-label="Mathematical notation">cores per machine                8
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One request, one machine, one fleet</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Capacity and target utilisation</span><p>The <strong>capacity</strong> of a machine is the reciprocal of the scarce resource one request consumes. Its <strong>target utilisation</strong> <span class="math" data-say="rho">ρ</span> is the fraction of that capacity the design is willing to use, so <strong>usable capacity</strong> is <span class="math" data-say="capacity times rho">capacity · ρ</span>. The <strong>machine count</strong> is <span class="math" data-say="N equals the ceiling of peak over the quantity capacity times rho">N = ⌈peak / (capacity · ρ)⌉</span>.</p></div><p>Every term has to be a peak or none of them can be. The rate going in is the peak rate from &ldquo;Peak to Average&rdquo;, not the mean; a fleet sized from a mean rate is short for as long as the busy period lasts, and no amount of care about the ceiling rescues it.</p><div class="mathblock" data-say="cores per machine, 8. cost of one request, 40 milliseconds of one core. capacity, 8 times 1000 milliseconds per second over 40 milliseconds, equals, 200 req per second. target utilisation rho, 60 percent. usable, 200 times 0.6, equals, 120 req per second. peak rate, 20000 req per second. machines needed, 20000 over 120 equals 500 over 3, equals, 166.67. N equals the ceiling of 500 over 3, equals, 167. fleet capacity, 167 times 200, equals, 33400 req per second. the peak sits at 20000 over 33400 equals 100 over 167, equals, 59.88 percent. spare, 33400 minus 20000, equals, 13400 req per second" tabindex="0" role="region" aria-label="Mathematical notation">cores per machine                8
 cost of one request             40 ms of one core
 capacity     8 · 1000 ms/s / 40 ms          =  200 req/s
 
@@ -1404,22 +1448,21 @@ N = ⌈500/3⌉                                 =  167
 
 fleet capacity   167 · 200                  =  33 400 req/s
 the peak sits at 20 000 / 33 400 = 100/167  =  59.88%
-spare            33 400 − 20 000            =  13 400 req/s</div><p><span class="math" data-say="59.88 percent">59.88%</span> rather than <span class="math" data-say="60 percent">60%</span> is the ceiling showing up in the answer: rounding <span class="math" data-say="166.67">166.67</span> up to <span class="math" data-say="167">167</span> bought two-thirds of a machine that nobody asked for, and the fleet is very slightly emptier than the target. That is the normal direction for this error to run, and it is the safe one.</p><div class="example"><span class="label">Example &middot; A checkout API at twenty thousand a second</span><p>Eight cores, <span class="math" data-say="40 milliseconds">40 ms</span> of one core per request, <span class="math" data-say="60 percent">60%</span> target. Each machine serves <span class="math" data-say="200">200</span> requests a second and is allowed <span class="math" data-say="120">120</span>, so the fleet is <span class="math" data-say="167">167</span> machines carrying <span class="math" data-say="33400">33 400</span> requests a second of raw capacity, <span class="math" data-say="13400">13 400</span> of which is deliberately unused. Sized at <span class="math" data-say="100 percent">100%</span> the same peak gives <span class="math" data-say="100">100</span> machines, and the sixty-seven machines between those two answers are the headroom, priced.</p></div><h3>What the sixty-seven machines buy</h3><p>Not insurance against the estimate being wrong. The target utilisation is a queueing decision: as utilisation approaches one, waiting time rises without bound, and a fleet run at <span class="math" data-say="95 percent">95%</span> has a latency profile that no amount of extra patience fixes. <span class="math" data-say="60 percent">60%</span> is a point on that curve, chosen so that the response time is tolerable and a machine can be lost without the rest going over the knee.</p><p>The uncertainty in the inputs is a separate and multiplicative thing. If the peak rate and the per-request cost are each known to a factor of two, the ranges from &ldquo;Orders of Magnitude&rdquo; put the fleet somewhere across a <span class="math" data-say="divided by 4 and so on times 4">÷4 … ×4</span> interval, and the headroom does not begin to cover that. Two different questions, two different answers, and conflating them produces a fleet that is neither adequately provisioned nor honestly estimated.</p><h3>An integer is not a precise answer</h3><p><span class="math" data-say="167">167</span> looks like a hard number and is only as hard as its inputs. Halve the per-request cost in the lab and the same peak and target give <span class="math" data-say="84">84</span>; double it and they give <span class="math" data-say="334">334</span>. Nothing about the ceiling makes <span class="math" data-say="167">167</span> more certain than the <span class="math" data-say="40 milliseconds">40 ms</span> it came from &mdash; the ceiling removes the fractional part, not the range. The honest report names the fleet and the assumption that moves it most, which here is the cost of a request.</p><h3>One constraint, and the case with two</h3><p>This is the one-constraint version: the fleet is sized by request throughput and by nothing else. Real fleets are often held up by a second constraint at the same time &mdash; a data volume that will not fit, a connection count, a per-node write rate &mdash; and then the answer is the larger of the two ceilings rather than either one. &ldquo;How Many Shards&rdquo;, on Partitioning and Load Balancing, is that lesson: the same ceiling computed twice and a maximum taken. Doing the one-constraint case first is worth it, because the trap there is always to compute one ceiling and stop.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>From a request&#x27;s cost to a machine count</h2></div><p>An integer, with a headroom you have to name</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+spare            33 400 − 20 000            =  13 400 req/s</div><p><span class="math" data-say="59.88 percent">59.88%</span> rather than <span class="math" data-say="60 percent">60%</span> is the ceiling showing up in the answer: rounding <span class="math" data-say="166.67">166.67</span> up to <span class="math" data-say="167">167</span> bought two-thirds of a machine that nobody asked for, and the fleet is very slightly emptier than the target. That is the normal direction for this error to run, and it is the safe one.</p><div class="example"><span class="label">Example &middot; A checkout API at twenty thousand a second</span><p>Eight cores, <span class="math" data-say="40 milliseconds">40 ms</span> of one core per request, <span class="math" data-say="60 percent">60%</span> target. Each machine serves <span class="math" data-say="200">200</span> requests a second and is allowed <span class="math" data-say="120">120</span>, so the fleet is <span class="math" data-say="167">167</span> machines carrying <span class="math" data-say="33400">33 400</span> requests a second of raw capacity, <span class="math" data-say="13400">13 400</span> of which is deliberately unused. Sized at <span class="math" data-say="100 percent">100%</span> the same peak gives <span class="math" data-say="100">100</span> machines, and the sixty-seven machines between those two answers are the headroom, priced.</p></div><h3>What the sixty-seven machines buy</h3><p>Not insurance against the estimate being wrong. The target utilisation is a queueing decision: as utilisation approaches one, waiting time rises without bound, and a fleet run at <span class="math" data-say="95 percent">95%</span> has a latency profile that no amount of extra patience fixes. <span class="math" data-say="60 percent">60%</span> is a point on that curve, chosen so that the response time is tolerable and a machine can be lost without the rest going over the knee.</p><p>The uncertainty in the inputs is a separate and multiplicative thing. If the peak rate and the per-request cost are each known to a factor of two, the ranges from &ldquo;Orders of Magnitude&rdquo; put the fleet somewhere across a <span class="math" data-say="divided by 4 and so on times 4">÷4 … ×4</span> interval, and the headroom does not begin to cover that. Two different questions, two different answers, and conflating them produces a fleet that is neither adequately provisioned nor honestly estimated.</p><h3>An integer is not a precise answer</h3><p><span class="math" data-say="167">167</span> looks like a hard number and is only as hard as its inputs. Halve the per-request cost in the lab and the same peak and target give <span class="math" data-say="84">84</span>; double it and they give <span class="math" data-say="334">334</span>. Nothing about the ceiling makes <span class="math" data-say="167">167</span> more certain than the <span class="math" data-say="40 milliseconds">40 ms</span> it came from &mdash; the ceiling removes the fractional part, not the range. The honest report names the fleet and the assumption that moves it most, which here is the cost of a request.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>From a request&#x27;s cost to a machine count</h2></div><p>An integer, with a headroom you have to name</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>From a request's cost to a machine count</strong><span>N = ⌈peak / (capacity × ρ)⌉, and the ceiling is the lesson</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>machines needed</span><span class="tone-amber"><i class="legend-swatch"></i>your peak</span></div>
       </div>
       <div class="lab-stage" id="mcStage" tabindex="0" role="region" aria-label="Machine count as a staircase against the peak request rate."><svg id="mcStair" style="min-width:520px" viewBox="0 0 520 180" role="img" aria-label="The machine count rising in integer steps as the peak rate grows."></svg></div>
       <div class="status-banner" id="mcStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set the peak, the cost of a request and the headroom</h3>
-          <p>The staircase is <span class="math" data-say="N">N</span> against the peak rate, and the marker sits partway up a tread &mdash; that gap is the capacity the ceiling bought you. Drag the target utilisation to <span class="math" data-say="100 percent">100%</span> and watch <span class="math" data-say="N">N</span> collapse to the figure the panel calls &ldquo;N if sized at 100%&rdquo;.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set the peak, the cost of a request and the headroom</h3>
+            <p>The staircase is <span class="math" data-say="N">N</span> against the peak rate, and the marker sits partway up a tread &mdash; that gap is the capacity the ceiling bought you. Drag the target utilisation to <span class="math" data-say="100 percent">100%</span> and watch <span class="math" data-say="N">N</span> collapse to the figure the panel calls &ldquo;N if sized at 100%&rdquo;.</p>
         <div class="field" id="mcPresetField">
           <label for="mcPreset">Worked example</label>
           <select id="mcPreset"><option value="checkout-api" selected>a checkout API: 20 000 req/s peak, 40 ms of one core each, 8 cores, 60% target</option><option value="thumbnailer">an image thumbnailer: 2 000 req/s, 250 ms each, 16 cores, 70% target</option><option value="static-edge">a static edge: 500 000 req/s, 2 ms each, 4 cores, 80% target</option></select>
@@ -1449,12 +1492,15 @@ spare            33 400 − 20 000            =  13 400 req/s</div><p><span clas
           <div class="kpi"><span>N if sized at 100%</span><strong id="mcFull">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>One constraint, and the case with two</h3><p>This is the one-constraint version: the fleet is sized by request throughput and by nothing else. Real fleets are often held up by a second constraint at the same time &mdash; a data volume that will not fit, a connection count, a per-node write rate &mdash; and then the answer is the larger of the two ceilings rather than either one. &ldquo;How Many Shards&rdquo;, on Partitioning and Load Balancing, is that lesson: the same ceiling computed twice and a maximum taken. Doing the one-constraint case first is worth it, because the trap there is always to compute one ceiling and stop.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Turning a peak rate into a fleet</h2></div><p>The scarce resource first, then a reciprocal, then a target, then a ceiling.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide which resource a request actually consumes</h3><p>CPU milliseconds, memory, disk I/O, connections &mdash; one of them runs out first and it is the one to count. Getting this wrong produces a fleet sized by a resource that was never scarce, and the symptom is a system that falls over at a fraction of its computed capacity.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Turn the per-request cost into a per-machine capacity</h3><p>Capacity is the reciprocal: <span class="math" data-say="cores times 1000 milliseconds per second divided by cost in ms">cores × 1000 ms/s ÷ cost in ms</span> for a CPU bound. Keep the units on the page &mdash; the <span class="math" data-say="1000 milliseconds per second">1000 ms/s</span> row is the one people drop, and dropping it moves the answer by three orders of magnitude.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply by the target utilisation, and say where it came from</h3><p><span class="math" data-say="rho equals 0.6">ρ = 0.6</span> is a decision, not a measurement, and it belongs in the write-up next to the answer. An estimate that reports <span class="math" data-say="N">N</span> without reporting <span class="math" data-say="rho">ρ</span> cannot be checked by anyone, because the two numbers are only meaningful together.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Divide the peak by the usable capacity and take the ceiling</h3><p><span class="math" data-say="the ceiling of peak over usable">⌈peak / usable⌉</span>. Round up always: the fractional machine is doing real work at the peak, and the alternative is a fleet that is short for exactly as long as the busy hour lasts.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Report the fleet with the assumption that moves it most</h3><p>Say what <span class="math" data-say="N">N</span> is, what <span class="math" data-say="rho">ρ</span> was, and what the per-request cost was &mdash; and then say what <span class="math" data-say="N">N</span> would be if that cost were half or double. The integer looks exact and inherits every range that went into it.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Turning a peak rate into a fleet</h2>
+      <p class="lead-in">The scarce resource first, then a reciprocal, then a target, then a ceiling.</p>
+      <ol class="key-ideas method"><li><strong>Decide which resource a request actually consumes.</strong> CPU milliseconds, memory, disk I/O, connections &mdash; one of them runs out first and it is the one to count. Getting this wrong produces a fleet sized by a resource that was never scarce, and the symptom is a system that falls over at a fraction of its computed capacity.</li><li><strong>Turn the per-request cost into a per-machine capacity.</strong> Capacity is the reciprocal: <span class="math" data-say="cores times 1000 milliseconds per second divided by cost in ms">cores × 1000 ms/s ÷ cost in ms</span> for a CPU bound. Keep the units on the page &mdash; the <span class="math" data-say="1000 milliseconds per second">1000 ms/s</span> row is the one people drop, and dropping it moves the answer by three orders of magnitude.</li><li><strong>Multiply by the target utilisation, and say where it came from.</strong> <span class="math" data-say="rho equals 0.6">ρ = 0.6</span> is a decision, not a measurement, and it belongs in the write-up next to the answer. An estimate that reports <span class="math" data-say="N">N</span> without reporting <span class="math" data-say="rho">ρ</span> cannot be checked by anyone, because the two numbers are only meaningful together.</li><li><strong>Divide the peak by the usable capacity and take the ceiling.</strong> <span class="math" data-say="the ceiling of peak over usable">⌈peak / usable⌉</span>. Round up always: the fractional machine is doing real work at the peak, and the alternative is a fleet that is short for exactly as long as the busy hour lasts.</li><li><strong>Report the fleet with the assumption that moves it most.</strong> Say what <span class="math" data-say="N">N</span> is, what <span class="math" data-say="rho">ρ</span> was, and what the per-request cost was &mdash; and then say what <span class="math" data-say="N">N</span> would be if that cost were half or double. The integer looks exact and inherits every range that went into it.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1487,17 +1533,16 @@ cost halved to 20 ms   capacity 400, usable 240       =  N = 84
 cost doubled to 80 ms  capacity 100, usable  60       =  N = 334</div><p>The two lines at the bottom are the ones that stop <span class="math" data-say="167">167</span> from looking like a measurement. The per-request cost is a ranged factor like every other input on this course, and a factor of two in it is very nearly a factor of two in the fleet. The ceiling removed the fraction; it did not remove the range.</p><p>The <span class="math" data-say="59.88 percent">59.88%</span> is worth noticing too. The target was <span class="math" data-say="60 percent">60%</span> and the fleet runs just under it, because the ceiling handed you two-thirds of a machine you had not asked for. Over-provisioning by a fraction of a machine is the correct direction for that error, and it is the direction the ceiling always errs in.</p><p>For a faded rehearsal, take the lab&rsquo;s edge-cache example: <span class="math" data-say="500000">500 000</span> requests a second, <span class="math" data-say="2 milliseconds">2 ms</span> a request, <span class="math" data-say="4">4</span> cores, <span class="math" data-say="80 percent">80%</span> target. The supplied first move is the capacity, <span class="math" data-say="4 times 1000 over 2 equals 2000">4 · 1000/2 = 2 000</span> requests a second per machine. Produce the usable capacity, the exact machine count and <span class="math" data-say="N">N</span>, then predict what <span class="math" data-say="N">N</span> becomes at a <span class="math" data-say="60 percent">60%</span> target before changing the slider.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing the fleet at a hundred percent of capacity</strong><span><span class="math" data-say="the ceiling of 20000 over 200, equals 100">⌈20 000/200⌉ = 100</span> machines is arithmetically correct and describes a fleet with no room for a deploy, a failed machine or a bad afternoon, running at the part of the queueing curve where response time climbs fastest. The same peak at a <span class="math" data-say="60 percent">60%</span> target needs <span class="math" data-say="167">167</span>. The sixty-seven machines are not waste; they are the latency the design asked for, and they should be reported as such.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the headroom as cover for a wrong estimate</strong><span>The <span class="math" data-say="60 percent">60%</span> answers &ldquo;how full should a queue run&rdquo; and the ranges answer &ldquo;how well do we know the inputs&rdquo;, and they compose by multiplying rather than one absorbing the other. A peak known to <span class="math" data-say="plus or minus 2 times">±2×</span> and a cost known to <span class="math" data-say="plus or minus 2 times">±2×</span> put <span class="math" data-say="N">N</span> across a <span class="math" data-say="divided by 4 and so on times 4">÷4 … ×4</span> interval; a target of <span class="math" data-say="60 percent">60%</span> covers a factor of well under two. Anyone relying on the headroom to absorb the estimate has covered neither.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the integer as a precise answer</strong><span><span class="math" data-say="167">167</span> is a ceiling of an exact fraction, which makes it exact given its inputs and no better known than they are. In the lab, halving the per-request cost gives <span class="math" data-say="84">84</span> and doubling it gives <span class="math" data-say="334">334</span> &mdash; the same peak, the same target, three fleets. The ceiling is the last step of the arithmetic and it is not a promotion from estimate to measurement.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a machine count quoted without its target utilisation reads as an unfinished answer.</strong><p>You should be able to turn a peak rate, a per-request cost and a target into <span class="math" data-say="N">N</span> without assistance, say why the answer is a ceiling and never a rounding, distinguish the headroom from the uncertainty in the inputs, and name what <span class="math" data-say="N">N</span> becomes if the per-request cost is out by a factor of two.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Machines are counted; memory is not counted the same way. &ldquo;Memory and the Working Set&rdquo; is the last of the four things a rate sizes, and it is the one where the whole dataset is the wrong denominator &mdash; a cache is sized to the fraction of the data the traffic actually touches, and the curve relating that fraction to the hit rate has a knee in it that decides the budget.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sizing the fleet at a hundred percent of capacity</strong><span><span class="math" data-say="the ceiling of 20000 over 200, equals 100">⌈20 000/200⌉ = 100</span> machines is arithmetically correct and describes a fleet with no room for a deploy, a failed machine or a bad afternoon, running at the part of the queueing curve where response time climbs fastest. The same peak at a <span class="math" data-say="60 percent">60%</span> target needs <span class="math" data-say="167">167</span>. The sixty-seven machines are not waste; they are the latency the design asked for, and they should be reported as such.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the headroom as cover for a wrong estimate</strong><span>The <span class="math" data-say="60 percent">60%</span> answers &ldquo;how full should a queue run&rdquo; and the ranges answer &ldquo;how well do we know the inputs&rdquo;, and they compose by multiplying rather than one absorbing the other. A peak known to <span class="math" data-say="plus or minus 2 times">±2×</span> and a cost known to <span class="math" data-say="plus or minus 2 times">±2×</span> put <span class="math" data-say="N">N</span> across a <span class="math" data-say="divided by 4 and so on times 4">÷4 … ×4</span> interval; a target of <span class="math" data-say="60 percent">60%</span> covers a factor of well under two. Anyone relying on the headroom to absorb the estimate has covered neither.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the integer as a precise answer</strong><span><span class="math" data-say="167">167</span> is a ceiling of an exact fraction, which makes it exact given its inputs and no better known than they are. In the lab, halving the per-request cost gives <span class="math" data-say="84">84</span> and doubling it gives <span class="math" data-say="334">334</span> &mdash; the same peak, the same target, three fleets. The ceiling is the last step of the arithmetic and it is not a promotion from estimate to measurement.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a machine count quoted without its target utilisation reads as an unfinished answer.</strong><p>You should be able to turn a peak rate, a per-request cost and a target into <span class="math" data-say="N">N</span> without assistance, say why the answer is a ceiling and never a rounding, distinguish the headroom from the uncertainty in the inputs, and name what <span class="math" data-say="N">N</span> becomes if the per-request cost is out by a factor of two.</p></div></div><div class="note"><strong>Note:</strong> Machines are counted; memory is not counted the same way. &ldquo;Memory and the Working Set&rdquo; is the last of the four things a rate sizes, and it is the one where the whole dataset is the wrong denominator &mdash; a cache is sized to the fraction of the data the traffic actually touches, and the curve relating that fraction to the hit rate has a knee in it that decides the budget.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Capacity per machine is one over the cost of a request</summary><p>A request that occupies one core for <span class="math" data-say="40 milliseconds">40 ms</span> lets a machine with <span class="math" data-say="8">8</span> cores serve <span class="math" data-say="8 times 1000 over 40 equals 200">8 · 1000/40 = 200</span> requests a second. The general form is the same for any resource: capacity is the reciprocal of what one request consumes, in whatever unit is scarce. Choosing which resource is scarce is the modelling decision; the arithmetic after that is a reciprocal.</p></details><details class="recall"><summary>N is a ceiling, and the ceiling is the point</summary><p><span class="math" data-say="20000">20 000</span> requests a second over <span class="math" data-say="120">120</span> usable gives <span class="math" data-say="500 over 3">500/3</span> machines, which is <span class="math" data-say="166.67">166.67</span> and therefore <span class="math" data-say="167">167</span>. Machines come in whole numbers, so the exact fraction is never the answer &mdash; and rounding down for tidiness gives a fleet that is short at exactly the moment the peak arrives. The lab draws the staircase so the <span class="math" data-say="2 over 3">2/3</span> of a machine at the top of the last tread is visible.</p></details><details class="recall"><summary>The headroom is named, and it is not an error bar</summary><p><span class="math" data-say="60 percent">60%</span> is a decision about how full a queue should be allowed to run, and it comes from queueing theory rather than from uncertainty about the inputs. It is taken as given on this course. &ldquo;The Knee: Response Time vs Utilisation&rdquo; is where it is earned, and the short version is that response time rises steeply as utilisation approaches one, so the last <span class="math" data-say="40 percent">40%</span> of a machine buys latency you cannot pay for any other way.</p></details></div>
+      <h3>Summary</h3>
       <p>A machine&rsquo;s capacity is one over what a request costs it, and the fleet is the peak divided by the capacity you are willing to use. Two things make this more than a division. The answer is a ceiling, because machines are integers and most of a machine will not serve anything. And the utilisation you divide by is a decision that has to be named: at <span class="math" data-say="60 percent">60%</span> the fleet here is <span class="math" data-say="167">167</span> machines, at <span class="math" data-say="100 percent">100%</span> it is <span class="math" data-say="100">100</span>, and the difference is not a rounding.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Capacity per machine is one over the cost of a request.</strong> A request that occupies one core for <span class="math" data-say="40 milliseconds">40 ms</span> lets a machine with <span class="math" data-say="8">8</span> cores serve <span class="math" data-say="8 times 1000 over 40 equals 200">8 · 1000/40 = 200</span> requests a second. The general form is the same for any resource: capacity is the reciprocal of what one request consumes, in whatever unit is scarce. Choosing which resource is scarce is the modelling decision; the arithmetic after that is a reciprocal.</li><li><strong>N is a ceiling, and the ceiling is the point.</strong> <span class="math" data-say="20000">20 000</span> requests a second over <span class="math" data-say="120">120</span> usable gives <span class="math" data-say="500 over 3">500/3</span> machines, which is <span class="math" data-say="166.67">166.67</span> and therefore <span class="math" data-say="167">167</span>. Machines come in whole numbers, so the exact fraction is never the answer &mdash; and rounding down for tidiness gives a fleet that is short at exactly the moment the peak arrives. The lab draws the staircase so the <span class="math" data-say="2 over 3">2/3</span> of a machine at the top of the last tread is visible.</li><li><strong>The headroom is named, and it is not an error bar.</strong> <span class="math" data-say="60 percent">60%</span> is a decision about how full a queue should be allowed to run, and it comes from queueing theory rather than from uncertainty about the inputs. It is taken as given on this course. &ldquo;The Knee: Response Time vs Utilisation&rdquo; is where it is earned, and the short version is that response time rises steeply as utilisation approaches one, so the last <span class="math" data-say="40 percent">40%</span> of a machine buys latency you cannot pay for any other way.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="capacity, equals, 1 over resource per request. equals, 8 cores times 1000 milliseconds per second over 40 milliseconds, equals, 200 req per second per machine. usable, equals, capacity times rho sub target, equals, 200 times 0.6 equals 120 req per second. N, equals, the ceiling of peak over usable, equals, the ceiling of 20000 over 120, equals the ceiling of 500 over 3, equals 167. at N equals 167 the peak sits at 100 over 167 equals 59.88 percent of the fleet. sized at rho equals 1 the same peak would have said N equals 100" tabindex="0" role="region" aria-label="Mathematical notation">capacity  =  1 / (resource per request)
           =  8 cores · 1000 ms/s / 40 ms  =  200 req/s per machine
 usable    =  capacity · ρ_target          =  200 · 0.6 = 120 req/s
@@ -2507,11 +2552,40 @@ sized at ρ = 1 the same peak would have said N = 100</div><figcaption>Capacity,
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2579,7 +2653,7 @@ sized at ρ = 1 the same peak would have said N = 100</div><figcaption>Capacity,
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

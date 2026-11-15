@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,34 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Justice and Collective Choice</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Democracy</p>
       <h1>The Condorcet Jury Theorem</h1>
       <p class="lesson-lede">A majority of voters who are each right more than half the time is right more often than any of them.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Competence is a probability of being right</li><li>The majority is right when more than half are</li><li>A vote is pivotal when the others split evenly</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Three voters, then eleven</h2>
-      <article class="prose reading"><p>Condorcet's question was whether a group votes better than a person. The case that makes it computable is a jury deciding a question of fact, such as whether the accused did it. Suppose each of <span class="math" data-say="n">n</span> jurors is right with probability <span class="math" data-say="p">p</span>, whatever the others think, and the verdict is whatever more than half of them say.</p><p>Take three jurors, each right with probability <span class="math" data-say="3 over 5">3/5</span>. The majority is right when at least two of them are. All three are right with probability <span class="math" data-say="the quantity 3 over 5, times the quantity 3 over 5, times the quantity 3 over 5">(3/5)·(3/5)·(3/5)</span>, which is <span class="math" data-say="27 over 125">27/125</span>. Exactly two are right in three ways, according to which juror is wrong, and each way has probability <span class="math" data-say="the quantity 3 over 5, times the quantity 3 over 5, times the quantity 2 over 5">(3/5)·(3/5)·(2/5)</span>, so together they have probability <span class="math" data-say="54 over 125">54/125</span>.</p><div class="mathblock" data-say="all three right, the quantity 3 over 5, times the quantity 3 over 5, times the quantity 3 over 5, 27 over 125. exactly two right, 3 times the quantity 3 over 5, times the quantity 3 over 5, times the quantity 2 over 5, 54 over 125. majority right, 27 over 125 plus 54 over 125, 81 over 125" tabindex="0" role="region" aria-label="Mathematical notation">     all three right     (3/5)·(3/5)·(3/5)         27/125
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Three voters, then eleven</h2><div class="prose reading"><p>Condorcet's question was whether a group votes better than a person. The case that makes it computable is a jury deciding a question of fact, such as whether the accused did it. Suppose each of <span class="math" data-say="n">n</span> jurors is right with probability <span class="math" data-say="p">p</span>, whatever the others think, and the verdict is whatever more than half of them say.</p><p>Take three jurors, each right with probability <span class="math" data-say="3 over 5">3/5</span>. The majority is right when at least two of them are. All three are right with probability <span class="math" data-say="the quantity 3 over 5, times the quantity 3 over 5, times the quantity 3 over 5">(3/5)·(3/5)·(3/5)</span>, which is <span class="math" data-say="27 over 125">27/125</span>. Exactly two are right in three ways, according to which juror is wrong, and each way has probability <span class="math" data-say="the quantity 3 over 5, times the quantity 3 over 5, times the quantity 2 over 5">(3/5)·(3/5)·(2/5)</span>, so together they have probability <span class="math" data-say="54 over 125">54/125</span>.</p><div class="mathblock" data-say="all three right, the quantity 3 over 5, times the quantity 3 over 5, times the quantity 3 over 5, 27 over 125. exactly two right, 3 times the quantity 3 over 5, times the quantity 3 over 5, times the quantity 2 over 5, 54 over 125. majority right, 27 over 125 plus 54 over 125, 81 over 125" tabindex="0" role="region" aria-label="Mathematical notation">     all three right     (3/5)·(3/5)·(3/5)         27/125
      exactly two right   3·(3/5)·(3/5)·(2/5)       54/125
-     majority right      27/125 + 54/125           81/125</div><p>So the majority of three is right with probability <span class="math" data-say="81 over 125">81/125</span>, which is <span class="math" data-say="0.648">0.648</span>, while a single juror is right with <span class="math" data-say="3 over 5">3/5</span>, which is <span class="math" data-say="75 over 125">75/125</span>. The jury is better than its members, by a little. The lab prints the exact fraction and works for any number of jurors up to <span class="math" data-say="101">101</span>.</p><h3>More voters</h3><p>With eleven jurors, still each right with probability <span class="math" data-say="3 over 5">3/5</span>, the majority is right with probability <span class="math" data-say="36791901 over 48828125">36791901/48828125</span>, about <span class="math" data-say="0.75">0.75</span>. The gain from the size of the jury has been substantial. The pattern is general: if <span class="math" data-say="p">p</span> is above <span class="math" data-say="1 over 2">1/2</span>, the probability that the majority is right increases with every added pair of jurors, and tends to certainty.</p><p>The pattern reverses on the other side. Three jurors each right with probability <span class="math" data-say="2 over 5">2/5</span> produce a majority that is right with probability <span class="math" data-say="44 over 125">44/125</span>, which is less than <span class="math" data-say="2 over 5">2/5</span>. Eleven such jurors produce <span class="math" data-say="12036224 over 48828125">12036224/48828125</span>, about <span class="math" data-say="0.25">0.25</span>. With probability below <span class="math" data-say="1 over 2">1/2</span> each, the crowd does worse than its members, and the larger the crowd, the worse it does. At exactly <span class="math" data-say="1 over 2">1/2</span> the crowd gains nothing: eleven jurors, each a coin flip, are right with probability <span class="math" data-say="1 over 2">1/2</span>.</p><div class="defbox"><span class="label">Definition &middot; The Condorcet jury theorem</span><p>If voters answer a yes-or-no question independently, each right with the same probability <span class="math" data-say="p">p</span>, then the probability that a majority is right increases with the number of voters when <span class="math" data-say="p">p</span> is above <span class="math" data-say="1 over 2">1/2</span>, decreases when it is below, and stays at <span class="math" data-say="1 over 2">1/2</span> when it equals <span class="math" data-say="1 over 2">1/2</span>.</p></div><h3>What the theorem needs</h3><p>Two assumptions carry the result, and both are strong. The first is independence: each voter's chance of being right does not depend on how the others voted. Voters who read the same newspaper are not independent; if each follows a newspaper that is right with probability <span class="math" data-say="3 over 5">3/5</span>, a million voters are right together with probability <span class="math" data-say="3 over 5">3/5</span> and not higher. “Testimony and Independent Witnesses” made the same point about witnesses.</p><p>The second is that there is a fact to be right about, and that voters are better than chance at finding it. A vote on a tax rate or a way of life is not an estimate of anything. The theorem's weight rests on the question being of the first kind.</p><h3>The pivotal voter</h3><p>The probability that one juror decides the verdict is a different quantity. With three jurors, a given juror decides the result only if the other two split, one right and one wrong, which can happen in two ways: <span class="math" data-say="2 times the quantity 3 over 5, times the quantity 2 over 5">2·(3/5)·(2/5)</span>, which is <span class="math" data-say="12 over 25">12/25</span>. In general, for odd <span class="math" data-say="n">n</span>, the others must divide exactly evenly, and the lab prints that probability.</p><p>With eleven jurors at <span class="math" data-say="3 over 5">3/5</span> it is <span class="math" data-say="1959552 over 9765625">1959552/9765625</span>, about <span class="math" data-say="0.20">0.20</span>; with eleven coin-flipping jurors, <span class="math" data-say="63 over 256">63/256</span>, about <span class="math" data-say="0.25">0.25</span>. The probability shrinks as the electorate grows, and in a national election it is very small. That is the paradox of the pivotal voter: the benefit from any one vote is the probability that it decides, multiplied by whatever is at stake, and the first factor is tiny. The lab computes the first factor and not the second, and what the stakes are worth is a question about welfare, not about probability.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+     majority right      27/125 + 54/125           81/125</div><p>So the majority of three is right with probability <span class="math" data-say="81 over 125">81/125</span>, which is <span class="math" data-say="0.648">0.648</span>, while a single juror is right with <span class="math" data-say="3 over 5">3/5</span>, which is <span class="math" data-say="75 over 125">75/125</span>. The jury is better than its members, by a little. The lab prints the exact fraction and works for any number of jurors up to <span class="math" data-say="101">101</span>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Collective choice</h2></div><p>six voting rules, the majority relation, judgment aggregation and the jury theorem</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>From individual verdicts to a group's</strong><span>every winner recomputed from the profile as typed</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="voTable"></table></div>
       <div class="status-banner" id="voStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Compute a jury</h3>
-          <p>A jury reads n=3 p=3/5, with an odd n up to 101 and p a fraction between 0 and 1. The table gives the majority's exact probability of being right.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Compute a jury</h3>
+            <p>A jury reads n=3 p=3/5, with an odd n up to 101 and p a fraction between 0 and 1. The table gives the majority's exact probability of being right.</p>
         <div class="field">
           <label for="voPreset">Worked example</label>
           <select id="voPreset"><option value="three" selected>Three jurors, each right with 3/5</option><option value="eleven">Eleven jurors, each right with 3/5</option><option value="incompetent">Three jurors, each right with 2/5</option><option value="incompetent-eleven">Eleven jurors, each right with 2/5</option><option value="coin">Eleven jurors, each right with 1/2</option></select>
@@ -1438,12 +1481,15 @@
           <div class="kpi"><span>One vote decisive</span><strong id="voPivot">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><h3>More voters</h3><p>With eleven jurors, still each right with probability <span class="math" data-say="3 over 5">3/5</span>, the majority is right with probability <span class="math" data-say="36791901 over 48828125">36791901/48828125</span>, about <span class="math" data-say="0.75">0.75</span>. The gain from the size of the jury has been substantial. The pattern is general: if <span class="math" data-say="p">p</span> is above <span class="math" data-say="1 over 2">1/2</span>, the probability that the majority is right increases with every added pair of jurors, and tends to certainty.</p><p>The pattern reverses on the other side. Three jurors each right with probability <span class="math" data-say="2 over 5">2/5</span> produce a majority that is right with probability <span class="math" data-say="44 over 125">44/125</span>, which is less than <span class="math" data-say="2 over 5">2/5</span>. Eleven such jurors produce <span class="math" data-say="12036224 over 48828125">12036224/48828125</span>, about <span class="math" data-say="0.25">0.25</span>. With probability below <span class="math" data-say="1 over 2">1/2</span> each, the crowd does worse than its members, and the larger the crowd, the worse it does. At exactly <span class="math" data-say="1 over 2">1/2</span> the crowd gains nothing: eleven jurors, each a coin flip, are right with probability <span class="math" data-say="1 over 2">1/2</span>.</p><div class="defbox"><span class="label">Definition &middot; The Condorcet jury theorem</span><p>If voters answer a yes-or-no question independently, each right with the same probability <span class="math" data-say="p">p</span>, then the probability that a majority is right increases with the number of voters when <span class="math" data-say="p">p</span> is above <span class="math" data-say="1 over 2">1/2</span>, decreases when it is below, and stays at <span class="math" data-say="1 over 2">1/2</span> when it equals <span class="math" data-say="1 over 2">1/2</span>.</p></div><h3>What the theorem needs</h3><p>Two assumptions carry the result, and both are strong. The first is independence: each voter's chance of being right does not depend on how the others voted. Voters who read the same newspaper are not independent; if each follows a newspaper that is right with probability <span class="math" data-say="3 over 5">3/5</span>, a million voters are right together with probability <span class="math" data-say="3 over 5">3/5</span> and not higher. “Testimony and Independent Witnesses” made the same point about witnesses.</p><p>The second is that there is a fact to be right about, and that voters are better than chance at finding it. A vote on a tax rate or a way of life is not an estimate of anything. The theorem's weight rests on the question being of the first kind.</p><h3>The pivotal voter</h3><p>The probability that one juror decides the verdict is a different quantity. With three jurors, a given juror decides the result only if the other two split, one right and one wrong, which can happen in two ways: <span class="math" data-say="2 times the quantity 3 over 5, times the quantity 2 over 5">2·(3/5)·(2/5)</span>, which is <span class="math" data-say="12 over 25">12/25</span>. In general, for odd <span class="math" data-say="n">n</span>, the others must divide exactly evenly, and the lab prints that probability.</p><p>With eleven jurors at <span class="math" data-say="3 over 5">3/5</span> it is <span class="math" data-say="1959552 over 9765625">1959552/9765625</span>, about <span class="math" data-say="0.20">0.20</span>; with eleven coin-flipping jurors, <span class="math" data-say="63 over 256">63/256</span>, about <span class="math" data-say="0.25">0.25</span>. The probability shrinks as the electorate grows, and in a national election it is very small. That is the paradox of the pivotal voter: the benefit from any one vote is the probability that it decides, multiplied by whatever is at stake, and the first factor is tiny. The lab computes the first factor and not the second, and what the stakes are worth is a question about welfare, not about probability.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a jury&#x27;s majority</h2></div><p>Five moves for an odd number of jurors. The first four give the majority and the last gives the pivotal vote.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the question and the competence</h3><p>The question has a correct answer and each voter is right with probability <span class="math" data-say="p">p</span>, independently. Write down <span class="math" data-say="n">n</span> and <span class="math" data-say="p">p</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the counts that give a majority</h3><p>For three voters the majority is right when two or three are. In general it is every count of right voters from <span class="math" data-say="the quantity n plus 1, over 2">(n + 1)/2</span> to <span class="math" data-say="n">n</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the probability of each count</h3><p>A given set with <span class="math" data-say="k">k</span> right and the rest wrong has probability <span class="math" data-say="p">p</span> to the power <span class="math" data-say="k">k</span> times <span class="math" data-say="1 minus p">1 − p</span> to the power <span class="math" data-say="n minus k">n − k</span>, and there are as many such sets as ways to choose which <span class="math" data-say="k">k</span> are right.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Add and compare with <span class="math" data-say="p">p</span></h3><p>The sum is the probability that the majority is right. If it exceeds <span class="math" data-say="p">p</span>, the jury has improved on its members.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Find the pivotal probability</h3><p>The others must split exactly evenly, <span class="math" data-say="the quantity n minus 1, over 2">(n − 1)/2</span> right and <span class="math" data-say="the quantity n minus 1, over 2">(n − 1)/2</span> wrong, in as many ways as there are ways to choose which are right. Multiply by that count.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a jury&#x27;s majority</h2>
+      <p class="lead-in">Five moves for an odd number of jurors. The first four give the majority and the last gives the pivotal vote.</p>
+      <ol class="key-ideas method"><li><strong>State the question and the competence.</strong> The question has a correct answer and each voter is right with probability <span class="math" data-say="p">p</span>, independently. Write down <span class="math" data-say="n">n</span> and <span class="math" data-say="p">p</span>.</li><li><strong>List the counts that give a majority.</strong> For three voters the majority is right when two or three are. In general it is every count of right voters from <span class="math" data-say="the quantity n plus 1, over 2">(n + 1)/2</span> to <span class="math" data-say="n">n</span>.</li><li><strong>Find the probability of each count.</strong> A given set with <span class="math" data-say="k">k</span> right and the rest wrong has probability <span class="math" data-say="p">p</span> to the power <span class="math" data-say="k">k</span> times <span class="math" data-say="1 minus p">1 − p</span> to the power <span class="math" data-say="n minus k">n − k</span>, and there are as many such sets as ways to choose which <span class="math" data-say="k">k</span> are right.</li><li><strong>Add and compare with <span class="math" data-say="p">p</span>.</strong> The sum is the probability that the majority is right. If it exceeds <span class="math" data-say="p">p</span>, the jury has improved on its members.</li><li><strong>Find the pivotal probability.</strong> The others must split exactly evenly, <span class="math" data-say="the quantity n minus 1, over 2">(n − 1)/2</span> right and <span class="math" data-say="the quantity n minus 1, over 2">(n − 1)/2</span> wrong, in as many ways as there are ways to choose which are right. Multiply by that count.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1461,17 +1507,16 @@ single juror:       3/5                  = 75/125
 pivotal juror:      2·(3/5)·(2/5)        = 12/25</div><p>The majority is right more often than a juror, and the margin is small: 81 against 75 out of 125. The pivotal probability is 12/25 for three jurors and is already 1959552/9765625 for eleven.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that a large electorate is wise whatever its voters&#x27; competence</strong><span>With each voter right with probability 2/5, three voters give a majority right with probability 44/125, less than 2/5, and eleven give about 0.25. With each a coin flip, eleven give exactly 1/2. The size of the electorate magnifies whatever the voters' competence already is, upward above 1/2 and downward below it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the theorem as being about preferences</strong><span>The result concerns a question with a correct answer, about which each voter has a probability of being right. A vote for a tax rate has no answer to be right about, and the theorem does not apply to it. It is a claim about estimating a fact, and the impossibility results of the earlier lessons are claims about combining preferences.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding from a small pivotal probability that a vote is worthless</strong><span>The value of a vote is the probability that it decides times the stakes. At eleven jurors at 3/5 the first factor is about 0.20, and for a very large electorate it is far smaller, but it is multiplied by a stake that may be shared among millions. The lab computes only the first factor, so the conclusion needs a second premise about the stakes, the question “Public Goods and Free-Riding” asks of one contribution among many.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a majority&#x27;s probability of being right and a voter&#x27;s chance of being pivotal.</strong><p>Given n and p, write the probability that a majority is right as a sum, evaluate it for three voters, say which way it moves as n grows when p is above, at and below one half, and compute the pivotal probability.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Try n = 1 and see that the majority of one is the voter. Then compare the pivotal probabilities of the two eleven-juror presets at 3/5 and 2/5: they are the same, because a juror who is wrong with probability 3/5 decides the verdict with the same chance as one who is right with probability 3/5.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing that a large electorate is wise whatever its voters&#x27; competence</strong><span>With each voter right with probability 2/5, three voters give a majority right with probability 44/125, less than 2/5, and eleven give about 0.25. With each a coin flip, eleven give exactly 1/2. The size of the electorate magnifies whatever the voters' competence already is, upward above 1/2 and downward below it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the theorem as being about preferences</strong><span>The result concerns a question with a correct answer, about which each voter has a probability of being right. A vote for a tax rate has no answer to be right about, and the theorem does not apply to it. It is a claim about estimating a fact, and the impossibility results of the earlier lessons are claims about combining preferences.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding from a small pivotal probability that a vote is worthless</strong><span>The value of a vote is the probability that it decides times the stakes. At eleven jurors at 3/5 the first factor is about 0.20, and for a very large electorate it is far smaller, but it is multiplied by a stake that may be shared among millions. The lab computes only the first factor, so the conclusion needs a second premise about the stakes, the question “Public Goods and Free-Riding” asks of one contribution among many.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a majority&#x27;s probability of being right and a voter&#x27;s chance of being pivotal.</strong><p>Given n and p, write the probability that a majority is right as a sum, evaluate it for three voters, say which way it moves as n grows when p is above, at and below one half, and compute the pivotal probability.</p></div></div><div class="note"><strong>Note:</strong> Try n = 1 and see that the majority of one is the voter. Then compare the pivotal probabilities of the two eleven-juror presets at 3/5 and 2/5: they are the same, because a juror who is wrong with probability 3/5 decides the verdict with the same chance as one who is right with probability 3/5.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Competence is a probability of being right</summary><p>Each voter answers a yes-or-no question that has a correct answer, and is right with probability <span class="math" data-say="p">p</span>, independently of the others. The theorem is silent on questions of taste, where there is no answer to be right about.</p></details><details class="recall"><summary>The majority is right when more than half are</summary><p>With an odd number <span class="math" data-say="n">n</span> of voters the majority is right exactly when at least <span class="math" data-say="the quantity n plus 1, over 2">(n + 1)/2</span> of them are, and the probability is the sum of the exact probabilities of each such count.</p></details><details class="recall"><summary>A vote is pivotal when the others split evenly</summary><p>One voter decides the result only if the other <span class="math" data-say="n minus 1">n − 1</span> voters divide exactly half and half. The probability of that is small, and it falls as the electorate grows.</p></details></div>
+      <h3>Summary</h3>
       <p>If n independent voters are each right with probability p about a question that has a correct answer, the probability that a majority is right can be computed exactly. It rises with n when p exceeds one half, falls when p is below one half, and stays at one half when p equals it. The probability that a single vote decides the outcome shrinks as the electorate grows. The wrong model is that a large electorate is wise whatever its voters' competence.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Competence is a probability of being right.</strong> Each voter answers a yes-or-no question that has a correct answer, and is right with probability <span class="math" data-say="p">p</span>, independently of the others. The theorem is silent on questions of taste, where there is no answer to be right about.</li><li><strong>The majority is right when more than half are.</strong> With an odd number <span class="math" data-say="n">n</span> of voters the majority is right exactly when at least <span class="math" data-say="the quantity n plus 1, over 2">(n + 1)/2</span> of them are, and the probability is the sum of the exact probabilities of each such count.</li><li><strong>A vote is pivotal when the others split evenly.</strong> One voter decides the result only if the other <span class="math" data-say="n minus 1">n − 1</span> voters divide exactly half and half. The probability of that is small, and it falls as the electorate grows.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="majority right equals P of more than half are right. p above 1 over 2, more voters, better majority. p below 1 over 2, more voters, worse majority. pivotal, the others split exactly evenly" tabindex="0" role="region" aria-label="Mathematical notation">majority right = P(more than half are right)
 p above 1/2: more voters, better majority
 p below 1/2: more voters, worse majority
@@ -2453,11 +2498,40 @@ pivotal: the others split exactly evenly</div><figcaption>A majority&#x27;s chan
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2525,7 +2599,7 @@ pivotal: the others split exactly evenly</div><figcaption>A majority&#x27;s chan
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

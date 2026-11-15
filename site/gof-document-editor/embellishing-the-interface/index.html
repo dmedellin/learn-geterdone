@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>Embellishing the User Interface</h1>
       <p class="lesson-lede">Borders and scroll bars added by wrapping an object in another with the same interface, so they can be stacked, reordered and removed without subclasses.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Transparent enclosure</li><li>MonoGlyph</li><li>Decorator</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Embellishment without a subclass for every combination</h2>
-      <article class="prose reading"><p>&ldquo;All this leads us to the concept of transparent enclosure, which combines the notions of (1) single-child (or single-component) composition and (2) compatible interfaces.&rdquo; Section 2.4, Embellishing the User Interface, arrives at that concept by asking how to put a border and scroll bars around Lexi's page. Read the section in your own copy first.</p><p>The authors want the embellishments easy to add and remove, even while the program runs, and invisible to the rest of the interface. Inheritance fails both tests. A bordered composition is a subclass, a scrollable one another, and one with both a third; carry that on and there is a class for every combination of embellishments, which grows out of hand as embellishments are added, and none of them can be rearranged at run time. Object composition is the alternative, which leaves the question of who holds whom. If the glyph held its border, every glyph class would have to know about borders; if the border holds the glyph, the drawing of borders stays in one class.</p><p>Then comes the step that makes it transparent. A border has an appearance, so it can be a glyph; more to the point, clients should not care whether a glyph has a border. If Border is a subclass of Glyph, a client tells a bordered glyph to draw exactly as it told the plain one. The enclosure can forward everything, or add work before or after forwarding, or keep state of its own. Lexi gathers this in MonoGlyph, an abstract glyph holding one component and forwarding every request to it. A border's draw operation forwards first, so the component draws itself, and then draws the border: it extends the forwarded operation rather than replacing it. A scroller draws its component offset by the scroll bars' positions and clipped to its bounds.</p><p>Lexi's page puts the composition inside a scroller and the scroller inside a border. The authors point out that the order can be reversed: put the border inside the scroller, and the border scrolls with the text, which a designer may or may not want. They also insist that an embellishment encloses one glyph, never several; grouping is already the job of rows and columns, and mixing it into embellishment would duplicate it. The pattern is Decorator, in which embellishment means any added responsibility, not only a visual one. Its catalog entry is fair about the costs: a decorated object is not the same object as the one inside it, so code that compares identities can be fooled, and a design built of many small, similar decorators can be easy to configure and hard to learn and debug.</p><pre class="codeblock" data-say="line 1, comment, A charge, and decorators that enclose one charge each.. line 2, interface charge. line 3, big decimal amount. line 5, abstract class charge decorator implements charge. line 6, private final charge inner. line 7, charge decorator of charge inner this dot inner is set to inner. line 8, public big decimal amount return inner dot amount, comment, forward. line 10, final class family extends charge decorator. line 11, family of charge inner super of inner. line 12, public big decimal amount. line 13, return super dot amount dot multiply of new big decimal of the string 3, comment, after. line 16, comment, new Donation new Family new Headphones new GuideRental" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A charge, and decorators that enclose one charge each.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Embellishment without a subclass for every combination</h2><div class="prose reading"><p>&ldquo;All this leads us to the concept of transparent enclosure, which combines the notions of (1) single-child (or single-component) composition and (2) compatible interfaces.&rdquo; Section 2.4, Embellishing the User Interface, arrives at that concept by asking how to put a border and scroll bars around Lexi's page. Read the section in your own copy first.</p><p>The authors want the embellishments easy to add and remove, even while the program runs, and invisible to the rest of the interface. Inheritance fails both tests. A bordered composition is a subclass, a scrollable one another, and one with both a third; carry that on and there is a class for every combination of embellishments, which grows out of hand as embellishments are added, and none of them can be rearranged at run time. Object composition is the alternative, which leaves the question of who holds whom. If the glyph held its border, every glyph class would have to know about borders; if the border holds the glyph, the drawing of borders stays in one class.</p><p>Then comes the step that makes it transparent. A border has an appearance, so it can be a glyph; more to the point, clients should not care whether a glyph has a border. If Border is a subclass of Glyph, a client tells a bordered glyph to draw exactly as it told the plain one. The enclosure can forward everything, or add work before or after forwarding, or keep state of its own. Lexi gathers this in MonoGlyph, an abstract glyph holding one component and forwarding every request to it. A border's draw operation forwards first, so the component draws itself, and then draws the border: it extends the forwarded operation rather than replacing it. A scroller draws its component offset by the scroll bars' positions and clipped to its bounds.</p><p>Lexi's page puts the composition inside a scroller and the scroller inside a border. The authors point out that the order can be reversed: put the border inside the scroller, and the border scrolls with the text, which a designer may or may not want. They also insist that an embellishment encloses one glyph, never several; grouping is already the job of rows and columns, and mixing it into embellishment would duplicate it. The pattern is Decorator, in which embellishment means any added responsibility, not only a visual one. Its catalog entry is fair about the costs: a decorated object is not the same object as the one inside it, so code that compares identities can be fooled, and a design built of many small, similar decorators can be easy to configure and hard to learn and debug.</p><pre class="codeblock" data-say="line 1, comment, A charge, and decorators that enclose one charge each.. line 2, interface charge. line 3, big decimal amount. line 5, abstract class charge decorator implements charge. line 6, private final charge inner. line 7, charge decorator of charge inner this dot inner is set to inner. line 8, public big decimal amount return inner dot amount, comment, forward. line 10, final class family extends charge decorator. line 11, family of charge inner super of inner. line 12, public big decimal amount. line 13, return super dot amount dot multiply of new big decimal of the string 3, comment, after. line 16, comment, new Donation new Family new Headphones new GuideRental" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A charge, and decorators that enclose one charge each.</span>
 <span class="cl">interface Charge {</span>
 <span class="cl">    BigDecimal amount();</span>
 <span class="cl">}</span>
@@ -1460,14 +1504,11 @@
 <span class="cl">        return super.amount().multiply(new BigDecimal(&quot;3&quot;));   // after</span>
 <span class="cl">    }</span>
 <span class="cl">}</span>
-<span class="cl">// new Donation(new Family(new Headphones(new GuideRental())))</span></code></pre><p>The lab works a rental charge at a museum's audio-guide desk instead of a page. On the preset <code>guide-rental</code> the component is a guide at 6, and three decorators wrap it, innermost first: headphones adds 2, family multiplies by 3, and a donation adds 1.5. A request goes in through donation, family and headphones to the guide and comes back out the other way, and each decorator does its work on the way out, as Lexi's border draws after its component: <span data-say="the quantity 6 plus 2, times 3 plus 1.5 equals 25.5">(6 + 2) × 3 + 1.5 = 25.5</span>. Reversed, with the donation innermost, it is <span data-say="the quantity 6 plus 1.5, times 3 plus 2 equals 24.5">(6 + 1.5) × 3 + 2 = 24.5</span>, so the order matters. Every combination of three options as its own subclass would be 8 classes, the plain guide and 7 combinations; with Decorator, 6: the interface, the guide, the abstract decorator and 3 decorators. A fourth option would add 8 subclasses against 1 decorator.</p><p>The preset <code>family-first</code> keeps the same three decorators and compares another order, family innermost: <span data-say="6 times 3 plus 2 plus 1.5 equals 21.5">6 × 3 + 2 + 1.5 = 21.5</span>. The preset <code>two-adds</code> drops the family rate, and both orders give 9.5, because two additions commute; the order of decorators changes a result only when their operations do not. The class counts become 4 against 5, so with two options Decorator costs a class more than the subclasses, since the subclass design needs no separate interface; it is the growth, <span data-say="2 to the power n">2ⁿ</span> against n + 3, and the freedom to rearrange at run time that the authors argue from.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, core, ticket, 40. line 2, layers, booking minus fee, add, 2.5, member, times, 0.8. line 3, open bracket, innermost first, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">core:   ticket, 40</span>
-<span class="cl">layers: booking-fee, add, 2.5; member, times, 0.8</span>
-<span class="cl">        (innermost first)</span></code></pre><p>A theatre ticket, as the lab's core and layers. By hand, give the result with the layers as listed and in the reverse order, and the call order a request follows. Then type the two fields into the lab to check.</p><p>Every embellishment so far is one of Lexi's own classes. The next lesson, Supporting Multiple Look-and-Feel Standards, reads Section 2.5, where whole sets of classes must be swapped at once.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Requests in motion</h2></div><p>a component in a stack of decorators</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">// new Donation(new Family(new Headphones(new GuideRental())))</span></code></pre><p>The lab works a rental charge at a museum's audio-guide desk instead of a page. On the preset <code>guide-rental</code> the component is a guide at 6, and three decorators wrap it, innermost first: headphones adds 2, family multiplies by 3, and a donation adds 1.5. A request goes in through donation, family and headphones to the guide and comes back out the other way, and each decorator does its work on the way out, as Lexi's border draws after its component: <span data-say="the quantity 6 plus 2, times 3 plus 1.5 equals 25.5">(6 + 2) × 3 + 1.5 = 25.5</span>. Reversed, with the donation innermost, it is <span data-say="the quantity 6 plus 1.5, times 3 plus 2 equals 24.5">(6 + 1.5) × 3 + 2 = 24.5</span>, so the order matters. Every combination of three options as its own subclass would be 8 classes, the plain guide and 7 combinations; with Decorator, 6: the interface, the guide, the abstract decorator and 3 decorators. A fourth option would add 8 subclasses against 1 decorator.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Requests in motion</h2></div><p>a component in a stack of decorators</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Requests in motion</strong><span>a component in a stack of decorators</span></div>
       </div>
@@ -1475,10 +1516,10 @@
       <div class="table-wrap" id="grtTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="grtTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A call enters the outermost decorator first and is passed inward to the component; the value comes back out through the decorators innermost first, each applying its op: add adds its amount, times multiplies by it (exact), then appends its word. A number takes add and times, a word takes only then. The other order is the one given, or else the reverse. Classes are counted for n options that may each be on or off: one subclass per combination is the component plus one class for every non-empty set of options, 2ⁿ in all; Decorator is the component interface, the concrete component, the abstract decorator and one class per option, n + 3. One more option doubles the first (+2ⁿ) and adds 1 to the second. The combination count ignores order and repetition, which decorators can also vary.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A component wrapped in decorators</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A component wrapped in decorators</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="grtPreset">Worked example</label>
           <select id="grtPreset"><option value="guide-rental" selected>An audio-guide rental: headphones, a family rate, a donation</option><option value="family-first">The same rental, compared with the family rate innermost</option><option value="two-adds">Headphones and a donation only, where order does not matter</option></select>
@@ -1506,12 +1547,17 @@
           <div class="kpi"><span>Classes one more option adds</span><strong id="grtAddOne">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>family-first</code> keeps the same three decorators and compares another order, family innermost: <span data-say="6 times 3 plus 2 plus 1.5 equals 21.5">6 × 3 + 2 + 1.5 = 21.5</span>. The preset <code>two-adds</code> drops the family rate, and both orders give 9.5, because two additions commute; the order of decorators changes a result only when their operations do not. The class counts become 4 against 5, so with two options Decorator costs a class more than the subclasses, since the subclass design needs no separate interface; it is the growth, <span data-say="2 to the power n">2ⁿ</span> against n + 3, and the freedom to rearrange at run time that the authors argue from.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, core, ticket, 40. line 2, layers, booking minus fee, add, 2.5, member, times, 0.8. line 3, open bracket, innermost first, close bracket" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">core:   ticket, 40</span>
+<span class="cl">layers: booking-fee, add, 2.5; member, times, 0.8</span>
+<span class="cl">        (innermost first)</span></code></pre><p>A theatre ticket, as the lab's core and layers. By hand, give the result with the layers as listed and in the reverse order, and the call order a request follows. Then type the two fields into the lab to check.</p><p>Every embellishment so far is one of Lexi's own classes. The next lesson, Supporting Multiple Look-and-Feel Standards, reads Section 2.5, where whole sets of classes must be swapped at once.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Reading a stack of decorators</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the layers innermost first</h3><p>Write the component, then each decorator in the order it wraps: the first one listed encloses the component directly.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Trace the call in and out</h3><p>A request enters at the outermost decorator and passes inward to the component; the results come back out in the reverse order, each decorator applying its work as the result passes.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Swap the order and compare</h3><p>Apply the same layers in another order. If every operation is an addition, nothing changes; mix a multiplication in and the result moves.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Find a feature in your own code that is switched on by options: logging, caching, retries, compression around a stream. Count the classes if each combination were a subclass (<span data-say="2 to the power n">2ⁿ</span> with n options), against n + 3 with Decorator, and say which orders of the options would behave differently.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Reading a stack of decorators</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the layers innermost first.</strong> Write the component, then each decorator in the order it wraps: the first one listed encloses the component directly.</li><li><strong>Trace the call in and out.</strong> A request enters at the outermost decorator and passes inward to the component; the results come back out in the reverse order, each decorator applying its work as the result passes.</li><li><strong>Swap the order and compare.</strong> Apply the same layers in another order. If every operation is an addition, nothing changes; mix a multiplication in and the result moves.</li><li><strong>Do it on a design of your own.</strong> Find a feature in your own code that is switched on by options: logging, caching, retries, compression around a stream. Count the classes if each combination were a subclass (<span data-say="2 to the power n">2ⁿ</span> with n options), against n + 3 with Decorator, and say which orders of the options would behave differently.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1530,17 +1576,16 @@ donation: 24 + 1.5 = 25.5
 reversed: (6 + 1.5) × 3 + 2 = 24.5</div><p>Each decorator sees only the charge inside it and the same interface on both sides. The client holds the outermost one and asks it the same question it would ask a plain guide.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding each optional feature as a subclass</strong><span>Section 2.4 shows where that goes: a bordered class, a scrollable class, a bordered scrollable class, one for every combination, none rearrangeable at run time. On the lesson's rental the lab counts 8 classes for three options and 16 for four, against 6 and 7 with Decorator.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the order of decorators never matters</strong><span>The authors point out that a border inside the scroller scrolls with the text and one outside it does not. On the lab's rental the same three decorators give 25.5, 24.5 or 21.5 depending on the order; only operations that commute, like the two additions, make the order irrelevant.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making one decorator enclose several components</strong><span>The authors keep embellishment to a single component, because grouping is already done by rows and columns and mixing the two would duplicate it. A decorator that holds several objects is no longer transparent: it is a composite with something added.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a stack of decorators and count its classes.</strong><p>Given a component and its decorators innermost first, state the call order, the result in that order and another, whether the order matters, and the classes as subclasses against Decorator.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab applies each decorator's operation as the result passes outward and counts classes by the formulas it states. It cannot say whether a reordering is a fault or a feature, as the authors leave the scrolling border to taste, nor whether many small objects will be easy for your team to follow.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Adding each optional feature as a subclass</strong><span>Section 2.4 shows where that goes: a bordered class, a scrollable class, a bordered scrollable class, one for every combination, none rearrangeable at run time. On the lesson's rental the lab counts 8 classes for three options and 16 for four, against 6 and 7 with Decorator.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the order of decorators never matters</strong><span>The authors point out that a border inside the scroller scrolls with the text and one outside it does not. On the lab's rental the same three decorators give 25.5, 24.5 or 21.5 depending on the order; only operations that commute, like the two additions, make the order irrelevant.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Making one decorator enclose several components</strong><span>The authors keep embellishment to a single component, because grouping is already done by rows and columns and mixing the two would duplicate it. A decorator that holds several objects is no longer transparent: it is a composite with something added.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace a stack of decorators and count its classes.</strong><p>Given a component and its decorators innermost first, state the call order, the result in that order and another, whether the order matters, and the classes as subclasses against Decorator.</p></div></div><div class="note"><strong>Note:</strong> The lab applies each decorator's operation as the result passes outward and counts classes by the formulas it states. It cannot say whether a reordering is a fault or a feature, as the authors leave the scrolling border to taste, nor whether many small objects will be easy for your team to follow.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Transparent enclosure</summary><p>Two ideas together: an object that encloses exactly one component, and an interface identical to that component's. Clients cannot tell the two apart; the enclosure forwards each request and may do work of its own before or after, or hold state the component lacks.</p></details><details class="recall"><summary>MonoGlyph</summary><p>Lexi's abstract class for embellishing glyphs. It holds one component glyph and forwards every operation to it, so that a subclass such as a border or a scroller overrides only what it adds to.</p></details><details class="recall"><summary>Decorator</summary><p>The pattern: a Decorator conforms to the Component interface, holds one component, and adds responsibilities around the requests it forwards; ConcreteDecorators can be stacked in any order. It has a lesson of its own, Decorator, in Structural Patterns.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.4 adds a border and scroll bars to Lexi's page without a subclass for each combination, by enclosing one glyph in another that looks the same to its clients. Read the idea of transparent enclosure, then wrap an audio guide's rental charge in decorators and count the call order, the result, and what changes when the order does.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Transparent enclosure.</strong> Two ideas together: an object that encloses exactly one component, and an interface identical to that component's. Clients cannot tell the two apart; the enclosure forwards each request and may do work of its own before or after, or hold state the component lacks.</li><li><strong>MonoGlyph.</strong> Lexi's abstract class for embellishing glyphs. It holds one component glyph and forwards every operation to it, so that a subclass such as a border or a scroller overrides only what it adds to.</li><li><strong>Decorator.</strong> The pattern: a Decorator conforms to the Component interface, holds one component, and adds responsibilities around the requests it forwards; ConcreteDecorators can be stacked in any order. It has a lesson of its own, Decorator, in Structural Patterns.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="enclose one component, same interface. work before or after forwarding. clients cannot tell the enclosure. order of wrapping is a design choice. 2 to the power n subclasses, or n plus 3 classes. many little objects that look alike" tabindex="0" role="region" aria-label="Mathematical notation">enclose one component, same interface
 work before or after forwarding
 clients cannot tell the enclosure
@@ -2329,11 +2374,40 @@ many little objects that look alike</div><figcaption>Embellishment in six lines<
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2401,7 +2475,7 @@ many little objects that look alike</div><figcaption>Embellishment in six lines<
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

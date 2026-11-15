@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,36 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Talking to the Database</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Mapping to Relational Databases</p>
       <h1>Database Connections and Registry</h1>
       <p class="lesson-lede">A connection is opened, tied to a transaction and closed; it is found by a parameter or a thread-scoped Registry; and statements batched into one call share one wait.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Connection pool</li><li>Registry</li><li>Statement batch</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The narrative, the pattern, then the arithmetic</h2>
-      <article class="prose reading"><p>&ldquo;Many environments give you the ability to batch multiple SQL queries into a single database call.&rdquo; That sentence is from Chapter 3's Some Miscellaneous Points, and Fowler adds that his examples do not do it but production code should. This lesson reads the connection that every statement goes through, the Registry that finds it, and then counts what batching saves. Read the sections in your own copy first.</p><p>Database Connections starts from what a connection is: the link between the code and the database, opened before any command runs and held open while the command, and any transaction it belongs to, takes place. Connections are often expensive to create, so environments pool them, and Fowler notes that most platforms now do the pooling for you; if you must do it yourself, check first that it helps, since creating a new connection keeps getting cheaper. A pool behind an interface that looks like opening a fresh connection is, he says, a good thing: the choice to pool is properly encapsulated.</p><p>Then the management. Close a connection as soon as you are done, and keep every command of one transaction on the same connection. That raises two problems: having the connection wherever it is needed, and not forgetting to close it. Passing it as a parameter adds it to all sorts of calls whose only use for it is to hand it on, which is where a thread-scoped Registry comes in. Closing by hand is easy to forget, he admits of himself, and the garbage collector closes too late to rely on, though it makes a backup. His preference is to tie the connection to the transaction: open it when the transaction begins and close it at commit or rollback, a job a Unit of Work fits naturally.</p><p>Some Miscellaneous Points adds three habits. Do not use <span class="math" data-say="select star">SELECT *</span> with positional column indices, since a reordered column then breaks the code; column names are clearer, if perhaps slower, and as usual he says to measure. Prefer static SQL that can be precompiled, and avoid putting queries together by string concatenation. And batch statements into one call where the platform allows it, which is the quotation and the one point this lesson's lab counts.</p><p>Registry, in Chapter 18, is read as a tool: a well-known object that others use to find common objects and services. Fowler prefers static methods as its interface and does not let that make its data static: the data may be global to the process, to a thread or to a session, and a connection is thread data, held in thread-local storage behind the same static method. The book's thread-safe example is Matt Foemmel's and Fowler's. He is uncomfortable with it all the same, because a Registry is still global data: pass the object as a parameter if you can, and he takes a Registry when the parameter would sit unused in nine of every ten calls that carry it, the book's figure. Any global data, he ends, is &ldquo;guilty until proven innocent&rdquo;.</p><p>The lesson's snippet takes its connection as a parameter, the choice Fowler prefers. It prepares one INSERT, and for each line of an order it sets the three placeholders and calls <span class="math" data-say="add batch">addBatch</span>, which queues the statement instead of sending it; <span class="math" data-say="execute batch">executeBatch</span> then sends every queued statement in one call to the driver, which a batching driver sends as one round trip; the last step asks you to check yours. Like every snippet in the course, it leaves out the try-with-resources that would close the statement.</p><pre class="codeblock" data-say="line 1, comment, Sends every line of an order to the database in one call.. line 2, void save lines of connection db, long order id, list of line lines. line 3, throws SQL exception. line 4, prepared statement s is set to db dot prepare statement. line 5, INSERT INTO line order id, sku, qty VALUES ?, ?, ?. line 6, for line line in lines. line 7, s dot set long of 1, order id. line 8, s dot set string of 2, line dot sku. line 9, s dot set int of 3, line dot qty. line 10, s dot add batch. line 12, s dot execute batch" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Sends every line of an order to the database in one call.</span>
-<span class="cl">void saveLines(Connection db, long orderId, List&lt;Line&gt; lines)</span>
-<span class="cl">        throws SQLException {</span>
-<span class="cl">    PreparedStatement s = db.prepareStatement(</span>
-<span class="cl">        &quot;INSERT INTO line (order_id, sku, qty) VALUES (?, ?, ?)&quot;);</span>
-<span class="cl">    for (Line line : lines) {</span>
-<span class="cl">        s.setLong(1, orderId);</span>
-<span class="cl">        s.setString(2, line.sku());</span>
-<span class="cl">        s.setInt(3, line.qty());</span>
-<span class="cl">        s.addBatch();</span>
-<span class="cl">    }</span>
-<span class="cl">    s.executeBatch();</span>
-<span class="cl">}</span></code></pre><p>Now the arithmetic. The lab treats the database as the far end of a round trip. Each record is one batch and the statements it carries; sent one at a time, every statement pays the latency and its work, <span data-say="n times, open bracket, latency plus">n·(latency +</span> work); batched, each batch pays the latency once and the work is the same, <span data-say="m times latency plus n times work">m·latency + n·work</span>. Its six tiles are the round trips each way, the two times, the share of the one-at-a-time time spent waiting, and the ratio of the two times. The panel and banner use the path's word for remote calls, calling a batch a coarse-grained call and a statement a fine-grained one; the tile labels say statements and batches. Holding the work the same is the lab's assumption: a real driver may also save some parsing and commit work.</p><p>In <code>save-an-order</code> a save makes 1 insert for the order, 12 for its lines and 12 stock updates, with an illustrative 2 ms latency and 0.5 ms of work a statement. One at a time that is 25 round trips and 125/2 = 62.50 ms, of which 4/5 = 80% is waiting; in 3 batches it is 37/2, or 18.50 ms, which the lab prints as <span data-say="125 over 37 is approximately 3.4 times">125/37 ≈ 3.4×</span> faster. In <code>same-machine</code> the latency is 0.1 ms: 15 ms against 64/5 = 12.80 ms, waiting only <span data-say="1 over 6 is approximately 16.7 percent">1/6 ≈ 16.7%</span> of the first, and <span data-say="75 over 64 is approximately 1.2 times">75/64 ≈ 1.2×</span>. Batching removes waits; where the waits are short it has little to remove, and only your own measurement says which case you are in.</p><h3>Exercise</h3><ul><li>A save: <span class="math" data-say="insert invoice, 1 statement, insert items, 40 statements">insert-invoice, 1; insert-items, 40</span>, one batch for the invoice and one for its items.</li><li>Latency 3 ms; work 0.2 ms a statement.</li></ul><p>Compute by hand the statements, the time one at a time and in batches, the share of the first spent waiting, and how many times faster the batches are. Check your figures in the lab afterwards.</p><p>This ends the course on how the domain talks to the database. The next course, Objects and Tables, begins with Chapter 3's behavioral problem and the Unit of Work that answers it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Remote calls</h2></div><p>fine-grained calls against coarse-grained ones</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The narrative, the pattern, then the arithmetic</h2><div class="prose reading"><p>&ldquo;Many environments give you the ability to batch multiple SQL queries into a single database call.&rdquo; That sentence is from Chapter 3's Some Miscellaneous Points, and Fowler adds that his examples do not do it but production code should. This lesson reads the connection that every statement goes through, the Registry that finds it, and then counts what batching saves. Read the sections in your own copy first.</p><p>Database Connections starts from what a connection is: the link between the code and the database, opened before any command runs and held open while the command, and any transaction it belongs to, takes place. Connections are often expensive to create, so environments pool them, and Fowler notes that most platforms now do the pooling for you; if you must do it yourself, check first that it helps, since creating a new connection keeps getting cheaper. A pool behind an interface that looks like opening a fresh connection is, he says, a good thing: the choice to pool is properly encapsulated.</p><p>Then the management. Close a connection as soon as you are done, and keep every command of one transaction on the same connection. That raises two problems: having the connection wherever it is needed, and not forgetting to close it. Passing it as a parameter adds it to all sorts of calls whose only use for it is to hand it on, which is where a thread-scoped Registry comes in. Closing by hand is easy to forget, he admits of himself, and the garbage collector closes too late to rely on, though it makes a backup. His preference is to tie the connection to the transaction: open it when the transaction begins and close it at commit or rollback, a job a Unit of Work fits naturally.</p><p>Some Miscellaneous Points adds three habits. Do not use <span class="math" data-say="select star">SELECT *</span> with positional column indices, since a reordered column then breaks the code; column names are clearer, if perhaps slower, and as usual he says to measure. Prefer static SQL that can be precompiled, and avoid putting queries together by string concatenation. And batch statements into one call where the platform allows it, which is the quotation and the one point this lesson's lab counts.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Remote calls</h2></div><p>fine-grained calls against coarse-grained ones</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Remote calls</strong><span>fine-grained calls against coarse-grained ones</span></div>
       </div>
@@ -1470,10 +1501,10 @@
       <div class="table-wrap" id="rrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one coarse-grained call that does the work of the given number of fine-grained ones. Fine-grained: every call waits the latency and does its work. Coarse-grained: one wait a coarse call, and the same work.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What batching statements saves</h3>
-          <p>The arithmetic of the figures the lesson states (marked with their source). The database is the far end of the round trip. Each record is one batch, a coarse-grained call, and the statements it carries, each a fine-grained call. Sent one at a time every statement pays the latency; batched, each batch pays it once. Figures: every figure is illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What batching statements saves</h3>
+            <p>The arithmetic of the figures the lesson states (marked with their source). The database is the far end of the round trip. Each record is one batch, a coarse-grained call, and the statements it carries, each a fine-grained call. Sent one at a time every statement pays the latency; batched, each batch pays it once. Figures: every figure is illustrative.</p>
         <div class="field">
           <label for="rrPreset">Worked example</label>
           <select id="rrPreset"><option value="save-an-order" selected>Saving an order with 12 lines, 2 ms a round trip</option><option value="same-machine">The same save, 0.1 ms a round trip</option></select>
@@ -1499,12 +1530,27 @@
           <div class="kpi"><span>Time of the statements over the batches</span><strong id="rrSpeedup">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Registry, in Chapter 18, is read as a tool: a well-known object that others use to find common objects and services. Fowler prefers static methods as its interface and does not let that make its data static: the data may be global to the process, to a thread or to a session, and a connection is thread data, held in thread-local storage behind the same static method. The book's thread-safe example is Matt Foemmel's and Fowler's. He is uncomfortable with it all the same, because a Registry is still global data: pass the object as a parameter if you can, and he takes a Registry when the parameter would sit unused in nine of every ten calls that carry it, the book's figure. Any global data, he ends, is &ldquo;guilty until proven innocent&rdquo;.</p><p>The lesson's snippet takes its connection as a parameter, the choice Fowler prefers. It prepares one INSERT, and for each line of an order it sets the three placeholders and calls <span class="math" data-say="add batch">addBatch</span>, which queues the statement instead of sending it; <span class="math" data-say="execute batch">executeBatch</span> then sends every queued statement in one call to the driver, which a batching driver sends as one round trip; the last step asks you to check yours. Like every snippet in the course, it leaves out the try-with-resources that would close the statement.</p><pre class="codeblock" data-say="line 1, comment, Sends every line of an order to the database in one call.. line 2, void save lines of connection db, long order id, list of line lines. line 3, throws SQL exception. line 4, prepared statement s is set to db dot prepare statement. line 5, INSERT INTO line order id, sku, qty VALUES ?, ?, ?. line 6, for line line in lines. line 7, s dot set long of 1, order id. line 8, s dot set string of 2, line dot sku. line 9, s dot set int of 3, line dot qty. line 10, s dot add batch. line 12, s dot execute batch" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Sends every line of an order to the database in one call.</span>
+<span class="cl">void saveLines(Connection db, long orderId, List&lt;Line&gt; lines)</span>
+<span class="cl">        throws SQLException {</span>
+<span class="cl">    PreparedStatement s = db.prepareStatement(</span>
+<span class="cl">        &quot;INSERT INTO line (order_id, sku, qty) VALUES (?, ?, ?)&quot;);</span>
+<span class="cl">    for (Line line : lines) {</span>
+<span class="cl">        s.setLong(1, orderId);</span>
+<span class="cl">        s.setString(2, line.sku());</span>
+<span class="cl">        s.setInt(3, line.qty());</span>
+<span class="cl">        s.addBatch();</span>
+<span class="cl">    }</span>
+<span class="cl">    s.executeBatch();</span>
+<span class="cl">}</span></code></pre><p>Now the arithmetic. The lab treats the database as the far end of a round trip. Each record is one batch and the statements it carries; sent one at a time, every statement pays the latency and its work, <span data-say="n times, open bracket, latency plus">n·(latency +</span> work); batched, each batch pays the latency once and the work is the same, <span data-say="m times latency plus n times work">m·latency + n·work</span>. Its six tiles are the round trips each way, the two times, the share of the one-at-a-time time spent waiting, and the ratio of the two times. The panel and banner use the path's word for remote calls, calling a batch a coarse-grained call and a statement a fine-grained one; the tile labels say statements and batches. Holding the work the same is the lab's assumption: a real driver may also save some parsing and commit work.</p><p>In <code>save-an-order</code> a save makes 1 insert for the order, 12 for its lines and 12 stock updates, with an illustrative 2 ms latency and 0.5 ms of work a statement. One at a time that is 25 round trips and 125/2 = 62.50 ms, of which 4/5 = 80% is waiting; in 3 batches it is 37/2, or 18.50 ms, which the lab prints as <span data-say="125 over 37 is approximately 3.4 times">125/37 ≈ 3.4×</span> faster. In <code>same-machine</code> the latency is 0.1 ms: 15 ms against 64/5 = 12.80 ms, waiting only <span data-say="1 over 6 is approximately 16.7 percent">1/6 ≈ 16.7%</span> of the first, and <span data-say="75 over 64 is approximately 1.2 times">75/64 ≈ 1.2×</span>. Batching removes waits; where the waits are short it has little to remove, and only your own measurement says which case you are in.</p><h3>Exercise</h3><ul><li>A save: <span class="math" data-say="insert invoice, 1 statement, insert items, 40 statements">insert-invoice, 1; insert-items, 40</span>, one batch for the invoice and one for its items.</li><li>Latency 3 ms; work 0.2 ms a statement.</li></ul><p>Compute by hand the statements, the time one at a time and in batches, the share of the first spent waiting, and how many times faster the batches are. Check your figures in the lab afterwards.</p><p>This ends the course on how the domain talks to the database. The next course, Objects and Tables, begins with Chapter 3's behavioral problem and the Unit of Work that answers it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Working out what batching saves</h2></div><p>Four steps, the last of them on a save of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the statements</h3><p>Add up the statements of the save, n, and the batches they would go in, m.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Time them one at a time</h3><p>Multiply n by the latency plus one statement's work. Then multiply n by the latency alone, and divide by the first figure for the share spent waiting.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Time the batches</h3><p>Multiply m by the latency and add n times the work, then divide the first time by this one for how many times faster the batches are.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count a save you know</h3><p>Take one save in a system you know that writes many rows. Count its statements, and find out from its log or its driver's settings whether they are sent one at a time or in batches; write both down.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Working out what batching saves</h2>
+      <p class="lead-in">Four steps, the last of them on a save of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the statements.</strong> Add up the statements of the save, n, and the batches they would go in, m.</li><li><strong>Time them one at a time.</strong> Multiply n by the latency plus one statement's work. Then multiply n by the latency alone, and divide by the first figure for the share spent waiting.</li><li><strong>Time the batches.</strong> Multiply m by the latency and add n times the work, then divide the first time by this one for how many times faster the batches are.</li><li><strong>Count a save you know.</strong> Take one save in a system you know that writes many rows. Count its statements, and find out from its log or its driver's settings whether they are sent one at a time or in batches; write both down.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1523,17 +1569,16 @@ share waiting: 50 / 62.5, 80 per cent
 62.5 / 18.5: about 3.4 times</div><p>The work, 12.5 ms, is in both times. Batching took away 22 of the 25 waits, 44 ms, and that is the whole difference.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking batching is faster because the database does less work</strong><span>The lab holds the work the same, <span data-say="25 times 0.5 ms">25 × 0.5 ms</span>, and batching is still <span data-say="125 over 37 is approximately 3.4 times">125/37 ≈ 3.4×</span> faster on the lesson's first preset: it removes 22 of the 25 waits. Holding the work fixed is the lab's assumption, and a real driver may also save some parsing and commit work; but the saving the quotation points to is the round trips.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a Registry is a global variable, so it is always wrong</strong><span>Fowler's position is narrower. He is uncomfortable with any global data and calls a Registry a last resort: pass the object if you can. But he uses one when passing it would thread a parameter through calls that do not use it most of the time, and he scopes it to the thread or session, so that it is less global than it looks.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Building a connection pool as a matter of course</strong><span>Database Connections says most platforms already pool, behind an interface that looks like opening a connection, and that if you must pool yourself you should first check that it helps performance, since new connections keep getting cheaper to create.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can work out what batching saves.</strong><p>Given groups of statements, a latency and a work time each, compute the one-at-a-time and batched times and the latency's share of the first.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts batching and nothing else in the lesson: where a connection lives, how it is pooled and whether a Registry holds it are read without a count. Its figures are illustrative, and it assumes each statement's work is the same whether or not it is batched.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking batching is faster because the database does less work</strong><span>The lab holds the work the same, <span data-say="25 times 0.5 ms">25 × 0.5 ms</span>, and batching is still <span data-say="125 over 37 is approximately 3.4 times">125/37 ≈ 3.4×</span> faster on the lesson's first preset: it removes 22 of the 25 waits. Holding the work fixed is the lab's assumption, and a real driver may also save some parsing and commit work; but the saving the quotation points to is the round trips.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a Registry is a global variable, so it is always wrong</strong><span>Fowler's position is narrower. He is uncomfortable with any global data and calls a Registry a last resort: pass the object if you can. But he uses one when passing it would thread a parameter through calls that do not use it most of the time, and he scopes it to the thread or session, so that it is less global than it looks.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Building a connection pool as a matter of course</strong><span>Database Connections says most platforms already pool, behind an interface that looks like opening a connection, and that if you must pool yourself you should first check that it helps performance, since new connections keep getting cheaper to create.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can work out what batching saves.</strong><p>Given groups of statements, a latency and a work time each, compute the one-at-a-time and batched times and the latency's share of the first.</p></div></div><div class="note"><strong>Note:</strong> The lab counts batching and nothing else in the lesson: where a connection lives, how it is pooled and whether a Registry holds it are read without a count. Its figures are illustrative, and it assumes each statement's work is the same whether or not it is batched.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Connection pool</summary><p>A set of open connections that code borrows and returns instead of opening and closing its own. Most platforms provide one behind an interface that looks like opening a new connection, so the choice to pool stays hidden.</p></details><details class="recall"><summary>Registry</summary><p>A well-known object, usually reached through static methods, that code uses to find common objects and services such as a connection or a finder. Its data can be scoped to the process, a thread or a session; a connection is thread-scoped.</p></details><details class="recall"><summary>Statement batch</summary><p>Several SQL statements sent to the database in one call. Each call pays the round trip's wait once, however many statements it carries.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3's Database Connections says how a connection is opened, pooled, tied to a transaction and closed, and Some Miscellaneous Points adds three habits, the last of them batching. Chapter 18's Registry is how code finds a connection it was not handed. Work out what batching the statements of one save removes, on a network and on one machine.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Connection pool.</strong> A set of open connections that code borrows and returns instead of opening and closing its own. Most platforms provide one behind an interface that looks like opening a new connection, so the choice to pool stays hidden.</li><li><strong>Registry.</strong> A well-known object, usually reached through static methods, that code uses to find common objects and services such as a connection or a finder. Its data can be scoped to the process, a thread or a session; a connection is thread-scoped.</li><li><strong>Statement batch.</strong> Several SQL statements sent to the database in one call. Each call pays the round trip's wait once, however many statements it carries.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="tie the connection to the transaction. pass it, or look it up in the registry. one at a time, n times the quantity latency plus work. batched, m times latency, plus n times work. a batch removes waits, not work" tabindex="0" role="region" aria-label="Mathematical notation">tie the connection to the transaction
 pass it, or look it up in the Registry
 one at a time: n·(latency + work)
@@ -2203,11 +2248,40 @@ a batch removes waits, not work</div><figcaption>Connections and batching in fiv
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2275,7 +2349,7 @@ a batch removes waits, not work</div><figcaption>Connections and batching in fiv
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

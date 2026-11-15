@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">What Design Patterns Are</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 1 · Introduction</p>
       <h1>Selecting and Using a Design Pattern</h1>
       <p class="lesson-lede">Six ways to find the pattern for a problem, seven steps to apply it, and the warning that a pattern&#x27;s flexibility is worth its cost only where it is needed.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Six ways to select</li><li>Encapsulate what varies</li><li>Seven steps of use</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The two sections first, then a selection, then the warning</h2>
-      <article class="prose reading"><p>&ldquo;A design pattern should only be applied when the flexibility it affords is actually needed.&rdquo; That sentence is near the end of Section 1.8, How to Use a Design Pattern, the last section of Chapter 1. This lesson reads it and Section 1.7, How to Select a Design Pattern. Read both in your own copy first.</p><p>Section 1.7 begins from the reader's position: more than twenty patterns, a problem in front of you, and a catalog you do not yet know. It gives six ways in. Go back to Section 1.6 and its list of how patterns solve design problems. Read through the intents of Section 1.4, narrowing by the purpose and scope of Table 1.1. Follow the cross-references of Figure 1.1 from a pattern you know. Read the catalog chapter for the right purpose, each of which opens with an introduction and closes with a comparison of its patterns. Look for your problem among the causes of redesign. Or ask what in your design ought to vary.</p><p>The last two are, the authors say, opposites. A cause of redesign asks what might force a change on you; the last approach asks what you want to be free to change without redesigning, and puts that concept behind an interface of its own, which they call a theme of many patterns. Table 1.2 supports it: for each pattern, the aspect it lets vary. In the lesson's words, a few of its entries: Strategy lets an algorithm vary, State the states of an object, Observer how many objects depend on another and how they keep up, Abstract Factory the families of product objects, Bridge an object's implementation, and Builder how a composite object is put together.</p><p>Section 1.8 then gives seven steps for applying a pattern once chosen. Read it through once, paying most attention to Applicability and Consequences, to be sure it fits. Study its Structure, Participants and Collaborations until the classes and their relations are clear. Look at its Sample Code. Choose names for the participants that mean something in your application, keeping the participant's name inside them so the pattern stays visible, as the sketch below does. Define the classes, their interfaces, inheritance and references, and change the existing classes the pattern touches. Name the operations, consistently. Then implement them, with the Implementation section's hints. These are a start, the authors add; readers will develop ways of their own.</p><pre class="codeblock" data-say="line 1, comment, The participant&#x27;s name, Strategy, kept inside the application&#x27;s names.. line 2, interface discount strategy. line 3, long discount cents of order order. line 6, final class no discount strategy implements discount strategy. line 7, public long discount cents of order order return 0. line 10, final class dozen discount strategy implements discount strategy. line 11, public long discount cents of order order. line 12, int dozens is set to order dot items divided by 12. line 13, return dozens times order dot unit cents, comment, one unit free per dozen" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The participant&#x27;s name, Strategy, kept inside the application&#x27;s names.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The two sections first, then a selection, then the warning</h2><div class="prose reading"><p>&ldquo;A design pattern should only be applied when the flexibility it affords is actually needed.&rdquo; That sentence is near the end of Section 1.8, How to Use a Design Pattern, the last section of Chapter 1. This lesson reads it and Section 1.7, How to Select a Design Pattern. Read both in your own copy first.</p><p>Section 1.7 begins from the reader's position: more than twenty patterns, a problem in front of you, and a catalog you do not yet know. It gives six ways in. Go back to Section 1.6 and its list of how patterns solve design problems. Read through the intents of Section 1.4, narrowing by the purpose and scope of Table 1.1. Follow the cross-references of Figure 1.1 from a pattern you know. Read the catalog chapter for the right purpose, each of which opens with an introduction and closes with a comparison of its patterns. Look for your problem among the causes of redesign. Or ask what in your design ought to vary.</p><p>The last two are, the authors say, opposites. A cause of redesign asks what might force a change on you; the last approach asks what you want to be free to change without redesigning, and puts that concept behind an interface of its own, which they call a theme of many patterns. Table 1.2 supports it: for each pattern, the aspect it lets vary. In the lesson's words, a few of its entries: Strategy lets an algorithm vary, State the states of an object, Observer how many objects depend on another and how they keep up, Abstract Factory the families of product objects, Bridge an object's implementation, and Builder how a composite object is put together.</p><p>Section 1.8 then gives seven steps for applying a pattern once chosen. Read it through once, paying most attention to Applicability and Consequences, to be sure it fits. Study its Structure, Participants and Collaborations until the classes and their relations are clear. Look at its Sample Code. Choose names for the participants that mean something in your application, keeping the participant's name inside them so the pattern stays visible, as the sketch below does. Define the classes, their interfaces, inheritance and references, and change the existing classes the pattern touches. Name the operations, consistently. Then implement them, with the Implementation section's hints. These are a start, the authors add; readers will develop ways of their own.</p><pre class="codeblock" data-say="line 1, comment, The participant&#x27;s name, Strategy, kept inside the application&#x27;s names.. line 2, interface discount strategy. line 3, long discount cents of order order. line 6, final class no discount strategy implements discount strategy. line 7, public long discount cents of order order return 0. line 10, final class dozen discount strategy implements discount strategy. line 11, public long discount cents of order order. line 12, int dozens is set to order dot items divided by 12. line 13, return dozens times order dot unit cents, comment, one unit free per dozen" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The participant&#x27;s name, Strategy, kept inside the application&#x27;s names.</span>
 <span class="cl">interface DiscountStrategy {</span>
 <span class="cl">    long discountCents(Order order);</span>
 <span class="cl">}</span>
@@ -1459,16 +1503,11 @@
 <span class="cl">        int dozens = order.items() / 12;</span>
 <span class="cl">        return dozens * order.unitCents();   // one unit free per dozen</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Then the warning, which this course ends on. &ldquo;Design patterns should not be applied indiscriminately.&rdquo; Their flexibility is often bought with extra levels of indirection, the authors explain, and indirection can complicate a design and cost some performance; the Consequences sections are where the benefits and liabilities are weighed. It is the same point the last three lessons made in their own terms: an interface with one implementation, a composed object whose behaviour is spread over three, an interface that confines one kind of change and spreads another.</p><p>Now the lab, on a bakery's order system of the lesson's own. Its team has listed seven changes it can foresee, each with the aspect that would vary, whether they think it likely, and how many months away. The preset <code>needed</code> writes the team's rule for what should vary, likely and within a year, as <code>likely = yes and months <span data-say="is at most 12">&lt;= 12</span></code>. It selects 3 of the 7 candidates: discount-rules, payment-provider and loyalty-alerts. The failing list gives each rejection's clause: oven-schedule, receipt-layout and new-branch fail <code>likely = yes</code>, and order-states fails <code>months <span data-say="is at most 12">&lt;= 12</span></code> at 18 months.</p><p>Each selected change points to a pattern: the discount rules are an algorithm, which Table 1.2 gives to Strategy, as in the sketch; the payment provider is a platform dependence, for which Section 1.6's list of causes gives Abstract Factory and Bridge (in Table 1.2, Bridge lets an object's implementation vary); the loyalty alerts are objects that depend on an order, Observer. The preset <code>algorithms</code> adds <code>aspect = algorithm</code> and selects only discount-rules, the narrowing Section 1.7 suggests once the purpose is known. The preset <code>everything</code> asks for anything within four years, <code>months <span data-say="is at most 48">&lt;= 48</span></code>, and selects all 7, failing none: a pattern for every change the team can imagine, each with its indirection, which is the indiscriminate use Section 1.8 warns against.</p><p>The rule is the team's, and so are the attributes. The lab shows what a rule selects and which clause turns each candidate away; it cannot say whether a change rated unlikely will come anyway, or whether eighteen months is near enough to prepare for now. Those are the judgements the Consequences sections exist to inform.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, search minus ranking, aspect is set to algorithm, likely is set to yes, months is set to 4. line 2, ebook minus loans, aspect is set to platform, likely is set to yes, months is set to 14. line 3, hold minus queue, aspect is set to dependents, likely is set to yes, months is set to 8. line 4, fine minus rules, aspect is set to algorithm, likely is set to no, months is set to 6. line 5, specification, likely is set to yes and months is at most 12" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">search-ranking, aspect=algorithm, likely=yes, months=4;</span>
-<span class="cl">ebook-loans, aspect=platform, likely=yes, months=14;</span>
-<span class="cl">hold-queue, aspect=dependents, likely=yes, months=8;</span>
-<span class="cl">fine-rules, aspect=algorithm, likely=no, months=6</span>
-<span class="cl">specification: likely = yes and months &lt;= 12</span></code></pre><p>A library catalogue's foreseeable changes, with the same rule. By hand, say which candidates the specification selects and which clause rejects each of the others, and name a pattern from Table 1.2 for each one selected. Then type the candidates into the lab to check.</p><p>That ends Chapter 1, and its last word is the one to carry into the rest of the book: a pattern buys flexibility with indirection, and is worth applying only where that flexibility is needed. The next course, A Case Study: Designing a Document Editor, watches the authors make exactly those choices, one design problem at a time, beginning with Design Problems and Document Structure.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Then the warning, which this course ends on. &ldquo;Design patterns should not be applied indiscriminately.&rdquo; Their flexibility is often bought with extra levels of indirection, the authors explain, and indirection can complicate a design and cost some performance; the Consequences sections are where the benefits and liabilities are weighed. It is the same point the last three lessons made in their own terms: an interface with one implementation, a composed object whose behaviour is spread over three, an interface that confines one kind of change and spreads another.</p><p>Now the lab, on a bakery's order system of the lesson's own. Its team has listed seven changes it can foresee, each with the aspect that would vary, whether they think it likely, and how many months away. The preset <code>needed</code> writes the team's rule for what should vary, likely and within a year, as <code>likely = yes and months <span data-say="is at most 12">&lt;= 12</span></code>. It selects 3 of the 7 candidates: discount-rules, payment-provider and loyalty-alerts. The failing list gives each rejection's clause: oven-schedule, receipt-layout and new-branch fail <code>likely = yes</code>, and order-states fails <code>months <span data-say="is at most 12">&lt;= 12</span></code> at 18 months.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Specifications</h2></div><p>a rule as a query over candidates</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Specifications</strong><span>a rule as a query over candidates</span></div>
       </div>
@@ -1476,10 +1515,10 @@
       <div class="table-wrap" id="dspTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dspTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A specification is clauses attribute op value, with op one of = != &lt; &lt;= &gt; &gt;=, joined by and, or, not and parentheses (not binds tightest, then and, then or); a value is a number or a word beginning with a letter. Numbers compare exactly; a word compares only by = and != (an ordering op on a word is refused), and words compare exactly, letter case counted. A clause on an attribute the candidate lacks is false whatever its op, so not of it is true; an ordering clause on a word value is false. Candidates are listed in record order. A failing candidate is shown with the clause that rejects it, found from the left: a false and is blamed on its first false part, a true or on its first true part, and under a not a clause rejects by being true (for clauses joined only by and, this is the first false clause in the order written).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The changes a rule for what should vary selects</h3>
-          <p>A count over the small model the lesson states. The lab counts one consequence of a rule for what should vary; whether a change is likely, and whether a pattern is worth its indirection, is weighed in the book's Consequences sections and by the team.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The changes a rule for what should vary selects</h3>
+            <p>A count over the small model the lesson states. The lab counts one consequence of a rule for what should vary; whether a change is likely, and whether a pattern is worth its indirection, is weighed in the book's Consequences sections and by the team.</p>
         <div class="field">
           <label for="dspPreset">Worked example</label>
           <select id="dspPreset"><option value="needed" selected>A bakery's foreseeable changes: likely, within a year</option><option value="algorithms">The same rule, for algorithms only</option><option value="everything">Every change within four years</option></select>
@@ -1498,12 +1537,19 @@
           <div class="kpi"><span>Failing, each with the clause that rejects it</span><strong id="dspFailing">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Each selected change points to a pattern: the discount rules are an algorithm, which Table 1.2 gives to Strategy, as in the sketch; the payment provider is a platform dependence, for which Section 1.6's list of causes gives Abstract Factory and Bridge (in Table 1.2, Bridge lets an object's implementation vary); the loyalty alerts are objects that depend on an order, Observer. The preset <code>algorithms</code> adds <code>aspect = algorithm</code> and selects only discount-rules, the narrowing Section 1.7 suggests once the purpose is known. The preset <code>everything</code> asks for anything within four years, <code>months <span data-say="is at most 48">&lt;= 48</span></code>, and selects all 7, failing none: a pattern for every change the team can imagine, each with its indirection, which is the indiscriminate use Section 1.8 warns against.</p><p>The rule is the team's, and so are the attributes. The lab shows what a rule selects and which clause turns each candidate away; it cannot say whether a change rated unlikely will come anyway, or whether eighteen months is near enough to prepare for now. Those are the judgements the Consequences sections exist to inform.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, search minus ranking, aspect is set to algorithm, likely is set to yes, months is set to 4. line 2, ebook minus loans, aspect is set to platform, likely is set to yes, months is set to 14. line 3, hold minus queue, aspect is set to dependents, likely is set to yes, months is set to 8. line 4, fine minus rules, aspect is set to algorithm, likely is set to no, months is set to 6. line 5, specification, likely is set to yes and months is at most 12" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">search-ranking, aspect=algorithm, likely=yes, months=4;</span>
+<span class="cl">ebook-loans, aspect=platform, likely=yes, months=14;</span>
+<span class="cl">hold-queue, aspect=dependents, likely=yes, months=8;</span>
+<span class="cl">fine-rules, aspect=algorithm, likely=no, months=6</span>
+<span class="cl">specification: likely = yes and months &lt;= 12</span></code></pre><p>A library catalogue's foreseeable changes, with the same rule. By hand, say which candidates the specification selects and which clause rejects each of the others, and name a pattern from Table 1.2 for each one selected. Then type the candidates into the lab to check.</p><p>That ends Chapter 1, and its last word is the one to carry into the rest of the book: a pattern buys flexibility with indirection, and is worth applying only where that flexibility is needed. The next course, A Case Study: Designing a Document Editor, watches the authors make exactly those choices, one design problem at a time, beginning with Design Problems and Document Structure.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Selecting a pattern for what should vary</h2></div><p>Five steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the changes you can foresee</h3><p>Write each change the design might meet, with the aspect that would vary, whether it is likely, and how soon.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the rule</h3><p>Write, as clauses joined by and, what makes a change worth preparing for now. Agree it before looking at which changes it selects.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Select and read the rejections</h3><p>Evaluate the rule on each change. For each one rejected, note the clause that rejects it; that is the reason not to add a pattern for it yet.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Find the pattern</h3><p>For each selected change, find the aspect in Table 1.2, read that pattern's Applicability and Consequences, and check it fits before going further.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Do it on a design of your own</h3><p>List five changes your own system might meet and apply the rule. For the one change it selects that matters most, name a pattern, its participants with your application's names, and the extra indirection it adds.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Selecting a pattern for what should vary</h2>
+      <p class="lead-in">Five steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the changes you can foresee.</strong> Write each change the design might meet, with the aspect that would vary, whether it is likely, and how soon.</li><li><strong>Write the rule.</strong> Write, as clauses joined by and, what makes a change worth preparing for now. Agree it before looking at which changes it selects.</li><li><strong>Select and read the rejections.</strong> Evaluate the rule on each change. For each one rejected, note the clause that rejects it; that is the reason not to add a pattern for it yet.</li><li><strong>Find the pattern.</strong> For each selected change, find the aspect in Table 1.2, read that pattern's Applicability and Consequences, and check it fits before going further.</li><li><strong>Do it on a design of your own.</strong> List five changes your own system might meet and apply the rule. For the one change it selects that matters most, name a pattern, its participants with your application's names, and the extra indirection it adds.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1523,17 +1569,16 @@ receipt layout, new branch: likely is no
 selected: 3 of the 7 changes</div><p>Three changes are worth a pattern now by the team's rule. Order-states is likely and fails only on time; if the rule's year were eighteen months, State would join the list.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying every pattern that could fit</strong><span>The chapter's closing warning is against exactly that: patterns should not be applied indiscriminately, because their flexibility comes from indirection that complicates a design and can cost performance. On the lesson's illustration, a rule that admits every imaginable change selects all seven, and each would add its indirection.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the six ways of selecting as one method</strong><span>Section 1.7 offers several ways in, and says two of them are opposites: examining what might force a change, and considering what you want to be free to change. They can lead to different patterns for the same design, and reading one problem both ways is part of the point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying the participants&#x27; names into the code</strong><span>Step four says the book's participant names are usually too abstract to use as they are. Choose names that mean something in the application, and keep the participant's name inside them, as <code>DozenDiscountStrategy</code> keeps Strategy, so the pattern stays visible.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can select a pattern by what should vary, and say when not to apply one.</strong><p>Given a design's foreseeable changes and a rule for what should vary, state which changes the rule selects and which clause rejects each other one, name a pattern for each selected change from Table 1.2, list Section 1.8's steps, and give the chapter's reason for restraint.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab applies the rule to the attributes typed in. Whether a change is likely, how soon it will come, and whether a pattern's indirection is worth it are judgements no count makes; the authors' answer is to apply a pattern only where its flexibility is actually needed, and to read its Consequences first.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Applying every pattern that could fit</strong><span>The chapter's closing warning is against exactly that: patterns should not be applied indiscriminately, because their flexibility comes from indirection that complicates a design and can cost performance. On the lesson's illustration, a rule that admits every imaginable change selects all seven, and each would add its indirection.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating the six ways of selecting as one method</strong><span>Section 1.7 offers several ways in, and says two of them are opposites: examining what might force a change, and considering what you want to be free to change. They can lead to different patterns for the same design, and reading one problem both ways is part of the point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Copying the participants&#x27; names into the code</strong><span>Step four says the book's participant names are usually too abstract to use as they are. Choose names that mean something in the application, and keep the participant's name inside them, as <code>DozenDiscountStrategy</code> keeps Strategy, so the pattern stays visible.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can select a pattern by what should vary, and say when not to apply one.</strong><p>Given a design's foreseeable changes and a rule for what should vary, state which changes the rule selects and which clause rejects each other one, name a pattern for each selected change from Table 1.2, list Section 1.8's steps, and give the chapter's reason for restraint.</p></div></div><div class="note"><strong>Note:</strong> The lab applies the rule to the attributes typed in. Whether a change is likely, how soon it will come, and whether a pattern's indirection is worth it are judgements no count makes; the authors' answer is to apply a pattern only where its flexibility is actually needed, and to read its Consequences first.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Six ways to select</summary><p>Consider how patterns solve design problems (Section 1.6); scan the intents (Section 1.4); study how patterns refer to each other (Figure 1.1); read the catalog chapter for the right purpose; look for a cause of redesign; and ask what in your design should vary.</p></details><details class="recall"><summary>Encapsulate what varies</summary><p>The opposite of examining a cause of redesign: instead of asking what might force a change, ask what you would like to be free to change without redesign, and put that behind an interface of its own. Table 1.2 lists, for each pattern, the aspect it lets vary.</p></details><details class="recall"><summary>Seven steps of use</summary><p>Read the pattern for an overview, attending to Applicability and Consequences; study Structure, Participants and Collaborations; look at the Sample Code; name the participants for your application; define the classes; name the operations; implement them.</p></details></div>
+      <h3>Summary</h3>
       <p>The last two sections of Chapter 1 give six ways to find a pattern, seven steps for applying one, and a warning against applying them where their flexibility is not needed. Read them, then list the changes a design's team can foresee and let a specification of what should vary select the ones worth a pattern, and say which clause rejects the rest.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Six ways to select.</strong> Consider how patterns solve design problems (Section 1.6); scan the intents (Section 1.4); study how patterns refer to each other (Figure 1.1); read the catalog chapter for the right purpose; look for a cause of redesign; and ask what in your design should vary.</li><li><strong>Encapsulate what varies.</strong> The opposite of examining a cause of redesign: instead of asking what might force a change, ask what you would like to be free to change without redesign, and put that behind an interface of its own. Table 1.2 lists, for each pattern, the aspect it lets vary.</li><li><strong>Seven steps of use.</strong> Read the pattern for an overview, attending to Applicability and Consequences; study Structure, Participants and Collaborations; look at the Sample Code; name the participants for your application; define the classes; name the operations; implement them.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="six ways to find a pattern. encapsulate the concept that varies. read applicability and consequences first. keep the participant name in your names. patterns add indirection. apply one only where flexibility is needed" tabindex="0" role="region" aria-label="Mathematical notation">six ways to find a pattern
 encapsulate the concept that varies
 read Applicability and Consequences first
@@ -2442,11 +2487,40 @@ apply one only where flexibility is needed</div><figcaption>Selecting and using 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2514,7 +2588,7 @@ apply one only where flexibility is needed</div><figcaption>Selecting and using 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

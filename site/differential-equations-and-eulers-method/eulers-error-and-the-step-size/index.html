@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Differential Equations and Euler&#x27;s Method</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Stepping</p>
       <h1>Euler&#x27;s Error and the Step Size</h1>
       <p class="lesson-lede">Measure the error at three step sizes, form the exact ratios, and read the order: halving the step roughly halves Euler&#x27;s error, and on <span data-say="y prime equals 2 t">y′ = 2t</span> exactly.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The error is measured at a fixed end time</li><li>The error is the accumulation of every step, not the last one</li><li>The ratio of successive errors names the order</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>From one error to an order</h2>
-      <article class="prose reading"><p>The lab runs Euler's method three times on one equation, with step sizes <span class="math" data-say="h">h</span>, <span class="math" data-say="h over 2">h/2</span> and <span class="math" data-say="h over 4">h/4</span>, to the same end time <span class="math" data-say="T equals 1">T = 1</span>. For each it prints the error <span class="math" data-say="E of h">E(h)</span> against the known solution, then the two ratios <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> and <span class="math" data-say="E of h over 2 over E of h over 4">E(h/2)/E(h/4)</span>, and the order those ratios imply.</p><div class="mathblock" data-say="y prime equals 2 t, y of 0 equals 0, exact y equals t squared, T equals 1. h, N, y sub N, y of 1, E of h. a table, shown on the page. ratios, E of 1 over 4 over E of 1 over 8 equals 2, E of 1 over 8 over E of 1 over 16 equals 2" tabindex="0" role="region" aria-label="Mathematical notation">y′ = 2t,  y(0) = 0,  exact y = t²,  T = 1
-
-h       N     y_N       y(1)    E(h)
-1/4     4     3/4       1       1/4
-1/8     8     7/8       1       1/8
-1/16    16    15/16     1       1/16
-
-ratios  E(1/4)/E(1/8) = 2,   E(1/8)/E(1/16) = 2</div><p>On this equation the error is exactly <span class="math" data-say="h">h</span>: <span class="math" data-say="E of 1 over 4 equals 1 over 4">E(1/4) = 1/4</span>, <span class="math" data-say="E of 1 over 8 equals 1 over 8">E(1/8) = 1/8</span>, <span class="math" data-say="E of 1 over 16 equals 1 over 16">E(1/16) = 1/16</span>. Euler's method on <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is a left sum, and the left sum of <span class="math" data-say="2 t">2t</span> over <span class="math" data-say="N">N</span> pieces from <span class="math" data-say="t equals 0">t = 0</span> to <span class="math" data-say="t equals 1">t = 1</span> is <span class="math" data-say="h squared times N times the quantity N minus 1, equals 1 minus h">h²·N·(N − 1) = 1 − h</span>, which differs from <span class="math" data-say="1">1</span> by exactly <span class="math" data-say="h">h</span>. Both ratios are exactly <span class="math" data-say="2">2</span>, the order is <span class="math" data-say="1">1</span>, and here that is not an approximation.</p><h3>Where the total comes from</h3><p>Look at one step. The true solution <span class="math" data-say="t squared">t²</span> moves from <span class="math" data-say="t squared">t²</span> to <span class="math" data-say="the quantity t plus h, squared">(t + h)²</span>, a rise of <span class="math" data-say="2 t h plus h squared">2th + h²</span>. Euler's step rises by <span class="math" data-say="h times 2 t">h·2t</span>. The difference is <span class="math" data-say="h squared">h²</span>, whatever <span class="math" data-say="t">t</span> is, so every step falls short by the same <span class="math" data-say="h squared">h²</span>. With <span class="math" data-say="N equals 1 over h">N = 1/h</span> steps the total is <span class="math" data-say="the quantity 1 over h, times h squared equals h">(1/h)·h² = h</span>. At <span class="math" data-say="h equals 1 over 4">h = 1/4</span> each of the four steps misses by <span class="math" data-say="1 over 16">1/16</span>, and the four add to <span class="math" data-say="1 over 4">1/4</span>.</p><div class="thm"><span class="label">Theorem &middot; Euler&#x27;s method is first order</span><p>For a right-hand side with continuous first derivatives, Euler's error at a fixed <span class="math" data-say="T">T</span> is approximately <span class="math" data-say="C times h">C·h</span> for a constant <span class="math" data-say="C">C</span> that depends on the equation and <span class="math" data-say="T">T</span> but not on <span class="math" data-say="h">h</span>. Halving <span class="math" data-say="h">h</span> therefore halves the error, and the ratio <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> approaches <span class="math" data-say="2">2</span>.</p></div><p>The lab demonstrates the claim on chosen equations by exact ratios, and does not prove it for every equation. On an equation where <span class="math" data-say="f">f</span> also depends on <span class="math" data-say="y">y</span>, an early error is carried forward by the later steps, which changes the constant <span class="math" data-say="C">C</span> and not the power of <span class="math" data-say="h">h</span>.</p><h3>When the ratio only approaches 2</h3><p>Take <span class="math" data-say="y prime equals t squared">y′ = t²</span>, with exact solution <span class="math" data-say="t cubed over 3">t³/3</span>. Euler's method is again a left sum, and the lab prints the errors <span class="math" data-say="11 over 96">11/96</span>, <span class="math" data-say="23 over 384">23/384</span> and <span class="math" data-say="47 over 1536">47/1536</span>. The ratios are <span class="math" data-say="44 over 23 is approximately 1.91304">44/23 ≈ 1.91304</span> and <span class="math" data-say="92 over 47 is approximately 1.95745">92/47 ≈ 1.95745</span>, both rounded here, and the order tile reads <span class="math" data-say="is approximately 0.968973">≈ 0.968973</span>, also rounded. The ratios are close to <span class="math" data-say="2">2</span> and not equal to it.</p><p>The reason can be read off the numbers. For this equation the error is exactly <span class="math" data-say="h over 2 minus h squared over 6">h/2 − h²/6</span>: at <span class="math" data-say="h equals 1 over 4">h = 1/4</span> that is <span class="math" data-say="1 over 8 minus 1 over 96 equals 11 over 96">1/8 − 1/96 = 11/96</span>. The first term halves exactly when <span class="math" data-say="h">h</span> does. The second term is four times smaller after each halving, so it falls faster, and its effect on the ratio fades: the ratio stays below <span class="math" data-say="2">2</span> and climbs towards it as <span class="math" data-say="h">h</span> falls.</p><div class="example"><span class="label">Example &middot; An error that is itself rounded</span><p>On <span class="math" data-say="y prime equals y">y′ = y</span> with exact solution <span class="math" data-say="e to the power t">e^t</span>, the true value <span class="math" data-say="e">e</span> is not a fraction, so the lab cannot subtract exactly. Each error is printed rounded with <span class="math" data-say="is approximately">≈</span>, the two ratios are rounded, and the order is rounded.</p><p>That is the exactness rule at work: Euler's values <span class="math" data-say="the quantity 1 plus h, to the power n">(1 + h)ⁿ</span> are exact, the true value is not, and the lab says so in every tile where the two meet.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Order of a method</h2></div><p>Errors at h, h/2 and h/4, and their ratios</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>From one error to an order</h2><div class="prose reading"><p>The lab runs Euler's method three times on one equation, with step sizes <span class="math" data-say="h">h</span>, <span class="math" data-say="h over 2">h/2</span> and <span class="math" data-say="h over 4">h/4</span>, to the same end time <span class="math" data-say="T equals 1">T = 1</span>. For each it prints the error <span class="math" data-say="E of h">E(h)</span> against the known solution, then the two ratios <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> and <span class="math" data-say="E of h over 2 over E of h over 4">E(h/2)/E(h/4)</span>, and the order those ratios imply.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Order of a method</h2></div><p>Errors at h, h/2 and h/4, and their ratios</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The order of a method</strong><span>halve h and watch the error</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>log₂ error against log₂ h</span></div>
@@ -1412,10 +1448,10 @@ ratios  E(1/4)/E(1/8) = 2,   E(1/8)/E(1/16) = 2</div><p>On this equation the err
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="odPlot" viewBox="0 0 660 420" role="img" aria-label="error against step size"></svg></div>
       <div class="status-banner" id="odStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Three step sizes, two ratios, one order</h3>
-          <p>Each preset runs Euler's method to T = 1 with h = 1/4, 1/8 and 1/16. Read the three errors, then the ratios, and say before you look whether the ratio will be exactly 2. Then type your own right-hand side, such as <span data-say="3 t squared">3t^2</span>, and a matching exact solution, <span data-say="t cubed">t^3</span>, and predict the first error.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Three step sizes, two ratios, one order</h3>
+            <p>Each preset runs Euler's method to T = 1 with h = 1/4, 1/8 and 1/16. Read the three errors, then the ratios, and say before you look whether the ratio will be exactly 2. Then type your own right-hand side, such as <span data-say="3 t squared">3t^2</span>, and a matching exact solution, <span data-say="t cubed">t^3</span>, and predict the first error.</p>
         <div class="field">
           <label for="odPreset">Equation</label>
           <select id="odPreset"><option value="ramp" selected>y' = 2t, exact t^2, to T = 1</option><option value="square">y' = t^2, exact t^3/3, to T = 1</option><option value="growth">y' = y, exact e^t, to T = 1</option></select>
@@ -1453,12 +1489,22 @@ ratios  E(1/4)/E(1/8) = 2,   E(1/8)/E(1/16) = 2</div><p>On this equation the err
         </div>
         <p class="small-copy" style="margin:0;">Each h must divide T − t0 into a whole number of steps: at most 64, or 32 for RK4.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="y prime equals 2 t, y of 0 equals 0, exact y equals t squared, T equals 1. h, N, y sub N, y of 1, E of h. a table, shown on the page. ratios, E of 1 over 4 over E of 1 over 8 equals 2, E of 1 over 8 over E of 1 over 16 equals 2" tabindex="0" role="region" aria-label="Mathematical notation">y′ = 2t,  y(0) = 0,  exact y = t²,  T = 1
+
+h       N     y_N       y(1)    E(h)
+1/4     4     3/4       1       1/4
+1/8     8     7/8       1       1/8
+1/16    16    15/16     1       1/16
+
+ratios  E(1/4)/E(1/8) = 2,   E(1/8)/E(1/16) = 2</div><p>On this equation the error is exactly <span class="math" data-say="h">h</span>: <span class="math" data-say="E of 1 over 4 equals 1 over 4">E(1/4) = 1/4</span>, <span class="math" data-say="E of 1 over 8 equals 1 over 8">E(1/8) = 1/8</span>, <span class="math" data-say="E of 1 over 16 equals 1 over 16">E(1/16) = 1/16</span>. Euler's method on <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> is a left sum, and the left sum of <span class="math" data-say="2 t">2t</span> over <span class="math" data-say="N">N</span> pieces from <span class="math" data-say="t equals 0">t = 0</span> to <span class="math" data-say="t equals 1">t = 1</span> is <span class="math" data-say="h squared times N times the quantity N minus 1, equals 1 minus h">h²·N·(N − 1) = 1 − h</span>, which differs from <span class="math" data-say="1">1</span> by exactly <span class="math" data-say="h">h</span>. Both ratios are exactly <span class="math" data-say="2">2</span>, the order is <span class="math" data-say="1">1</span>, and here that is not an approximation.</p><h3>Where the total comes from</h3><p>Look at one step. The true solution <span class="math" data-say="t squared">t²</span> moves from <span class="math" data-say="t squared">t²</span> to <span class="math" data-say="the quantity t plus h, squared">(t + h)²</span>, a rise of <span class="math" data-say="2 t h plus h squared">2th + h²</span>. Euler's step rises by <span class="math" data-say="h times 2 t">h·2t</span>. The difference is <span class="math" data-say="h squared">h²</span>, whatever <span class="math" data-say="t">t</span> is, so every step falls short by the same <span class="math" data-say="h squared">h²</span>. With <span class="math" data-say="N equals 1 over h">N = 1/h</span> steps the total is <span class="math" data-say="the quantity 1 over h, times h squared equals h">(1/h)·h² = h</span>. At <span class="math" data-say="h equals 1 over 4">h = 1/4</span> each of the four steps misses by <span class="math" data-say="1 over 16">1/16</span>, and the four add to <span class="math" data-say="1 over 4">1/4</span>.</p><div class="thm"><span class="label">Theorem &middot; Euler&#x27;s method is first order</span><p>For a right-hand side with continuous first derivatives, Euler's error at a fixed <span class="math" data-say="T">T</span> is approximately <span class="math" data-say="C times h">C·h</span> for a constant <span class="math" data-say="C">C</span> that depends on the equation and <span class="math" data-say="T">T</span> but not on <span class="math" data-say="h">h</span>. Halving <span class="math" data-say="h">h</span> therefore halves the error, and the ratio <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> approaches <span class="math" data-say="2">2</span>.</p></div><p>The lab demonstrates the claim on chosen equations by exact ratios, and does not prove it for every equation. On an equation where <span class="math" data-say="f">f</span> also depends on <span class="math" data-say="y">y</span>, an early error is carried forward by the later steps, which changes the constant <span class="math" data-say="C">C</span> and not the power of <span class="math" data-say="h">h</span>.</p><h3>When the ratio only approaches 2</h3><p>Take <span class="math" data-say="y prime equals t squared">y′ = t²</span>, with exact solution <span class="math" data-say="t cubed over 3">t³/3</span>. Euler's method is again a left sum, and the lab prints the errors <span class="math" data-say="11 over 96">11/96</span>, <span class="math" data-say="23 over 384">23/384</span> and <span class="math" data-say="47 over 1536">47/1536</span>. The ratios are <span class="math" data-say="44 over 23 is approximately 1.91304">44/23 ≈ 1.91304</span> and <span class="math" data-say="92 over 47 is approximately 1.95745">92/47 ≈ 1.95745</span>, both rounded here, and the order tile reads <span class="math" data-say="is approximately 0.968973">≈ 0.968973</span>, also rounded. The ratios are close to <span class="math" data-say="2">2</span> and not equal to it.</p><p>The reason can be read off the numbers. For this equation the error is exactly <span class="math" data-say="h over 2 minus h squared over 6">h/2 − h²/6</span>: at <span class="math" data-say="h equals 1 over 4">h = 1/4</span> that is <span class="math" data-say="1 over 8 minus 1 over 96 equals 11 over 96">1/8 − 1/96 = 11/96</span>. The first term halves exactly when <span class="math" data-say="h">h</span> does. The second term is four times smaller after each halving, so it falls faster, and its effect on the ratio fades: the ratio stays below <span class="math" data-say="2">2</span> and climbs towards it as <span class="math" data-say="h">h</span> falls.</p><div class="example"><span class="label">Example &middot; An error that is itself rounded</span><p>On <span class="math" data-say="y prime equals y">y′ = y</span> with exact solution <span class="math" data-say="e to the power t">e^t</span>, the true value <span class="math" data-say="e">e</span> is not a fraction, so the lab cannot subtract exactly. Each error is printed rounded with <span class="math" data-say="is approximately">≈</span>, the two ratios are rounded, and the order is rounded.</p><p>That is the exactness rule at work: Euler's values <span class="math" data-say="the quantity 1 plus h, to the power n">(1 + h)ⁿ</span> are exact, the true value is not, and the lab says so in every tile where the two meet.</p></div></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring an error and reading an order</h2></div><p>From an equation with a known solution to a number you can state.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose the end time and three step sizes</h3><p>Pick <span class="math" data-say="T">T</span> and <span class="math" data-say="h, h over 2, h over 4">h, h/2, h/4</span> so that <span class="math" data-say="the quantity T minus t sub 0, over h">(T − t₀)/h</span> is a whole number of steps for each. Every error is then an error at the same <span class="math" data-say="T">T</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Run the method and subtract the true value</h3><p>Compute <span class="math" data-say="y sub N">y_N</span> for each step size and the gap <span class="math" data-say="the absolute value of y sub N minus y of T">|y_N − y(T)|</span>. Keep the gap exact when the true value at <span class="math" data-say="T">T</span> is rational and mark it <span class="math" data-say="is approximately">≈</span> when it is not.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Form the two ratios</h3><p>Divide each error by the next: <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> and <span class="math" data-say="E of h over 2 over E of h over 4">E(h/2)/E(h/4)</span>. Two ratios that agree are better evidence than one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read the order from the last ratio</h3><p>A ratio of <span class="math" data-say="2">2</span> is first order, <span class="math" data-say="4">4</span> second, <span class="math" data-say="16">16</span> fourth. A ratio near but not equal to a power of two is read as approaching it, and the order is <span class="math" data-say="log base 2">log₂</span> of the ratio.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Measuring an error and reading an order</h2>
+      <p class="lead-in">From an equation with a known solution to a number you can state.</p>
+      <ol class="key-ideas method"><li><strong>Choose the end time and three step sizes.</strong> Pick <span class="math" data-say="T">T</span> and <span class="math" data-say="h, h over 2, h over 4">h, h/2, h/4</span> so that <span class="math" data-say="the quantity T minus t sub 0, over h">(T − t₀)/h</span> is a whole number of steps for each. Every error is then an error at the same <span class="math" data-say="T">T</span>.</li><li><strong>Run the method and subtract the true value.</strong> Compute <span class="math" data-say="y sub N">y_N</span> for each step size and the gap <span class="math" data-say="the absolute value of y sub N minus y of T">|y_N − y(T)|</span>. Keep the gap exact when the true value at <span class="math" data-say="T">T</span> is rational and mark it <span class="math" data-say="is approximately">≈</span> when it is not.</li><li><strong>Form the two ratios.</strong> Divide each error by the next: <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> and <span class="math" data-say="E of h over 2 over E of h over 4">E(h/2)/E(h/4)</span>. Two ratios that agree are better evidence than one.</li><li><strong>Read the order from the last ratio.</strong> A ratio of <span class="math" data-say="2">2</span> is first order, <span class="math" data-say="4">4</span> second, <span class="math" data-say="16">16</span> fourth. A ratio near but not equal to a power of two is read as approaching it, and the order is <span class="math" data-say="log base 2">log₂</span> of the ratio.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1482,17 +1528,16 @@ h = 1/16: 16·(1/256) = 1/16
 ratios:  (1/4)/(1/8) = 2,  (1/8)/(1/16) = 2</div><p>The three errors agree with the lab. The shortfall of a single step is <span class="math" data-say="h squared">h²</span>, a tiny number, and it is the number of steps that turns it into an error of size <span class="math" data-say="h">h</span>: halving <span class="math" data-say="h">h</span> quarters each piece and doubles the number of pieces, which halves the total.</p><p>For a rehearsal, run <span class="math" data-say="h equals 1 over 10">h = 1/10</span> by the same formula: ten steps of <span class="math" data-say="1 over 100">1/100</span> give <span class="math" data-say="1 over 10">1/10</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the error to be the error of the last step</strong><span>On <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> with <span class="math" data-say="h equals 1 over 4">h = 1/4</span>, the last step misses by <span class="math" data-say="1 over 16">1/16</span>, and the lab's error is <span class="math" data-say="1 over 4">1/4</span>: four equal pieces, one from each step. The error at <span class="math" data-say="T">T</span> is whatever has accumulated from the start to there, and each step's miss sits inside every later value.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every ratio to be exactly 2</strong><span>Only <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> gives <span class="math" data-say="2, 2">2, 2</span>. On <span class="math" data-say="y prime equals t squared">y′ = t²</span> the ratios are <span class="math" data-say="44 over 23">44/23</span> and <span class="math" data-say="92 over 47">92/47</span>, below <span class="math" data-say="2">2</span> and rising, and on <span class="math" data-say="y prime equals y">y′ = y</span> they are rounded. The claim is that they approach <span class="math" data-say="2">2</span>, and where they are exactly <span class="math" data-say="2">2</span> the lesson has shown why.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Naming the order from a single error</strong><span>An error of <span class="math" data-say="1 over 4">1/4</span> means nothing by itself, since it depends on <span class="math" data-say="T">T</span>, on the equation and on the step. The order is how the error changes when the step does, and that takes at least two errors and their ratio.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can measure Euler&#x27;s error at three step sizes, form the ratios and state the order.</strong><p>You should be able to run the method to a fixed <span class="math" data-say="T">T</span> with <span class="math" data-say="h">h</span>, <span class="math" data-say="h over 2">h/2</span> and <span class="math" data-say="h over 4">h/4</span>, subtract the true value, divide successive errors, and say that a ratio near <span class="math" data-say="2">2</span> means first order. You should also be able to explain, for <span class="math" data-say="y prime equals 2 t">y′ = 2t</span>, why the total error is <span class="math" data-say="h">h</span> and not the error of one step.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> First order is slow: to halve the error you must double the work. A cheap change to the step itself does better, and it uses a second slope. &ldquo;The Improved Euler Method&rdquo; shows the error quartering instead.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking the error to be the error of the last step</strong><span>On <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> with <span class="math" data-say="h equals 1 over 4">h = 1/4</span>, the last step misses by <span class="math" data-say="1 over 16">1/16</span>, and the lab's error is <span class="math" data-say="1 over 4">1/4</span>: four equal pieces, one from each step. The error at <span class="math" data-say="T">T</span> is whatever has accumulated from the start to there, and each step's miss sits inside every later value.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every ratio to be exactly 2</strong><span>Only <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> gives <span class="math" data-say="2, 2">2, 2</span>. On <span class="math" data-say="y prime equals t squared">y′ = t²</span> the ratios are <span class="math" data-say="44 over 23">44/23</span> and <span class="math" data-say="92 over 47">92/47</span>, below <span class="math" data-say="2">2</span> and rising, and on <span class="math" data-say="y prime equals y">y′ = y</span> they are rounded. The claim is that they approach <span class="math" data-say="2">2</span>, and where they are exactly <span class="math" data-say="2">2</span> the lesson has shown why.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Naming the order from a single error</strong><span>An error of <span class="math" data-say="1 over 4">1/4</span> means nothing by itself, since it depends on <span class="math" data-say="T">T</span>, on the equation and on the step. The order is how the error changes when the step does, and that takes at least two errors and their ratio.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can measure Euler&#x27;s error at three step sizes, form the ratios and state the order.</strong><p>You should be able to run the method to a fixed <span class="math" data-say="T">T</span> with <span class="math" data-say="h">h</span>, <span class="math" data-say="h over 2">h/2</span> and <span class="math" data-say="h over 4">h/4</span>, subtract the true value, divide successive errors, and say that a ratio near <span class="math" data-say="2">2</span> means first order. You should also be able to explain, for <span class="math" data-say="y prime equals 2 t">y′ = 2t</span>, why the total error is <span class="math" data-say="h">h</span> and not the error of one step.</p></div></div><div class="note"><strong>Note:</strong> First order is slow: to halve the error you must double the work. A cheap change to the step itself does better, and it uses a second slope. &ldquo;The Improved Euler Method&rdquo; shows the error quartering instead.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The error is measured at a fixed end time</summary><p>To compare step sizes, fix an end time <span class="math" data-say="T">T</span> and ask for <span class="math" data-say="E of h equals the absolute value of y sub N minus y of T">E(h) = |y_N − y(T)|</span>, where <span class="math" data-say="N equals the quantity T minus t sub 0, over h">N = (T − t₀)/h</span> steps are needed to arrive. A smaller <span class="math" data-say="h">h</span> takes more steps to reach the same <span class="math" data-say="T">T</span>, and that is what makes the three errors comparable. An error at the end of four steps and an error at the end of eight of the same size are errors at two different times.</p></details><details class="recall"><summary>The error is the accumulation of every step, not the last one</summary><p>Each step starts a little off and adds a little more. On <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> one step of size <span class="math" data-say="h">h</span> from <span class="math" data-say="t">t</span> misses by exactly <span class="math" data-say="h squared">h²</span>, and there are <span class="math" data-say="1 over h">1/h</span> of them, so the error at <span class="math" data-say="T equals 1">T = 1</span> is <span class="math" data-say="h squared times the quantity 1 over h, equals h">h²·(1/h) = h</span>. The last step contributes one of those pieces and no more.</p></details><details class="recall"><summary>The ratio of successive errors names the order</summary><p>If the error is about <span class="math" data-say="C times h">C·h</span>, halving <span class="math" data-say="h">h</span> halves it, and <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> is near <span class="math" data-say="2">2</span>. If it were about <span class="math" data-say="C times h squared">C·h²</span> the ratio would be near <span class="math" data-say="4">4</span>. The order is the power: <span class="math" data-say="log base 2">log₂</span> of the ratio. A ratio is read from two errors, and the lab forms two ratios from three, so one can check the other.</p></details></div>
+      <h3>Summary</h3>
       <p>The error of Euler's method at a fixed end time is the accumulation of every step's small error, and it shrinks in proportion to the step. Halve <span class="math" data-say="h">h</span> and the error is about halved, which the lab shows as a ratio near 2 and names first order. On one equation the ratio is exactly 2; on the others it only approaches 2, and the lesson says which is which.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The error is measured at a fixed end time.</strong> To compare step sizes, fix an end time <span class="math" data-say="T">T</span> and ask for <span class="math" data-say="E of h equals the absolute value of y sub N minus y of T">E(h) = |y_N − y(T)|</span>, where <span class="math" data-say="N equals the quantity T minus t sub 0, over h">N = (T − t₀)/h</span> steps are needed to arrive. A smaller <span class="math" data-say="h">h</span> takes more steps to reach the same <span class="math" data-say="T">T</span>, and that is what makes the three errors comparable. An error at the end of four steps and an error at the end of eight of the same size are errors at two different times.</li><li><strong>The error is the accumulation of every step, not the last one.</strong> Each step starts a little off and adds a little more. On <span class="math" data-say="y prime equals 2 t">y′ = 2t</span> one step of size <span class="math" data-say="h">h</span> from <span class="math" data-say="t">t</span> misses by exactly <span class="math" data-say="h squared">h²</span>, and there are <span class="math" data-say="1 over h">1/h</span> of them, so the error at <span class="math" data-say="T equals 1">T = 1</span> is <span class="math" data-say="h squared times the quantity 1 over h, equals h">h²·(1/h) = h</span>. The last step contributes one of those pieces and no more.</li><li><strong>The ratio of successive errors names the order.</strong> If the error is about <span class="math" data-say="C times h">C·h</span>, halving <span class="math" data-say="h">h</span> halves it, and <span class="math" data-say="E of h over E of h over 2">E(h)/E(h/2)</span> is near <span class="math" data-say="2">2</span>. If it were about <span class="math" data-say="C times h squared">C·h²</span> the ratio would be near <span class="math" data-say="4">4</span>. The order is the power: <span class="math" data-say="log base 2">log₂</span> of the ratio. A ratio is read from two errors, and the lab forms two ratios from three, so one can check the other.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="E of h equals the absolute value of y sub N minus y of T, and N equals the quantity T minus t sub 0, over h. y prime equals 2 t, E of h equals h exactly. one step errs h squared, N steps total N times h squared equals h. halve h, the ratio of errors approaches 2. ratio 2 means first order" tabindex="0" role="region" aria-label="Mathematical notation">E(h) = |y_N − y(T)|,  N = (T − t₀)/h
 y′ = 2t:  E(h) = h exactly
 one step errs h²;  N steps total N·h² = h
@@ -3848,11 +3893,40 @@ ratio 2 means first order</div><figcaption>The error at a fixed time, and what i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3920,7 +3994,7 @@ ratio 2 means first order</div><figcaption>The error at a fixed time, and what i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

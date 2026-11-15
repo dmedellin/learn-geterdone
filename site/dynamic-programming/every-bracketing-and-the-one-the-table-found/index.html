@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Dynamic Programming and Optimal Substructure</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; A table, an order, a recurrence</p>
       <h1>Every Bracketing, and the One the Table Found</h1>
       <p class="lesson-lede">Enumerate all 132 bracketings of seven matrices, read the table&#x27;s answer back as a tree, and re-cost that tree from the dimensions alone.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The table stores a split point, and that is what the object is made of</li><li>Re-costing the object is a third computation, not a restatement</li><li>The enumeration is the only route that is obviously right, and the first to die</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Counting the bracketings, and getting one of them back</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A bracketing, as a binary tree</span><p>A <strong>bracketing</strong> of matrices <span class="math" data-say="1">1</span> through <span class="math" data-say="n">n</span> is a binary tree whose leaves are the matrices in order and whose internal nodes are multiplications. Its cost is the sum, over internal nodes, of <span class="math" data-say="p times q times r">p·q·r</span> where the left child spans dimensions <span class="math" data-say="p">p</span> by <span class="math" data-say="q">q</span> and the right child <span class="math" data-say="q">q</span> by <span class="math" data-say="r">r</span>.</p></div><div class="thm"><span class="label">Theorem &middot; The number of bracketings</span><p>The number of bracketings of <span class="math" data-say="n">n</span> matrices is the Catalan number <span class="math" data-say="C of the quantity n minus 1">C(n−1)</span>, where <span class="math" data-say="C of 0 equals 1">C(0) = 1</span> and <span class="math" data-say="C of m equals sum over i of C of i times C of the quantity m minus 1 minus i">C(m) = sum over i of C(i)·C(m−1−i)</span> for <span class="math" data-say="i">i</span> from 0 to <span class="math" data-say="m minus 1">m−1</span>.</p></div><div class="proof"><p>A bracketing of <span class="math" data-say="n is at least 2">n ≥ 2</span> matrices has a last multiplication, splitting the chain after matrix <span class="math" data-say="k">k</span> for some <span class="math" data-say="k">k</span> from 1 to <span class="math" data-say="n minus 1">n−1</span>. The left part is a bracketing of <span class="math" data-say="k">k</span> matrices and the right part a bracketing of <span class="math" data-say="n minus k">n−k</span>, and the two are chosen independently, so the count for <span class="math" data-say="n">n</span> is the sum over <span class="math" data-say="k">k</span> of the count for <span class="math" data-say="k">k</span> times the count for <span class="math" data-say="n minus k">n−k</span>.</p><p>Writing <span class="math" data-say="c of n">c(n)</span> for the count, that is <span class="math" data-say="c of n equals sum over k of c of k times c of the quantity n minus k">c(n) = sum over k of c(k)·c(n−k)</span> with <span class="math" data-say="c of 1 equals 1">c(1) = 1</span>, which is the Catalan recurrence shifted by one. Hence <span class="math" data-say="c of n equals the Catalan number C of the quantity n minus 1">c(n) = C(n−1)</span>, giving 5 at four matrices, 42 at six and 132 at seven &mdash; and the lab's enumeration returns exactly those counts, because it is the same recursion with the trees kept instead of counted.</p><p><span class="qed">&#9633;</span></p></div><p>The split in that proof is the same split the recurrence minimises over. That is not a coincidence: the recurrence is the enumeration with the sub-answers reused instead of rebuilt, which is what dynamic programming is. The table's <span class="math" data-say="theta of n cubed">Θ(n³)</span> and the enumeration's <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span> are two costs for the same search, differing only in whether the sub-results are stored.</p><h3>Following the pointers back</h3><p>The reconstruction starts at the cell covering the whole chain and reads its recorded split <span class="math" data-say="k">k</span>. That gives two intervals, <span class="math" data-say="i">i</span> to <span class="math" data-say="k">k</span> and <span class="math" data-say="k plus 1">k+1</span> to <span class="math" data-say="j">j</span>, each of which has its own recorded split, and the recursion bottoms out at single matrices. On the lab's seven-matrix chain the result is <span class="math" data-say="A 1 A 2 times A 3 A 4 times A 5 A 6 A 7">((A1A2)(((A3A4)(A5A6))A7))</span>, which is a bracketing of seven matrices in the given order, as it has to be.</p><div class="example"><span class="label">Example &middot; Two claims, checked separately</span><p>The table reports 2052 after filling 28 cells. The enumeration walks all 132 bracketings with no table at all and reports a best of 2052 and a worst of 14 060. The reconstruction returns the tree above, and re-costing that tree from <span class="math" data-say="5 10 3 12 5 50 6 4">5 10 3 12 5 50 6 4</span> gives 2052. Three numbers, three routes, one answer &mdash; and the third route is the only one that says anything about the tree.</p></div><p>Why insist on the third route? Because a reconstruction that follows the wrong pointer returns a bracketing, not an error. It is still a binary tree over the matrices in order; it is still printable; it still looks like an answer. The only cheap way to catch it is to cost it independently and compare with the number the table reported, which is what the panel's re-cost row does.</p><h3>What the two counts say about each other</h3><p>On this chain the table fills 28 cells and the enumeration walks 132 bracketings, so the table is ahead by a factor of about five. At four matrices the table fills 10 cells against 5 bracketings and the table is behind. The crossing is early here, which is why matrix chain is the friendly case, and the next course on this path has a problem where the crossing does not arrive until ten items.</p><p>Both numbers on the panel are measured on the chain on screen. The proved statements are <span class="math" data-say="theta of n cubed">Θ(n³)</span> against <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span>, and <span class="math" data-say="Catalan">Catalan</span> grows like <span class="math" data-say="4 to the power n">4^n</span> over <span class="math" data-say="n">n</span> to the three halves, so the ratio widens without bound. Neither of those growth claims is established by the two counts, and the counts are what tell you that on four matrices the asymptotically better method is the slower one.</p><p>One more thing the enumeration buys: the worst bracketing. On this chain it costs 14 060 against the optimum's 2052, a factor of about 6.9. The table cannot tell you that, because it only ever keeps minima, and a reader who wants to know what the optimisation is worth has to ask the enumeration while the enumeration is still affordable.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The order the cells are filled in is part of the algorithm</h2></div><p>By interval length against row by row, both against every bracketing</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Counting the bracketings, and getting one of them back</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A bracketing, as a binary tree</span><p>A <strong>bracketing</strong> of matrices <span class="math" data-say="1">1</span> through <span class="math" data-say="n">n</span> is a binary tree whose leaves are the matrices in order and whose internal nodes are multiplications. Its cost is the sum, over internal nodes, of <span class="math" data-say="p times q times r">p·q·r</span> where the left child spans dimensions <span class="math" data-say="p">p</span> by <span class="math" data-say="q">q</span> and the right child <span class="math" data-say="q">q</span> by <span class="math" data-say="r">r</span>.</p></div><div class="thm"><span class="label">Theorem &middot; The number of bracketings</span><p>The number of bracketings of <span class="math" data-say="n">n</span> matrices is the Catalan number <span class="math" data-say="C of the quantity n minus 1">C(n−1)</span>, where <span class="math" data-say="C of 0 equals 1">C(0) = 1</span> and <span class="math" data-say="C of m equals sum over i of C of i times C of the quantity m minus 1 minus i">C(m) = sum over i of C(i)·C(m−1−i)</span> for <span class="math" data-say="i">i</span> from 0 to <span class="math" data-say="m minus 1">m−1</span>.</p></div><div class="proof"><p>A bracketing of <span class="math" data-say="n is at least 2">n ≥ 2</span> matrices has a last multiplication, splitting the chain after matrix <span class="math" data-say="k">k</span> for some <span class="math" data-say="k">k</span> from 1 to <span class="math" data-say="n minus 1">n−1</span>. The left part is a bracketing of <span class="math" data-say="k">k</span> matrices and the right part a bracketing of <span class="math" data-say="n minus k">n−k</span>, and the two are chosen independently, so the count for <span class="math" data-say="n">n</span> is the sum over <span class="math" data-say="k">k</span> of the count for <span class="math" data-say="k">k</span> times the count for <span class="math" data-say="n minus k">n−k</span>.</p><p>Writing <span class="math" data-say="c of n">c(n)</span> for the count, that is <span class="math" data-say="c of n equals sum over k of c of k times c of the quantity n minus k">c(n) = sum over k of c(k)·c(n−k)</span> with <span class="math" data-say="c of 1 equals 1">c(1) = 1</span>, which is the Catalan recurrence shifted by one. Hence <span class="math" data-say="c of n equals the Catalan number C of the quantity n minus 1">c(n) = C(n−1)</span>, giving 5 at four matrices, 42 at six and 132 at seven &mdash; and the lab's enumeration returns exactly those counts, because it is the same recursion with the trees kept instead of counted.</p><p><span class="qed">&#9633;</span></p></div><p>The split in that proof is the same split the recurrence minimises over. That is not a coincidence: the recurrence is the enumeration with the sub-answers reused instead of rebuilt, which is what dynamic programming is. The table's <span class="math" data-say="theta of n cubed">Θ(n³)</span> and the enumeration's <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span> are two costs for the same search, differing only in whether the sub-results are stored.</p><h3>Following the pointers back</h3><p>The reconstruction starts at the cell covering the whole chain and reads its recorded split <span class="math" data-say="k">k</span>. That gives two intervals, <span class="math" data-say="i">i</span> to <span class="math" data-say="k">k</span> and <span class="math" data-say="k plus 1">k+1</span> to <span class="math" data-say="j">j</span>, each of which has its own recorded split, and the recursion bottoms out at single matrices. On the lab's seven-matrix chain the result is <span class="math" data-say="A 1 A 2 times A 3 A 4 times A 5 A 6 A 7">((A1A2)(((A3A4)(A5A6))A7))</span>, which is a bracketing of seven matrices in the given order, as it has to be.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The order the cells are filled in is part of the algorithm</h2></div><p>By interval length against row by row, both against every bracketing</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Fill by length, or fill by row and be wrong</strong><span>the same recurrence, two orders, two answers, one of them checked</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the cell being explained</span><span class="tone-amber"><i class="legend-swatch"></i>the cells it read</span><span class="tone-red"><i class="legend-swatch"></i>a cell that was read before it was filled</span></div>
@@ -1404,10 +1447,10 @@
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="chGrid" viewBox="0 0 660 200" role="img" aria-label="The table filled in the chosen order, one row and column per matrix."></svg><svg id="chWrong" viewBox="0 0 660 200" role="img" aria-label="The same table filled row by row, for comparison."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="chOrders"></table></div>
       <div class="status-banner" id="chStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Seven matrices, and every way of bracketing them</h3>
-          <p>The panel loads a seven-matrix chain, so the enumeration is 132 bracketings and still instant. The reconstruction is printed as a bracketing and re-costed from the dimensions, and those are two separate rows because they are two separate claims.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Seven matrices, and every way of bracketing them</h3>
+            <p>The panel loads a seven-matrix chain, so the enumeration is 132 bracketings and still instant. The reconstruction is printed as a bracketing and re-costed from the dimensions, and those are two separate rows because they are two separate claims.</p>
         <div class="field">
           <label for="chPreset">Dimensions</label>
           <select id="chPreset"><option value="clrs">six matrices, the usual worked example</option><option value="thin">a thin matrix in the middle</option><option value="square">all the same size</option><option value="long" selected>seven matrices</option></select>
@@ -1437,12 +1480,15 @@
           <div class="kpi"><span>The worst bracketing costs</span><strong id="chWorst">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="chHint" style="margin:0;">Seven numbers describe six matrices: <span class="tt">30 35 15 5 10 20 25</span> is 30&times;35, then 35&times;15, and so on. A cell covers an interval of the chain and reads two shorter intervals, so the shorter ones have to be filled first. Fill row by row instead and some of them are not &mdash; the table still finishes, and the number it finishes with is wrong.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; Two claims, checked separately</span><p>The table reports 2052 after filling 28 cells. The enumeration walks all 132 bracketings with no table at all and reports a best of 2052 and a worst of 14 060. The reconstruction returns the tree above, and re-costing that tree from <span class="math" data-say="5 10 3 12 5 50 6 4">5 10 3 12 5 50 6 4</span> gives 2052. Three numbers, three routes, one answer &mdash; and the third route is the only one that says anything about the tree.</p></div><p>Why insist on the third route? Because a reconstruction that follows the wrong pointer returns a bracketing, not an error. It is still a binary tree over the matrices in order; it is still printable; it still looks like an answer. The only cheap way to catch it is to cost it independently and compare with the number the table reported, which is what the panel's re-cost row does.</p><h3>What the two counts say about each other</h3><p>On this chain the table fills 28 cells and the enumeration walks 132 bracketings, so the table is ahead by a factor of about five. At four matrices the table fills 10 cells against 5 bracketings and the table is behind. The crossing is early here, which is why matrix chain is the friendly case, and the next course on this path has a problem where the crossing does not arrive until ten items.</p><p>Both numbers on the panel are measured on the chain on screen. The proved statements are <span class="math" data-say="theta of n cubed">Θ(n³)</span> against <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span>, and <span class="math" data-say="Catalan">Catalan</span> grows like <span class="math" data-say="4 to the power n">4^n</span> over <span class="math" data-say="n">n</span> to the three halves, so the ratio widens without bound. Neither of those growth claims is established by the two counts, and the counts are what tell you that on four matrices the asymptotically better method is the slower one.</p><p>One more thing the enumeration buys: the worst bracketing. On this chain it costs 14 060 against the optimum's 2052, a factor of about 6.9. The table cannot tell you that, because it only ever keeps minima, and a reader who wants to know what the optimisation is worth has to ask the enumeration while the enumeration is still affordable.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Getting an object back out of a table, and checking it</h2></div><p>The value and the object are different claims, and the second one needs its own check.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Record the choice, not just the value</h3><p>When a cell takes a minimum, store which option attained it. Without that the table answers what the optimum costs and cannot answer what it is, and recovering the choice afterwards means recomputing the minimum.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Walk the choices from the whole problem inward</h3><p>Start at the cell covering everything, follow its recorded choice into subproblems, and stop at the base cases. For the chain that walk is a binary tree; for a knapsack it is a path; the shape of the walk is the shape of the answer.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Re-cost the object from the input alone</h3><p>Compute what the returned object costs, using only the problem's data and not the table. This is the check that catches a reconstruction that followed a stale or wrong pointer, because such a reconstruction still returns a well-formed object.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Enumerate while you still can, and record the cap</h3><p>Every bracketing at six, seven and eight matrices is 42, 132 and 429, and the lab refuses above eight. Use the enumeration to establish the table on small instances, then rely on the table &mdash; and write down the size at which you stopped being able to check.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Getting an object back out of a table, and checking it</h2>
+      <p class="lead-in">The value and the object are different claims, and the second one needs its own check.</p>
+      <ol class="key-ideas method"><li><strong>Record the choice, not just the value.</strong> When a cell takes a minimum, store which option attained it. Without that the table answers what the optimum costs and cannot answer what it is, and recovering the choice afterwards means recomputing the minimum.</li><li><strong>Walk the choices from the whole problem inward.</strong> Start at the cell covering everything, follow its recorded choice into subproblems, and stop at the base cases. For the chain that walk is a binary tree; for a knapsack it is a path; the shape of the walk is the shape of the answer.</li><li><strong>Re-cost the object from the input alone.</strong> Compute what the returned object costs, using only the problem's data and not the table. This is the check that catches a reconstruction that followed a stale or wrong pointer, because such a reconstruction still returns a well-formed object.</li><li><strong>Enumerate while you still can, and record the cap.</strong> Every bracketing at six, seven and eight matrices is 42, 132 and 429, and the lab refuses above eight. Use the enumeration to establish the table on small instances, then rely on the table &mdash; and write down the size at which you stopped being able to check.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1477,17 +1523,16 @@ re-costing it from the dimensions alone
 the worst of the 132 bracketings costs 14060, which is 6.9 times the best</div><p>Every line of the re-costing uses only the dimensions and the shape of the tree. No cell of the table appears in it. That is what makes the agreement worth something: if the reconstruction had followed a wrong split the tree would still be a tree, the six products would still be computable, and the total would have come out as something other than 2052.</p><p>The gap between 2052 and 14 060 is what the optimisation is worth on this chain, and it is knowable only by enumeration. Switch the dimensions to <span class="math" data-say="10100 5 50">10 100 5 50</span> and the same gap is 7 500 against 75 000, exactly ten times, on four matrices and two bracketings. Switch to <span class="math" data-say="10 10 10 10 10">10 10 10 10 10</span> and the gap vanishes: every bracketing costs 3 000, so the optimum is unique in value and not in shape, and the split the table records is one arbitrary choice among five.</p><p>For a faded rehearsal, predict the number of bracketings for eight matrices before you change the dimensions. The supplied first move: the counts so far are 1, 2, 5, 14, 42, 132 for one through seven matrices, and each is the sum of products of earlier pairs. Work out the next one, then add a dimension and read the panel &mdash; and note that one more matrix after that is refused.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the value and the object as one answer</strong><span>The corner cell is a number and the bracketing is a tree, and a table can be right about the first while the walk back is wrong about the second. They are printed as separate rows on the panel for that reason, with a third row for the re-cost, and a reader who merges them has removed the only check on the walk.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Relying on an enumeration you cannot run at the size you care about</strong><span>132 bracketings is instant, 429 is fine, and the lab refuses nine matrices. Every claim this page makes about the table's correctness was established at a size where the enumeration still ran. Extending those claims to a fifty-matrix chain is an argument from the recurrence's proof, not from the check.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the optimum&#x27;s value as the value of optimising</strong><span>2052 is what the best bracketing costs. What the optimisation is <em>worth</em> is 14 060 minus 2052, and the table cannot tell you either term of that subtraction except the first. On a chain where every bracketing costs the same the optimisation is worth nothing, and only the enumeration says so.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can return an object from a table and check it without the table.</strong><p>You should be able to store the choice a cell made, walk it back into an object, re-cost that object from the problem's data alone, and say at what size the exhaustive check you were relying on stops running.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both tables so far have been square and indexed by the problem's own structure. The next lesson moves to a grid whose two axes are different kinds of thing &mdash; which item, and how much room is left &mdash; and where the bound that looks polynomial is not.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating the value and the object as one answer</strong><span>The corner cell is a number and the bracketing is a tree, and a table can be right about the first while the walk back is wrong about the second. They are printed as separate rows on the panel for that reason, with a third row for the re-cost, and a reader who merges them has removed the only check on the walk.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Relying on an enumeration you cannot run at the size you care about</strong><span>132 bracketings is instant, 429 is fine, and the lab refuses nine matrices. Every claim this page makes about the table's correctness was established at a size where the enumeration still ran. Extending those claims to a fifty-matrix chain is an argument from the recurrence's proof, not from the check.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the optimum&#x27;s value as the value of optimising</strong><span>2052 is what the best bracketing costs. What the optimisation is <em>worth</em> is 14 060 minus 2052, and the table cannot tell you either term of that subtraction except the first. On a chain where every bracketing costs the same the optimisation is worth nothing, and only the enumeration says so.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can return an object from a table and check it without the table.</strong><p>You should be able to store the choice a cell made, walk it back into an object, re-cost that object from the problem's data alone, and say at what size the exhaustive check you were relying on stops running.</p></div></div><div class="note"><strong>Note:</strong> Both tables so far have been square and indexed by the problem's own structure. The next lesson moves to a grid whose two axes are different kinds of thing &mdash; which item, and how much room is left &mdash; and where the bound that looks polynomial is not.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The table stores a split point, and that is what the object is made of</summary><p>Each cell records not only its value but which <span class="math" data-say="k">k</span> attained the minimum. Reading the answer back means starting at the whole interval, taking its split, and recursing on the two halves &mdash; which produces a binary tree over the matrices, and that tree printed with brackets is the bracketing. The value came from a minimum; the object comes from a pointer, and they can disagree.</p></details><details class="recall"><summary>Re-costing the object is a third computation, not a restatement</summary><p>Given the tree and the dimensions, the cost can be worked out from scratch: each internal node costs the product of three dimensions determined by the span of its two children, and the total is the sum over nodes. Nothing in that calculation looks at the table. When the table says 2052 and the re-costed tree says 2052, two independent computations have agreed.</p></details><details class="recall"><summary>The enumeration is the only route that is obviously right, and the first to die</summary><p>Listing every bracketing needs no recurrence and no order, so it cannot share a mistake with the table. It is also <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span>, which is 132 at seven matrices, 429 at eight, and past a hundred million by nineteen. The lab refuses above eight. That is the shape of the whole subject: the check you trust most is the one you can least afford.</p></details></div>
+      <h3>Summary</h3>
       <p>A table returns a number. A bracketing is an object, and getting the object back means following the split point each cell recorded. Those are two different claims and they are checked separately here: the number against every one of the 132 bracketings of seven matrices, and the tree against the dimensions it was supposedly built from.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The table stores a split point, and that is what the object is made of.</strong> Each cell records not only its value but which <span class="math" data-say="k">k</span> attained the minimum. Reading the answer back means starting at the whole interval, taking its split, and recursing on the two halves &mdash; which produces a binary tree over the matrices, and that tree printed with brackets is the bracketing. The value came from a minimum; the object comes from a pointer, and they can disagree.</li><li><strong>Re-costing the object is a third computation, not a restatement.</strong> Given the tree and the dimensions, the cost can be worked out from scratch: each internal node costs the product of three dimensions determined by the span of its two children, and the total is the sum over nodes. Nothing in that calculation looks at the table. When the table says 2052 and the re-costed tree says 2052, two independent computations have agreed.</li><li><strong>The enumeration is the only route that is obviously right, and the first to die.</strong> Listing every bracketing needs no recurrence and no order, so it cannot share a mistake with the table. It is also <span class="math" data-say="Catalan of the quantity n minus 1">Catalan(n−1)</span>, which is 132 at seven matrices, 429 at eight, and past a hundred million by nineteen. The lab refuses above eight. That is the shape of the whole subject: the check you trust most is the one you can least afford.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="bracketings of n matrices equals Catalan of the quantity n minus 1. n equals 4, 5, n equals 6, 42, n equals 8, 429. n equals 5, 14, n equals 7, 132, n equals 9, 1430. dimensions 5 10 3 12 5 50 6 4, seven matrices. the table, 2052, 28 cells. all 132 bracketings, best, 2052, worst 14060. the tree, r e-costed, 2052, A 1 A 2 times A 3 A 4 times A 5 A 6 A 7" tabindex="0" role="region" aria-label="Mathematical notation">bracketings of n matrices = Catalan(n−1)
   n = 4:    5        n = 6:   42        n = 8:   429
   n = 5:   14        n = 7:  132        n = 9:  1430
@@ -3502,11 +3547,40 @@ dimensions 5 10 3 12 5 50 6 4, seven matrices
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3574,7 +3648,7 @@ dimensions 5 10 3 12 5 50 6 4, seven matrices
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

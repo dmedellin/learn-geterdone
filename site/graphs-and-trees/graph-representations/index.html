@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,29 +1424,27 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Graphs and Trees</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Basics</p>
       <h1>Graph Representations</h1>
       <p class="lesson-lede">Adjacency matrix, adjacency list, and what each makes cheap.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The matrix is symmetric with a zero diagonal</li><li>Lists win for sparse graphs</li><li>Matrix powers count walks</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Storing a graph</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Adjacency matrix</span><p>The <span class="math" data-say="n times n">n × n</span> matrix <span class="math" data-say="A">A</span> with <span class="math" data-say="A at i j equals 1">A[i][j] = 1</span> when vertices <span class="math" data-say="i">i</span> and <span class="math" data-say="j">j</span> are adjacent and 0 otherwise. For a simple undirected graph it is symmetric with zero diagonal.</p></div><div class="defbox"><span class="label">Definition &middot; Adjacency list</span><p>For each vertex, the list of its neighbours. Total space <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span>, since each edge appears in two lists.</p></div><div class="mathblock" data-say="operation, matrix, list. is u adjacent to v ?, big O of 1, big O of the degree of u. iterate the neighbours of v, big O of n, big O of the degree of v. space, theta of n squared, theta of the quantity n plus the size of E. add an edge, big O of 1, big O of 1. iterate all edges, big O of n squared, theta of the quantity n plus the size of E" tabindex="0" role="region" aria-label="Mathematical notation">operation                        matrix        list
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Storing a graph</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Adjacency matrix</span><p>The <span class="math" data-say="n times n">n × n</span> matrix <span class="math" data-say="A">A</span> with <span class="math" data-say="A at i j equals 1">A[i][j] = 1</span> when vertices <span class="math" data-say="i">i</span> and <span class="math" data-say="j">j</span> are adjacent and 0 otherwise. For a simple undirected graph it is symmetric with zero diagonal.</p></div><div class="defbox"><span class="label">Definition &middot; Adjacency list</span><p>For each vertex, the list of its neighbours. Total space <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span>, since each edge appears in two lists.</p></div><div class="mathblock" data-say="operation, matrix, list. is u adjacent to v ?, big O of 1, big O of the degree of u. iterate the neighbours of v, big O of n, big O of the degree of v. space, theta of n squared, theta of the quantity n plus the size of E. add an edge, big O of 1, big O of 1. iterate all edges, big O of n squared, theta of the quantity n plus the size of E" tabindex="0" role="region" aria-label="Mathematical notation">operation                        matrix        list
 is u adjacent to v?              O(1)          O(deg u)
 iterate the neighbours of v      O(n)          O(deg v)
 space                            Θ(n²)         Θ(n + |E|)
 add an edge                      O(1)          O(1)
-iterate all edges                O(n²)         Θ(n + |E|)</div><p>The <span class="math" data-say="O">O</span> and <span class="math" data-say="theta">Θ</span> in the table are the notation of “Divide-and-Conquer Recurrences”, in Induction and Recursion: <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> means proportional to <span class="math" data-say="n plus the size of E">n + |E|</span> up to a constant factor, and <span class="math" data-say="big O of 1">O(1)</span> means bounded by a constant. “Big-O, Big-Omega and Big-Theta” in Algorithms and Complexity makes both precise; here they are read as "linear" and "constant".</p><p>The traversals of “Breadth-First and Depth-First Search” iterate neighbours constantly, so an adjacency list gives breadth-first search a running time of <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> while a matrix gives <span class="math" data-say="theta of n squared">Θ(n²)</span>. On a sparse graph that is the difference between linear and quadratic.</p><p>The matrix wins when the graph is dense, when adjacency tests dominate, or when the linear algebra of the next theorem is wanted.</p><div class="thm"><span class="label">Theorem &middot; Matrix powers count walks</span><p>For a graph with adjacency matrix <span class="math" data-say="A">A</span>, the entry <span class="math" data-say="A to the power k i j">Aᵏ[i][j]</span> is the number of walks of length exactly <span class="math" data-say="k">k</span> from vertex <span class="math" data-say="i">i</span> to vertex <span class="math" data-say="j">j</span>. A <strong>walk</strong> may repeat vertices and edges.</p></div><div class="proof"><p>By induction on <span class="math" data-say="k">k</span>. For <span class="math" data-say="k equals 1">k = 1</span> the claim is the definition of <span class="math" data-say="A">A</span>.</p><p>Assume it for <span class="math" data-say="k">k</span>. A walk of length <span class="math" data-say="k plus 1">k+1</span> from <span class="math" data-say="i">i</span> to <span class="math" data-say="j">j</span> is a walk of length <span class="math" data-say="k">k</span> from <span class="math" data-say="i">i</span> to some <span class="math" data-say="t">t</span>, followed by an edge from <span class="math" data-say="t">t</span> to <span class="math" data-say="j">j</span>. Summing over <span class="math" data-say="t">t</span> gives <span class="math" data-say="the sum over t of A to the power k at i t times A at t j">Σ_t A^k[i][t] · A[t][j]</span>, which is exactly <span class="math" data-say="A to the power the quantity k plus 1, i j">A^{k+1}[i][j]</span> by the definition of matrix multiplication.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is the definition of matrix multiplication read as a combinatorial statement: the sum over the middle index is the sum over the intermediate vertex.</p><div class="example"><span class="label">Example &middot; Counting triangles</span><p><span class="math" data-say="A cubed v v">A³[v][v]</span> counts closed walks of length 3 from <span class="math" data-say="v">v</span> back to itself, and each such walk is a triangle traversed from <span class="math" data-say="v">v</span>. Each triangle gives 6 closed walks &mdash; three starting vertices, two directions &mdash; so the number of triangles is <span class="math" data-say="the sum over v of A cubed v v over 6">(Σ_v A³[v][v]) / 6</span>, one sixth of the trace of <span class="math" data-say="A cubed">A³</span>.</p></div><p>That is a genuine algorithm: matrix multiplication counts triangles in <span class="math" data-say="big O of n to the power omega">O(n^ω)</span> where <span class="math" data-say="omega is less than 2.4">ω &lt; 2.4</span> is the matrix multiplication exponent, which beats the obvious <span class="math" data-say="big O of n cubed">O(n³)</span> enumeration. It is one of the standard examples of algebra outperforming combinatorics.</p><h3>Other representations</h3><ul><li><strong>Edge list.</strong> Just the pairs. Minimal space, and every query is a scan. Kruskal's algorithm in “Spanning Trees and Minimum Spanning Trees” sorts exactly this.</li><li><strong>Incidence matrix.</strong> Rows are vertices, columns edges, with a 1 where they meet. Useful in flow problems and rarely elsewhere here.</li></ul></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+iterate all edges                O(n²)         Θ(n + |E|)</div><p>The <span class="math" data-say="O">O</span> and <span class="math" data-say="theta">Θ</span> in the table are the notation of “Divide-and-Conquer Recurrences”, in Induction and Recursion: <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> means proportional to <span class="math" data-say="n plus the size of E">n + |E|</span> up to a constant factor, and <span class="math" data-say="big O of 1">O(1)</span> means bounded by a constant. “Big-O, Big-Omega and Big-Theta” in Algorithms and Complexity makes both precise; here they are read as "linear" and "constant".</p><p>The traversals of “Breadth-First and Depth-First Search” iterate neighbours constantly, so an adjacency list gives breadth-first search a running time of <span class="math" data-say="theta of the quantity n plus the size of E">Θ(n + |E|)</span> while a matrix gives <span class="math" data-say="theta of n squared">Θ(n²)</span>. On a sparse graph that is the difference between linear and quadratic.</p><p>The matrix wins when the graph is dense, when adjacency tests dominate, or when the linear algebra of the next theorem is wanted.</p><div class="thm"><span class="label">Theorem &middot; Matrix powers count walks</span><p>For a graph with adjacency matrix <span class="math" data-say="A">A</span>, the entry <span class="math" data-say="A to the power k i j">Aᵏ[i][j]</span> is the number of walks of length exactly <span class="math" data-say="k">k</span> from vertex <span class="math" data-say="i">i</span> to vertex <span class="math" data-say="j">j</span>. A <strong>walk</strong> may repeat vertices and edges.</p></div><div class="proof"><p>By induction on <span class="math" data-say="k">k</span>. For <span class="math" data-say="k equals 1">k = 1</span> the claim is the definition of <span class="math" data-say="A">A</span>.</p><p>Assume it for <span class="math" data-say="k">k</span>. A walk of length <span class="math" data-say="k plus 1">k+1</span> from <span class="math" data-say="i">i</span> to <span class="math" data-say="j">j</span> is a walk of length <span class="math" data-say="k">k</span> from <span class="math" data-say="i">i</span> to some <span class="math" data-say="t">t</span>, followed by an edge from <span class="math" data-say="t">t</span> to <span class="math" data-say="j">j</span>. Summing over <span class="math" data-say="t">t</span> gives <span class="math" data-say="the sum over t of A to the power k at i t times A at t j">Σ_t A^k[i][t] · A[t][j]</span>, which is exactly <span class="math" data-say="A to the power the quantity k plus 1, i j">A^{k+1}[i][j]</span> by the definition of matrix multiplication.</p><p><span class="qed">&#9633;</span></p></div><p>The proof is the definition of matrix multiplication read as a combinatorial statement: the sum over the middle index is the sum over the intermediate vertex.</p><div class="example"><span class="label">Example &middot; Counting triangles</span><p><span class="math" data-say="A cubed v v">A³[v][v]</span> counts closed walks of length 3 from <span class="math" data-say="v">v</span> back to itself, and each such walk is a triangle traversed from <span class="math" data-say="v">v</span>. Each triangle gives 6 closed walks &mdash; three starting vertices, two directions &mdash; so the number of triangles is <span class="math" data-say="the sum over v of A cubed v v over 6">(Σ_v A³[v][v]) / 6</span>, one sixth of the trace of <span class="math" data-say="A cubed">A³</span>.</p></div><p>That is a genuine algorithm: matrix multiplication counts triangles in <span class="math" data-say="big O of n to the power omega">O(n^ω)</span> where <span class="math" data-say="omega is less than 2.4">ω &lt; 2.4</span> is the matrix multiplication exponent, which beats the obvious <span class="math" data-say="big O of n cubed">O(n³)</span> enumeration. It is one of the standard examples of algebra outperforming combinatorics.</p><h3>Other representations</h3><ul><li><strong>Edge list.</strong> Just the pairs. Minimal space, and every query is a scan. Kruskal's algorithm in “Spanning Trees and Minimum Spanning Trees” sorts exactly this.</li><li><strong>Incidence matrix.</strong> Rows are vertices, columns edges, with a 1 where they meet. Useful in flow problems and rarely elsewhere here.</li></ul></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
@@ -1414,10 +1457,10 @@ iterate all edges                O(n²)         Θ(n + |E|)</div><p>The <span cl
         <div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gFacts"></table></div>
       </div>
       <div class="status-banner" id="gStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3><span class="math" data-say="A squared">A²</span>, and what it counts</h3>
-          <p><span class="math" data-say="C sub 4">C₄</span> from the worked example is loaded and the matrix shown is <span class="math" data-say="A squared">A²</span>: the diagonal reads 2 (each vertex's degree), the entries at adjacent positions read 0, and the panel reports <span class="math" data-say="A squared 1 4 equals 0">A²[1][4] = 0</span>, <span class="math" data-say="A cubed 1 4 equals 4">A³[1][4] = 4</span> and <span class="math" data-say="the sum of A cubed v v equals 0">Σ A³[v][v] = 0</span> &mdash; no triangle. Switch the preset to Two triangles joined at 6 vertices: the closed-walk count becomes 12, one sixth of which is the 2 triangles you can see. To edit the graph, switch the algorithm to Degrees, toggle, and switch back.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3><span class="math" data-say="A squared">A²</span>, and what it counts</h3>
+            <p><span class="math" data-say="C sub 4">C₄</span> from the worked example is loaded and the matrix shown is <span class="math" data-say="A squared">A²</span>: the diagonal reads 2 (each vertex's degree), the entries at adjacent positions read 0, and the panel reports <span class="math" data-say="A squared 1 4 equals 0">A²[1][4] = 0</span>, <span class="math" data-say="A cubed 1 4 equals 4">A³[1][4] = 4</span> and <span class="math" data-say="the sum of A cubed v v equals 0">Σ A³[v][v] = 0</span> &mdash; no triangle. Switch the preset to Two triangles joined at 6 vertices: the closed-walk count becomes 12, one sixth of which is the 2 triangles you can see. To edit the graph, switch the algorithm to Degrees, toggle, and switch back.</p>
         <div class="field">
           <label for="gAlgo">Algorithm</label>
           <select id="gAlgo">
@@ -1462,12 +1505,14 @@ iterate all edges                O(n²)         Θ(n + |E|)</div><p>The <span cl
           <div class="kpi"><span>|E|</span><strong id="gE">&mdash;</strong></div>
           <div class="kpi"><span>Σ deg</span><strong id="gSum">&mdash;</strong></div>
         </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Choosing a representation</h2></div><p>Ask which operation dominates.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Estimate the density</h3><p><span class="math" data-say="the size of E">|E|</span> near <span class="math" data-say="n squared">n²</span> is dense and favours the matrix; <span class="math" data-say="the size of E">|E|</span> near <span class="math" data-say="n">n</span> is sparse and favours lists, usually decisively.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Ask which query dominates</h3><p>Repeated adjacency tests favour the matrix; repeated neighbour iteration favours lists.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the space budget</h3><p><span class="math" data-say="n squared">n²</span> entries is impossible past a few tens of thousands of vertices. Real large graphs are always stored as lists.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Use powers when counting walks</h3><p><span class="math" data-say="A to the power k">Aᵏ</span> answers walk-counting questions directly, and nothing else does so cleanly.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Choosing a representation</h2>
+      <p class="lead-in">Ask which operation dominates.</p>
+      <ol class="key-ideas method"><li><strong>Estimate the density.</strong> <span class="math" data-say="the size of E">|E|</span> near <span class="math" data-say="n squared">n²</span> is dense and favours the matrix; <span class="math" data-say="the size of E">|E|</span> near <span class="math" data-say="n">n</span> is sparse and favours lists, usually decisively.</li><li><strong>Ask which query dominates.</strong> Repeated adjacency tests favour the matrix; repeated neighbour iteration favours lists.</li><li><strong>Check the space budget.</strong> <span class="math" data-say="n squared">n²</span> entries is impossible past a few tens of thousands of vertices. Real large graphs are always stored as lists.</li><li><strong>Use powers when counting walks.</strong> <span class="math" data-say="A to the power k">Aᵏ</span> answers walk-counting questions directly, and nothing else does so cleanly.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1491,17 +1536,16 @@ A²[1][2] = 0:  no walk of length 2 joins adjacent vertices here,
 trace(A³) = 0, so C₄ contains no triangle.        ✓</div><p>The zeros in <span class="math" data-say="A squared">A²</span> at adjacent positions are the bipartiteness of “Bipartite Graphs” showing up in the algebra: in a bipartite graph every walk of even length ends on the same side it started, so it can never end at a neighbour.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing walks with paths</strong><span><span class="math" data-say="A to the power k">Aᵏ</span> counts walks, which may revisit vertices. Counting paths is a much harder problem with no matrix formula.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using a matrix for a large sparse graph</strong><span>The space is quadratic and almost all of it is zeros. Lists are the default for anything real.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting each edge appears twice in the lists</strong><span>So the total list length is <span class="math" data-say="2 times the size of E">2|E|</span>, not <span class="math" data-say="the size of E">|E|</span>. It matters for the space estimate and for iterating edges without duplication.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict which structure suits a problem.</strong><p>For a road network of a million junctions with an average of three roads each, state the space each representation needs: <span class="math" data-say="the size of E, equals 1.5">|E| = 1.5</span> million, so the lists hold <span class="math" data-say="2 times the size of E, equals 3">2|E| = 3</span> million entries against the matrix's <span class="math" data-say="10 to the power 12">10¹²</span> &mdash; a factor of about 300 000. Then say which queries each makes cheap.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Sparse matrix formats used in practice &mdash; compressed sparse row and its relatives &mdash; are adjacency lists with the indices packed into flat arrays. The trade-off in the table is the one every graph library is designed around.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Confusing walks with paths</strong><span><span class="math" data-say="A to the power k">Aᵏ</span> counts walks, which may revisit vertices. Counting paths is a much harder problem with no matrix formula.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using a matrix for a large sparse graph</strong><span>The space is quadratic and almost all of it is zeros. Lists are the default for anything real.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting each edge appears twice in the lists</strong><span>So the total list length is <span class="math" data-say="2 times the size of E">2|E|</span>, not <span class="math" data-say="the size of E">|E|</span>. It matters for the space estimate and for iterating edges without duplication.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict which structure suits a problem.</strong><p>For a road network of a million junctions with an average of three roads each, state the space each representation needs: <span class="math" data-say="the size of E, equals 1.5">|E| = 1.5</span> million, so the lists hold <span class="math" data-say="2 times the size of E, equals 3">2|E| = 3</span> million entries against the matrix's <span class="math" data-say="10 to the power 12">10¹²</span> &mdash; a factor of about 300 000. Then say which queries each makes cheap.</p></div></div><div class="note"><strong>Note:</strong> Sparse matrix formats used in practice &mdash; compressed sparse row and its relatives &mdash; are adjacency lists with the indices packed into flat arrays. The trade-off in the table is the one every graph library is designed around.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The matrix is symmetric with a zero diagonal</summary><p>For a simple undirected graph. Symmetry is the relation being symmetric; the zero diagonal is the absence of loops.</p></details><details class="recall"><summary>Lists win for sparse graphs</summary><p>Most real graphs have <span class="math" data-say="the size of E">|E|</span> far below <span class="math" data-say="n squared">n²</span>. A road network with a million junctions has a few million edges and a matrix would need <span class="math" data-say="10 to the power 12">10¹²</span> entries.</p></details><details class="recall"><summary>Matrix powers count walks</summary><p><span class="math" data-say="A to the power k i j">Aᵏ[i][j]</span> is the number of walks of length exactly <span class="math" data-say="k">k</span>, because matrix multiplication sums over the intermediate vertex.</p></details></div>
+      <h3>Summary</h3>
       <p>The same graph stored two ways. The matrix answers "are these adjacent" instantly and costs <span class="math" data-say="n squared">n²</span> space; the list is compact and iterates neighbours quickly. And <span class="math" data-say="A to the power k">Aᵏ</span> counts walks.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The matrix is symmetric with a zero diagonal.</strong> For a simple undirected graph. Symmetry is the relation being symmetric; the zero diagonal is the absence of loops.</li><li><strong>Lists win for sparse graphs.</strong> Most real graphs have <span class="math" data-say="the size of E">|E|</span> far below <span class="math" data-say="n squared">n²</span>. A road network with a million junctions has a few million edges and a matrix would need <span class="math" data-say="10 to the power 12">10¹²</span> entries.</li><li><strong>Matrix powers count walks.</strong> <span class="math" data-say="A to the power k i j">Aᵏ[i][j]</span> is the number of walks of length exactly <span class="math" data-say="k">k</span>, because matrix multiplication sums over the intermediate vertex.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="adjacency matrix, n times n, A at i j equals 1 if i is approximately j. adjacency list, one neighbour list per vertex. matrix, big O of 1 adjacency test, big O of n squared space. A to the power k i j equals number of walks of length k from i to j" tabindex="0" role="region" aria-label="Mathematical notation">adjacency matrix   n × n,  A[i][j] = 1 if i ~ j
 adjacency list     one neighbour list per vertex
 matrix: O(1) adjacency test, O(n²) space
@@ -2650,11 +2694,40 @@ Aᵏ[i][j] = number of walks of length k from i to j</div><figcaption>Two struct
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2722,7 +2795,7 @@ Aᵏ[i][j] = number of walks of length k from i to j</div><figcaption>Two struct
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

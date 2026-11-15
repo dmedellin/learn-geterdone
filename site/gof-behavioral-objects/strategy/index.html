@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Strategy</h1>
       <p class="lesson-lede">A family of algorithms, each in a class of its own behind one interface, so a client can be given whichever one it needs.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Strategy and context</li><li>Taking the data to the strategy</li><li>Decision points</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Code containing many conditional statements often indicates the need to apply the Strategy pattern.&rdquo; The sentence ends the third of Strategy's Consequences, in Chapter 5, Behavioral Patterns. The intent, in the lesson's words: make each algorithm of a family an object of its own, all behind one interface, so they can be swapped, and the code that uses an algorithm stays the same whichever is chosen. The book's other name for it is Policy.</p><p>The Motivation, summarised, is the case of breaking text into lines, for which there are many algorithms. Writing them all into the class that needs them makes it bigger, keeps algorithms you may not use, and makes a new one hard to add. So the book's text-composition class holds a compositor object, and three compositor subclasses implement a simple line-at-a-time method, a paragraph-wide optimizing one and one that fills each row with a fixed number of items. It is the same pair the case study met in Formatting, in Chapter 2. In short, the Applicability says: reach for it when there is more than one way to do a job, the ways can be swapped, and you would rather not see the choice written into conditionals or the ways' private data seen by their callers.</p><p>The participants are three: the Strategy, the common interface; each ConcreteStrategy, one algorithm; and the Context, which is configured with a concrete strategy, keeps a reference to it and may give it access to its own data. In the collaborations the context either passes the data the algorithm needs or passes itself so the strategy can call back. Clients usually create a concrete strategy and hand it to the context, and from then on deal with the context only.</p><p>Four of the Consequences are benefits. A hierarchy of strategies is a family that inheritance can factor. Strategy is an alternative to subclassing the context for each behaviour, which would fix the algorithm into the context and rule out changing it at run time. It removes the conditionals that pick a behaviour, as the opening quotation says. And it lets a client choose among implementations with different trade-offs of time and space.</p><p>Three are liabilities, and the authors put them plainly. Clients must know how the strategies differ to choose one, so the pattern belongs where the variation matters to clients. All strategies share one interface, so a context may prepare arguments a simple strategy never reads. And there are more objects, which stateless strategies shared among contexts can reduce, as Flyweight describes. The Implementation adds the choice between taking the data to the strategy, which keeps the two decoupled, and passing the context, which couples them more closely; strategies as C++ template parameters when the choice is fixed at compile time; and optional strategies, where a context with none falls back on default behaviour.</p><p>The Sample Code is the compositor example in C++, from InterViews, where the simple compositor ignores some of what it is passed and the fixed-row one ignores all of it. Known Uses ranges from ET++ and InterViews to a compiler's register allocators, a financial framework's pricing strategies, the Booch components' memory-allocation template arguments, a circuit-layout router and the validators of Borland's ObjectWindows, an example of the optional kind. Strategy's Related Patterns name only Flyweight, since stateless strategies make good flyweights. Two neighbours: Template Method varies part of an algorithm by inheritance, where Strategy varies the whole of it by delegation; and Domain-Driven Design's lesson Strategy and Composite in the Model reads the same pattern as a policy the business names.</p><pre class="codeblock" data-say="line 1, long quote cents of job job. line 2, int sheets is set to job dot pages times job dot copies. line 3, switch job dot method. line 4, case offset. line 5, if job dot copies is less than 500 return 9000 plus 4 times sheets. line 6, return 9000 plus 3 times sheets. line 7, case riso. line 8, return 2500 plus 2 times sheets. line 9, case digital. line 10, return 20 times sheets. line 11, default. line 12, throw new illegal state exception of no such method. line 15, int days to print of job job. line 16, if job dot method equals method dot offset return 5. line 17, if job dot method equals method dot riso and job dot copies is greater than 1000 return 3. line 18, return 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">long quoteCents(Job job) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Code containing many conditional statements often indicates the need to apply the Strategy pattern.&rdquo; The sentence ends the third of Strategy's Consequences, in Chapter 5, Behavioral Patterns. The intent, in the lesson's words: make each algorithm of a family an object of its own, all behind one interface, so they can be swapped, and the code that uses an algorithm stays the same whichever is chosen. The book's other name for it is Policy.</p><p>The Motivation, summarised, is the case of breaking text into lines, for which there are many algorithms. Writing them all into the class that needs them makes it bigger, keeps algorithms you may not use, and makes a new one hard to add. So the book's text-composition class holds a compositor object, and three compositor subclasses implement a simple line-at-a-time method, a paragraph-wide optimizing one and one that fills each row with a fixed number of items. It is the same pair the case study met in Formatting, in Chapter 2. In short, the Applicability says: reach for it when there is more than one way to do a job, the ways can be swapped, and you would rather not see the choice written into conditionals or the ways' private data seen by their callers.</p><p>The participants are three: the Strategy, the common interface; each ConcreteStrategy, one algorithm; and the Context, which is configured with a concrete strategy, keeps a reference to it and may give it access to its own data. In the collaborations the context either passes the data the algorithm needs or passes itself so the strategy can call back. Clients usually create a concrete strategy and hand it to the context, and from then on deal with the context only.</p><p>Four of the Consequences are benefits. A hierarchy of strategies is a family that inheritance can factor. Strategy is an alternative to subclassing the context for each behaviour, which would fix the algorithm into the context and rule out changing it at run time. It removes the conditionals that pick a behaviour, as the opening quotation says. And it lets a client choose among implementations with different trade-offs of time and space.</p><p>Three are liabilities, and the authors put them plainly. Clients must know how the strategies differ to choose one, so the pattern belongs where the variation matters to clients. All strategies share one interface, so a context may prepare arguments a simple strategy never reads. And there are more objects, which stateless strategies shared among contexts can reduce, as Flyweight describes. The Implementation adds the choice between taking the data to the strategy, which keeps the two decoupled, and passing the context, which couples them more closely; strategies as C++ template parameters when the choice is fixed at compile time; and optional strategies, where a context with none falls back on default behaviour.</p><p>The Sample Code is the compositor example in C++, from InterViews, where the simple compositor ignores some of what it is passed and the fixed-row one ignores all of it. Known Uses ranges from ET++ and InterViews to a compiler's register allocators, a financial framework's pricing strategies, the Booch components' memory-allocation template arguments, a circuit-layout router and the validators of Borland's ObjectWindows, an example of the optional kind. Strategy's Related Patterns name only Flyweight, since stateless strategies make good flyweights. Two neighbours: Template Method varies part of an algorithm by inheritance, where Strategy varies the whole of it by delegation; and Domain-Driven Design's lesson Strategy and Composite in the Model reads the same pattern as a policy the business names.</p><pre class="codeblock" data-say="line 1, long quote cents of job job. line 2, int sheets is set to job dot pages times job dot copies. line 3, switch job dot method. line 4, case offset. line 5, if job dot copies is less than 500 return 9000 plus 4 times sheets. line 6, return 9000 plus 3 times sheets. line 7, case riso. line 8, return 2500 plus 2 times sheets. line 9, case digital. line 10, return 20 times sheets. line 11, default. line 12, throw new illegal state exception of no such method. line 15, int days to print of job job. line 16, if job dot method equals method dot offset return 5. line 17, if job dot method equals method dot riso and job dot copies is greater than 1000 return 3. line 18, return 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">long quoteCents(Job job) {</span>
 <span class="cl">    int sheets = job.pages() * job.copies();</span>
 <span class="cl">    switch (job.method()) {</span>
 <span class="cl">        case OFFSET:</span>
@@ -1463,7 +1507,50 @@
 <span class="cl">    if (job.method() == Method.OFFSET) { return 5; }</span>
 <span class="cl">    if (job.method() == Method.RISO &amp;&amp; job.copies() &gt; 1000) { return 3; }</span>
 <span class="cl">    return 1;</span>
-<span class="cl">}</span></code></pre><p>Now the lab, on a print shop of the lesson's own, above. It quotes and schedules a job by the printing method on its ticket, and both operations test the method. On the preset <code>print-by-method</code> the lab counts 8 decision points: one to start, three cases, three ifs and one conditional and. The bands beside the count are McConnell's guidance from Code Complete, not this book's; the deepest nesting, 1, is first reached at line 4, inside the switch. Of the eight, five ask which method applies: the three cases and the first test of each <code>if</code> in <code>daysToPrint</code>.</p><pre class="codeblock" data-say="line 1, interface print method. line 2, long quote cents of int sheets, int copies. line 3, int days to print of int copies. line 5, class offset implements print method. line 6, public long quote cents of int sheets, int copies. line 7, if copies is less than 500 return 9000 plus 4 times sheets. line 8, return 9000 plus 3 times sheets. line 10, public int days to print of int copies return 5. line 12, class riso implements print method. line 13, public long quote cents of int sheets, int copies return 2500 plus 2 times sheets. line 14, public int days to print of int copies. line 15, if copies is greater than 1000 return 3. line 16, return 1. line 19, comment, Digital is written the same way, and tests nothing." tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface PrintMethod {</span>
+<span class="cl">}</span></code></pre><p>Now the lab, on a print shop of the lesson's own, above. It quotes and schedules a job by the printing method on its ticket, and both operations test the method. On the preset <code>print-by-method</code> the lab counts 8 decision points: one to start, three cases, three ifs and one conditional and. The bands beside the count are McConnell's guidance from Code Complete, not this book's; the deepest nesting, 1, is first reached at line 4, inside the switch. Of the eight, five ask which method applies: the three cases and the first test of each <code>if</code> in <code>daysToPrint</code>.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The tests a strategy moves</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; the Gang of Four give no count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="print-by-method" selected>A print shop testing the method in every operation</option><option value="print-methods">The same prices and times as printing strategies</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, interface print method. line 2, long quote cents of int sheets, int copies. line 3, int days to print of int copies. line 5, class offset implements print method. line 6, public long quote cents of int sheets, int copies. line 7, if copies is less than 500 return 9000 plus 4 times sheets. line 8, return 9000 plus 3 times sheets. line 10, public int days to print of int copies return 5. line 12, class riso implements print method. line 13, public long quote cents of int sheets, int copies return 2500 plus 2 times sheets. line 14, public int days to print of int copies. line 15, if copies is greater than 1000 return 3. line 16, return 1. line 19, comment, Digital is written the same way, and tests nothing." tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface PrintMethod {</span>
 <span class="cl">    long quoteCents(int sheets, int copies);</span>
 <span class="cl">    int daysToPrint(int copies);</span>
 <span class="cl">}</span>
@@ -1496,53 +1583,12 @@
 <span class="cl">        return 5 * a.streak();</span>
 <span class="cl">    }</span>
 <span class="cl">    return 10;</span>
-<span class="cl">}</span></code></pre><p>A quiz app scores an answer by the round's mode. Count its decision points by the lab's rule. Then sketch classic, timed and streak scoring strategies, keeping the test of whether the answer is correct in the context, and count the context and the strategies together. Paste each into the lab to check.</p><p>Strategy varies a whole algorithm by giving an object another one. The next lesson, Template Method, keeps the algorithm and lets subclasses vary some of its steps.</p></article>
+<span class="cl">}</span></code></pre><p>A quiz app scores an answer by the round's mode. Count its decision points by the lab's rule. Then sketch classic, timed and streak scoring strategies, keeping the test of whether the answer is correct in the context, and count the context and the strategies together. Paste each into the lab to check.</p><p>Strategy varies a whole algorithm by giving an object another one. The next lesson, Template Method, keeps the algorithm and lets subclasses vary some of its steps.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The tests a strategy moves</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; the Gang of Four give no count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="print-by-method" selected>A print shop testing the method in every operation</option><option value="print-methods">The same prices and times as printing strategies</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Moving an algorithm into strategies</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the decisions</h3><p>Count one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> or a <span class="math" data-say="default">default</span> adds nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the tests on the algorithm</h3><p>For each decision, say whether it asks which algorithm applies or applies a rule within one. Tests of the first kind, repeated across operations, are what Strategy gathers.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write one class per algorithm</h3><p>Give each algorithm a class implementing every operation that varied, check each case gives what it gave before, and name the one place where a strategy is chosen.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on code of your own</h3><p>Find a method in code you know that switches on a mode, type or flag, count its decisions before and after strategies, and say whether its clients need to know which algorithm they get.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Moving an algorithm into strategies</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the decisions.</strong> Count one, plus one for each <span class="math" data-say="if">if</span>, <span class="math" data-say="while">while</span>, <span class="math" data-say="for">for</span>, <span class="math" data-say="case">case</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span>. An <span class="math" data-say="else">else</span> or a <span class="math" data-say="default">default</span> adds nothing.</li><li><strong>Mark the tests on the algorithm.</strong> For each decision, say whether it asks which algorithm applies or applies a rule within one. Tests of the first kind, repeated across operations, are what Strategy gathers.</li><li><strong>Write one class per algorithm.</strong> Give each algorithm a class implementing every operation that varied, check each case gives what it gave before, and name the one place where a strategy is chosen.</li><li><strong>Do it on code of your own.</strong> Find a method in code you know that switches on a mode, type or flag, count its decisions before and after strategies, and say whether its clients need to know which algorithm they get.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1563,17 +1609,16 @@ line 17: if on the method, and &amp;&amp;: +2
 after: 1 + if 2 = 3</div><p>The two tests that survive, on lines 7 and 15 of the strategies, are rules of one method each; every test of which method applies has moved to where a job is given its method.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reaching for Strategy wherever an algorithm could vary</strong><span>The book attaches a condition: clients must understand how strategies differ to pick one, so the pattern belongs where the variation is relevant to them. An algorithm that never varies in practice gains an interface, several classes and a choice someone must make, and nothing else.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the falling count as the whole story</strong><span>On the lesson's illustration the decisions fall from 8 to 3 because the method is no longer tested in each operation. It is still chosen once, where a job is given its method, in code the lab does not see; and the strategies are more objects, which the book counts as a cost.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Shaping the interface around the first algorithm</strong><span>The book stresses that the compositor's interface was designed to suit every layout algorithm, since changing it for each new strategy means changing every existing one. The Strategy and Context interfaces, it says, decide how well the pattern works.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a Strategy moves out of a class and what it costs.</strong><p>Count a listing's decisions before and after strategies, name where the choice of algorithm went, and give one liability the book names.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts decisions in the listing it is given. It does not see the code that picks a strategy, or the objects a strategy adds, and it cannot say whether the clients care which algorithm they get; the book makes that the condition for using the pattern at all.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reaching for Strategy wherever an algorithm could vary</strong><span>The book attaches a condition: clients must understand how strategies differ to pick one, so the pattern belongs where the variation is relevant to them. An algorithm that never varies in practice gains an interface, several classes and a choice someone must make, and nothing else.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the falling count as the whole story</strong><span>On the lesson's illustration the decisions fall from 8 to 3 because the method is no longer tested in each operation. It is still chosen once, where a job is given its method, in code the lab does not see; and the strategies are more objects, which the book counts as a cost.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Shaping the interface around the first algorithm</strong><span>The book stresses that the compositor's interface was designed to suit every layout algorithm, since changing it for each new strategy means changing every existing one. The Strategy and Context interfaces, it says, decide how well the pattern works.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a Strategy moves out of a class and what it costs.</strong><p>Count a listing's decisions before and after strategies, name where the choice of algorithm went, and give one liability the book names.</p></div></div><div class="note"><strong>Note:</strong> The lab counts decisions in the listing it is given. It does not see the code that picks a strategy, or the objects a strategy adds, and it cannot say whether the clients care which algorithm they get; the book makes that the condition for using the pattern at all.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Strategy and context</summary><p>A strategy is an object that carries out one algorithm behind an interface every algorithm of the family shares. The context is the object that holds a strategy and calls it whenever it needs that algorithm done.</p></details><details class="recall"><summary>Taking the data to the strategy</summary><p>One way to connect the two: the context passes everything the algorithm might need as arguments. The other is to pass the context itself, and let the strategy ask for what it needs.</p></details><details class="recall"><summary>Decision points</summary><p>A count of the places code can go two ways: one, plus one for each if, while, for and case, and for each conditional and and or. Tests that ask which algorithm applies are the ones a Strategy moves.</p></details></div>
+      <h3>Summary</h3>
       <p>Strategy puts each algorithm of a family behind one interface, so the object that uses them can be configured with any. Read the pattern, then count the decision points of a print shop's code that tests the printing method in every operation, against the same prices as three printing strategies.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Strategy and context.</strong> A strategy is an object that carries out one algorithm behind an interface every algorithm of the family shares. The context is the object that holds a strategy and calls it whenever it needs that algorithm done.</li><li><strong>Taking the data to the strategy.</strong> One way to connect the two: the context passes everything the algorithm might need as arguments. The other is to pass the context itself, and let the strategy ask for what it needs.</li><li><strong>Decision points.</strong> A count of the places code can go two ways: one, plus one for each if, while, for and case, and for each conditional and and or. Tests that ask which algorithm applies are the ones a Strategy moves.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="one interface, many algorithms. the client picks, the context delegates. composition instead of a subclass each. take the data, or pass the context. only when clients care which" tabindex="0" role="region" aria-label="Mathematical notation">one interface, many algorithms
 the client picks; the context delegates
 composition instead of a subclass each
@@ -2600,11 +2645,40 @@ only when clients care which</div><figcaption>Strategy in five lines</figcaption
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2672,7 +2746,7 @@ only when clients care which</div><figcaption>Strategy in five lines</figcaption
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

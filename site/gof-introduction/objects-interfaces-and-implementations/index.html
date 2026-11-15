@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">What Design Patterns Are</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 1 · Introduction</p>
       <h1>Objects, Interfaces and Implementations</h1>
       <p class="lesson-lede">An object is known only through its interface, so a client written against a type rather than a class can be given any object of that type.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Interface and type</li><li>Dynamic binding and polymorphism</li><li>Class versus interface inheritance</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The section&#x27;s argument first, then the principle, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Program to an interface, not an implementation.&rdquo; The authors set that on a line of its own in Section 1.6, How Design Patterns Solve Design Problems, and explain it at once: &ldquo;Don't declare variables to be instances of particular concrete classes. Instead, commit only to an interface defined by an abstract class.&rdquo; This lesson reads the section from its start to that principle. Read it in your own copy first.</p><p>Section 1.6 is a list of everyday design problems and the ways patterns help with each. The first is finding the objects. An object packages data with the operations on it, and a client can only send it requests; that restriction is what keeps its state encapsulated. Deciding what the objects should be is the hard part, the authors say, because encapsulation, granularity, dependency, flexibility, performance and reuse all pull in different directions, and methods disagree: underline the nouns, follow responsibilities, or model the real world. Many classes do come from analysis, but a design that only copies today's world is not ready for tomorrow's, and some of the most useful objects have no counterpart in it: an algorithm made an object (Strategy), each state of something made an object (State), found late, as a design is made flexible.</p><p>The second is granularity: objects can be as small as a character or as large as a subsystem. Patterns help here as well. Facade makes a whole subsystem one object, and Flyweight supports very many tiny ones; Abstract Factory and Builder produce objects whose only job is to make other objects, and Visitor and Command objects whose only job is to carry out a request on something else.</p><p>Then interfaces. Each operation has a signature, and the set of an object's signatures is its interface, every request it will accept. A type is a name for an interface, so an object that accepts every request named in a type has that type, and a subtype's interface includes its supertype's. Objects are known only through their interfaces, which say nothing about how the requests are carried out. Which operation runs depends on the request and on the object that receives it, decided when the program runs: that is dynamic binding, and the freedom it gives to swap one object for another of the same type is polymorphism. Patterns often say what belongs in an interface (Memento's two, one narrow and one privileged) and how interfaces must relate (a Decorator's and a Proxy's match the object they wrap).</p><p>Then implementations. A class defines an object's data and operations; a subclass inherits both and may override; an abstract class exists mainly to define an interface for its subclasses and cannot be instantiated. The section's key distinction follows. An object's class is how it is built; its type is only what it can be asked. Class inheritance reuses code and representation; interface inheritance says what may stand in for what. C++ and Eiffel use one mechanism for both, and Smalltalk's inheritance is of implementation only, since its variables have no declared types. Java, which came later, gives interface inheritance a keyword of its own, <code>interface</code>, which is why the sketches here use it where the book has a pure abstract class.</p><p>That distinction is what the principle rests on. Inheritance is a quick way to define a new kind of object from an old one, but its other use matters as much: when every subclass of an abstract class keeps its interface, all of them are subtypes, and clients can use any of them. Clients that deal with objects only through such an interface need not know the objects' types or the classes that implement them, and the implementation dependencies between parts of a system shrink accordingly. Concrete classes still have to be instantiated somewhere, the authors add; the creational patterns are ways of doing it without the rest of the code naming them.</p><pre class="codeblock" data-say="line 1, comment, The locker names every sender it might use.. line 2, final class locker app. line 3, private final sms sender sms is set to new sms sender. line 4, private final email sender email is set to new email sender. line 5, private final push sender push is set to new push sender. line 7, void parcel arrived of customer c, string box. line 8, string text is set to Your parcel is in box plus box. line 9, if c dot prefers equals channel dot sms. line 10, sms dot text of c dot phone, text. line 11, else if c dot prefers equals channel dot email. line 12, email dot mail of c dot address, Parcel, text. line 13, else. line 14, push dot send of c dot device id, text" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The locker names every sender it might use.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The section&#x27;s argument first, then the principle, then the count</h2><div class="prose reading"><p>&ldquo;Program to an interface, not an implementation.&rdquo; The authors set that on a line of its own in Section 1.6, How Design Patterns Solve Design Problems, and explain it at once: &ldquo;Don't declare variables to be instances of particular concrete classes. Instead, commit only to an interface defined by an abstract class.&rdquo; This lesson reads the section from its start to that principle. Read it in your own copy first.</p><p>Section 1.6 is a list of everyday design problems and the ways patterns help with each. The first is finding the objects. An object packages data with the operations on it, and a client can only send it requests; that restriction is what keeps its state encapsulated. Deciding what the objects should be is the hard part, the authors say, because encapsulation, granularity, dependency, flexibility, performance and reuse all pull in different directions, and methods disagree: underline the nouns, follow responsibilities, or model the real world. Many classes do come from analysis, but a design that only copies today's world is not ready for tomorrow's, and some of the most useful objects have no counterpart in it: an algorithm made an object (Strategy), each state of something made an object (State), found late, as a design is made flexible.</p><p>The second is granularity: objects can be as small as a character or as large as a subsystem. Patterns help here as well. Facade makes a whole subsystem one object, and Flyweight supports very many tiny ones; Abstract Factory and Builder produce objects whose only job is to make other objects, and Visitor and Command objects whose only job is to carry out a request on something else.</p><p>Then interfaces. Each operation has a signature, and the set of an object's signatures is its interface, every request it will accept. A type is a name for an interface, so an object that accepts every request named in a type has that type, and a subtype's interface includes its supertype's. Objects are known only through their interfaces, which say nothing about how the requests are carried out. Which operation runs depends on the request and on the object that receives it, decided when the program runs: that is dynamic binding, and the freedom it gives to swap one object for another of the same type is polymorphism. Patterns often say what belongs in an interface (Memento's two, one narrow and one privileged) and how interfaces must relate (a Decorator's and a Proxy's match the object they wrap).</p><p>Then implementations. A class defines an object's data and operations; a subclass inherits both and may override; an abstract class exists mainly to define an interface for its subclasses and cannot be instantiated. The section's key distinction follows. An object's class is how it is built; its type is only what it can be asked. Class inheritance reuses code and representation; interface inheritance says what may stand in for what. C++ and Eiffel use one mechanism for both, and Smalltalk's inheritance is of implementation only, since its variables have no declared types. Java, which came later, gives interface inheritance a keyword of its own, <code>interface</code>, which is why the sketches here use it where the book has a pure abstract class.</p><p>That distinction is what the principle rests on. Inheritance is a quick way to define a new kind of object from an old one, but its other use matters as much: when every subclass of an abstract class keeps its interface, all of them are subtypes, and clients can use any of them. Clients that deal with objects only through such an interface need not know the objects' types or the classes that implement them, and the implementation dependencies between parts of a system shrink accordingly. Concrete classes still have to be instantiated somewhere, the authors add; the creational patterns are ways of doing it without the rest of the code naming them.</p><pre class="codeblock" data-say="line 1, comment, The locker names every sender it might use.. line 2, final class locker app. line 3, private final sms sender sms is set to new sms sender. line 4, private final email sender email is set to new email sender. line 5, private final push sender push is set to new push sender. line 7, void parcel arrived of customer c, string box. line 8, string text is set to Your parcel is in box plus box. line 9, if c dot prefers equals channel dot sms. line 10, sms dot text of c dot phone, text. line 11, else if c dot prefers equals channel dot email. line 12, email dot mail of c dot address, Parcel, text. line 13, else. line 14, push dot send of c dot device id, text" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The locker names every sender it might use.</span>
 <span class="cl">final class LockerApp {</span>
 <span class="cl">    private final SmsSender sms = new SmsSender();</span>
 <span class="cl">    private final EmailSender email = new EmailSender();</span>
@@ -1461,7 +1505,42 @@
 <span class="cl">            push.send(c.deviceId(), text);</span>
 <span class="cl">        }</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>That is a parcel locker's app, written to three implementations: it names a text sender, a mail sender and a push sender, and chooses among them itself. The preset <code>concrete-senders</code> writes its dependencies as records, user then used. The lab counts 4 classes, 3 distinct uses and 6 possible pairs, of which 3 are connected, printed reduced as <code>1/2 = 50%</code>. The largest fan-out, the most classes one class uses, is <code>LockerApp 3</code>. The largest fan-in, the most users one class has, is a tie at 1 among the three senders, broken alphabetically to EmailSender, and the banner names the others.</p><pre class="codeblock" data-say="line 1, comment, The locker commits only to a type anything that can send a notice.. line 2, interface notifier. line 3, void send of customer c, string text. line 6, final class locker app. line 7, private final notifier notifier. line 9, locker app of notifier notifier, comment, the caller chooses the class. line 10, this dot notifier is set to notifier. line 13, void parcel arrived of customer c, string box. line 14, notifier dot send of c, Your parcel is in box plus box" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The locker commits only to a type: anything that can send a notice.</span>
+<span class="cl">}</span></code></pre><p>That is a parcel locker's app, written to three implementations: it names a text sender, a mail sender and a push sender, and chooses among them itself. The preset <code>concrete-senders</code> writes its dependencies as records, user then used. The lab counts 4 classes, 3 distinct uses and 6 possible pairs, of which 3 are connected, printed reduced as <code>1/2 = 50%</code>. The largest fan-out, the most classes one class uses, is <code>LockerApp 3</code>. The largest fan-in, the most users one class has, is a tie at 1 among the three senders, broken alphabetically to EmailSender, and the banner names the others.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>who uses whom, and how connected the modules are</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Counting dependencies</strong><span>who uses whom, and how connected the modules are</span></div>
+      </div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
+      <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>A client&#x27;s dependencies on classes and on an interface</h3>
+            <p>A count over the structure the lesson states. Each record is one use, written user, used. The lab counts the classes, the distinct uses, the possible pairs, the pairs connected in either direction, and the largest fan-out and fan-in. The designs are the lesson's, and a count shows one consequence of programming to an interface or not, not whether a design needs one.</p>
+        <div class="field">
+          <label for="dgPreset">Worked example</label>
+          <select id="dgPreset"><option value="concrete-senders" selected>A locker app that names three concrete senders</option><option value="one-interface">The same app written to one interface, Notifier</option><option value="concrete-plus-post">Concrete senders, with a postal sender added</option><option value="interface-plus-post">The interface, with a postal sender added</option></select>
+        </div>
+        <div class="field">
+          <label for="dgInEdges">Uses (a, b: a uses b; one pair per entry)</label>
+          <input id="dgInEdges" type="text" value="LockerApp, SmsSender; LockerApp, EmailSender; LockerApp, PushSender" inputmode="text" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Modules</span><strong id="dgModules">&mdash;</strong></div>
+          <div class="kpi"><span>Distinct uses</span><strong id="dgEdges">&mdash;</strong></div>
+          <div class="kpi"><span>Possible pairs</span><strong id="dgPairs">&mdash;</strong></div>
+          <div class="kpi"><span>Pairs connected either way</span><strong id="dgConnected">&mdash;</strong></div>
+          <div class="kpi"><span>Largest fan-out</span><strong id="dgFanOut">&mdash;</strong></div>
+          <div class="kpi"><span>Largest fan-in</span><strong id="dgFanIn">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, The locker commits only to a type anything that can send a notice.. line 2, interface notifier. line 3, void send of customer c, string text. line 6, final class locker app. line 7, private final notifier notifier. line 9, locker app of notifier notifier, comment, the caller chooses the class. line 10, this dot notifier is set to notifier. line 13, void parcel arrived of customer c, string box. line 14, notifier dot send of c, Your parcel is in box plus box" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The locker commits only to a type: anything that can send a notice.</span>
 <span class="cl">interface Notifier {</span>
 <span class="cl">    void send(Customer c, String text);</span>
 <span class="cl">}</span>
@@ -1482,45 +1561,12 @@
 <span class="cl">// after: the three sources behind one interface</span>
 <span class="cl">TileView, TileSource; TileView, CanvasRenderer;</span>
 <span class="cl">OsmSource, TileSource; SatelliteSource, TileSource;</span>
-<span class="cl">CacheSource, TileSource</span></code></pre><p>A map viewer's tile view, before and after its three tile sources are put behind one interface. By hand, give the fan-out of <code>TileView</code> and the fan-in of each used class in both designs, and the number of distinct uses. Then type the records into the lab to check, and say which class a fourth tile source would make you edit in each.</p><p>Programming to an interface is the first of the section's two principles. The second is about how to reuse an implementation once you have one. The next lesson is Inheritance Versus Composition.</p></article>
+<span class="cl">CacheSource, TileSource</span></code></pre><p>A map viewer's tile view, before and after its three tile sources are put behind one interface. By hand, give the fan-out of <code>TileView</code> and the fan-in of each used class in both designs, and the number of distinct uses. Then type the records into the lab to check, and say which class a fourth tile source would make you edit in each.</p><p>Programming to an interface is the first of the section's two principles. The second is about how to reuse an implementation once you have one. The next lesson is Inheritance Versus Composition.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>who uses whom, and how connected the modules are</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Counting dependencies</strong><span>who uses whom, and how connected the modules are</span></div>
-      </div>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
-      <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>A client&#x27;s dependencies on classes and on an interface</h3>
-          <p>A count over the structure the lesson states. Each record is one use, written user, used. The lab counts the classes, the distinct uses, the possible pairs, the pairs connected in either direction, and the largest fan-out and fan-in. The designs are the lesson's, and a count shows one consequence of programming to an interface or not, not whether a design needs one.</p>
-        <div class="field">
-          <label for="dgPreset">Worked example</label>
-          <select id="dgPreset"><option value="concrete-senders" selected>A locker app that names three concrete senders</option><option value="one-interface">The same app written to one interface, Notifier</option><option value="concrete-plus-post">Concrete senders, with a postal sender added</option><option value="interface-plus-post">The interface, with a postal sender added</option></select>
-        </div>
-        <div class="field">
-          <label for="dgInEdges">Uses (a, b: a uses b; one pair per entry)</label>
-          <input id="dgInEdges" type="text" value="LockerApp, SmsSender; LockerApp, EmailSender; LockerApp, PushSender" inputmode="text" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Modules</span><strong id="dgModules">&mdash;</strong></div>
-          <div class="kpi"><span>Distinct uses</span><strong id="dgEdges">&mdash;</strong></div>
-          <div class="kpi"><span>Possible pairs</span><strong id="dgPairs">&mdash;</strong></div>
-          <div class="kpi"><span>Pairs connected either way</span><strong id="dgConnected">&mdash;</strong></div>
-          <div class="kpi"><span>Largest fan-out</span><strong id="dgFanOut">&mdash;</strong></div>
-          <div class="kpi"><span>Largest fan-in</span><strong id="dgFanIn">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding where a client commits to a class</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List what the client uses</h3><p>Write one record for each class or interface the client names in a field, parameter, local variable or constructor call.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark the concrete ones</h3><p>Mark each used name that is a concrete class rather than an interface or abstract class. Those are the client's commitments to an implementation.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add a variant on paper</h3><p>Add one more implementation of the thing that varies, and write down which existing classes gain a record. If the client is one of them, it must be edited for every new variant.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on code of your own</h3><p>Pick a class in your own code that chooses among several implementations with an <code>if</code> or a <code>switch</code>. Count its fan-out, then count it again with the choices behind one interface, and say where the concrete classes would be created instead.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding where a client commits to a class</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>List what the client uses.</strong> Write one record for each class or interface the client names in a field, parameter, local variable or constructor call.</li><li><strong>Mark the concrete ones.</strong> Mark each used name that is a concrete class rather than an interface or abstract class. Those are the client's commitments to an implementation.</li><li><strong>Add a variant on paper.</strong> Add one more implementation of the thing that varies, and write down which existing classes gain a record. If the client is one of them, it must be edited for every new variant.</li><li><strong>Do it on code of your own.</strong> Pick a class in your own code that chooses among several implementations with an <code>if</code> or a <code>switch</code>. Count its fan-out, then count it again with the choices behind one interface, and say where the concrete classes would be created instead.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1539,17 +1585,16 @@ add PostSender: PostSender → Notifier
 LockerApp fan out stays 1; Notifier fan in 5</div><p>Under the interface, the new class depends on the type, and nothing that already exists depends on the new class. Whatever creates the <code>PostSender</code> still names it, which is the creational patterns' problem.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking an object&#x27;s class and its type for the same thing</strong><span>Section 1.6 separates them: the class says how an object is implemented, the type only which requests it answers. A single object may carry several types, and unrelated classes may share a type; on the lesson's illustration, three unrelated sender classes all have the type <code>Notifier</code>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the real world to supply every object</strong><span>The authors grant that many classes come from analysis, but warn that a design which only models today's world may not suit tomorrow's. Some of the objects that make a design flexible, an algorithm or a state made into an object, have no counterpart in the world and appear only as the design is worked.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking an interface removes concrete classes from the program</strong><span>Concrete classes must be instantiated somewhere, as the section says itself. Programming to an interface moves the naming of them out of the clients; the creational patterns say where it goes.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can tell a class from a type and count a client&#x27;s commitments.</strong><p>Given a client and the classes it uses, state its fan-out and which uses are of concrete classes, say what a new implementation reaches with and without an interface, and define signature, interface, type, dynamic binding and polymorphism.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts uses on the records it is given. It cannot see who creates the objects, whether a variant will ever be added, or whether an interface with one implementation earns its place; the authors' principle is a default, and each pattern's consequences say when it pays.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking an object&#x27;s class and its type for the same thing</strong><span>Section 1.6 separates them: the class says how an object is implemented, the type only which requests it answers. A single object may carry several types, and unrelated classes may share a type; on the lesson's illustration, three unrelated sender classes all have the type <code>Notifier</code>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting the real world to supply every object</strong><span>The authors grant that many classes come from analysis, but warn that a design which only models today's world may not suit tomorrow's. Some of the objects that make a design flexible, an algorithm or a state made into an object, have no counterpart in the world and appear only as the design is worked.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking an interface removes concrete classes from the program</strong><span>Concrete classes must be instantiated somewhere, as the section says itself. Programming to an interface moves the naming of them out of the clients; the creational patterns say where it goes.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can tell a class from a type and count a client&#x27;s commitments.</strong><p>Given a client and the classes it uses, state its fan-out and which uses are of concrete classes, say what a new implementation reaches with and without an interface, and define signature, interface, type, dynamic binding and polymorphism.</p></div></div><div class="note"><strong>Note:</strong> The lab counts uses on the records it is given. It cannot see who creates the objects, whether a variant will ever be added, or whether an interface with one implementation earns its place; the authors' principle is a default, and each pattern's consequences say when it pays.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Interface and type</summary><p>An operation's signature is its name, its parameters and its result; an object's interface is the set of all its signatures, the requests it accepts. A type is a name for an interface. One object can have several types, very different objects can share one, and a subtype's interface contains its supertype's.</p></details><details class="recall"><summary>Dynamic binding and polymorphism</summary><p>Dynamic binding is the choice, made when the program runs, of which object's operation answers a request. It lets one object stand in for another with the same interface, which is polymorphism: the client assumes only that the object supports the interface.</p></details><details class="recall"><summary>Class versus interface inheritance</summary><p>An object's class says how it is implemented; its type says only which requests it answers. Class inheritance shares code and representation; interface inheritance, or subtyping, says when one object can stand in place of another. Many languages run the two together.</p></details></div>
+      <h3>Summary</h3>
       <p>The first half of Section 1.6 says how patterns help find objects, size them, define their interfaces and implement them, and arrives at the first principle of the book: program to an interface, not an implementation. Read the argument, then count a client's dependencies when it names three concrete classes and when it names one interface, and see what a fourth class reaches in each.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Interface and type.</strong> An operation's signature is its name, its parameters and its result; an object's interface is the set of all its signatures, the requests it accepts. A type is a name for an interface. One object can have several types, very different objects can share one, and a subtype's interface contains its supertype's.</li><li><strong>Dynamic binding and polymorphism.</strong> Dynamic binding is the choice, made when the program runs, of which object's operation answers a request. It lets one object stand in for another with the same interface, which is polymorphism: the client assumes only that the object supports the interface.</li><li><strong>Class versus interface inheritance.</strong> An object's class says how it is implemented; its type says only which requests it answers. Class inheritance shares code and representation; interface inheritance, or subtyping, says when one object can stand in place of another. Many languages run the two together.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="requests are the only way in. an interface is a set of signatures. a type names an interface. the class is how, the type is what. the request picks the operation at run time. program to an interface, not to A class" tabindex="0" role="region" aria-label="Mathematical notation">requests are the only way in
 an interface is a set of signatures
 a type names an interface
@@ -2274,11 +2319,40 @@ program to an interface, not to a class</div><figcaption>Interfaces in six lines
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2346,7 +2420,7 @@ program to an interface, not to a class</div><figcaption>Interfaces in six lines
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

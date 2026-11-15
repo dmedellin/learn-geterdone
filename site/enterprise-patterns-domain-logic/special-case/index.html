@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,61 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Organizing Domain Logic</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 18 · Base Patterns</p>
       <h1>Special Case</h1>
       <p class="lesson-lede">Instead of returning null and making every caller check, return an object with the expected interface and harmless behaviour.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Special Case</li><li>Null Object</li><li>Flyweight</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then one caller counted</h2>
-      <article class="prose reading"><p>&ldquo;Instead of returning null, or some odd value, return a Special Case that has the same interface as what the caller expects.&rdquo; That is the pattern in one sentence, from Chapter 18's Special Case, which this lesson reads as a tool. Read it in your own copy first.</p><p>Fowler's starting point is that nulls defeat polymorphism. You can normally call a method on a variable without caring which subclass it holds, and a typed language checks the call for you, but if the variable can be null the call fails at run time, and, as he notes, you get a stack trace for your trouble. So every caller that might see a null must test for it, and since the right response is often the same in many places, the same test is written in many places, which is duplication, and Fowler counts it a sin. Nulls are the common case; infinity in arithmetic and a customer only partly known are others.</p><p>How It Works is short. Make a subclass for the special case, override all the methods to give harmless behaviour, and put an instance of it wherever a null would have been. There is usually no reason to tell one instance from another, so a special case can often be a flyweight, one shared instance, though not when it gathers state of its own. A null can also mean different things, such as no customer at all or a customer nobody has identified, and Fowler suggests separate special cases for each. A special case's methods often return other special cases, so what an unknown customer owes is itself unknown.</p><p>He finds a good example outside business code: IEEE 754 floating point, whose infinities and not-a-number are special values a division by zero can return instead of raising an exception, and which then take part in arithmetic like any other number. When to Use It is a single test: use a Special Case wherever several places in the system respond alike once a test has found one particular instance, or found a null. The book cites Bobby Woolf's Null Object and, pardoning what Fowler calls the pun, files Null Object as a special case of Special Case. A caller that does need to know can still ask: the example gives the class an <span class="math" data-say="is null">isNull</span> method, or a marker interface to test for.</p><p>Now the count. The greeting below must cope with a missing customer and with a customer whose name or plan is missing, and it guards every call. On <code>null-checks</code> the lab counts 5 decision points, 1 + if <span data-say="2 plus and 2">2 + && 2</span>, band 0–5, deepest nesting 1, first at line 4. Each <span class="math" data-say="and">&amp;&amp;</span> is there only so that the call after it does not land on a null.</p><pre class="codeblock" data-say="line 1, string greeting of customer c. line 2, string name is set to friend. line 3, if c is not equal to null and c dot name is not equal to null. line 4, name is set to c dot name. line 6, string plan is set to basic. line 7, if c is not equal to null and c dot plan is not equal to null. line 8, plan is set to c dot plan dot title. line 10, return Dear plus name plus, your plan plus plan" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">String greeting(Customer c) {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then one caller counted</h2><div class="prose reading"><p>&ldquo;Instead of returning null, or some odd value, return a Special Case that has the same interface as what the caller expects.&rdquo; That is the pattern in one sentence, from Chapter 18's Special Case, which this lesson reads as a tool. Read it in your own copy first.</p><p>Fowler's starting point is that nulls defeat polymorphism. You can normally call a method on a variable without caring which subclass it holds, and a typed language checks the call for you, but if the variable can be null the call fails at run time, and, as he notes, you get a stack trace for your trouble. So every caller that might see a null must test for it, and since the right response is often the same in many places, the same test is written in many places, which is duplication, and Fowler counts it a sin. Nulls are the common case; infinity in arithmetic and a customer only partly known are others.</p><p>How It Works is short. Make a subclass for the special case, override all the methods to give harmless behaviour, and put an instance of it wherever a null would have been. There is usually no reason to tell one instance from another, so a special case can often be a flyweight, one shared instance, though not when it gathers state of its own. A null can also mean different things, such as no customer at all or a customer nobody has identified, and Fowler suggests separate special cases for each. A special case's methods often return other special cases, so what an unknown customer owes is itself unknown.</p><p>He finds a good example outside business code: IEEE 754 floating point, whose infinities and not-a-number are special values a division by zero can return instead of raising an exception, and which then take part in arithmetic like any other number. When to Use It is a single test: use a Special Case wherever several places in the system respond alike once a test has found one particular instance, or found a null. The book cites Bobby Woolf's Null Object and, pardoning what Fowler calls the pun, files Null Object as a special case of Special Case. A caller that does need to know can still ask: the example gives the class an <span class="math" data-say="is null">isNull</span> method, or a marker interface to test for.</p><p>Now the count. The greeting below must cope with a missing customer and with a customer whose name or plan is missing, and it guards every call. On <code>null-checks</code> the lab counts 5 decision points, 1 + if <span data-say="2 plus and 2">2 + && 2</span>, band 0–5, deepest nesting 1, first at line 4. Each <span class="math" data-say="and">&amp;&amp;</span> is there only so that the call after it does not land on a null.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The null checks a Special Case removes</h3>
+            <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="null-checks" selected>A greeting that checks for a missing customer twice</option><option value="guest-customer">The same greeting, given a GuestCustomer</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
+          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
+          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
+          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
+          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, string greeting of customer c. line 2, string name is set to friend. line 3, if c is not equal to null and c dot name is not equal to null. line 4, name is set to c dot name. line 6, string plan is set to basic. line 7, if c is not equal to null and c dot plan is not equal to null. line 8, plan is set to c dot plan dot title. line 10, return Dear plus name plus, your plan plus plan" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">String greeting(Customer c) {</span>
 <span class="cl">    String name = &quot;friend&quot;;</span>
 <span class="cl">    if (c != null &amp;&amp; c.name() != null) {</span>
 <span class="cl">        name = c.name();</span>
@@ -1473,53 +1560,12 @@
 <span class="cl">        return city;</span>
 <span class="cl">    }</span>
 <span class="cl">    return city + &quot; &quot; + a.postcode();</span>
-<span class="cl">}</span></code></pre><p>Count this routine's decision points by the lab's rule, with the breakdown. Then write a special case for the missing address, with the city and postcode it should report, and the routine as it would read once the finder returns it. Paste the listing into the lab to check the count.</p><p>This course has built the domain layer: its organisation, its service boundary and its small objects. The next course, Talking to the Database, connects it to the tables, and its choice of data-source pattern turns on the domain pattern chosen here.</p></article>
+<span class="cl">}</span></code></pre><p>Count this routine's decision points by the lab's rule, with the breakdown. Then write a special case for the missing address, with the city and postcode it should report, and the routine as it would read once the finder returns it. Paste the listing into the lab to check the count.</p><p>This course has built the domain layer: its organisation, its service boundary and its small objects. The next course, Talking to the Database, connects it to the tables, and its choice of data-source pattern turns on the domain pattern chosen here.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>decision points and nesting depth</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>decision points and nesting depth</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>Decision points: 1, plus one for each <code>if</code>, <code>while</code>, <code>for</code>, <code>case</code>, <code>&amp;&amp;</code> and <code>||</code>; <code>else</code>, <code>default</code>, <code>do</code>, <code>?:</code>, <code>try</code> and <code>catch</code> add nothing. Depth is brace depth below the routine's own braces.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The null checks a Special Case removes</h3>
-          <p>A count over code, by the rules stated below the listing. The lab counts decision points by a stated rule: one, plus one for each if, while, for and case, and for each conditional and and conditional or. The bands beside the count are McConnell's, from Code Complete; Fowler gives no count. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="null-checks" selected>A greeting that checks for a missing customer twice</option><option value="guest-customer">The same greeting, given a GuestCustomer</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Decision points</span><strong id="coDecisions">&mdash;</strong></div>
-          <div class="kpi"><span>Breakdown</span><strong id="coBreakdown">&mdash;</strong></div>
-          <div class="kpi"><span>Band</span><strong id="coBand">&mdash;</strong></div>
-          <div class="kpi"><span>Deepest nesting</span><strong id="coDepth">&mdash;</strong></div>
-          <div class="kpi"><span>First line at that depth</span><strong id="coDeepest">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Replacing null checks with a Special Case</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the guards</h3><p>Count the routine's decision points, and mark each <span class="math" data-say="if">if</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span> that exists only to keep a call off a null.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Name what null means</h3><p>Write what each null stands for: nothing there at all, or something there that nobody knows. Each meaning is its own special case.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write the subclass</h3><p>Subclass the expected type and override each method the callers use with the answer the guarded code gave, then have the finder return it instead of null.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find one method in a system you know that returns null. Count the null checks its callers make, write the figure down, and say whether they all do the same thing afterwards.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Replacing null checks with a Special Case</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the guards.</strong> Count the routine's decision points, and mark each <span class="math" data-say="if">if</span>, <span class="math" data-say="and">&amp;&amp;</span> and <span class="math" data-say="or">||</span> that exists only to keep a call off a null.</li><li><strong>Name what null means.</strong> Write what each null stands for: nothing there at all, or something there that nobody knows. Each meaning is its own special case.</li><li><strong>Write the subclass.</strong> Subclass the expected type and override each method the callers use with the answer the guarded code gave, then have the finder return it instead of null.</li><li><strong>Do it on your own code.</strong> Find one method in a system you know that returns null. Count the null checks its callers make, write the figure down, and say whether they all do the same thing afterwards.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1536,17 +1582,16 @@ line 7: if, and &amp;&amp; on the plan: 5
 with a GuestCustomer: no tests, 1</div><p>Four of the five decisions guard calls against null. The finder now makes that decision once, by returning a guest, and every caller that greets a customer is spared it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a Special Case hides errors</strong><span>It is for a case that has the same behaviour wherever it turns up (When to Use It), and it hides nothing a caller needs: the book's own example can still be tested for explicitly, with an <span class="math" data-say="is null">isNull</span> method or a marker interface. Even a failure can be a special case, as the book's IEEE example shows: a division by zero returns a special value instead of throwing. What should still fail loudly is a null that means a bug, and that is not this pattern's case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking every caller still has to know about the Special Case</strong><span>The finder returns it; callers call the same methods they call on a real customer. On the lesson's illustration the greeting has no test at all and never names <span class="math" data-say="guest customer">GuestCustomer</span>. Only the code that decides there is no customer knows the special case exists.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using one null object for every meaning of null</strong><span>A null can mean no customer at all, or a customer nobody has identified, and these may need different answers. The book's own case is a utility customer nobody has identified, whose charges must still be kept apart. Fowler suggests separate special cases for missing and unknown, and keeps those with state of their own apart rather than sharing one instance.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the null checks a Special Case removes.</strong><p>Given a caller with null checks, count its decision points with the breakdown, and write the Special Case class that removes them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts the decisions left in the listing; it cannot tell a check that guards against a missing object from one that tests a real rule, and it cannot say whether every null in a system means the same thing. The bands are McConnell's guidance for routines, not Fowler's, who gives no count.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a Special Case hides errors</strong><span>It is for a case that has the same behaviour wherever it turns up (When to Use It), and it hides nothing a caller needs: the book's own example can still be tested for explicitly, with an <span class="math" data-say="is null">isNull</span> method or a marker interface. Even a failure can be a special case, as the book's IEEE example shows: a division by zero returns a special value instead of throwing. What should still fail loudly is a null that means a bug, and that is not this pattern's case.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking every caller still has to know about the Special Case</strong><span>The finder returns it; callers call the same methods they call on a real customer. On the lesson's illustration the greeting has no test at all and never names <span class="math" data-say="guest customer">GuestCustomer</span>. Only the code that decides there is no customer knows the special case exists.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using one null object for every meaning of null</strong><span>A null can mean no customer at all, or a customer nobody has identified, and these may need different answers. The book's own case is a utility customer nobody has identified, whose charges must still be kept apart. Fowler suggests separate special cases for missing and unknown, and keeps those with state of their own apart rather than sharing one instance.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count the null checks a Special Case removes.</strong><p>Given a caller with null checks, count its decision points with the breakdown, and write the Special Case class that removes them.</p></div></div><div class="note"><strong>Note:</strong> The lab counts the decisions left in the listing; it cannot tell a check that guards against a missing object from one that tests a real rule, and it cannot say whether every null in a system means the same thing. The bands are McConnell's guidance for routines, not Fowler's, who gives no count.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Special Case</summary><p>A subclass that stands in for one particular situation, such as a customer who is missing, returned in place of null so that callers can call the usual methods on it.</p></details><details class="recall"><summary>Null Object</summary><p>The special case of Special Case for null, written up as a pattern by Bobby Woolf, whom the book cites. Its methods do nothing harmful and return harmless values.</p></details><details class="recall"><summary>Flyweight</summary><p>A single shared instance used wherever one is needed, after the Design Patterns book of Gamma and his co-authors. A special case with no state of its own can be one.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 18's Special Case replaces a null, or an odd value, with a subclass that answers the caller's questions sensibly, so the null checks that every caller would repeat are written once. Count the decision points a greeting spends on a missing customer, then give it a guest.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Special Case.</strong> A subclass that stands in for one particular situation, such as a customer who is missing, returned in place of null so that callers can call the usual methods on it.</li><li><strong>Null Object.</strong> The special case of Special Case for null, written up as a pattern by Bobby Woolf, whom the book cites. Its methods do nothing harmful and return harmless values.</li><li><strong>Flyweight.</strong> A single shared instance used wherever one is needed, after the Design Patterns book of Gamma and his co-authors. A special case with no state of its own can be one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="nulls defeat polymorphism. the same check, repeated in every caller. return a subclass with harmless answers. missing and unknown, two special cases. the caller asks, nothing branches" tabindex="0" role="region" aria-label="Mathematical notation">nulls defeat polymorphism
 the same check, repeated in every caller
 return a subclass with harmless answers
@@ -2573,11 +2618,40 @@ the caller asks; nothing branches</div><figcaption>Special Case in five lines</f
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2645,7 +2719,7 @@ the caller asks; nothing branches</div><figcaption>Special Case in five lines</f
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

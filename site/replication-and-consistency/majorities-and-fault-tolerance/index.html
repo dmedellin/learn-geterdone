@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Replication and Consistency</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Majorities and leaders</p>
       <h1>Majorities and Fault Tolerance</h1>
       <p class="lesson-lede">Compute the failures a cluster size tolerates and the availability of its majority, and say what an even size buys.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Any two majorities intersect, which is why consensus uses them</li><li>A majority survives exactly <span class="math" data-say="f equals the floor of the quantity n minus 1, over 2">f = ⌊(n − 1)/2⌋</span> failures</li><li>An even <span class="math" data-say="n">n</span> raises the quorum and not the tolerance</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Majorities, the integer f, and the availability that follows</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Majority, and fault tolerance</span><p>A <strong>majority</strong> of <span class="math" data-say="n">n</span> nodes is any subset of size <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span>. A cluster that requires a majority to make progress <strong>tolerates</strong> <span class="math" data-say="f equals the floor of the quantity n minus 1, over 2">f = ⌊(n − 1)/2⌋</span> failures, and the relation is usually written <span class="math" data-say="n equals 2 f plus 1">n = 2f + 1</span>: to tolerate <span class="math" data-say="f">f</span>, buy <span class="math" data-say="2 f plus 1">2f + 1</span> nodes.</p></div><p>The intersection property is the reason for all of it. Two majorities of the same <span class="math" data-say="n">n</span> must share a node, by the same pigeonhole argument that “Quorums Overlap” proved, so a node that has voted for one decision can refuse a conflicting one. Nothing else about a majority is special — it is simply the smallest quorum that overlaps itself.</p><div class="mathblock" data-say="each node up with probability 99 over 100, failures independent. A equals P of at least the majority are up, A k-of-n binomial tail. n, majority, f, A. a table, shown on the page. f rises only on the odd sizes, and A falls on every even one" tabindex="0" role="region" aria-label="Mathematical notation">each node up with probability 99/100, failures independent
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Majorities, the integer f, and the availability that follows</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Majority, and fault tolerance</span><p>A <strong>majority</strong> of <span class="math" data-say="n">n</span> nodes is any subset of size <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span>. A cluster that requires a majority to make progress <strong>tolerates</strong> <span class="math" data-say="f equals the floor of the quantity n minus 1, over 2">f = ⌊(n − 1)/2⌋</span> failures, and the relation is usually written <span class="math" data-say="n equals 2 f plus 1">n = 2f + 1</span>: to tolerate <span class="math" data-say="f">f</span>, buy <span class="math" data-say="2 f plus 1">2f + 1</span> nodes.</p></div><p>The intersection property is the reason for all of it. Two majorities of the same <span class="math" data-say="n">n</span> must share a node, by the same pigeonhole argument that “Quorums Overlap” proved, so a node that has voted for one decision can refuse a conflicting one. Nothing else about a majority is special — it is simply the smallest quorum that overlaps itself.</p><div class="mathblock" data-say="each node up with probability 99 over 100, failures independent. A equals P of at least the majority are up, A k-of-n binomial tail. n, majority, f, A. a table, shown on the page. f rises only on the odd sizes, and A falls on every even one" tabindex="0" role="region" aria-label="Mathematical notation">each node up with probability 99/100, failures independent
 A = P(at least the majority are up), a k-of-n binomial tail
 
   n    majority   f    A
@@ -1415,12 +1459,11 @@ n = 4, majority 3
     = 3 881 196/100 000 000 + 96 059 601/100 000 000
     = 99 940 797/100 000 000  =  99.940797%
 
-one more node, the same f, and 0.029403 points LESS availability</div><p>The arithmetic is not a curiosity, it is the direct consequence of needing three specific things to work instead of two. Availability of a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> system falls as <span class="math" data-say="k">k</span> rises and rises as <span class="math" data-say="n">n</span> does, and the even step raises <span class="math" data-say="k">k</span> by one while raising <span class="math" data-say="n">n</span> by one — and at <span class="math" data-say="99 percent">99%</span> per node the first effect wins.</p><div class="example"><span class="label">Example &middot; Where the next real step is</span><p>From three nodes, the upgrade is five, not four. Five tolerates two failures instead of one and is available <span class="math" data-say="99.99901494 percent">99.99901494%</span> of the time against <span class="math" data-say="99.9702 percent">99.9702%</span> — a factor of about thirty in the downtime, for two more machines. Four tolerates one failure and is available <span class="math" data-say="99.940797 percent">99.940797%</span>, which is worse than the three it replaced. If the budget allows one more node and not two, the right answer is to keep three and spend the money on making a node's own availability better, because that is the quantity every figure in this table is a function of.</p></div><p>Every number here assumes failures are independent, and Availability and Failure's “Correlated Failure” exists to say how badly that can go. Three nodes in one rack share a switch, a power feed and an operator; the majority arithmetic is then describing a cluster that does not exist and the real availability is closer to one node's. Spreading the <span class="math" data-say="2 f plus 1">2f + 1</span> across failure domains is what makes the independence assumption approximately true, and it is the whole reason to care where the nodes are.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Majorities and fault tolerance</h2></div><p>f = floor((n − 1)/2), and the availability of the quorum that follows</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+one more node, the same f, and 0.029403 points LESS availability</div><p>The arithmetic is not a curiosity, it is the direct consequence of needing three specific things to work instead of two. Availability of a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> system falls as <span class="math" data-say="k">k</span> rises and rises as <span class="math" data-say="n">n</span> does, and the even step raises <span class="math" data-say="k">k</span> by one while raising <span class="math" data-say="n">n</span> by one — and at <span class="math" data-say="99 percent">99%</span> per node the first effect wins.</p><div class="example"><span class="label">Example &middot; Where the next real step is</span><p>From three nodes, the upgrade is five, not four. Five tolerates two failures instead of one and is available <span class="math" data-say="99.99901494 percent">99.99901494%</span> of the time against <span class="math" data-say="99.9702 percent">99.9702%</span> — a factor of about thirty in the downtime, for two more machines. Four tolerates one failure and is available <span class="math" data-say="99.940797 percent">99.940797%</span>, which is worse than the three it replaced. If the budget allows one more node and not two, the right answer is to keep three and spend the money on making a node's own availability better, because that is the quantity every figure in this table is a function of.</p></div><p>Every number here assumes failures are independent, and Availability and Failure's “Correlated Failure” exists to say how badly that can go. Three nodes in one rack share a switch, a power feed and an operator; the majority arithmetic is then describing a cluster that does not exist and the real availability is closer to one node's. Spreading the <span class="math" data-say="2 f plus 1">2f + 1</span> across failure domains is what makes the independence assumption approximately true, and it is the whole reason to care where the nodes are.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Majorities and fault tolerance</h2></div><p>f = floor((n − 1)/2), and the availability of the quorum that follows</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>2f + 1 tolerates f</strong><span>so a fourth node tolerates what three did, and is available less often</span></div>
         <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>odd sizes, which earn their node</span><span class="tone-red"><i class="legend-swatch"></i>even sizes, which do not</span><span class="tone-cyan"><i class="legend-swatch"></i>the majority's availability</span></div>
@@ -1428,10 +1471,10 @@ one more node, the same f, and 0.029403 points LESS availability</div><p>The ari
       <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="mjPlot" viewBox="0 0 520 200" role="img" aria-label="Fault tolerance and majority availability against cluster size, with even sizes marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mjTable"></table></div>
       <div class="status-banner" id="mjStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Sweep the cluster size</h3>
-          <p>Tolerance is an integer and the availability beside it is the same <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> binomial tail summed over exact fractions. Step through <span class="math" data-say="n">n</span> one at a time and watch the availability column fall on every even size.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Sweep the cluster size</h3>
+            <p>Tolerance is an integer and the availability beside it is the same <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> binomial tail summed over exact fractions. Step through <span class="math" data-say="n">n</span> one at a time and watch the availability column fall on every even size.</p>
         <div>
           <div class="range-row"><label class="small-copy" for="mjN">Cluster size n</label><span class="range-value" id="mjNOut">3</span></div>
           <input id="mjN" type="range" min="1" max="12" step="1" value="3" />
@@ -1449,12 +1492,14 @@ one more node, the same f, and 0.029403 points LESS availability</div><p>The ari
           <div class="kpi"><span>Against n &minus; 1</span><strong id="mjDelta">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="mjHint" style="margin:0;">The availability is the k-of-n binomial tail of Availability and Failure, at k = the majority. Read the table down the even rows: each of them tolerates exactly what the odd row above it tolerates, and is available <em>less</em> often, because the majority grew by one and the fleet grew by one too.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sizing a cluster that needs a majority</h2></div><p>Start from the failures you intend to survive, not from the number of machines you happen to have.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Decide <span class="math" data-say="f">f</span> first, then take <span class="math" data-say="n equals 2 f plus 1">n = 2f + 1</span></h3><p>“How many failures must this survive” is a product question with an answer; “how many nodes should we run” is not. One failure means three nodes, two means five, three means seven, and nothing in between is worth buying.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute the majority <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> and check it against <span class="math" data-say="f">f</span></h3><p><span class="math" data-say="n minus majority">n − majority</span> must equal the <span class="math" data-say="f">f</span> you chose. Doing this explicitly is what catches an even <span class="math" data-say="n">n</span>: at <span class="math" data-say="n equals 4">n = 4</span> the majority is <span class="math" data-say="3">3</span> and <span class="math" data-say="n minus 3 equals 1">n − 3 = 1</span>, which is the tolerance you would have had for one machine less.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the availability as a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> tail at your node availability</h3><p><span class="math" data-say="A equals the sum of n choose k p to the power k the quantity 1 minus p, to the power the quantity n minus k">A = Σ C(n,k) p^k (1 − p)^(n−k)</span> from <span class="math" data-say="k equals majority">k = majority</span> to <span class="math" data-say="n">n</span>. Do it for your <span class="math" data-say="n">n</span> and for <span class="math" data-say="n minus 1">n − 1</span> and <span class="math" data-say="n plus 1">n + 1</span>, so that the shape of the table is in front of you rather than remembered.</p></article><article class="card concept-card"><div class="icon">4</div><h3>State the independence assumption and where it fails</h3><p>Name the failure domains the nodes are spread across. If two of three share a rack, the binomial tail is optimistic and the number to report is much closer to that rack's availability than to <span class="math" data-say="99.9702 percent">99.9702%</span>.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sizing a cluster that needs a majority</h2>
+      <p class="lead-in">Start from the failures you intend to survive, not from the number of machines you happen to have.</p>
+      <ol class="key-ideas method"><li><strong>Decide <span class="math" data-say="f">f</span> first, then take <span class="math" data-say="n equals 2 f plus 1">n = 2f + 1</span>.</strong> “How many failures must this survive” is a product question with an answer; “how many nodes should we run” is not. One failure means three nodes, two means five, three means seven, and nothing in between is worth buying.</li><li><strong>Compute the majority <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> and check it against <span class="math" data-say="f">f</span>.</strong> <span class="math" data-say="n minus majority">n − majority</span> must equal the <span class="math" data-say="f">f</span> you chose. Doing this explicitly is what catches an even <span class="math" data-say="n">n</span>: at <span class="math" data-say="n equals 4">n = 4</span> the majority is <span class="math" data-say="3">3</span> and <span class="math" data-say="n minus 3 equals 1">n − 3 = 1</span>, which is the tolerance you would have had for one machine less.</li><li><strong>Compute the availability as a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> tail at your node availability.</strong> <span class="math" data-say="A equals the sum of n choose k p to the power k the quantity 1 minus p, to the power the quantity n minus k">A = Σ C(n,k) p^k (1 − p)^(n−k)</span> from <span class="math" data-say="k equals majority">k = majority</span> to <span class="math" data-say="n">n</span>. Do it for your <span class="math" data-say="n">n</span> and for <span class="math" data-say="n minus 1">n − 1</span> and <span class="math" data-say="n plus 1">n + 1</span>, so that the shape of the table is in front of you rather than remembered.</li><li><strong>State the independence assumption and where it fails.</strong> Name the failure domains the nodes are spread across. If two of three share a rack, the binomial tail is optimistic and the number to report is much closer to that rack's availability than to <span class="math" data-say="99.9702 percent">99.9702%</span>.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1487,17 +1532,16 @@ the fourth node:  f unchanged at 1
 n = 5    majority 3,  f = 2,  A = 99.99901494%</div><p>Four numbers went the wrong way and one stayed still. The fourth node buys no additional tolerance, roughly doubles the expected downtime, adds a third to the storage and write work, and gives the operator one more machine to patch. There is no reading of that table in which it is an improvement.</p><p>The five-node row is the honest alternative and it is a large step: two tolerated failures and about a thirtieth of the downtime. Whether it is worth two machines is a real question; whether the four-node cluster is worth one machine is not.</p><p>For a faded rehearsal, suppose the nodes are only <span class="math" data-say="95 percent">95%</span> available each rather than <span class="math" data-say="99 percent">99%</span>. The supplied first move is that the <span class="math" data-say="n equals 3">n = 3</span> majority availability becomes <span class="math" data-say="3 times 0.95 squared 0.05 plus 0.95 cubed">3(0.95)²(0.05) + (0.95)³</span>. Compute it, do the same for <span class="math" data-say="n equals 4">n = 4</span> and <span class="math" data-say="n equals 5">n = 5</span>, and say whether the even-size penalty is larger or smaller at <span class="math" data-say="95 percent">95%</span> than it was at <span class="math" data-say="99 percent">99%</span> — then check both in the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a bigger majority tolerates more failures</strong><span>The majority of four is three, which is bigger than the majority of three, and it tolerates exactly the same single failure. Tolerance is <span class="math" data-say="n minus majority">n − majority</span>, and the even step adds one to both sides of that subtraction. This is the misconception the lesson exists to break, and it is the reason four- and six-node clusters get built.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing a cluster on an even number</strong><span>Every even <span class="math" data-say="n">n</span> is dominated: it costs a machine more than <span class="math" data-say="n minus 1">n − 1</span>, tolerates the same failures, and is less available. If somebody has a spare machine, it belongs in a different cluster, or as a non-voting replica that serves reads without joining the quorum.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting the binomial availability of nodes that are not independent</strong><span><span class="math" data-say="99.9702 percent">99.9702%</span> is what three nodes give if their failures are unrelated. Three nodes in one rack, on one power feed, patched by one script at one time, fail together often enough that the correct number is closer to the shared component's availability than to the tail. The arithmetic is only as good as the failure domains the nodes are spread across, and “Correlated Failure” on the availability course is the treatment of what goes wrong when they are not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a proposal to add one node to a three-node cluster makes you ask which failure it is meant to survive.</strong><p>You should be able to compute <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> and <span class="math" data-say="f">f</span> for any <span class="math" data-say="n">n</span>, evaluate the majority's availability as a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> binomial tail, say why every even size is dominated by the odd one below it, and name the independence assumption and the failure domains it needs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A majority decides who the leader is, but it does not decide how the candidates agree to hold a vote at all. If every node times out at the same instant they all stand, they all split the vote, and the cluster has no leader — for ever, if the timeout is fixed. “Randomised Election Timeouts” computes the probability of a clean first round and the number of rounds it takes, and shows that a fixed timeout gives exactly zero.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a bigger majority tolerates more failures</strong><span>The majority of four is three, which is bigger than the majority of three, and it tolerates exactly the same single failure. Tolerance is <span class="math" data-say="n minus majority">n − majority</span>, and the even step adds one to both sides of that subtraction. This is the misconception the lesson exists to break, and it is the reason four- and six-node clusters get built.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing a cluster on an even number</strong><span>Every even <span class="math" data-say="n">n</span> is dominated: it costs a machine more than <span class="math" data-say="n minus 1">n − 1</span>, tolerates the same failures, and is less available. If somebody has a spare machine, it belongs in a different cluster, or as a non-voting replica that serves reads without joining the quorum.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting the binomial availability of nodes that are not independent</strong><span><span class="math" data-say="99.9702 percent">99.9702%</span> is what three nodes give if their failures are unrelated. Three nodes in one rack, on one power feed, patched by one script at one time, fail together often enough that the correct number is closer to the shared component's availability than to the tail. The arithmetic is only as good as the failure domains the nodes are spread across, and “Correlated Failure” on the availability course is the treatment of what goes wrong when they are not.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a proposal to add one node to a three-node cluster makes you ask which failure it is meant to survive.</strong><p>You should be able to compute <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span> and <span class="math" data-say="f">f</span> for any <span class="math" data-say="n">n</span>, evaluate the majority's availability as a <span class="math" data-say="k">k</span>-of-<span class="math" data-say="n">n</span> binomial tail, say why every even size is dominated by the odd one below it, and name the independence assumption and the failure domains it needs.</p></div></div><div class="note"><strong>Note:</strong> A majority decides who the leader is, but it does not decide how the candidates agree to hold a vote at all. If every node times out at the same instant they all stand, they all split the vote, and the cluster has no leader — for ever, if the timeout is fixed. “Randomised Election Timeouts” computes the probability of a clean first round and the number of rounds it takes, and shows that a fixed timeout gives exactly zero.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Any two majorities intersect, which is why consensus uses them</summary><p>Two subsets of <span class="math" data-say="n">n</span> each larger than <span class="math" data-say="n over 2">n/2</span> cannot be disjoint — it is the overlap theorem with <span class="math" data-say="R equals W equals the floor of n over 2, plus 1">R = W = ⌊n/2⌋ + 1</span>. That is what stops two leaders being elected in the same term and two conflicting decisions being committed: any two decisions share a node, and a node does not vote both ways.</p></details><details class="recall"><summary>A majority survives exactly <span class="math" data-say="f equals the floor of the quantity n minus 1, over 2">f = ⌊(n − 1)/2⌋</span> failures</summary><p>The cluster keeps working while a majority is still up, so it tolerates <span class="math" data-say="n minus the quantity the floor of n over 2, plus 1">n − (⌊n/2⌋ + 1)</span> failures, which is <span class="math" data-say="the floor of the quantity n minus 1, over 2">⌊(n − 1)/2⌋</span>. At <span class="math" data-say="n equals 3">n = 3</span> that is <span class="math" data-say="1">1</span>; at <span class="math" data-say="n equals 4">n = 4</span> it is also <span class="math" data-say="1">1</span>; at <span class="math" data-say="n equals 5">n = 5</span> it is <span class="math" data-say="2">2</span>. <span class="math" data-say="f">f</span> only moves on the odd sizes, and <span class="math" data-say="n equals 2 f plus 1">n = 2f + 1</span> is the cheapest cluster tolerating <span class="math" data-say="f">f</span>.</p></details><details class="recall"><summary>An even <span class="math" data-say="n">n</span> raises the quorum and not the tolerance</summary><p>Going from three nodes to four takes the majority from <span class="math" data-say="2">2</span> to <span class="math" data-say="3">3</span> while <span class="math" data-say="f">f</span> stays at <span class="math" data-say="1">1</span>. You now need three specific machines up instead of two, out of a pool with one more thing in it that can break. With independent <span class="math" data-say="99 percent">99%</span> nodes that is a net loss: <span class="math" data-say="99.940797 percent">99.940797%</span> against <span class="math" data-say="99.9702 percent">99.9702%</span>, and the fourth machine has been bought to make the cluster worse.</p></details></div>
+      <h3>Summary</h3>
       <p>A majority of <span class="math" data-say="n">n</span> is <span class="math" data-say="the floor of n over 2, plus 1">⌊n/2⌋ + 1</span>, and any two majorities intersect, which is why consensus is built on them. The failures tolerated are <span class="math" data-say="f equals the floor of the quantity n minus 1, over 2">f = ⌊(n − 1)/2⌋</span>, so <span class="math" data-say="2 f plus 1">2f + 1</span> is the only cluster size worth buying: four nodes tolerate one failure exactly as three do, while needing three of four up instead of two of three. With nodes up <span class="math" data-say="99 percent">99%</span> of the time that makes four nodes strictly <em>less</em> available than three — <span class="math" data-say="99.940797 percent">99.940797%</span> against <span class="math" data-say="99.9702 percent">99.9702%</span>.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Any two majorities intersect, which is why consensus uses them.</strong> Two subsets of <span class="math" data-say="n">n</span> each larger than <span class="math" data-say="n over 2">n/2</span> cannot be disjoint — it is the overlap theorem with <span class="math" data-say="R equals W equals the floor of n over 2, plus 1">R = W = ⌊n/2⌋ + 1</span>. That is what stops two leaders being elected in the same term and two conflicting decisions being committed: any two decisions share a node, and a node does not vote both ways.</li><li><strong>A majority survives exactly <span class="math" data-say="f equals the floor of the quantity n minus 1, over 2">f = ⌊(n − 1)/2⌋</span> failures.</strong> The cluster keeps working while a majority is still up, so it tolerates <span class="math" data-say="n minus the quantity the floor of n over 2, plus 1">n − (⌊n/2⌋ + 1)</span> failures, which is <span class="math" data-say="the floor of the quantity n minus 1, over 2">⌊(n − 1)/2⌋</span>. At <span class="math" data-say="n equals 3">n = 3</span> that is <span class="math" data-say="1">1</span>; at <span class="math" data-say="n equals 4">n = 4</span> it is also <span class="math" data-say="1">1</span>; at <span class="math" data-say="n equals 5">n = 5</span> it is <span class="math" data-say="2">2</span>. <span class="math" data-say="f">f</span> only moves on the odd sizes, and <span class="math" data-say="n equals 2 f plus 1">n = 2f + 1</span> is the cheapest cluster tolerating <span class="math" data-say="f">f</span>.</li><li><strong>An even <span class="math" data-say="n">n</span> raises the quorum and not the tolerance.</strong> Going from three nodes to four takes the majority from <span class="math" data-say="2">2</span> to <span class="math" data-say="3">3</span> while <span class="math" data-say="f">f</span> stays at <span class="math" data-say="1">1</span>. You now need three specific machines up instead of two, out of a pool with one more thing in it that can break. With independent <span class="math" data-say="99 percent">99%</span> nodes that is a net loss: <span class="math" data-say="99.940797 percent">99.940797%</span> against <span class="math" data-say="99.9702 percent">99.9702%</span>, and the fourth machine has been bought to make the cluster worse.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="majority of n equals the floor of n over 2, plus 1, any two majorities share a node. f equals the floor of the quantity n minus 1, over 2, so the useful sizes are n equals 2 f plus 1. n equals 3, majority 2, f equals 1, A equals 99.9702 percent. n equals 4, majority 3, f equals 1, A equals 99.940797 percent, worse, for one more node. n equals 5, majority 3, f equals 2, A equals 99.99901494 percent. each node up 99 over 100, failures assumed independent" tabindex="0" role="region" aria-label="Mathematical notation">majority of n = ⌊n/2⌋ + 1        any two majorities share a node
 f = ⌊(n − 1)/2⌋                  so the useful sizes are n = 2f + 1
 n = 3   majority 2   f = 1   A = 99.9702%
@@ -2950,11 +2994,40 @@ each node up 99/100, failures assumed independent</div><figcaption>Two integers 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3022,7 +3095,7 @@ each node up 99/100, failures assumed independent</div><figcaption>Two integers 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

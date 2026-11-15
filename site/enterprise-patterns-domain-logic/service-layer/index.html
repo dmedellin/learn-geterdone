@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,59 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Organizing Domain Logic</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 9 · Domain Logic Patterns</p>
       <h1>Service Layer</h1>
       <p class="lesson-lede">Randy Stafford&#x27;s boundary of application operations, which holds the transactions and notifications each kind of client would otherwise repeat.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Domain logic and application logic</li><li>Domain facade</li><li>Operation script</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two authors on one layer, then the count</h2>
-      <article class="prose reading"><p>&ldquo;But as soon as you envision a second kind of client, or a second transactional resource in use case responses, it pays to design in a Service Layer from the beginning.&rdquo; The words are Randy Stafford's, from his Service Layer pattern in Chapter 9 of Fowler's book. This lesson reads Chapter 2's section on the layer, which is Fowler's argument, and then Stafford's pattern. Read both in your own copy first.</p><p>Chapter 2 describes a common approach: split the domain layer in two and put a Service Layer over a Domain Model or a Table Module, so that the presentation talks to the domain only through it, as an API for the application. It is also a good place for transaction control and security. The key decision, Fowler says, is how much behaviour it holds. At one extreme it is a facade that forwards every call to the objects below; at the other, most of the business logic is in Transaction Scripts inside it, over simple domain objects. Between them is the controller-entity style, which he has never liked much: its use-case controllers invite duplicate code, as scripts do.</p><p>His own preference is as thin a Service Layer as possible, and none if he can manage without one; he assumes he does not and adds it when the application seems to need it. Then he concedes the point at once. Many good designers, he says, always use a Service Layer with a good deal of logic, and Stafford has done well with a rich layer, which is why Fowler asked him to write the pattern. So the book holds two answers to how thick the layer should be, and says so.</p><p>Stafford's pattern defines the layer as an application's boundary: a set of available operations, seen from the clients' side, each of which coordinates the application's response. His motivation is that enterprise applications have several kinds of interface, such as data loaders, user interfaces and integration gateways, which need the same interactions with the application, and coding them again in each interface duplicates them. His section Kinds of &ldquo;Business Logic&rdquo; then divides the logic into domain logic, about the problem domain, and application logic, about the application's responsibilities, such as notifying administrators and integrated systems. Putting the second kind in domain classes makes them less reusable across applications, and harder to move into a workflow tool.</p><p>He gives two ways to build the layer: a domain facade, thin classes over a Domain Model that does all the business logic, and an operation script, thicker classes that carry out the application logic and delegate the domain logic. The operations come from the use cases and the screens; many are plain create, read, update and delete, but what the application must do around them, notifying people and other systems, is often far from dull, and the operation coordinates it and makes it atomic. Its interface is coarse-grained, so it could be called remotely, but his advice is to start with a local layer and add a Remote Facade only if you need one. When to Use It turns the quotation round: with one kind of client and no response that spans several transactional resources, you probably do not need the layer.</p><p>Now the code. In the listing below a web page and a nightly import both place orders, and each does the whole response itself. On the preset <code>orders-twice</code> the lab finds 1 repeated block, 10 lines in all the copies, at lines 4–8 and lines 13–17: five lines in each client, from <span class="math" data-say="db dot begin">db.begin()</span> to the confirmation mail. Only the line that builds the order differs, from the form in one and from the imported row in the other.</p><pre class="codeblock" data-say="line 1, comment, The web page and the nightly import both place orders.. line 2, void web place of request req. line 3, order order is set to orders dot from form of req. line 4, db dot begin. line 5, inventory dot reserve of order. line 6, order dot confirm. line 7, db dot commit. line 8, mailer dot send confirmation of order. line 11, void import place of row row. line 12, order order is set to orders dot from row of row. line 13, db dot begin. line 14, inventory dot reserve of order. line 15, order dot confirm. line 16, db dot commit. line 17, mailer dot send confirmation of order" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The web page and the nightly import both place orders.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two authors on one layer, then the count</h2><div class="prose reading"><p>&ldquo;But as soon as you envision a second kind of client, or a second transactional resource in use case responses, it pays to design in a Service Layer from the beginning.&rdquo; The words are Randy Stafford's, from his Service Layer pattern in Chapter 9 of Fowler's book. This lesson reads Chapter 2's section on the layer, which is Fowler's argument, and then Stafford's pattern. Read both in your own copy first.</p><p>Chapter 2 describes a common approach: split the domain layer in two and put a Service Layer over a Domain Model or a Table Module, so that the presentation talks to the domain only through it, as an API for the application. It is also a good place for transaction control and security. The key decision, Fowler says, is how much behaviour it holds. At one extreme it is a facade that forwards every call to the objects below; at the other, most of the business logic is in Transaction Scripts inside it, over simple domain objects. Between them is the controller-entity style, which he has never liked much: its use-case controllers invite duplicate code, as scripts do.</p><p>His own preference is as thin a Service Layer as possible, and none if he can manage without one; he assumes he does not and adds it when the application seems to need it. Then he concedes the point at once. Many good designers, he says, always use a Service Layer with a good deal of logic, and Stafford has done well with a rich layer, which is why Fowler asked him to write the pattern. So the book holds two answers to how thick the layer should be, and says so.</p><p>Stafford's pattern defines the layer as an application's boundary: a set of available operations, seen from the clients' side, each of which coordinates the application's response. His motivation is that enterprise applications have several kinds of interface, such as data loaders, user interfaces and integration gateways, which need the same interactions with the application, and coding them again in each interface duplicates them. His section Kinds of &ldquo;Business Logic&rdquo; then divides the logic into domain logic, about the problem domain, and application logic, about the application's responsibilities, such as notifying administrators and integrated systems. Putting the second kind in domain classes makes them less reusable across applications, and harder to move into a workflow tool.</p><p>He gives two ways to build the layer: a domain facade, thin classes over a Domain Model that does all the business logic, and an operation script, thicker classes that carry out the application logic and delegate the domain logic. The operations come from the use cases and the screens; many are plain create, read, update and delete, but what the application must do around them, notifying people and other systems, is often far from dull, and the operation coordinates it and makes it atomic. Its interface is coarse-grained, so it could be called remotely, but his advice is to start with a local layer and add a Remote Facade only if you need one. When to Use It turns the quotation round: with one kind of client and no response that spans several transactional resources, you probably do not need the layer.</p><p>Now the code. In the listing below a web page and a nightly import both place orders, and each does the whole response itself. On the preset <code>orders-twice</code> the lab finds 1 repeated block, 10 lines in all the copies, at lines 4–8 and lines 13–17: five lines in each client, from <span class="math" data-say="db dot begin">db.begin()</span> to the confirmation mail. Only the line that builds the order differs, from the form in one and from the imported row in the other.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Reading the code</h2></div><p>repeated runs of statements, matched as text</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Reading the code</strong><span>repeated runs of statements, matched as text</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
+          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
+        </div>
+        <div style="flex:1 1 19.5em;min-width:0;">
+          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
+          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
+        </div>
+      </div>
+      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
+        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>This view compares statement lines as text, white space collapsed. A repeated block is a run of at least the lesson's minimum of consecutive statement lines that occurs again, not overlapping, and as long as it can be made at its start.</p></div>
+      </details>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
+      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
+
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The application logic two clients repeat</h3>
+            <p>A count over code, by the rules stated below the listing. The lab compares statement lines as text, with white space collapsed and comments left out, and reports every run of two or more lines that occurs again. A closing brace alone is not a statement line. It matches text, so a copy with renamed variables is one it cannot see. The listings are the lesson's.</p>
+        <div class="field">
+          <label for="coPreset">Worked example</label>
+          <select id="coPreset"><option value="orders-twice" selected>A web page and a nightly import each place an order</option><option value="orders-served">Both clients call one service operation</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Repeated blocks</span><strong id="coDupBlocks">&mdash;</strong></div>
+          <div class="kpi"><span>Lines in all the copies</span><strong id="coDupLines">&mdash;</strong></div>
+          <div class="kpi"><span>Where</span><strong id="coDupWhere">&mdash;</strong></div>
+        </div>
+
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, The web page and the nightly import both place orders.. line 2, void web place of request req. line 3, order order is set to orders dot from form of req. line 4, db dot begin. line 5, inventory dot reserve of order. line 6, order dot confirm. line 7, db dot commit. line 8, mailer dot send confirmation of order. line 11, void import place of row row. line 12, order order is set to orders dot from row of row. line 13, db dot begin. line 14, inventory dot reserve of order. line 15, order dot confirm. line 16, db dot commit. line 17, mailer dot send confirmation of order" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// The web page and the nightly import both place orders.</span>
 <span class="cl">void webPlace(Request req) {</span>
 <span class="cl">    Order order = orders.fromForm(req);</span>
 <span class="cl">    db.begin();</span>
@@ -1495,51 +1580,12 @@
 <span class="cl">    order.cancel();</span>
 <span class="cl">    db.commit();</span>
 <span class="cl">    mailer.sendCancellation(order);</span>
-<span class="cl">}</span></code></pre><p>A web page and a phone client both cancel orders. Mark the lines they repeat by the lab's rule and the lines in all the copies, write the service operation both would call, and say which line stays in its own client and why.</p><p>A Service Layer is built from the domain's objects. The next lesson, Value Object, starts Chapter 18's small objects with the smallest: one whose equality is its value.</p></article>
+<span class="cl">}</span></code></pre><p>A web page and a phone client both cancel orders. Mark the lines they repeat by the lab's rule and the lines in all the copies, write the service operation both would call, and say which line stays in its own client and why.</p><p>A Service Layer is built from the domain's objects. The next lesson, Value Object, starts Chapter 18's small objects with the smallest: one whose equality is its value.</p></div></div>
     </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Reading the code</h2></div><p>repeated runs of statements, matched as text</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
-      <div class="lab-toolbar">
-        <div class="lab-title"><strong>Reading the code</strong><span>repeated runs of statements, matched as text</span></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:4px;">
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <label for="coInCode" class="small-copy" style="display:block;margin-bottom:4px;">Java listing (the lab reads it; it never runs it)</label>
-          <textarea id="coInCode" rows="16" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off" style="width:100%;box-sizing:border-box;white-space:pre;overflow:auto;tab-size:4;font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></textarea>
-        </div>
-        <div style="flex:1 1 19.5em;min-width:0;">
-          <p class="small-copy" id="coListingLabel" style="margin:0 0 4px;">The listing, numbered as every tile and the banner number it</p>
-          <pre id="coListing" aria-labelledby="coListingLabel" style="margin:0;max-height:30em;overflow:auto;white-space:pre;tab-size:4;padding:8px 10px 8px 0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--text);font-family:var(--mono);font-size:0.85rem;line-height:1.5;"></pre>
-        </div>
-      </div>
-      <details style="margin-top:10px;"><summary class="small-copy">How the lab reads Java</summary>
-        <div class="small-copy"><ul><li>Comments run from <code>//</code> to the end of the line, or from <code>/*</code> to <code>*/</code>; string and character literals are read as single tokens. The lab reads Java; it never runs it.</li><li>A line is blank, a comment line (it carries a comment, alone or after code) and/or a code line (it has code outside comments). A statement line is a code line that is not only braces and semicolons.</li><li>The routine is the first statement at brace depth 0 that ends in <code>{</code> and has the shape <em>type name(parameters)</em>. Without one the listing is a fragment.</li><li>A variable is a name that begins with a lower-case letter or <code>_</code>, is not a keyword, is not followed by <code>(</code> and does not follow a dot. Capitalised names are types or constants.</li><li>A declaration (a type, then a name and <code>=</code>, <code>;</code>, <code>,</code> or <code>:</code>) sets the name when it has a value and only declares it otherwise; parameters are set on the header's line. <code>name op expr</code> with <code>op</code> one of <code>= += -= *= /= %=</code> reads the expression (and the name too, unless <code>op</code> is <code>=</code>) and then sets the name; <code>x++</code> reads and then sets <code>x</code>. Setting an element or a field only reads the names in it. A <code>for</code> header is read as its three parts in order.</li><li>The lab reads the lines top to bottom and does not follow branches or loops.</li></ul><p>This view compares statement lines as text, white space collapsed. A repeated block is a run of at least the lesson's minimum of consecutive statement lines that occurs again, not overlapping, and as long as it can be made at its start.</p></div>
-      </details>
-      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="coTable"></table></div>
-      <div class="status-banner" id="coStatus" style="margin-top:12px;" aria-live="polite"></div>
-
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The application logic two clients repeat</h3>
-          <p>A count over code, by the rules stated below the listing. The lab compares statement lines as text, with white space collapsed and comments left out, and reports every run of two or more lines that occurs again. A closing brace alone is not a statement line. It matches text, so a copy with renamed variables is one it cannot see. The listings are the lesson's.</p>
-        <div class="field">
-          <label for="coPreset">Worked example</label>
-          <select id="coPreset"><option value="orders-twice" selected>A web page and a nightly import each place an order</option><option value="orders-served">Both clients call one service operation</option></select>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span>Repeated blocks</span><strong id="coDupBlocks">&mdash;</strong></div>
-          <div class="kpi"><span>Lines in all the copies</span><strong id="coDupLines">&mdash;</strong></div>
-          <div class="kpi"><span>Where</span><strong id="coDupWhere">&mdash;</strong></div>
-        </div>
-
-        </aside>
-      </div>
-    </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding the response each client repeats</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List the clients</h3><p>Find every client that runs the same use case: pages, jobs, APIs, imports.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Mark what each repeats</h3><p>Mark the identical runs of statement lines, and sort each line into domain logic, about the problem, and application logic, such as transactions and notifications.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write one operation</h3><p>Move the repeated response into one service operation that takes what the clients build, and leave in each client only what is about its own request.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own system</h3><p>Take the clients of one domain operation in a system you know. Count the lines of transaction, notification and integration code each repeats, and write the figure down.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding the response each client repeats</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>List the clients.</strong> Find every client that runs the same use case: pages, jobs, APIs, imports.</li><li><strong>Mark what each repeats.</strong> Mark the identical runs of statement lines, and sort each line into domain logic, about the problem, and application logic, such as transactions and notifications.</li><li><strong>Write one operation.</strong> Move the repeated response into one service operation that takes what the clients build, and leave in each client only what is about its own request.</li><li><strong>Do it on your own system.</strong> Take the clients of one domain operation in a system you know. Count the lines of transaction, notification and integration code each repeats, and write the figure down.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1559,17 +1605,16 @@ lines 8 and 17: send the confirmation
 one block, five lines in two copies: 10</div><p>Three of the five repeated lines are plainly application logic: the transaction's begin and commit, and the mail. Two are calls into the domain, <span class="math" data-say="inventory dot reserve">inventory.reserve</span> and <span class="math" data-say="order dot confirm">order.confirm()</span>, which the response must run together inside the transaction. Stafford's operation script takes all five, because together they are the use case's response; the rules themselves stay in <span class="math" data-say="reserve">reserve</span> and <span class="math" data-say="confirm">confirm</span>.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking domain logic and application logic are the same, so it does not matter which layer holds a rule</strong><span>Stafford divides them in Kinds of &ldquo;Business Logic&rdquo;: domain logic is about the problem domain, application logic about the application's responsibilities, such as notifying people and integrated systems. Putting the second in domain classes makes them harder to reuse in another application. How thick the service should be is a separate question, and the book gives two answers: Fowler prefers it thin, and says plainly that good designers, Stafford among them, make it rich. On the lesson's illustration the repeated lines are mostly the second kind.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking every application needs a Service Layer</strong><span>Stafford says not: with one kind of client and no response spanning several transactional resources, page controllers can manage the transactions. The condition in the lesson's opening quotation, another kind of client or another transactional resource, is the reason to have one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a Service Layer for a remote interface</strong><span>Its interface is coarse-grained, so it can be called remotely, and the J2EE Session Facade looks similar. Stafford separates them: Session Facade was motivated by the cost of remote calls to entity beans, Service Layer by factoring responsibility to avoid duplication. His advice is to start with a local layer and add remote access only if it is needed.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can move a repeated response into one operation.</strong><p>Given two clients that each run the same response to a use case, mark the repeated lines, and write the service operation both would call.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab finds the lines two clients repeat; it cannot tell application logic from domain logic, and it cannot say how thick a Service Layer should be. The book itself gives two answers to that, Fowler's thin layer and Stafford's rich one, and both are presented here.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking domain logic and application logic are the same, so it does not matter which layer holds a rule</strong><span>Stafford divides them in Kinds of &ldquo;Business Logic&rdquo;: domain logic is about the problem domain, application logic about the application's responsibilities, such as notifying people and integrated systems. Putting the second in domain classes makes them harder to reuse in another application. How thick the service should be is a separate question, and the book gives two answers: Fowler prefers it thin, and says plainly that good designers, Stafford among them, make it rich. On the lesson's illustration the repeated lines are mostly the second kind.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking every application needs a Service Layer</strong><span>Stafford says not: with one kind of client and no response spanning several transactional resources, page controllers can manage the transactions. The condition in the lesson's opening quotation, another kind of client or another transactional resource, is the reason to have one.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a Service Layer for a remote interface</strong><span>Its interface is coarse-grained, so it can be called remotely, and the J2EE Session Facade looks similar. Stafford separates them: Session Facade was motivated by the cost of remote calls to entity beans, Service Layer by factoring responsibility to avoid duplication. His advice is to start with a local layer and add remote access only if it is needed.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can move a repeated response into one operation.</strong><p>Given two clients that each run the same response to a use case, mark the repeated lines, and write the service operation both would call.</p></div></div><div class="note"><strong>Note:</strong> The lab finds the lines two clients repeat; it cannot tell application logic from domain logic, and it cannot say how thick a Service Layer should be. The book itself gives two answers to that, Fowler's thin layer and Stafford's rich one, and both are presented here.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Domain logic and application logic</summary><p>Stafford's two kinds of business logic. Domain logic is about the problem itself, such as how an order is priced. Application logic is about the application's responsibilities, such as telling people and other systems that something happened, and running the work in one transaction.</p></details><details class="recall"><summary>Domain facade</summary><p>A Service Layer of thin classes in front of a Domain Model. They hold no business logic; they set the boundary and the operations, and the model does the rest.</p></details><details class="recall"><summary>Operation script</summary><p>A Service Layer made of thicker classes that carry out the application logic themselves and hand the domain logic to domain objects. Each class groups related operations and is usually named something Service.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 2's account of a layer of services over the domain, and Randy Stafford's pattern in Chapter 9: a boundary that defines the operations clients see and coordinates the response to each. Count the application logic two kinds of client repeat, then move it into one service operation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Domain logic and application logic.</strong> Stafford's two kinds of business logic. Domain logic is about the problem itself, such as how an order is priced. Application logic is about the application's responsibilities, such as telling people and other systems that something happened, and running the work in one transaction.</li><li><strong>Domain facade.</strong> A Service Layer of thin classes in front of a Domain Model. They hold no business logic; they set the boundary and the operations, and the model does the rest.</li><li><strong>Operation script.</strong> A Service Layer made of thicker classes that carry out the application logic themselves and hand the domain logic to domain objects. Each class groups related operations and is usually named something Service.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a boundary of application operations. domain logic, about the problem. application logic, notify, transact. a second kind of client, add the layer. fowler, as thin as you can, if any. stafford, a rich layer serves well" tabindex="0" role="region" aria-label="Mathematical notation">a boundary of application operations
 domain logic: about the problem
 application logic: notify, transact
@@ -2574,11 +2619,40 @@ Stafford: a rich layer serves well</div><figcaption>Service Layer in six lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2646,7 +2720,7 @@ Stafford: a rich layer serves well</div><figcaption>Service Layer in six lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

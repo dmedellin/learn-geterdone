@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>User Operations</h1>
       <p class="lesson-lede">Each request a menu or button makes turned into an object that can be stored, executed, undone and redone.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Command object</li><li>Command history</li><li>Command</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Requests as objects, and a history of them</h2>
-      <article class="prose reading"><p>&ldquo;Here we have another example of encapsulating the concept that varies, in this case a request.&rdquo; Section 2.7, User Operations, applies the chapter's refrain to what users ask Lexi to do. Read the section in your own copy first.</p><p>Some of Lexi's work happens directly in the page, typing and selecting; the rest is reached through menus, buttons and keyboard shortcuts: new, open, save and print, cut and paste, fonts and alignment, quit. The authors set four requirements. One operation may have several interfaces, a menu entry and a page button for the same jump, and the interfaces may change. The operations live in many classes, and the interface classes should not come to depend on all of them. Most operations that change the document should be undoable and redoable, but not saving or quitting, which should not touch the undo history at all. And there should be no fixed limit on the levels of undo.</p><p>The first idea is a subclass of the menu-item class for each operation. The authors reject it: it ties the request to one kind of widget, so a page button for the same request needs its own subclass, and the classes approach the number of widget kinds times the number of requests. A function pointer is closer, but it does nothing for undo, has nowhere to keep state such as which font to apply, and is hard to extend or reuse. An object does all three. So each request becomes a command, an instance of a subclass of an abstract Command class whose one operation is Execute. A subclass may do the work itself or hand it to other objects; the menu item neither knows nor cares, and calls Execute when it is chosen.</p><p>Undo adds a second operation, Unexecute, which reverses Execute using whatever Execute saved, as a font change saves the range and its former fonts. A third, Reversible, lets a command report at run time that it changed nothing, so that a font change to the font already there does not cost the user an undo. The history is the list of executed commands with a line marking the present. To undo, call Unexecute on the command left of the line and move the line left; to redo, call Execute on the command to its right and move the line right. The authors call this Command, which describes how to encapsulate a request; its catalog entry adds that undo state can include the receiver, the arguments and the receiver's values before the change. It also warns that a command whose state changes when it runs must be copied before it goes on the history, and that errors can pile up over many undos and redos.</p><pre class="codeblock" data-say="line 1, comment, A command remembers what it needs to undo itself.. line 2, interface command. line 3, void execute. line 4, void unexecute. line 6, final class set minutes implements command. line 7, private final zone zone. line 8, private final int minutes. line 9, private int before, comment, stored by execute. line 10, set minutes of zone zone, int minutes. line 11, this dot zone is set to zone, this dot minutes is set to minutes. line 13, public void execute. line 14, before is set to zone dot minutes. line 15, zone dot set minutes of minutes. line 17, public void unexecute zone dot set minutes of before" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A command remembers what it needs to undo itself.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Requests as objects, and a history of them</h2><div class="prose reading"><p>&ldquo;Here we have another example of encapsulating the concept that varies, in this case a request.&rdquo; Section 2.7, User Operations, applies the chapter's refrain to what users ask Lexi to do. Read the section in your own copy first.</p><p>Some of Lexi's work happens directly in the page, typing and selecting; the rest is reached through menus, buttons and keyboard shortcuts: new, open, save and print, cut and paste, fonts and alignment, quit. The authors set four requirements. One operation may have several interfaces, a menu entry and a page button for the same jump, and the interfaces may change. The operations live in many classes, and the interface classes should not come to depend on all of them. Most operations that change the document should be undoable and redoable, but not saving or quitting, which should not touch the undo history at all. And there should be no fixed limit on the levels of undo.</p><p>The first idea is a subclass of the menu-item class for each operation. The authors reject it: it ties the request to one kind of widget, so a page button for the same request needs its own subclass, and the classes approach the number of widget kinds times the number of requests. A function pointer is closer, but it does nothing for undo, has nowhere to keep state such as which font to apply, and is hard to extend or reuse. An object does all three. So each request becomes a command, an instance of a subclass of an abstract Command class whose one operation is Execute. A subclass may do the work itself or hand it to other objects; the menu item neither knows nor cares, and calls Execute when it is chosen.</p><p>Undo adds a second operation, Unexecute, which reverses Execute using whatever Execute saved, as a font change saves the range and its former fonts. A third, Reversible, lets a command report at run time that it changed nothing, so that a font change to the font already there does not cost the user an undo. The history is the list of executed commands with a line marking the present. To undo, call Unexecute on the command left of the line and move the line left; to redo, call Execute on the command to its right and move the line right. The authors call this Command, which describes how to encapsulate a request; its catalog entry adds that undo state can include the receiver, the arguments and the receiver's values before the change. It also warns that a command whose state changes when it runs must be copied before it goes on the history, and that errors can pile up over many undos and redos.</p><pre class="codeblock" data-say="line 1, comment, A command remembers what it needs to undo itself.. line 2, interface command. line 3, void execute. line 4, void unexecute. line 6, final class set minutes implements command. line 7, private final zone zone. line 8, private final int minutes. line 9, private int before, comment, stored by execute. line 10, set minutes of zone zone, int minutes. line 11, this dot zone is set to zone, this dot minutes is set to minutes. line 13, public void execute. line 14, before is set to zone dot minutes. line 15, zone dot set minutes of minutes. line 17, public void unexecute zone dot set minutes of before" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A command remembers what it needs to undo itself.</span>
 <span class="cl">interface Command {</span>
 <span class="cl">    void execute();</span>
 <span class="cl">    void unexecute();</span>
@@ -1476,15 +1520,11 @@
 <span class="cl">        if (undone.isEmpty()) { return; }        // nothing to redo</span>
 <span class="cl">        Command c = undone.pop(); c.execute(); done.push(c);</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The second sketch keeps the present line as two stacks: the commands left of it on one, those right of it on the other. Running a new command clears the redo stack, as a new edit in an editor ends any chance of redoing what was undone. The lab steps through the same model on a garden irrigation controller with two zones, front at 20 minutes and back at 30, and four commands: boost adds 10 to front, trim takes 5 from back, rain sets front to 0, summer sets back to 45. On the preset <code>garden-week</code> the script is boost, trim, rain, undo, undo, redo, summer, undo. The table gives the state and both stacks after each step. At step 7 summer runs while rain still waits to be redone, so rain is discarded: 1 redo entry lost. The run ends with front 30, back 25, boost and trim on the undo stack and summer alone on the redo stack, and nothing refused.</p><p>The last tile counts what the history must hold. Kept as inverse commands, a set command stores the one value it overwrote and an add stores nothing, since it is undone by subtracting: 1 value at the end, for summer. Kept as snapshots of the whole state, each of the 3 commands on the stacks holds both zones: 6. The preset <code>garden-snapshots</code> runs the same script under snapshots, and the states do not change, only the count, 6 against 1. The preset <code>nothing-to-undo</code> runs boost, then two undos and three redos: one undo and two redos find their stack empty, and the lab counts them, undo 1, redo 2, leaving front at 30 with boost on the undo stack. The snapshot alternative is the subject of Memento, in Behavioral Patterns I.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, state, front 20, back 30. line 2, commands, boost add front plus 10 trim add back minus 5. line 3, rain set front 0 summer set back 45. line 4, script, rain boost undo trim redo undo" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">state:    front 20, back 30</span>
-<span class="cl">commands: boost  add front +10    trim   add back -5</span>
-<span class="cl">          rain   set front 0      summer set back 45</span>
-<span class="cl">script:   rain boost undo trim redo undo</span></code></pre><p>The same controller, another script. By hand, write the state and both stacks after each of the six steps, and count the redo entries discarded and the requests refused. Then type the script into the lab to check.</p><p>Every design problem so far has been about the document or what is done to it as a whole. The next lesson, Spelling Checking and Hyphenation, reads the last design problem, operations that must visit every part, and the chapter's summary.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Commands, undo and redo</h2></div><p>the undo and redo stacks after a sequence of commands</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The second sketch keeps the present line as two stacks: the commands left of it on one, those right of it on the other. Running a new command clears the redo stack, as a new edit in an editor ends any chance of redoing what was undone. The lab steps through the same model on a garden irrigation controller with two zones, front at 20 minutes and back at 30, and four commands: boost adds 10 to front, trim takes 5 from back, rain sets front to 0, summer sets back to 45. On the preset <code>garden-week</code> the script is boost, trim, rain, undo, undo, redo, summer, undo. The table gives the state and both stacks after each step. At step 7 summer runs while rain still waits to be redone, so rain is discarded: 1 redo entry lost. The run ends with front 30, back 25, boost and trim on the undo stack and summer alone on the redo stack, and nothing refused.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Commands, undo and redo</h2></div><p>the undo and redo stacks after a sequence of commands</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Commands, undo and redo</strong><span>the undo and redo stacks after a sequence of commands</span></div>
       </div>
@@ -1492,10 +1532,10 @@
       <div class="table-wrap" id="ghiTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ghiTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A command name in the script runs it: set puts its amount in the cell, add adds it. Running a command pushes it on the undo stack and empties the redo stack, whose entries are discarded. Undo pops the undo stack, restores the state before that command and pushes it on the redo stack; redo pops the redo stack, runs the command again and pushes it back. An undo or redo with its stack empty does nothing and is counted. Stored values count what the history holds at the end, one entry per command on either stack: as inverse operations, one old value per set (an add is undone by subtracting its amount, which the command already holds); as snapshots, every cell of the state per entry. The states are the same under both.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Commands, undo and redo on a small state</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Commands, undo and redo on a small state</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="ghiPreset">Worked example</label>
           <select id="ghiPreset"><option value="garden-week" selected>An irrigation controller: three commands, undo, redo, a fourth</option><option value="garden-snapshots">The same script, the history kept as snapshots</option><option value="nothing-to-undo">One command, then more undos and redos than there are</option></select>
@@ -1526,12 +1566,18 @@
           <div class="kpi"><span>Under the other scheme</span><strong id="ghiOther">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The last tile counts what the history must hold. Kept as inverse commands, a set command stores the one value it overwrote and an add stores nothing, since it is undone by subtracting: 1 value at the end, for summer. Kept as snapshots of the whole state, each of the 3 commands on the stacks holds both zones: 6. The preset <code>garden-snapshots</code> runs the same script under snapshots, and the states do not change, only the count, 6 against 1. The preset <code>nothing-to-undo</code> runs boost, then two undos and three redos: one undo and two redos find their stack empty, and the lab counts them, undo 1, redo 2, leaving front at 30 with boost on the undo stack. The snapshot alternative is the subject of Memento, in Behavioral Patterns I.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, state, front 20, back 30. line 2, commands, boost add front plus 10 trim add back minus 5. line 3, rain set front 0 summer set back 45. line 4, script, rain boost undo trim redo undo" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">state:    front 20, back 30</span>
+<span class="cl">commands: boost  add front +10    trim   add back -5</span>
+<span class="cl">          rain   set front 0      summer set back 45</span>
+<span class="cl">script:   rain boost undo trim redo undo</span></code></pre><p>The same controller, another script. By hand, write the state and both stacks after each of the six steps, and count the redo entries discarded and the requests refused. Then type the script into the lab to check.</p><p>Every design problem so far has been about the document or what is done to it as a whole. The next lesson, Spelling Checking and Hyphenation, reads the last design problem, operations that must visit every part, and the chapter's summary.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Stepping a command history</h2></div><p>Four steps, the last of them on an application of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Start from the state and two empty stacks</h3><p>Write each cell's value, an empty undo stack and an empty redo stack.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Run, undo and redo in order</h3><p>A command executes and goes on the undo stack, clearing the redo stack. Undo pops the top of the undo stack, reverses it and pushes it on the redo stack; redo does the opposite. An empty stack refuses.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count what the history keeps</h3><p>As inverse commands, each set holds the value it replaced and each add holds nothing; as snapshots, each command on either stack holds every cell.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on an application of your own</h3><p>Take an application you use with an undo menu and write four of its operations as commands on a small state. Run a script with an undo after a new command, and say which of the application's operations, like save, should never enter the history.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Stepping a command history</h2>
+      <p class="lead-in">Four steps, the last of them on an application of your own.</p>
+      <ol class="key-ideas method"><li><strong>Start from the state and two empty stacks.</strong> Write each cell's value, an empty undo stack and an empty redo stack.</li><li><strong>Run, undo and redo in order.</strong> A command executes and goes on the undo stack, clearing the redo stack. Undo pops the top of the undo stack, reverses it and pushes it on the redo stack; redo does the opposite. An empty stack refuses.</li><li><strong>Count what the history keeps.</strong> As inverse commands, each set holds the value it replaced and each add holds nothing; as snapshots, each command on either stack holds every cell.</li><li><strong>Do it on an application of your own.</strong> Take an application you use with an undo menu and write four of its operations as commands on a small state. Run a script with an undo after a new command, and say which of the application's operations, like save, should never enter the history.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1552,17 +1598,16 @@ summer: back 45; rain discarded
 undo summer: back 25; redo [summer]</div><p>Each undo reverses only the command on top, using what it stored when it ran: rain gives front back its 30 and summer gives back its 25. The redo stack lasts only until the next new command.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Binding each operation to the widget that triggers it</strong><span>Section 2.7 rejects a menu-item subclass per operation: the request is coupled to one interface, and the classes approach widget kinds times requests. A command object is handed to any number of widgets, and each calls the same Execute.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking any operation can enter the undo history</strong><span>The authors exclude saving and quitting, which should leave the history untouched, and add Reversible so that a command that changed nothing does not cost an undo. Which operations belong in the history is a decision about the application, not something the pattern settles.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting redo to survive a new command</strong><span>Commands right of the present line are only candidates for redo; running a new command replaces them. On the lesson's controller the lab counts rain discarded at step 7, and the exercise loses boost the same way.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can step a script of commands, undos and redos by hand.</strong><p>Given a small state, its commands and a script, state the state and both stacks after each step, the redo entries discarded and the requests refused, and what the history keeps as inverse commands and as snapshots.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab steps set and add commands on whole numbers. It does not model Reversible, commands that change nothing, or commands kept out of the history; which of an application's operations should be undoable is the designer's call, as the authors make it for Lexi.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Binding each operation to the widget that triggers it</strong><span>Section 2.7 rejects a menu-item subclass per operation: the request is coupled to one interface, and the classes approach widget kinds times requests. A command object is handed to any number of widgets, and each calls the same Execute.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking any operation can enter the undo history</strong><span>The authors exclude saving and quitting, which should leave the history untouched, and add Reversible so that a command that changed nothing does not cost an undo. Which operations belong in the history is a decision about the application, not something the pattern settles.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting redo to survive a new command</strong><span>Commands right of the present line are only candidates for redo; running a new command replaces them. On the lesson's controller the lab counts rain discarded at step 7, and the exercise loses boost the same way.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can step a script of commands, undos and redos by hand.</strong><p>Given a small state, its commands and a script, state the state and both stacks after each step, the redo entries discarded and the requests refused, and what the history keeps as inverse commands and as snapshots.</p></div></div><div class="note"><strong>Note:</strong> The lab steps set and add commands on whole numbers. It does not model Reversible, commands that change nothing, or commands kept out of the history; which of an application's operations should be undoable is the designer's call, as the authors make it for Lexi.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Command object</summary><p>An object that stands for one request, with an operation to carry it out. A menu item or button holds one and calls it when chosen, without knowing what the request does or which objects do the work.</p></details><details class="recall"><summary>Command history</summary><p>The list of commands executed so far, with a marker for the present. Undo reverses the command just before the marker and moves the marker back one place; redo re-executes the one just after and moves it forward; the length of the list is the only limit.</p></details><details class="recall"><summary>Command</summary><p>The pattern: a Command interface with an execute operation, ConcreteCommands that bind a Receiver to an action, an Invoker that stores and triggers them, and a Client that creates them. It has a lesson of its own, Command, in Behavioral Patterns I.</p></details></div>
+      <h3>Summary</h3>
       <p>Section 2.7 gives every menu item and button one way to reach Lexi's scattered operations, and undo and redo without a fixed limit, by making each request a command object kept in a history. Read the argument, then run a garden irrigation controller's commands, undos and redos, and read the two stacks and the state after each step.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Command object.</strong> An object that stands for one request, with an operation to carry it out. A menu item or button holds one and calls it when chosen, without knowing what the request does or which objects do the work.</li><li><strong>Command history.</strong> The list of commands executed so far, with a marker for the present. Undo reverses the command just before the marker and moves the marker back one place; redo re-executes the one just after and moves it forward; the length of the list is the only limit.</li><li><strong>Command.</strong> The pattern: a Command interface with an execute operation, ConcreteCommands that bind a Receiver to an action, an Invoker that stores and triggers them, and a Client that creates them. It has a lesson of its own, Command, in Behavioral Patterns I.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a request becomes an object. invoker and operation are decoupled. execute stores what unexecute needs. a history with a present line. undo left, redo right. A new command discards the redos" tabindex="0" role="region" aria-label="Mathematical notation">a request becomes an object
 invoker and operation are decoupled
 execute stores what unexecute needs
@@ -2345,11 +2390,40 @@ a new command discards the redos</div><figcaption>User operations in six lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2417,7 +2491,7 @@ a new command discards the redos</div><figcaption>User operations in six lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

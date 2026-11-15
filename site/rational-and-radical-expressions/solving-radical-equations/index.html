@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Rational and Radical Expressions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Radicals</p>
       <h1>Solving Radical Equations</h1>
       <p class="lesson-lede">Isolate one radical, raise both sides, solve, and reject every candidate that fails in the original equation.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Squaring is a one-way implication</li><li>The extraneous root is not a mistake</li><li>Check against the ORIGINAL equation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Solving equations that contain a radical</h2>
-      <article class="prose reading"><p>“Solving Rational Equations” met extraneous solutions when clearing denominators: multiplying by an expression that could be zero can create a root. This lesson meets them again from a different direction, and the cure is identical &mdash; substitute into the original.</p><div class="defbox"><span class="label">Definition &middot; Radical equation</span><p>A <strong>radical equation</strong> is one in which the variable appears under a radical sign. <span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> is one; <span class="math" data-say="the square root of 7 times x equals 5">√7 · x = 5</span> is not, since the variable is outside.</p></div><div class="thm"><span class="label">Theorem &middot; Raising both sides to a power</span><p>If <span class="math" data-say="A equals b">a = b</span> then <span class="math" data-say="A to the power n equals b to the power n">aⁿ = bⁿ</span> for every positive integer <span class="math" data-say="n">n</span>. The converse holds for odd <span class="math" data-say="n">n</span>, and fails for even <span class="math" data-say="n">n</span>.</p><p>For even <span class="math" data-say="n">n</span>, <span class="math" data-say="A to the power n equals b to the power n">aⁿ = bⁿ</span> gives <span class="math" data-say="A equals plus or minus b">a = ±b</span>. Squaring an equation therefore solves <span class="math" data-say="A equals b">a = b</span> and <span class="math" data-say="A equals negative b">a = −b</span> at once, and the two solution sets come back mixed together.</p></div><p>Follow the key example. <span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> squares to <span class="math" data-say="x plus 7 equals x squared minus 10 x plus 25">x + 7 = x² − 10x + 25</span>, which rearranges to <span class="math" data-say="x squared minus 11 x plus 18 equals 0">x² − 11x + 18 = 0</span> and factors as <span class="math" data-say="the quantity x minus 2, times the quantity x minus 9, equals 0">(x − 2)(x − 9) = 0</span>. The candidates are <span class="math" data-say="2">2</span> and <span class="math" data-say="9">9</span>.</p><p>At <span class="math" data-say="x equals 9">x = 9</span>: the left side is <span class="math" data-say="the square root of 16 equals 4">√16 = 4</span> and the right side is <span class="math" data-say="4">4</span>. It solves the equation. At <span class="math" data-say="x equals 2">x = 2</span>: the left side is <span class="math" data-say="the square root of 9 equals 3">√9 = 3</span> and the right side is <span class="math" data-say="negative 3">−3</span>. It does not &mdash; but it does solve <span class="math" data-say="the square root of the quantity x plus 7, equals negative the quantity x minus 5">√(x + 7) = −(x − 5)</span>, which is the other equation squaring silently included.</p><div class="example"><span class="label">Example &middot; Seen without any algebra</span><p><span class="math" data-say="the square root of the quantity x plus 1, equals negative 3">√(x + 1) = −3</span> has no solution, and no work is needed to say so: a principal square root is never negative. Squaring it produces <span class="math" data-say="x plus 1 equals 9">x + 1 = 9</span> and the confident answer <span class="math" data-say="x equals 8">x = 8</span>, which is entirely extraneous. The equation was unsolvable before the first step.</p></div><h3>Two radicals</h3><p>Isolate one radical on its own side before squaring, even if another remains. Squaring a side with two terms is where “Adding, Subtracting and Multiplying Radicals”'s middle term returns: <span class="math" data-say="the quantity 1 plus the square root of x, squared equals 1 plus 2 times the square root of x plus x">(1 + √x)² = 1 + 2√x + x</span> still contains a root, so nothing has been gained.</p><p>For <span class="math" data-say="the square root of the quantity x plus 5, minus the square root of x equals 1">√(x + 5) − √x = 1</span>, move <span class="math" data-say="the square root of x">√x</span> across to get <span class="math" data-say="the square root of the quantity x plus 5, equals 1 plus the square root of x">√(x + 5) = 1 + √x</span>. Squaring gives <span class="math" data-say="x plus 5 equals 1 plus 2 times the square root of x plus x">x + 5 = 1 + 2√x + x</span>, so <span class="math" data-say="4 equals 2 times the square root of x">4 = 2√x</span> and <span class="math" data-say="the square root of x equals 2">√x = 2</span>, hence <span class="math" data-say="x equals 4">x = 4</span>. Check in the original: <span class="math" data-say="the square root of 9 minus the square root of 4 equals 3 minus 2 equals 1">√9 − √4 = 3 − 2 = 1</span> ✓. Two squarings, one surviving solution.</p><p>For an odd index there is no extraneous-root problem, because cubing is reversible: <span class="math" data-say="A cubed equals b cubed">a³ = b³</span> forces <span class="math" data-say="A equals b">a = b</span> for real numbers. The check is still worth doing as arithmetic insurance, but it is no longer part of the logic of the method.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Radical equations</h2></div><p>Square both sides, then check what squaring let in</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Solving equations that contain a radical</h2><div class="prose reading"><p>“Solving Rational Equations” met extraneous solutions when clearing denominators: multiplying by an expression that could be zero can create a root. This lesson meets them again from a different direction, and the cure is identical &mdash; substitute into the original.</p><div class="defbox"><span class="label">Definition &middot; Radical equation</span><p>A <strong>radical equation</strong> is one in which the variable appears under a radical sign. <span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> is one; <span class="math" data-say="the square root of 7 times x equals 5">√7 · x = 5</span> is not, since the variable is outside.</p></div><div class="thm"><span class="label">Theorem &middot; Raising both sides to a power</span><p>If <span class="math" data-say="A equals b">a = b</span> then <span class="math" data-say="A to the power n equals b to the power n">aⁿ = bⁿ</span> for every positive integer <span class="math" data-say="n">n</span>. The converse holds for odd <span class="math" data-say="n">n</span>, and fails for even <span class="math" data-say="n">n</span>.</p><p>For even <span class="math" data-say="n">n</span>, <span class="math" data-say="A to the power n equals b to the power n">aⁿ = bⁿ</span> gives <span class="math" data-say="A equals plus or minus b">a = ±b</span>. Squaring an equation therefore solves <span class="math" data-say="A equals b">a = b</span> and <span class="math" data-say="A equals negative b">a = −b</span> at once, and the two solution sets come back mixed together.</p></div><p>Follow the key example. <span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> squares to <span class="math" data-say="x plus 7 equals x squared minus 10 x plus 25">x + 7 = x² − 10x + 25</span>, which rearranges to <span class="math" data-say="x squared minus 11 x plus 18 equals 0">x² − 11x + 18 = 0</span> and factors as <span class="math" data-say="the quantity x minus 2, times the quantity x minus 9, equals 0">(x − 2)(x − 9) = 0</span>. The candidates are <span class="math" data-say="2">2</span> and <span class="math" data-say="9">9</span>.</p><p>At <span class="math" data-say="x equals 9">x = 9</span>: the left side is <span class="math" data-say="the square root of 16 equals 4">√16 = 4</span> and the right side is <span class="math" data-say="4">4</span>. It solves the equation. At <span class="math" data-say="x equals 2">x = 2</span>: the left side is <span class="math" data-say="the square root of 9 equals 3">√9 = 3</span> and the right side is <span class="math" data-say="negative 3">−3</span>. It does not &mdash; but it does solve <span class="math" data-say="the square root of the quantity x plus 7, equals negative the quantity x minus 5">√(x + 7) = −(x − 5)</span>, which is the other equation squaring silently included.</p><div class="example"><span class="label">Example &middot; Seen without any algebra</span><p><span class="math" data-say="the square root of the quantity x plus 1, equals negative 3">√(x + 1) = −3</span> has no solution, and no work is needed to say so: a principal square root is never negative. Squaring it produces <span class="math" data-say="x plus 1 equals 9">x + 1 = 9</span> and the confident answer <span class="math" data-say="x equals 8">x = 8</span>, which is entirely extraneous. The equation was unsolvable before the first step.</p></div><h3>Two radicals</h3><p>Isolate one radical on its own side before squaring, even if another remains. Squaring a side with two terms is where “Adding, Subtracting and Multiplying Radicals”'s middle term returns: <span class="math" data-say="the quantity 1 plus the square root of x, squared equals 1 plus 2 times the square root of x plus x">(1 + √x)² = 1 + 2√x + x</span> still contains a root, so nothing has been gained.</p><p>For <span class="math" data-say="the square root of the quantity x plus 5, minus the square root of x equals 1">√(x + 5) − √x = 1</span>, move <span class="math" data-say="the square root of x">√x</span> across to get <span class="math" data-say="the square root of the quantity x plus 5, equals 1 plus the square root of x">√(x + 5) = 1 + √x</span>. Squaring gives <span class="math" data-say="x plus 5 equals 1 plus 2 times the square root of x plus x">x + 5 = 1 + 2√x + x</span>, so <span class="math" data-say="4 equals 2 times the square root of x">4 = 2√x</span> and <span class="math" data-say="the square root of x equals 2">√x = 2</span>, hence <span class="math" data-say="x equals 4">x = 4</span>. Check in the original: <span class="math" data-say="the square root of 9 minus the square root of 4 equals 3 minus 2 equals 1">√9 − √4 = 3 − 2 = 1</span> ✓. Two squarings, one surviving solution.</p><p>For an odd index there is no extraneous-root problem, because cubing is reversible: <span class="math" data-say="A cubed equals b cubed">a³ = b³</span> forces <span class="math" data-say="A equals b">a = b</span> for real numbers. The check is still worth doing as arithmetic insurance, but it is no longer part of the logic of the method.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Radical equations</h2></div><p>Square both sides, then check what squaring let in</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Radical equations</strong><span id="srSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the radical</span><span class="tone-purple"><i class="legend-swatch"></i>the other side</span><span class="tone-green"><i class="legend-swatch"></i>a real solution</span><span class="tone-red"><i class="legend-swatch"></i>rejected by the check</span></div>
@@ -1405,10 +1448,10 @@
       <div id="srStage" style="margin-top:12px;"></div>
       <div id="srWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="srStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Every candidate, substituted</h3>
-          <p>The lab solves the squared equation and then substitutes each candidate back into the ORIGINAL, showing both sides. An extraneous root is displayed failing that check rather than quietly dropped.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Every candidate, substituted</h3>
+            <p>The lab solves the squared equation and then substitutes each candidate back into the ORIGINAL, showing both sides. An extraneous root is displayed failing that check rather than quietly dropped.</p>
         <div class="field">
           <label for="srPreset">Example</label>
           <select id="srPreset"><option value="1|2|1|0">sqrt(x + 2) = x</option><option value="2|5|1|1">sqrt(2x + 5) = x + 1</option><option value="1|7|1|5">sqrt(x + 7) = x + 5</option><option value="1|-1|0|-3">sqrt(x - 1) = -3</option><option value="3|1|0|4">sqrt(3x + 1) = 4</option><option value="-1|2|1|-4">sqrt(2 - x) = x - 4</option></select>
@@ -1431,12 +1474,14 @@
         </div>
         <div class="kpi-grid"><div class="kpi"><span>Candidates</span><strong id="srK1">&mdash;</strong></div><div class="kpi"><span>Solutions</span><strong id="srK2">&mdash;</strong></div><div class="kpi"><span>Extraneous</span><strong id="srK3">&mdash;</strong></div></div>
         <p class="small-copy" style="margin:0;">The equation is <code>sqrt(px + q) = rx + s</code>. Set r to 0 to make the right side a constant.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Solving a radical equation</h2></div><p>Five steps, and the last one is not optional.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Isolate one radical on one side</h3><p>Get a single radical alone before raising anything to a power. If two radicals are present, isolate the more complicated one first.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Raise both sides to the index</h3><p>Square for a square root, cube for a cube root. Square the whole side, not term by term: <span class="math" data-say="the quantity x minus 5, squared">(x − 5)²</span> is <span class="math" data-say="x squared minus 10 x plus 25">x² − 10x + 25</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Repeat if a radical remains</h3><p>Isolate and raise again. Each pass removes one radical, and a second squaring does not add a second layer of extraneous risk beyond what the final check handles.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Solve the resulting equation</h3><p>It is usually linear or quadratic, and the factoring from Polynomials and Factoring handles it. These are candidates, not yet solutions.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Substitute every candidate into the ORIGINAL equation</h3><p>Keep the ones that make it true and discard the rest. State the discarded ones as extraneous &mdash; an answer of "no solution" is a legitimate and complete result.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Solving a radical equation</h2>
+      <p class="lead-in">Five steps, and the last one is not optional.</p>
+      <ol class="key-ideas method"><li><strong>Isolate one radical on one side.</strong> Get a single radical alone before raising anything to a power. If two radicals are present, isolate the more complicated one first.</li><li><strong>Raise both sides to the index.</strong> Square for a square root, cube for a cube root. Square the whole side, not term by term: <span class="math" data-say="the quantity x minus 5, squared">(x − 5)²</span> is <span class="math" data-say="x squared minus 10 x plus 25">x² − 10x + 25</span>.</li><li><strong>Repeat if a radical remains.</strong> Isolate and raise again. Each pass removes one radical, and a second squaring does not add a second layer of extraneous risk beyond what the final check handles.</li><li><strong>Solve the resulting equation.</strong> It is usually linear or quadratic, and the factoring from Polynomials and Factoring handles it. These are candidates, not yet solutions.</li><li><strong>Substitute every candidate into the ORIGINAL equation.</strong> Keep the ones that make it true and discard the rest. State the discarded ones as extraneous &mdash; an answer of "no solution" is a legitimate and complete result.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1472,17 +1517,16 @@
      solution set:  { 4 }</div><p>In (a), <span class="math" data-say="x equals 2">x = 2</span> satisfies <span class="math" data-say="x squared minus 11 x plus 18 equals 0">x² − 11x + 18 = 0</span> exactly. It is a real solution of the squared equation and not of the original, because squaring merged <span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> with <span class="math" data-say="the square root of the quantity x plus 7, equals negative the quantity x minus 5">√(x + 7) = −(x − 5)</span> &mdash; and <span class="math" data-say="2">2</span> solves the second one.</p><p>There is a shortcut worth noticing in (a): the left side is a principal square root, so it is never negative, so <span class="math" data-say="x minus 5 is at least 0">x − 5 ≥ 0</span> and <span class="math" data-say="x is at least 5">x ≥ 5</span> before any work is done. That condition alone rejects <span class="math" data-say="x equals 2">x = 2</span>. Writing the domain restriction first is the same habit “Rational Expressions and Their Domains” asked for.</p><p>For a faded solve, take <span class="math" data-say="the square root of the quantity 2 x plus 3, equals x">√(2x + 3) = x</span>. The supplied sign condition is <span class="math" data-say="x is at least 0">x ≥ 0</span>, because a principal square root cannot equal a negative right side. Square, factor the resulting quadratic and check both candidates in the original. You should obtain <span class="math" data-say="3">3</span> and <span class="math" data-say="negative 1">−1</span>, reject <span class="math" data-say="negative 1">−1</span>, and report <span class="math" data-say="the set 3">{3}</span>. Keeping <span class="math" data-say="negative 1">−1</span> means the sign condition and the original-equation check were both applied only to the squared equation.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Squaring term by term</strong><span><span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> does not become <span class="math" data-say="x plus 7 equals x squared minus 25">x + 7 = x² − 25</span>. The whole side is squared, and <span class="math" data-say="the quantity x minus 5, squared equals x squared minus 10 x plus 25">(x − 5)² = x² − 10x + 25</span> keeps its middle term.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Squaring before isolating</strong><span>With <span class="math" data-say="the square root of the quantity x plus 5, minus the square root of x equals 1">√(x + 5) − √x = 1</span>, squaring immediately leaves a cross term containing <span class="math" data-say="the square root of the quantity x squared plus 5 x">√(x² + 5x)</span>. Isolate one radical first and the second squaring is straightforward.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the check as optional tidying</strong><span>It is a step of the method, not a courtesy. Without it the answer to example (a) is "<span class="math" data-say="2">2</span> and <span class="math" data-say="9">9</span>", which is wrong, and nothing earlier in the working reveals it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say WHY a candidate failed, not merely that it did.</strong><p>Given a radical equation you should be able to solve it, check both candidates in the original, and name the equation the extraneous root actually satisfies. You should also be able to spot, before starting, when a sign condition makes some candidates impossible.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This lesson and “Solving Rational Equations” are the same lesson in two costumes. Clearing a denominator and squaring both sides are both legal, both irreversible, and both handled by the identical discipline: solve, then test every candidate against the equation you were given.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Squaring term by term</strong><span><span class="math" data-say="the square root of the quantity x plus 7, equals x minus 5">√(x + 7) = x − 5</span> does not become <span class="math" data-say="x plus 7 equals x squared minus 25">x + 7 = x² − 25</span>. The whole side is squared, and <span class="math" data-say="the quantity x minus 5, squared equals x squared minus 10 x plus 25">(x − 5)² = x² − 10x + 25</span> keeps its middle term.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Squaring before isolating</strong><span>With <span class="math" data-say="the square root of the quantity x plus 5, minus the square root of x equals 1">√(x + 5) − √x = 1</span>, squaring immediately leaves a cross term containing <span class="math" data-say="the square root of the quantity x squared plus 5 x">√(x² + 5x)</span>. Isolate one radical first and the second squaring is straightforward.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the check as optional tidying</strong><span>It is a step of the method, not a courtesy. Without it the answer to example (a) is "<span class="math" data-say="2">2</span> and <span class="math" data-say="9">9</span>", which is wrong, and nothing earlier in the working reveals it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say WHY a candidate failed, not merely that it did.</strong><p>Given a radical equation you should be able to solve it, check both candidates in the original, and name the equation the extraneous root actually satisfies. You should also be able to spot, before starting, when a sign condition makes some candidates impossible.</p></div></div><div class="note"><strong>Note:</strong> This lesson and “Solving Rational Equations” are the same lesson in two costumes. Clearing a denominator and squaring both sides are both legal, both irreversible, and both handled by the identical discipline: solve, then test every candidate against the equation you were given.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Squaring is a one-way implication</summary><p>If <span class="math" data-say="A equals b">a = b</span> then <span class="math" data-say="A squared equals b squared">a² = b²</span> &mdash; always. The converse fails: <span class="math" data-say="A squared equals b squared">a² = b²</span> allows <span class="math" data-say="A equals negative b">a = −b</span>. So every solution of the original survives the squaring, but the squared equation may have picked up solutions of <span class="math" data-say="A equals negative b">a = −b</span> as well.</p></details><details class="recall"><summary>The extraneous root is not a mistake</summary><p>It is the correct consequence of a legal step. No amount of care in the algebra prevents it, which is why the method has a checking step built in rather than a warning attached.</p></details><details class="recall"><summary>Check against the ORIGINAL equation</summary><p>Substituting into a line partway down verifies your arithmetic from that line onwards, and that is not what is at issue. Only the original distinguishes a solution from an artefact of squaring.</p></details></div>
+      <h3>Summary</h3>
       <p>Isolate the radical and raise both sides to the index. The step is legal and it is not reversible, so it can produce numbers that solve the new equation and not the original. The check is not proofreading &mdash; it is the final step of the method.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Squaring is a one-way implication.</strong> If <span class="math" data-say="A equals b">a = b</span> then <span class="math" data-say="A squared equals b squared">a² = b²</span> &mdash; always. The converse fails: <span class="math" data-say="A squared equals b squared">a² = b²</span> allows <span class="math" data-say="A equals negative b">a = −b</span>. So every solution of the original survives the squaring, but the squared equation may have picked up solutions of <span class="math" data-say="A equals negative b">a = −b</span> as well.</li><li><strong>The extraneous root is not a mistake.</strong> It is the correct consequence of a legal step. No amount of care in the algebra prevents it, which is why the method has a checking step built in rather than a warning attached.</li><li><strong>Check against the ORIGINAL equation.</strong> Substituting into a line partway down verifies your arithmetic from that line onwards, and that is not what is at issue. Only the original distinguishes a solution from an artefact of squaring.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="the square root of the quantity x plus 7, equals x minus 5. x plus 7 equals x squared minus 10 x plus 25, squaring, legal, NOT reversible. x squared minus 11 x plus 18 equals 0, goes to, x equals 2, or, x equals 9. x equals 9 checks, x equals 2 is EXTRANEOUS" tabindex="0" role="region" aria-label="Mathematical notation">√(x + 7) = x − 5
 x + 7 = x² − 10x + 25          squaring: legal, NOT reversible
 x² − 11x + 18 = 0  →  x = 2  or  x = 9
@@ -2871,11 +2915,40 @@ x = 9 checks;   x = 2 is EXTRANEOUS</div><figcaption>Two candidates, one solutio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2943,7 +3016,7 @@ x = 9 checks;   x = 2 is EXTRANEOUS</div><figcaption>Two candidates, one solutio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

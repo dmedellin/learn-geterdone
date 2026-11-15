@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns II: Notification, State and Algorithms, and the Conclusion</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Observer</h1>
       <p class="lesson-lede">One object changes and every object that depends on it hears about it, without the changing object knowing who they are.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Subject and observer</li><li>Push and pull</li><li>Change manager</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;A seemingly innocuous operation on the subject may cause a cascade of updates to observers and their dependent objects.&rdquo; That warning comes from the Consequences of Observer, the first of the five patterns that close Chapter 5, Behavioral Patterns. The pattern's intent, in other words: when one object's state changes, the objects that depend on it should be told and should update themselves, without anyone wiring them together by hand. The book also knows it as Dependents and as Publish-Subscribe.</p><p>The Motivation starts from a familiar problem. Split a system into cooperating classes and you must keep related objects consistent, but tight coupling between them would spoil their reuse. The book's example, summarised: a user interface toolkit keeps application data apart from its presentations, so that a table view and a chart of the same data can each be reused alone, yet a change typed into one shows up at once in the other. Neither view knows the other exists; both depend on the data. The Applicability's cases come down to one: some objects must keep up with another's state, and the one that changes should not have to know which objects they are, or how many.</p><p>The participants are four. The Subject knows its observers, however many, and offers operations to attach and detach them. The Observer declares the updating interface. A ConcreteSubject holds the state its observers care about and notifies them when it changes; a ConcreteObserver keeps a reference to its subject and its own state in step with it. In the collaboration the subject notifies, and each observer may then query the subject to reconcile itself. Even the observer whose request caused the change waits for the notification before updating, and notify need not be called by the subject at all.</p><p>The Consequences open with the benefit: subjects and observers vary independently, and observers can be added without touching the subject or each other. Three more follow. The coupling is abstract and minimal, so a low-level subject can inform a high-level observer without breaking the system's layers. Communication is broadcast: the notification names no receiver, and each observer handles or ignores it. The liability is the one the opening quotation names. Observers cannot see each other, so none can see what a change to the subject will cost in all; loosely kept dependencies give spurious updates that are hard to trace; and the simple protocol says nothing about what changed, so observers may work hard to find out.</p><pre class="codeblock" data-say="line 1, interface seat observer. line 2, void update of seat plan changed, comment, pull ask the plan what it needs. line 4, class seat plan. line 5, private final list of seat observer observers is set to new array list. line 6, private final set of string sold is set to new hash set. line 8, void attach of seat observer o observers dot add of o. line 9, void detach of seat observer o observers dot remove of o. line 11, void sell of string seat. line 12, sold dot add of seat, comment, make the state consistent first. line 13, notify observers, comment, then tell every observer, every time. line 15, boolean is sold of string seat return sold dot contains of seat. line 17, private void notify observers. line 18, for seat observer o in observers o dot update of this" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface SeatObserver {</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;A seemingly innocuous operation on the subject may cause a cascade of updates to observers and their dependent objects.&rdquo; That warning comes from the Consequences of Observer, the first of the five patterns that close Chapter 5, Behavioral Patterns. The pattern's intent, in other words: when one object's state changes, the objects that depend on it should be told and should update themselves, without anyone wiring them together by hand. The book also knows it as Dependents and as Publish-Subscribe.</p><p>The Motivation starts from a familiar problem. Split a system into cooperating classes and you must keep related objects consistent, but tight coupling between them would spoil their reuse. The book's example, summarised: a user interface toolkit keeps application data apart from its presentations, so that a table view and a chart of the same data can each be reused alone, yet a change typed into one shows up at once in the other. Neither view knows the other exists; both depend on the data. The Applicability's cases come down to one: some objects must keep up with another's state, and the one that changes should not have to know which objects they are, or how many.</p><p>The participants are four. The Subject knows its observers, however many, and offers operations to attach and detach them. The Observer declares the updating interface. A ConcreteSubject holds the state its observers care about and notifies them when it changes; a ConcreteObserver keeps a reference to its subject and its own state in step with it. In the collaboration the subject notifies, and each observer may then query the subject to reconcile itself. Even the observer whose request caused the change waits for the notification before updating, and notify need not be called by the subject at all.</p><p>The Consequences open with the benefit: subjects and observers vary independently, and observers can be added without touching the subject or each other. Three more follow. The coupling is abstract and minimal, so a low-level subject can inform a high-level observer without breaking the system's layers. Communication is broadcast: the notification names no receiver, and each observer handles or ignores it. The liability is the one the opening quotation names. Observers cannot see each other, so none can see what a change to the subject will cost in all; loosely kept dependencies give spurious updates that are hard to trace; and the simple protocol says nothing about what changed, so observers may work hard to find out.</p><pre class="codeblock" data-say="line 1, interface seat observer. line 2, void update of seat plan changed, comment, pull ask the plan what it needs. line 4, class seat plan. line 5, private final list of seat observer observers is set to new array list. line 6, private final set of string sold is set to new hash set. line 8, void attach of seat observer o observers dot add of o. line 9, void detach of seat observer o observers dot remove of o. line 11, void sell of string seat. line 12, sold dot add of seat, comment, make the state consistent first. line 13, notify observers, comment, then tell every observer, every time. line 15, boolean is sold of string seat return sold dot contains of seat. line 17, private void notify observers. line 18, for seat observer o in observers o dot update of this" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">interface SeatObserver {</span>
 <span class="cl">    void update(SeatPlan changed);   // pull: ask the plan what it needs</span>
 <span class="cl">}</span>
 <span class="cl">class SeatPlan {</span>
@@ -1464,14 +1508,11 @@
 <span class="cl">    private void notifyObservers() {</span>
 <span class="cl">        for (SeatObserver o : observers) { o.update(this); }</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The sketch above is the lesson's own, in Java: a seat plan that notifies after every sale. It uses the pull model, and it passes itself in the update, which is how the book lets one observer watch several subjects and tell them apart. It also changes its state before it notifies, the self-consistency rule of the Implementation: observers query the subject as they update, so a subclass that notifies through an inherited operation and then changes more state has notified too early. The book's remedy is a template method in the abstract subject that calls the subclass's primitive operation and notifies last (Template Method, two lessons on), and it advises documenting which operations notify.</p><p>The Implementation lists nine issues; the rest, briefly. A subject can hold its observers itself or, when subjects are many and observers few, leave the mapping in a hash table, saving space at some cost in time. Who triggers the update is a real choice: if the subject's state-setting operations notify, clients cannot forget, but a run of changes sends a run of updates; if clients notify when they are done, the needless updates go, and a forgotten call becomes a bug. A deleted subject should tell its observers so they hold no dangling reference. Push makes observers less reusable, since the subject assumes what they need; pull may be inefficient, since they must work out what changed. Observers can register interest in particular aspects of a subject. Smalltalk, without multiple inheritance, puts both interfaces in one class.</p><p>The eighth issue is the one the lab models. When the dependencies are complicated, a ChangeManager can map subjects to observers, define the update strategy and do the updating. The book sketches two: a simple one that updates every observer of each subject, and one for acyclic graphs of dependencies that makes sure an observer of several changed subjects gets one update. It notes that a ChangeManager is an instance of Mediator, the last course's lesson of that name, and usually a Singleton. The Sample Code, in C++, has a clock timer as subject and a digital and an analog clock as observers. Known Uses begins with Smalltalk's Model/View/Controller, and goes on to ET++, the THINK library, InterViews, the Andrew Toolkit and Unidraw.</p><p>Now the lab, on a theatre box office of the lesson's own. Its subjects are seats, prices and the schedule. The seat map watches seats and prices, the kiosk all three, the mailer the schedule, the nightly report seats. Four operations change them: a sale changes seats; a re-pricing changes prices and then seats, since it releases held seats; a new matinee changes schedule, prices and seats; an exchange changes seats twice. On the preset <code>box-office-direct</code> each change notifies at once. The lab counts 8 changes and 21 updates sent, one for every observer of the subject on each change: the seat map receives 7, the kiosk 8, the mailer 1, the report 5. No observer goes unnotified and no subject is unwatched, so those two tiles read <code>0: none</code>.</p><p>The preset <code>box-office-managed</code> runs the same operations through a change manager that sends one update per observer per operation, to each observer of anything the operation changed. It sends 13: 3, 3, 4 and 3. The tile for the other scheme gives the direct figure beside it, and the difference, 8, is the redundant updates the manager saves. Redundant is the book's word and not a fault: the simple manager, it says, is fine when several updates do no harm. The count says how many updates each design sends here. It does not weigh them: a kiosk redraw and a log line count the same.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, subjects, soil rain. line 2, observers, valve, soil, rain, panel, soil, rain, phone, rain. line 3, operations, dawn, soil, rain, shower, rain, rain, soil" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">subjects:    soil rain</span>
-<span class="cl">observers:   valve, soil, rain; panel, soil, rain; phone, rain</span>
-<span class="cl">operations:  dawn, soil, rain; shower, rain, rain, soil</span></code></pre><p>A garden irrigation controller: two subjects, three observers, two operations, the second changing rain twice. By hand, count the changes, the updates sent when each change notifies at once, and the updates a change manager sends when it waits for the end of each operation. Then type the design into the lab to check.</p><p>Observer lets the dependents decide what to do about a change. The next lesson, State, turns to an object whose own behaviour must change with its state.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Observers and their updates</h2></div><p>the updates a change sends, directly and through a change manager</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The sketch above is the lesson's own, in Java: a seat plan that notifies after every sale. It uses the pull model, and it passes itself in the update, which is how the book lets one observer watch several subjects and tell them apart. It also changes its state before it notifies, the self-consistency rule of the Implementation: observers query the subject as they update, so a subclass that notifies through an inherited operation and then changes more state has notified too early. The book's remedy is a template method in the abstract subject that calls the subclass's primitive operation and notifies last (Template Method, two lessons on), and it advises documenting which operations notify.</p><p>The Implementation lists nine issues; the rest, briefly. A subject can hold its observers itself or, when subjects are many and observers few, leave the mapping in a hash table, saving space at some cost in time. Who triggers the update is a real choice: if the subject's state-setting operations notify, clients cannot forget, but a run of changes sends a run of updates; if clients notify when they are done, the needless updates go, and a forgotten call becomes a bug. A deleted subject should tell its observers so they hold no dangling reference. Push makes observers less reusable, since the subject assumes what they need; pull may be inefficient, since they must work out what changed. Observers can register interest in particular aspects of a subject. Smalltalk, without multiple inheritance, puts both interfaces in one class.</p><p>The eighth issue is the one the lab models. When the dependencies are complicated, a ChangeManager can map subjects to observers, define the update strategy and do the updating. The book sketches two: a simple one that updates every observer of each subject, and one for acyclic graphs of dependencies that makes sure an observer of several changed subjects gets one update. It notes that a ChangeManager is an instance of Mediator, the last course's lesson of that name, and usually a Singleton. The Sample Code, in C++, has a clock timer as subject and a digital and an analog clock as observers. Known Uses begins with Smalltalk's Model/View/Controller, and goes on to ET++, the THINK library, InterViews, the Andrew Toolkit and Unidraw.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Observers and their updates</h2></div><p>the updates a change sends, directly and through a change manager</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Observers and their updates</strong><span>the updates a change sends, directly and through a change manager</span></div>
       </div>
@@ -1479,10 +1520,10 @@
       <div class="table-wrap" id="gnoTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gnoTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> An operation may change several subjects, and the same subject more than once; each is a change. Sent directly, each change notifies every observer of its subject, so an observer of two subjects that one operation changes is updated twice. Through a change manager, each observer is updated once for each operation that changed any subject it observes. Redundant updates are direct minus managed, printed under either scheme. Observers and subjects are listed in the order given.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The updates a change sends</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The updates a change sends</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gnoPreset">Worked example</label>
           <select id="gnoPreset"><option value="box-office-direct" selected>A box office: every change notifies at once</option><option value="box-office-managed">The same box office through a change manager</option></select>
@@ -1513,12 +1554,17 @@
           <div class="kpi"><span>Subjects no one observes</span><strong id="gnoUnobserved">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Now the lab, on a theatre box office of the lesson's own. Its subjects are seats, prices and the schedule. The seat map watches seats and prices, the kiosk all three, the mailer the schedule, the nightly report seats. Four operations change them: a sale changes seats; a re-pricing changes prices and then seats, since it releases held seats; a new matinee changes schedule, prices and seats; an exchange changes seats twice. On the preset <code>box-office-direct</code> each change notifies at once. The lab counts 8 changes and 21 updates sent, one for every observer of the subject on each change: the seat map receives 7, the kiosk 8, the mailer 1, the report 5. No observer goes unnotified and no subject is unwatched, so those two tiles read <code>0: none</code>.</p><p>The preset <code>box-office-managed</code> runs the same operations through a change manager that sends one update per observer per operation, to each observer of anything the operation changed. It sends 13: 3, 3, 4 and 3. The tile for the other scheme gives the direct figure beside it, and the difference, 8, is the redundant updates the manager saves. Redundant is the book's word and not a fault: the simple manager, it says, is fine when several updates do no harm. The count says how many updates each design sends here. It does not weigh them: a kiosk redraw and a log line count the same.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, subjects, soil rain. line 2, observers, valve, soil, rain, panel, soil, rain, phone, rain. line 3, operations, dawn, soil, rain, shower, rain, rain, soil" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">subjects:    soil rain</span>
+<span class="cl">observers:   valve, soil, rain; panel, soil, rain; phone, rain</span>
+<span class="cl">operations:  dawn, soil, rain; shower, rain, rain, soil</span></code></pre><p>A garden irrigation controller: two subjects, three observers, two operations, the second changing rain twice. By hand, count the changes, the updates sent when each change notifies at once, and the updates a change manager sends when it waits for the end of each operation. Then type the design into the lab to check.</p><p>Observer lets the dependents decide what to do about a change. The next lesson, State, turns to an object whose own behaviour must change with its state.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the updates a change sends</h2></div><p>Four steps, the last of them on a design of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>List subjects and observers</h3><p>Write each subject, and each observer with the subjects it watches. Count each subject's observers.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the operations</h3><p>For each operation a client performs, write the subjects it changes, in order, repeating a subject it changes twice.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count both ways</h3><p>Direct: for each change, add the observers of the subject changed. Managed: for each operation, count the distinct observers of anything it changed. The difference is what the change manager saves.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a design of your own</h3><p>Pick a model in code you know with listeners or subscribers. Count the updates one busy operation sends, and say who calls notify there and whether it pushes or pulls.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the updates a change sends</h2>
+      <p class="lead-in">Four steps, the last of them on a design of your own.</p>
+      <ol class="key-ideas method"><li><strong>List subjects and observers.</strong> Write each subject, and each observer with the subjects it watches. Count each subject's observers.</li><li><strong>List the operations.</strong> For each operation a client performs, write the subjects it changes, in order, repeating a subject it changes twice.</li><li><strong>Count both ways.</strong> Direct: for each change, add the observers of the subject changed. Managed: for each operation, count the distinct observers of anything it changed. The difference is what the change manager saves.</li><li><strong>Do it on a design of your own.</strong> Pick a model in code you know with listeners or subscribers. Count the updates one busy operation sends, and say who calls notify there and whether it pushes or pulls.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1539,17 +1585,16 @@ managed: 3 + 3 + 4 + 3 = 13
 saved: 21 − 13 = 8</div><p>Only the mailer's figure is the same under both schemes: it watches one subject, which one operation changes once.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a change to a subject as cheap because the subject does so little</strong><span>The subject only loops over a list, but every observer on it does its own work, and an observer may be a subject in turn; Consequences names the cascade and the spurious updates of ill-kept dependencies. On the lesson's illustration four operations send 21 updates; the lab counts them and cannot follow an observer that notifies others.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Notifying before the subject is consistent</strong><span>Observers query the subject while they update. A subclass operation that calls an inherited operation which notifies, and then changes more state, has told its observers about a state that never existed. The book's remedy is a template method that notifies last.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading redundant updates as a defect</strong><span>The updates a change manager saves are redundant in the book's sense, more than one per operation, and the book says the simple manager is fine when that does no harm. Whether 8 saved updates matter depends on what each costs, which the count does not say.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what a change sends to its observers.</strong><p>Given subjects, observers and operations, count the updates sent directly and through a change manager, and name the implementation choice each figure depends on.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts updates, one each, and stops at the first observers: it does not model an observer that is also a subject, so the cascade the book warns of is something to look for in your own code, not something these figures show.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a change to a subject as cheap because the subject does so little</strong><span>The subject only loops over a list, but every observer on it does its own work, and an observer may be a subject in turn; Consequences names the cascade and the spurious updates of ill-kept dependencies. On the lesson's illustration four operations send 21 updates; the lab counts them and cannot follow an observer that notifies others.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Notifying before the subject is consistent</strong><span>Observers query the subject while they update. A subclass operation that calls an inherited operation which notifies, and then changes more state, has told its observers about a state that never existed. The book's remedy is a template method that notifies last.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading redundant updates as a defect</strong><span>The updates a change manager saves are redundant in the book's sense, more than one per operation, and the book says the simple manager is fine when that does no harm. Whether 8 saved updates matter depends on what each costs, which the count does not say.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count what a change sends to its observers.</strong><p>Given subjects, observers and operations, count the updates sent directly and through a change manager, and name the implementation choice each figure depends on.</p></div></div><div class="note"><strong>Note:</strong> The lab counts updates, one each, and stops at the first observers: it does not model an observer that is also a subject, so the cascade the book warns of is something to look for in your own code, not something these figures show.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Subject and observer</summary><p>A subject holds state other objects depend on and keeps a list of them; an observer is any object that wants to hear when that state changes. The subject sees its observers only through one small updating interface, so it never needs their concrete classes.</p></details><details class="recall"><summary>Push and pull</summary><p>Two ends of a range for what a notification carries. Under push the subject sends details of the change, whether wanted or not; under pull it sends next to nothing, and each observer asks the subject for what it needs.</p></details><details class="recall"><summary>Change manager</summary><p>An object placed between subjects and observers that keeps the mapping between them, owns the update strategy, and does the notifying. One that waits until an operation has finished changing several subjects can send each observer a single update instead of one per change.</p></details></div>
+      <h3>Summary</h3>
       <p>Observer sets up a one-to-many dependency: when a subject changes, each of its observers is told and brings itself up to date. Read the pattern, then count the updates a box office's four operations send to four observers when every change notifies at once, and when a change manager waits for the end of each operation.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Subject and observer.</strong> A subject holds state other objects depend on and keeps a list of them; an observer is any object that wants to hear when that state changes. The subject sees its observers only through one small updating interface, so it never needs their concrete classes.</li><li><strong>Push and pull.</strong> Two ends of a range for what a notification carries. Under push the subject sends details of the change, whether wanted or not; under pull it sends next to nothing, and each observer asks the subject for what it needs.</li><li><strong>Change manager.</strong> An object placed between subjects and observers that keeps the mapping between them, owns the update strategy, and does the notifying. One that waits until an operation has finished changing several subjects can send each observer a single update instead of one per change.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a subject knows only the observer interface. a change can reach every observer. decide who calls notify. push assumes, pull asks. a change manager sends one per operation. say which operations notify" tabindex="0" role="region" aria-label="Mathematical notation">a subject knows only the Observer interface
 a change can reach every observer
 decide who calls notify
@@ -2327,11 +2372,40 @@ say which operations notify</div><figcaption>Observer in six lines</figcaption><
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2399,7 +2473,7 @@ say which operations notify</div><figcaption>Observer in six lines</figcaption><
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

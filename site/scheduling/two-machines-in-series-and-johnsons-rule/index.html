@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Scheduling</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; More than one machine</p>
       <h1>Two Machines in Series and Johnson&#x27;s Rule</h1>
       <p class="lesson-lede">Every job goes through machine one then machine two; the makespan is now worth optimising, and it is machine two&#x27;s idle time that the rule attacks.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The first machine never stops; the second one waits</li><li>Minimising the makespan is minimising idle time on the second machine</li><li>The rule has two halves and they do different jobs</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two machines, one recursion, and the rule that empties the gaps</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; The two-machine flow shop</span><p><span class="math" data-say="n">n</span> jobs; job <span class="math" data-say="j">j</span> needs <span class="math" data-say="p 1 sub j">p1_j</span> on machine one and then <span class="math" data-say="p 2 sub j">p2_j</span> on machine two, in that order. Both machines run one job at a time, nothing is interrupted, everything is available at time zero, and every job visits the machines in the same order &mdash; which is what makes it a <strong>flow shop</strong>.</p><p>The same order is used on both machines. A schedule that resequenced between the machines could in principle do better on more than two machines; on two it cannot, which is why one permutation is the whole decision here.</p></div><p>Write the order as <span class="math" data-say="k equals 1, 2, and so on, n">k = 1, 2, …, n</span>. Machine one finishes job <span class="math" data-say="k">k</span> at <span class="math" data-say="C 1 times k equals C 1 times the quantity k minus 1, plus p 1 times k">C1(k) = C1(k−1) + p1(k)</span>, with <span class="math" data-say="C 1 times 0 equals 0">C1(0) = 0</span>, so it is the running total. Machine two cannot start job <span class="math" data-say="k">k</span> until both that job has left machine one and machine two has finished job <span class="math" data-say="k minus 1">k−1</span>:</p><div class="mathblock" data-say="C 1 times k equals C 1 times the quantity k minus 1, plus p 1 times k. C 2 times k equals the max of C 1 times k and C 2 times the quantity k minus 1, plus p 2 times k. makespan equals C 2 times n. idle on machine 2 equals C 2 times n minus sum p 2, and sum p 2 does not move" tabindex="0" role="region" aria-label="Mathematical notation">  C1(k) = C1(k−1) + p1(k)
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two machines, one recursion, and the rule that empties the gaps</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; The two-machine flow shop</span><p><span class="math" data-say="n">n</span> jobs; job <span class="math" data-say="j">j</span> needs <span class="math" data-say="p 1 sub j">p1_j</span> on machine one and then <span class="math" data-say="p 2 sub j">p2_j</span> on machine two, in that order. Both machines run one job at a time, nothing is interrupted, everything is available at time zero, and every job visits the machines in the same order &mdash; which is what makes it a <strong>flow shop</strong>.</p><p>The same order is used on both machines. A schedule that resequenced between the machines could in principle do better on more than two machines; on two it cannot, which is why one permutation is the whole decision here.</p></div><p>Write the order as <span class="math" data-say="k equals 1, 2, and so on, n">k = 1, 2, …, n</span>. Machine one finishes job <span class="math" data-say="k">k</span> at <span class="math" data-say="C 1 times k equals C 1 times the quantity k minus 1, plus p 1 times k">C1(k) = C1(k−1) + p1(k)</span>, with <span class="math" data-say="C 1 times 0 equals 0">C1(0) = 0</span>, so it is the running total. Machine two cannot start job <span class="math" data-say="k">k</span> until both that job has left machine one and machine two has finished job <span class="math" data-say="k minus 1">k−1</span>:</p><div class="mathblock" data-say="C 1 times k equals C 1 times the quantity k minus 1, plus p 1 times k. C 2 times k equals the max of C 1 times k and C 2 times the quantity k minus 1, plus p 2 times k. makespan equals C 2 times n. idle on machine 2 equals C 2 times n minus sum p 2, and sum p 2 does not move" tabindex="0" role="region" aria-label="Mathematical notation">  C1(k) = C1(k−1) + p1(k)
   C2(k) = max( C1(k), C2(k−1) ) + p2(k)
 
   makespan = C2(n)
@@ -1410,12 +1454,11 @@ TYPED     A B C D E
    M2     A[5,7]  B[7,13]  C[15,22]  D[22,30]  E[30,34]
    makespan 34     idle on M2 = 5 + 2 = 7          work on M2 = 27
 
-  best of all 120 orders  30,  attained by 2 of them — Johnson&#x27;s is one</div><p>The two schedules do the same <span class="math" data-say="27">27</span> hours of work on machine two and differ only in how long that machine spent waiting. In the typed order it waits five hours at the start, because <span class="math" data-say="A">A</span> occupies machine one for five hours before anything can be handed over. Johnson puts <span class="math" data-say="B">B</span> first, which occupies machine one for one hour, and machine two starts at <span class="math" data-say="1">1</span> instead of at <span class="math" data-say="5">5</span>.</p><div class="example"><span class="label">Example &middot; The starved second machine, on purpose</span><p>The lab has a preset built to make this visible: four jobs where the typed order begins with an eight-hour job on machine one that needs one hour on machine two. Machine two stands idle for the whole eight hours, and the typed order finishes at <span class="math" data-say="35">35</span> with <span class="math" data-say="18">18</span> hours of idle time against <span class="math" data-say="17">17</span> hours of work.</p><p>Johnson's rule turns it round completely: <span class="math" data-say="D C B A">D C B A</span>, finishing at <span class="math" data-say="24">24</span> with <span class="math" data-say="7">7</span> hours of idle. Same jobs, same work, eleven hours saved, and the enumeration confirms that <span class="math" data-say="24">24</span> is the best any of the twenty-four orders can do.</p></div><h3>Checking the picture before believing the number</h3><p>A recursion that produces a number is easy to get subtly wrong, so the lab reads the drawing back. It checks that machine one runs with no gaps, that machine two never overlaps itself, that no job reaches machine two before it has left machine one, and that the makespan taken off the last bar is the makespan the recursion reported. Then it checks <span class="math" data-say="work plus idle equals makespan">work + idle = makespan</span> exactly, which is the identity the rule is built on.</p><p>It also runs every one of the <span class="math" data-say="n factorial">n!</span> orders through the same two-machine clock and reports the best, the count and how many orders tie for it. On the lab's instance two orders attain <span class="math" data-say="30">30</span>, and Johnson's is one of them. Reporting the tie count matters: naming a single order and implying it is the unique optimum is a claim nobody made.</p><h3>Where this stops</h3><p>Three machines in series is a different problem and this rule does not extend to it. There is a special case &mdash; when the middle machine is dominated by one of the others &mdash; in which a two-machine reduction works, and the general case is hard in the sense &ldquo;Algorithms and Complexity&rdquo; gave the word. The lab offers two machines and says so rather than offering a third with a rule that is not a theorem.</p><p>The tie case is worth one line. When <span class="math" data-say="p 1 equals p 2">p1 = p2</span> for every job, as in the lab's third preset, the front group is empty and the rule sorts everything into the back group by <span class="math" data-say="p 2">p2</span> descending. That order attains the optimum, and so does every other order: all twenty-four tie at <span class="math" data-say="21">21</span>. The rule is not doing any work there, and the panel's tie count says so.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Two machines in series: Johnson&#x27;s rule</h2></div><p>Machine 2&#x27;s idle time is the whole of the difference between one order and another</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  best of all 120 orders  30,  attained by 2 of them — Johnson&#x27;s is one</div><p>The two schedules do the same <span class="math" data-say="27">27</span> hours of work on machine two and differ only in how long that machine spent waiting. In the typed order it waits five hours at the start, because <span class="math" data-say="A">A</span> occupies machine one for five hours before anything can be handed over. Johnson puts <span class="math" data-say="B">B</span> first, which occupies machine one for one hour, and machine two starts at <span class="math" data-say="1">1</span> instead of at <span class="math" data-say="5">5</span>.</p><div class="example"><span class="label">Example &middot; The starved second machine, on purpose</span><p>The lab has a preset built to make this visible: four jobs where the typed order begins with an eight-hour job on machine one that needs one hour on machine two. Machine two stands idle for the whole eight hours, and the typed order finishes at <span class="math" data-say="35">35</span> with <span class="math" data-say="18">18</span> hours of idle time against <span class="math" data-say="17">17</span> hours of work.</p><p>Johnson's rule turns it round completely: <span class="math" data-say="D C B A">D C B A</span>, finishing at <span class="math" data-say="24">24</span> with <span class="math" data-say="7">7</span> hours of idle. Same jobs, same work, eleven hours saved, and the enumeration confirms that <span class="math" data-say="24">24</span> is the best any of the twenty-four orders can do.</p></div><h3>Checking the picture before believing the number</h3><p>A recursion that produces a number is easy to get subtly wrong, so the lab reads the drawing back. It checks that machine one runs with no gaps, that machine two never overlaps itself, that no job reaches machine two before it has left machine one, and that the makespan taken off the last bar is the makespan the recursion reported. Then it checks <span class="math" data-say="work plus idle equals makespan">work + idle = makespan</span> exactly, which is the identity the rule is built on.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Two machines in series: Johnson&#x27;s rule</h2></div><p>Machine 2&#x27;s idle time is the whole of the difference between one order and another</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Two machines in series: Johnson's rule</strong><span>the makespan is the second machine's finishing time, and idle time on it is the whole cost</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>machine 1</span><span class="tone-purple"><i class="legend-swatch"></i>machine 2</span><span class="tone-green"><i class="legend-swatch"></i>Johnson's order</span><span class="tone-red"><i class="legend-swatch"></i>the order you typed</span></div>
@@ -1424,10 +1467,10 @@ TYPED     A B C D E
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fsSplit"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="fsCompare"></table></div>
       <div class="status-banner" id="fsStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two machines, your order against the rule&#x27;s, and the idle time between them</h3>
-          <p>Both schedules are drawn as two tracks, and both are read back off the drawing before any figure is printed: machine one with no gaps, machine two never overlapping itself, and no job on machine two before it left machine one. The panel reports the idle time on machine two for each order beside the makespan, and checks the rule against every one of the orders there are.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two machines, your order against the rule&#x27;s, and the idle time between them</h3>
+            <p>Both schedules are drawn as two tracks, and both are read back off the drawing before any figure is printed: machine one with no gaps, machine two never overlapping itself, and no job on machine two before it left machine one. The panel reports the idle time on machine two for each order beside the makespan, and checks the rule against every one of the orders there are.</p>
         <div class="field">
           <label for="fsPreset">Worked example</label>
           <select id="fsPreset"><option value="johnson" selected>five jobs through two machines</option><option value="starved">four jobs, the first eight hours on machine 1</option><option value="balanced">every job the same length on both</option></select>
@@ -1449,12 +1492,15 @@ TYPED     A B C D E
           <div class="kpi"><span>Does the rule attain the best?</span><strong id="fsVerdict">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="fsHint" style="margin:0;">Machine 1 never stops: it is the machine 2 timeline that has gaps, and the makespan is the sum of every second-machine time plus the idle in between. So minimising the makespan and minimising idle time on machine 2 are the same problem, which is what the rule is doing when it puts the quick-on-1 jobs first.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>It also runs every one of the <span class="math" data-say="n factorial">n!</span> orders through the same two-machine clock and reports the best, the count and how many orders tie for it. On the lab's instance two orders attain <span class="math" data-say="30">30</span>, and Johnson's is one of them. Reporting the tie count matters: naming a single order and implying it is the unique optimum is a claim nobody made.</p><h3>Where this stops</h3><p>Three machines in series is a different problem and this rule does not extend to it. There is a special case &mdash; when the middle machine is dominated by one of the others &mdash; in which a two-machine reduction works, and the general case is hard in the sense &ldquo;Algorithms and Complexity&rdquo; gave the word. The lab offers two machines and says so rather than offering a third with a rule that is not a theorem.</p><p>The tie case is worth one line. When <span class="math" data-say="p 1 equals p 2">p1 = p2</span> for every job, as in the lab's third preset, the front group is empty and the rule sorts everything into the back group by <span class="math" data-say="p 2">p2</span> descending. That order attains the optimum, and so does every other order: all twenty-four tie at <span class="math" data-say="21">21</span>. The rule is not doing any work there, and the panel's tie count says so.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Sequencing a two-machine flow shop</h2></div><p>Four steps, and the second is the one that decides which half a job belongs to.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write each job as its two times, in machine order</h3><p><span class="math" data-say="p 1, p 2">p1:p2</span>, machine one first. Getting the two columns the wrong way round produces a valid schedule for a problem you do not have, and nothing in the output looks wrong &mdash; the makespan will simply be larger than it should be.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Split the jobs on <span class="math" data-say="p 1 is less than p 2">p1 &lt; p2</span></h3><p>Strictly quicker on machine one goes to the front group; everything else, including the ties, goes to the back group. The split is the decision; the two sorts that follow are bookkeeping.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Sort the front by <span class="math" data-say="p 1">p1</span> ascending and the back by <span class="math" data-say="p 2">p2</span> descending</h3><p>Two different keys for the two groups, and they are not the same sort run twice. The front wants the smallest first-machine time first, to start machine two as early as possible; the back wants the largest second-machine time first, so the tail at the end is short.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Build both timelines and check the identity</h3><p>Run the recursion, then add up the second machine's processing and its idle time and check that they come to the makespan. If they do not, the recursion has a gap in it that the drawing will show at once, and the lab refuses the schedule rather than printing the number.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Sequencing a two-machine flow shop</h2>
+      <p class="lead-in">Four steps, and the second is the one that decides which half a job belongs to.</p>
+      <ol class="key-ideas method"><li><strong>Write each job as its two times, in machine order.</strong> <span class="math" data-say="p 1, p 2">p1:p2</span>, machine one first. Getting the two columns the wrong way round produces a valid schedule for a problem you do not have, and nothing in the output looks wrong &mdash; the makespan will simply be larger than it should be.</li><li><strong>Split the jobs on <span class="math" data-say="p 1 is less than p 2">p1 &lt; p2</span>.</strong> Strictly quicker on machine one goes to the front group; everything else, including the ties, goes to the back group. The split is the decision; the two sorts that follow are bookkeeping.</li><li><strong>Sort the front by <span class="math" data-say="p 1">p1</span> ascending and the back by <span class="math" data-say="p 2">p2</span> descending.</strong> Two different keys for the two groups, and they are not the same sort run twice. The front wants the smallest first-machine time first, to start machine two as early as possible; the back wants the largest second-machine time first, so the tail at the end is short.</li><li><strong>Build both timelines and check the identity.</strong> Run the recursion, then add up the second machine's processing and its idle time and check that they come to the makespan. If they do not, the recursion has a gap in it that the drawing will show at once, and the lab refuses the schedule rather than printing the number.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1489,17 +1535,16 @@ THE TYPED ORDER
    the best of all 120 orders is 30, and 2 of them attain it</div><p>The two idle blocks in the typed order are the whole of the four-hour gap, and they have different causes. The five hours at the start are machine two waiting for the first job to exist; the two hours in the middle are machine two having finished <span class="math" data-say="B">B</span> at <span class="math" data-say="13">13</span> while <span class="math" data-say="C">C</span> is still on machine one until <span class="math" data-say="15">15</span>. Johnson's split attacks the first with the front group and the second with the back group.</p><p>Machine one is worth checking too. In both schedules it runs from <span class="math" data-say="0">0</span> to <span class="math" data-say="28">28</span> without a break and finishes before machine two does. That is always true here, and it is why no amount of cleverness about machine one helps: its timeline is fixed up to the order and it is never the thing that ends the schedule.</p><p>For a rehearsal, use the preset where every job takes the same time on both machines. The supplied first move is that no job satisfies <span class="math" data-say="p 1 is less than p 2">p1 < p2</span>, so the front group is empty. Predict what the rule returns and what the enumeration says about how many orders tie for the best makespan, before the panel tells you. The answer is that all twenty-four tie, which means the rule is choosing arbitrarily and the tie count is the only honest way to say so.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sorting the whole list by one key</strong><span>The rule is a split and then two <em>different</em> sorts: <span class="math" data-say="p 1">p1</span> ascending in the front group, <span class="math" data-say="p 2">p2</span> descending in the back. Sorting everything by <span class="math" data-say="p 1">p1</span> ascending gives <span class="math" data-say="B D A C E">B D A C E</span> on the lab's instance, which is not Johnson's order and does not attain <span class="math" data-say="30">30</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trying to improve machine one</strong><span>It runs from zero to the end of its work with no gaps in every order, and it always finishes before machine two. Effort spent smoothing it is effort spent on a timeline that is not deciding anything; the gaps that matter are all on the second machine.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Carrying the makespan intuition over from one machine</strong><span>On one machine the makespan is a constant and there is nothing to optimise. On two it ranges from <span class="math" data-say="30">30</span> to well above <span class="math" data-say="34">34</span> on the lab's five jobs, and it is the only objective in this lesson. The constant was a consequence of one machine never idling, and a second machine breaks it.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build both timelines by hand and account for the makespan as work plus idle.</strong><p>You should be able to run the two-machine recursion with its <span class="math" data-say="max">max</span>, split the jobs on <span class="math" data-say="p 1 is less than p 2">p1 < p2</span>, sort the two groups on their own keys, draw both machines' timelines, list the idle intervals on machine two, check that the idle time plus <span class="math" data-say="sum p 2">sum p2</span> equals the makespan, and compare the rule against a typed order on the same jobs.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The rule worked because the two machines are visited in the same order by every job, which made one permutation the whole decision. Let two jobs visit the machines in <em>opposite</em> orders and there is no permutation to choose: each shared machine has its own sequencing question, and the questions interact. &ldquo;The Job Shop and Disjunctive Orientations&rdquo; is what is left when the exchange argument runs out &mdash; but first, the same jobs on machines that run in parallel rather than in series, where a rule survives and arrives with a guarantee rather than a proof of optimality.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Sorting the whole list by one key</strong><span>The rule is a split and then two <em>different</em> sorts: <span class="math" data-say="p 1">p1</span> ascending in the front group, <span class="math" data-say="p 2">p2</span> descending in the back. Sorting everything by <span class="math" data-say="p 1">p1</span> ascending gives <span class="math" data-say="B D A C E">B D A C E</span> on the lab's instance, which is not Johnson's order and does not attain <span class="math" data-say="30">30</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trying to improve machine one</strong><span>It runs from zero to the end of its work with no gaps in every order, and it always finishes before machine two. Effort spent smoothing it is effort spent on a timeline that is not deciding anything; the gaps that matter are all on the second machine.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Carrying the makespan intuition over from one machine</strong><span>On one machine the makespan is a constant and there is nothing to optimise. On two it ranges from <span class="math" data-say="30">30</span> to well above <span class="math" data-say="34">34</span> on the lab's five jobs, and it is the only objective in this lesson. The constant was a consequence of one machine never idling, and a second machine breaks it.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can build both timelines by hand and account for the makespan as work plus idle.</strong><p>You should be able to run the two-machine recursion with its <span class="math" data-say="max">max</span>, split the jobs on <span class="math" data-say="p 1 is less than p 2">p1 < p2</span>, sort the two groups on their own keys, draw both machines' timelines, list the idle intervals on machine two, check that the idle time plus <span class="math" data-say="sum p 2">sum p2</span> equals the makespan, and compare the rule against a typed order on the same jobs.</p></div></div><div class="note"><strong>Note:</strong> The rule worked because the two machines are visited in the same order by every job, which made one permutation the whole decision. Let two jobs visit the machines in <em>opposite</em> orders and there is no permutation to choose: each shared machine has its own sequencing question, and the questions interact. &ldquo;The Job Shop and Disjunctive Orientations&rdquo; is what is left when the exchange argument runs out &mdash; but first, the same jobs on machines that run in parallel rather than in series, where a rule survives and arrives with a guarantee rather than a proof of optimality.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The first machine never stops; the second one waits</summary><p>Machine one runs the jobs back to back from time zero, so its timeline has no gaps and its finish times do not depend on anything but the order. Machine two can only start a job once machine one has released it <em>and</em> machine two is free, so its timeline has gaps in it. Every interesting quantity here is about those gaps.</p></details><details class="recall"><summary>Minimising the makespan is minimising idle time on the second machine</summary><p>The project ends when machine two finishes its last job, and machine two's timeline is made of exactly two things: the processing it does, which is <span class="math" data-say="sum p 2">sum p2</span> whatever the order, and the time it spends waiting. So <span class="math" data-say="makespan equals sum p 2 plus idle">makespan = sum p2 + idle</span>, the first term is a constant, and the whole of the optimisation is the second. On the lab's five jobs the work is <span class="math" data-say="27">27</span> in every order and the idle time is <span class="math" data-say="3">3</span> under the rule and <span class="math" data-say="7">7</span> in the typed order &mdash; which is the whole of the difference between <span class="math" data-say="30">30</span> and <span class="math" data-say="34">34</span>.</p></details><details class="recall"><summary>The rule has two halves and they do different jobs</summary><p>A job quicker on machine one is a job that gets machine two started early, so those jobs go to the front, shortest on machine one first, to start machine two as soon as possible. A job quicker on machine two leaves machine one free early, so those go to the back, longest on machine two first, so that the longest tail is not the thing left at the end. Both halves are minimising idle time, at the two ends where idle time happens.</p></details></div>
+      <h3>Summary</h3>
       <p>Two machines in series, every job visiting them in the same order. The first machine never stops, so the makespan is the work on the second machine plus the idle time in between &mdash; and the work does not depend on the order, so minimising the makespan <em>is</em> minimising idle time on the second machine. Johnson's rule does it exactly: jobs quicker on the first machine go to the front, shortest first, and the rest go to the back, longest on the second machine first.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The first machine never stops; the second one waits.</strong> Machine one runs the jobs back to back from time zero, so its timeline has no gaps and its finish times do not depend on anything but the order. Machine two can only start a job once machine one has released it <em>and</em> machine two is free, so its timeline has gaps in it. Every interesting quantity here is about those gaps.</li><li><strong>Minimising the makespan is minimising idle time on the second machine.</strong> The project ends when machine two finishes its last job, and machine two's timeline is made of exactly two things: the processing it does, which is <span class="math" data-say="sum p 2">sum p2</span> whatever the order, and the time it spends waiting. So <span class="math" data-say="makespan equals sum p 2 plus idle">makespan = sum p2 + idle</span>, the first term is a constant, and the whole of the optimisation is the second. On the lab's five jobs the work is <span class="math" data-say="27">27</span> in every order and the idle time is <span class="math" data-say="3">3</span> under the rule and <span class="math" data-say="7">7</span> in the typed order &mdash; which is the whole of the difference between <span class="math" data-say="30">30</span> and <span class="math" data-say="34">34</span>.</li><li><strong>The rule has two halves and they do different jobs.</strong> A job quicker on machine one is a job that gets machine two started early, so those jobs go to the front, shortest on machine one first, to start machine two as soon as possible. A job quicker on machine two leaves machine one free early, so those go to the back, longest on machine two first, so that the longest tail is not the thing left at the end. Both halves are minimising idle time, at the two ends where idle time happens.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="two machines in series, every job M 1 then M 2, no preemption, all ready at 0. C 2 times k equals the max of C 1 times k and C 2 times the quantity k minus 1, plus p 2 times k, the second machine waits or works. makespan equals work on M 2 plus idle on M 2, the work is order-independent. Johnson, p 1 is less than p 2 to the FRONT by p 1 ascending, the rest to the BACK by p 2 descending. A 5, 2, B 1, 6, C 9, 7, D 3, 8, E 10, 4, Johnson B D C E A, makespan 30. typed order A B C D E, 34, and M 2 idles 7 where Johnson idles 3" tabindex="0" role="region" aria-label="Mathematical notation">two machines in series, every job M1 then M2, no preemption, all ready at 0
 C2(k) = max(C1(k), C2(k−1)) + p2(k)          the second machine waits or works
 makespan = (work on M2) + (idle on M2);  the work is order-independent
@@ -3058,11 +3103,40 @@ typed order A B C D E: 34, and M2 idles 7 where Johnson idles 3</div><figcaption
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3130,7 +3204,7 @@ typed order A B C D E: 34, and M2 idles 7 where Johnson idles 3</div><figcaption
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

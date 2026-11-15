@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,41 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Talking to the Database</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Data Source Architectural Patterns</p>
       <h1>Row Data Gateway, and Reading in Data</h1>
       <p class="lesson-lede">A Row Data Gateway is an object per row, loaded by finders; Chapter 3’s rule for finders is to bring back many rows in one query, because every query pays the wait.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Row Data Gateway</li><li>Finder</li><li>Latency</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern, the narrative&#x27;s rules of thumb, then the arithmetic</h2>
-      <article class="prose reading"><p>&ldquo;It's usually better to use one query that brings back unnecessary rows than to issue 50 individual queries.&rdquo; That is Chapter 3's advice in Reading in Data, and the lab in this lesson puts numbers on it. First, though, the pattern whose objects those queries load: Chapter 10's Row Data Gateway. Read both in your own copy first.</p><p>Row Data Gateway, read as a tool, is an object that looks exactly like one record: each column becomes a field, the gateway converts the database's types to the language's, and every detail of reaching the database is behind its interface. Fowler uses it most with a Transaction Script, where it factors the database code out so that several scripts can share it. With a Domain Model he does not: a simple mapping wants an Active Record, which does the same job with one layer fewer, and a complex one a Data Mapper. A gateway under a Domain Model on a large scale gives three representations of the data, in the domain, the gateway and the database, and that, he says, is one too many.</p><p>Its open question is where the finders go, and Chapter 10 and Reading in Data give one answer. A table-based class can hold its finders beside its inserts and updates; a row-based one cannot, since there is no row object until the find has run. Static finders on the row class work, but a static method cannot be swapped for another, so a test cannot replace the database with a stand-in, a Service Stub. So Fowler prefers separate finder objects, one finder class for each table beside its gateway class, each method wrapping one SELECT and returning row objects.</p><p>The lesson's snippet keeps the finder static for brevity, which is the choice Reading in Data warns against; a finder object would hold the same method without <span class="math" data-say="static">static</span>. <span class="math" data-say="order row">OrderRow</span> holds an order's id and status, and <span class="math" data-say="find">find</span> runs one keyed SELECT and builds the row, or returns <span class="math" data-say="null">null</span> when there is none.</p><pre class="codeblock" data-say="line 1, comment, A gateway for one row of the orders table, and its finder.. line 2, class order row. line 3, final long id. line 4, string status. line 6, order row of long id, string status. line 7, this dot id is set to id. line 8, this dot status is set to status. line 11, static order row find of connection db, long id throws SQL exception. line 12, prepared statement s is set to db dot prepare statement. line 13, SELECT status FROM orders WHERE id ?. line 14, s dot set long of 1, id. line 15, result set rs is set to s dot execute query. line 16, return rs dot next, if so, new order row of id, rs dot get string of 1, otherwise, null" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A gateway for one row of the orders table, and its finder.</span>
-<span class="cl">class OrderRow {</span>
-<span class="cl">    final long id;</span>
-<span class="cl">    String status;</span>
-<span class="cl"></span>
-<span class="cl">    OrderRow(long id, String status) {</span>
-<span class="cl">        this.id = id;</span>
-<span class="cl">        this.status = status;</span>
-<span class="cl">    }</span>
-<span class="cl"></span>
-<span class="cl">    static OrderRow find(Connection db, long id) throws SQLException {</span>
-<span class="cl">        PreparedStatement s = db.prepareStatement(</span>
-<span class="cl">            &quot;SELECT status FROM orders WHERE id = ?&quot;);</span>
-<span class="cl">        s.setLong(1, id);</span>
-<span class="cl">        ResultSet rs = s.executeQuery();</span>
-<span class="cl">        return rs.next() ? new OrderRow(id, rs.getString(1)) : null;</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Reading in Data adds a warning that is easy to miss: a finder reads the database, not what is in memory. Add a line to an order in memory, then run a finder for the order's lines, and the new line is not among them. Fowler's advice is to do queries at the beginning. Then come his rules of thumb on speed. Pull back many rows at once; never query one table repeatedly to get several rows; it is almost always better to bring back too much than too little, though too many rows locked under pessimistic concurrency is a cost of its own.</p><p>His illustration is the quotation's. You need 50 people you can name by primary key, but the only query you can write brings back 200, from which further logic picks the 50; that one query is usually better than 50. Joins help the same way, pulling several tables back in one query, though he notes that databases are optimised for up to three or four joins a query and suffer beyond that. And he ends the section with his own caveat: profile with your own database and data, because for every rule of thumb he has heard of surprising exceptions.</p><p>Now the arithmetic. The lab takes the rows wanted, the rows the broad query returns, a batch size, a latency a statement and a time a row. Keyed finds are one statement a row wanted, each paying the latency and its row; the broad query is one statement paying the latency once and every row it returns; finds in batches send the keys <span class="math" data-say="batch">batch</span> at a time, each batch one statement. That third strategy is the lab's, not the book's. Its seven tiles are the keyed statements and time, the broad query's rows and time, the batched statements and time, and the rows the broad query returns that nobody wanted.</p><p>In <code>fifty-or-one</code> the 50 and the 200 are the book's; the 5 ms latency, 0.1 ms a row and batches of 10 are illustrative. Keyed finds make 50 statements and take 255 ms. The broad query returns 200 rows, 150 of them unneeded, in 25 ms. Batched finds make 5 statements and take 30 ms. Fifty keyed finds take about ten times as long as one query that returns four times the rows, because forty-nine of their fifty waits are the cost.</p><p>In <code>local-database</code> the latency falls to 0.2 ms, as if the database sat on the same machine, and the advice reverses on its own figures: keyed finds take 15 ms, the broad query 101/5 = 20.20 ms, and batches 6 ms. With a short wait, the 150 rows nobody wanted cost more than the 49 extra statements. Fowler's advice is to measure, and the lab shows why: on these figures, the rule of thumb holds only where a statement's wait is large against a row's cost.</p><h3>Exercise</h3><ul><li>Rows wanted: 30. Rows the broad query returns: 600.</li><li>Batches of 15 keys. Latency 4 ms a statement; 0.05 ms a row.</li></ul><p>Compute by hand the statements and the time of keyed finds, of the broad query and of finds in batches, and the rows the broad query returns that are not wanted. Say which is fastest here, and whether the broad query still beats keyed finds. Check your figures in the lab afterwards.</p><p>A Row Data Gateway holds no business rules. The next lesson, Active Record, adds them, and reads the one sentence Chapter 10 uses to tell the two apart.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Loading from the database</h2></div><p>a find a row, one broad query, or batches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern, the narrative&#x27;s rules of thumb, then the arithmetic</h2><div class="prose reading"><p>&ldquo;It's usually better to use one query that brings back unnecessary rows than to issue 50 individual queries.&rdquo; That is Chapter 3's advice in Reading in Data, and the lab in this lesson puts numbers on it. First, though, the pattern whose objects those queries load: Chapter 10's Row Data Gateway. Read both in your own copy first.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Loading from the database</h2></div><p>a find a row, one broad query, or batches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Loading from the database</strong><span>a find a row, one broad query, or batches</span></div>
       </div>
@@ -1475,10 +1501,10 @@
       <div class="table-wrap" id="ldTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ldTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> One find a row: a statement for each wanted row. One broad query: one statement returning every row it matches. Batches: ⌈wanted / batch⌉ statements returning the wanted rows. Each statement costs the latency, each row its time.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Fifty keyed finds, one broad query, or batches</h3>
-          <p>The arithmetic of the figures the lesson states (marked with their source). Keyed finds are one statement a row wanted; the broad query is one statement returning every row it returns; finds in batches send the keys a batch at a time, a strategy the lab adds and the book does not discuss. Each statement pays the latency, and each row its time. Figures: 50 rows wanted of 200 returned are the book's illustration in Chapter 3, Reading in Data; the latency, row time and batch size are illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Fifty keyed finds, one broad query, or batches</h3>
+            <p>The arithmetic of the figures the lesson states (marked with their source). Keyed finds are one statement a row wanted; the broad query is one statement returning every row it returns; finds in batches send the keys a batch at a time, a strategy the lab adds and the book does not discuss. Each statement pays the latency, and each row its time. Figures: 50 rows wanted of 200 returned are the book's illustration in Chapter 3, Reading in Data; the latency, row time and batch size are illustrative.</p>
         <div class="field">
           <label for="ldPreset">Worked example</label>
           <select id="ldPreset"><option value="fifty-or-one" selected>Fifty of two hundred, 5 ms a statement</option><option value="local-database">The same rows, 0.2 ms a statement</option></select>
@@ -1513,12 +1539,32 @@
           <div class="kpi"><span>Rows the broad query returns that are not wanted</span><strong id="ldUnneeded">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Row Data Gateway, read as a tool, is an object that looks exactly like one record: each column becomes a field, the gateway converts the database's types to the language's, and every detail of reaching the database is behind its interface. Fowler uses it most with a Transaction Script, where it factors the database code out so that several scripts can share it. With a Domain Model he does not: a simple mapping wants an Active Record, which does the same job with one layer fewer, and a complex one a Data Mapper. A gateway under a Domain Model on a large scale gives three representations of the data, in the domain, the gateway and the database, and that, he says, is one too many.</p><p>Its open question is where the finders go, and Chapter 10 and Reading in Data give one answer. A table-based class can hold its finders beside its inserts and updates; a row-based one cannot, since there is no row object until the find has run. Static finders on the row class work, but a static method cannot be swapped for another, so a test cannot replace the database with a stand-in, a Service Stub. So Fowler prefers separate finder objects, one finder class for each table beside its gateway class, each method wrapping one SELECT and returning row objects.</p><p>The lesson's snippet keeps the finder static for brevity, which is the choice Reading in Data warns against; a finder object would hold the same method without <span class="math" data-say="static">static</span>. <span class="math" data-say="order row">OrderRow</span> holds an order's id and status, and <span class="math" data-say="find">find</span> runs one keyed SELECT and builds the row, or returns <span class="math" data-say="null">null</span> when there is none.</p><pre class="codeblock" data-say="line 1, comment, A gateway for one row of the orders table, and its finder.. line 2, class order row. line 3, final long id. line 4, string status. line 6, order row of long id, string status. line 7, this dot id is set to id. line 8, this dot status is set to status. line 11, static order row find of connection db, long id throws SQL exception. line 12, prepared statement s is set to db dot prepare statement. line 13, SELECT status FROM orders WHERE id ?. line 14, s dot set long of 1, id. line 15, result set rs is set to s dot execute query. line 16, return rs dot next, if so, new order row of id, rs dot get string of 1, otherwise, null" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// A gateway for one row of the orders table, and its finder.</span>
+<span class="cl">class OrderRow {</span>
+<span class="cl">    final long id;</span>
+<span class="cl">    String status;</span>
+<span class="cl"></span>
+<span class="cl">    OrderRow(long id, String status) {</span>
+<span class="cl">        this.id = id;</span>
+<span class="cl">        this.status = status;</span>
+<span class="cl">    }</span>
+<span class="cl"></span>
+<span class="cl">    static OrderRow find(Connection db, long id) throws SQLException {</span>
+<span class="cl">        PreparedStatement s = db.prepareStatement(</span>
+<span class="cl">            &quot;SELECT status FROM orders WHERE id = ?&quot;);</span>
+<span class="cl">        s.setLong(1, id);</span>
+<span class="cl">        ResultSet rs = s.executeQuery();</span>
+<span class="cl">        return rs.next() ? new OrderRow(id, rs.getString(1)) : null;</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>Reading in Data adds a warning that is easy to miss: a finder reads the database, not what is in memory. Add a line to an order in memory, then run a finder for the order's lines, and the new line is not among them. Fowler's advice is to do queries at the beginning. Then come his rules of thumb on speed. Pull back many rows at once; never query one table repeatedly to get several rows; it is almost always better to bring back too much than too little, though too many rows locked under pessimistic concurrency is a cost of its own.</p><p>His illustration is the quotation's. You need 50 people you can name by primary key, but the only query you can write brings back 200, from which further logic picks the 50; that one query is usually better than 50. Joins help the same way, pulling several tables back in one query, though he notes that databases are optimised for up to three or four joins a query and suffer beyond that. And he ends the section with his own caveat: profile with your own database and data, because for every rule of thumb he has heard of surprising exceptions.</p><p>Now the arithmetic. The lab takes the rows wanted, the rows the broad query returns, a batch size, a latency a statement and a time a row. Keyed finds are one statement a row wanted, each paying the latency and its row; the broad query is one statement paying the latency once and every row it returns; finds in batches send the keys <span class="math" data-say="batch">batch</span> at a time, each batch one statement. That third strategy is the lab's, not the book's. Its seven tiles are the keyed statements and time, the broad query's rows and time, the batched statements and time, and the rows the broad query returns that nobody wanted.</p><p>In <code>fifty-or-one</code> the 50 and the 200 are the book's; the 5 ms latency, 0.1 ms a row and batches of 10 are illustrative. Keyed finds make 50 statements and take 255 ms. The broad query returns 200 rows, 150 of them unneeded, in 25 ms. Batched finds make 5 statements and take 30 ms. Fifty keyed finds take about ten times as long as one query that returns four times the rows, because forty-nine of their fifty waits are the cost.</p><p>In <code>local-database</code> the latency falls to 0.2 ms, as if the database sat on the same machine, and the advice reverses on its own figures: keyed finds take 15 ms, the broad query 101/5 = 20.20 ms, and batches 6 ms. With a short wait, the 150 rows nobody wanted cost more than the 49 extra statements. Fowler's advice is to measure, and the lab shows why: on these figures, the rule of thumb holds only where a statement's wait is large against a row's cost.</p><h3>Exercise</h3><ul><li>Rows wanted: 30. Rows the broad query returns: 600.</li><li>Batches of 15 keys. Latency 4 ms a statement; 0.05 ms a row.</li></ul><p>Compute by hand the statements and the time of keyed finds, of the broad query and of finds in batches, and the rows the broad query returns that are not wanted. Say which is fastest here, and whether the broad query still beats keyed finds. Check your figures in the lab afterwards.</p><p>A Row Data Gateway holds no business rules. The next lesson, Active Record, adds them, and reads the one sentence Chapter 10 uses to tell the two apart.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Timing three ways to read rows</h2></div><p>Four steps, the last of them on a page of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Time the keyed finds</h3><p>Multiply the rows wanted by the latency plus one row's time. That many statements, each paying the wait.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Time the broad query</h3><p>Add the latency once to the rows it returns times a row's time, and subtract the rows wanted from the rows returned for the rows nobody needs.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Time the batches</h3><p>Divide the rows wanted by the batch size, rounding up, for the statements; multiply by the latency and add the rows wanted times a row's time.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count it on a page you know</h3><p>Take one page in a system you know that loads a list. From a log or a profiler, count the queries it issues and the rows each returns, and write whether it reads the list in one query or one row at a time.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Timing three ways to read rows</h2>
+      <p class="lead-in">Four steps, the last of them on a page of your own.</p>
+      <ol class="key-ideas method"><li><strong>Time the keyed finds.</strong> Multiply the rows wanted by the latency plus one row's time. That many statements, each paying the wait.</li><li><strong>Time the broad query.</strong> Add the latency once to the rows it returns times a row's time, and subtract the rows wanted from the rows returned for the rows nobody needs.</li><li><strong>Time the batches.</strong> Divide the rows wanted by the batch size, rounding up, for the statements; multiply by the latency and add the rows wanted times a row's time.</li><li><strong>Count it on a page you know.</strong> Take one page in a system you know that loads a list. From a log or a profiler, count the queries it issues and the rows each returns, and write whether it reads the list in one query or one row at a time.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1537,17 +1583,16 @@ batched: 5 × 5 + 50 × 0.1, which is 30 ms
 unneeded rows: 200 − 50, which is 150</div><p>Of the keyed finds' 255 ms, 250 are waiting. The broad query waits once and pays for 150 rows nobody needs, which at 0.1 ms each costs 15 ms: far less than 49 more waits.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that fetching only the rows you need is always cheaper</strong><span>Every statement pays the latency, whatever it returns. On the lesson's first preset, fifty keyed finds take 255 ms and one query that returns four times the rows takes 25 ms, about a tenth of the time: the extra 150 rows cost 15 ms, and the 49 extra waits 245. Reading in Data's advice, to pull back too much rather than too little, is that arithmetic in words.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a static finder is as good as a finder object</strong><span>It finds the same rows, but Reading in Data's point is substitutability: a static method cannot be replaced, so a test cannot swap the database for a Service Stub. The lesson's snippet uses a static finder only for brevity. Moving the method onto an object of its own, one finder class a table, is what the section recommends.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the rule of thumb for a measurement</strong><span>The second preset reverses the advice on its own figures: at 0.2 ms a statement, keyed finds beat the broad query. Fowler says as much at the end of the section: profile your application with your own database and data, because every rule of thumb has its surprising exceptions.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can time three ways of reading rows by hand.</strong><p>Given the rows wanted, the rows a broad query returns, a batch size, a latency and a time a row, compute the keyed, broad and batched times and the unneeded rows, and say which way the figures point.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's model is a fixed wait a statement plus a fixed time a row. A real database also caches, locks and plans, and a broad query's extra rows can cost more than their transfer; none of that is in the figures. The 50 and the 200 are the book's illustration; the timings are the lesson's.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking that fetching only the rows you need is always cheaper</strong><span>Every statement pays the latency, whatever it returns. On the lesson's first preset, fifty keyed finds take 255 ms and one query that returns four times the rows takes 25 ms, about a tenth of the time: the extra 150 rows cost 15 ms, and the 49 extra waits 245. Reading in Data's advice, to pull back too much rather than too little, is that arithmetic in words.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking a static finder is as good as a finder object</strong><span>It finds the same rows, but Reading in Data's point is substitutability: a static method cannot be replaced, so a test cannot swap the database for a Service Stub. The lesson's snippet uses a static finder only for brevity. Moving the method onto an object of its own, one finder class a table, is what the section recommends.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the rule of thumb for a measurement</strong><span>The second preset reverses the advice on its own figures: at 0.2 ms a statement, keyed finds beat the broad query. Fowler says as much at the end of the section: profile your application with your own database and data, because every rule of thumb has its surprising exceptions.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can time three ways of reading rows by hand.</strong><p>Given the rows wanted, the rows a broad query returns, a batch size, a latency and a time a row, compute the keyed, broad and batched times and the unneeded rows, and say which way the figures point.</p></div></div><div class="note"><strong>Note:</strong> The lab's model is a fixed wait a statement plus a fixed time a row. A real database also caches, locks and plans, and a broad query's extra rows can cost more than their transfer; none of that is in the figures. The 50 and the 200 are the book's illustration; the timings are the lesson's.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Row Data Gateway</summary><p>An object that mimics one record exactly, with one field for each column, and holds the SQL to read and write it. It does any simple type conversion and nothing else: no business rules.</p></details><details class="recall"><summary>Finder</summary><p>A method that wraps a SELECT in an ordinary method call, such as <span class="math" data-say="find of id">find(id)</span> or a find for every order of a customer. Reading in Data prefers finders on objects of their own to static methods on the row class.</p></details><details class="recall"><summary>Latency</summary><p>The wait a statement pays to reach the database and come back, whatever it returns. In the lab it is a fixed time a statement, added to a time for each row; both are the lesson's figures, not a measured network.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 10's Row Data Gateway gives each row an object that holds its fields and its SQL, loaded by finders. Chapter 3's Reading in Data says where the finders go and how they should read: rather one query with rows you do not need than fifty that each fetch one. Time fifty keyed finds against one broad query and a batched one, on a slow link and on a fast one.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Row Data Gateway.</strong> An object that mimics one record exactly, with one field for each column, and holds the SQL to read and write it. It does any simple type conversion and nothing else: no business rules.</li><li><strong>Finder.</strong> A method that wraps a SELECT in an ordinary method call, such as <span class="math" data-say="find of id">find(id)</span> or a find for every order of a customer. Reading in Data prefers finders on objects of their own to static methods on the row class.</li><li><strong>Latency.</strong> The wait a statement pays to reach the database and come back, whatever it returns. In the lab it is a fixed time a statement, added to a time for each row; both are the lesson's figures, not a measured network.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a row data gateway, an object a row. a finder wraps one select in a method. keyed, wanted times the quantity latency plus row time. broad, latency plus broad times row time. batched, batches times latency, plus wanted times row time. profile with your own database" tabindex="0" role="region" aria-label="Mathematical notation">a row data gateway: an object a row
 a finder wraps one SELECT in a method
 keyed: wanted·(latency + row time)
@@ -2217,11 +2262,40 @@ profile with your own database</div><figcaption>Row Data Gateway and Reading in 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2289,7 +2363,7 @@ profile with your own database</div><figcaption>Row Data Gateway and Reading in 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

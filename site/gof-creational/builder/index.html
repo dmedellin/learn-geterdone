@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Creational Patterns</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 3 · Creational Patterns</p>
       <h1>Builder</h1>
       <p class="lesson-lede">A director that knows how a complex object is put together, driving a builder that decides what each part becomes, so one process yields many representations.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Builder</li><li>Director</li><li>Representation</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;Separate the construction of a complex object from its representation so that the same construction process can create different representations.&rdquo; That is the intent of Builder, the second pattern of Chapter 3, Creational Patterns, and an object creational pattern. Read it in your own copy first. The lesson reads it as a tool, then counts the classes a design needs when every pairing of a construction process with a representation is a class of its own, and when the two are split into directors and builders.</p><p>The book's motivating example is a reader for RTF, the Rich Text Format, which must convert documents into an open-ended number of other formats: plain ASCII text, TeX, an editable text widget. The answer is to give the reader a converter object. As the reader parses, it hands each token it recognises, plain text or a control word, to the converter, and each converter subclass decides what that token becomes in its own format; the ASCII converter, for one, ignores all but plain text. In the pattern's terms the converters are builders and the reader is the director, and the parsing is written once for every output there will ever be.</p><p>Builder applies, the authors say, when the algorithm that makes a complex object should not depend on its parts or on how they are put together, and when one construction process has to yield more than one representation. Its participants are the Builder, an abstract interface with an operation per part; the ConcreteBuilders, each of which assembles its own representation, keeps track of it and offers a way to retrieve it; the Director, which constructs through the Builder interface; and the Product. The collaboration is a short script: the client makes a director and gives it the builder it wants, the director calls the builder whenever a part should be built, the builder adds the part, and the client takes the finished product from the builder, not from the director.</p><pre class="codeblock" data-say="line 1, comment, Every part a recipe can have the defaults do nothing.. line 2, interface recipe builder. line 3, default void title of string text. line 4, default void ingredient of string name, string amount. line 5, default void step of string text. line 8, comment, A builder that keeps only what a shopping trip needs.. line 9, final class shopping list builder implements recipe builder. line 10, private final list of string items is set to new array list. line 12, at override. line 13, public void ingredient of string name, string amount. line 14, items dot add of amount plus a string of one space plus name. line 17, list of string result return items" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Every part a recipe can have; the defaults do nothing.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the count</h2><div class="prose reading"><p>&ldquo;Separate the construction of a complex object from its representation so that the same construction process can create different representations.&rdquo; That is the intent of Builder, the second pattern of Chapter 3, Creational Patterns, and an object creational pattern. Read it in your own copy first. The lesson reads it as a tool, then counts the classes a design needs when every pairing of a construction process with a representation is a class of its own, and when the two are split into directors and builders.</p><p>The book's motivating example is a reader for RTF, the Rich Text Format, which must convert documents into an open-ended number of other formats: plain ASCII text, TeX, an editable text widget. The answer is to give the reader a converter object. As the reader parses, it hands each token it recognises, plain text or a control word, to the converter, and each converter subclass decides what that token becomes in its own format; the ASCII converter, for one, ignores all but plain text. In the pattern's terms the converters are builders and the reader is the director, and the parsing is written once for every output there will ever be.</p><p>Builder applies, the authors say, when the algorithm that makes a complex object should not depend on its parts or on how they are put together, and when one construction process has to yield more than one representation. Its participants are the Builder, an abstract interface with an operation per part; the ConcreteBuilders, each of which assembles its own representation, keeps track of it and offers a way to retrieve it; the Director, which constructs through the Builder interface; and the Product. The collaboration is a short script: the client makes a director and gives it the builder it wants, the director calls the builder whenever a part should be built, the builder adds the part, and the client takes the finished product from the builder, not from the director.</p><pre class="codeblock" data-say="line 1, comment, Every part a recipe can have the defaults do nothing.. line 2, interface recipe builder. line 3, default void title of string text. line 4, default void ingredient of string name, string amount. line 5, default void step of string text. line 8, comment, A builder that keeps only what a shopping trip needs.. line 9, final class shopping list builder implements recipe builder. line 10, private final list of string items is set to new array list. line 12, at override. line 13, public void ingredient of string name, string amount. line 14, items dot add of amount plus a string of one space plus name. line 17, list of string result return items" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Every part a recipe can have; the defaults do nothing.</span>
 <span class="cl">interface RecipeBuilder {</span>
 <span class="cl">    default void title(String text) { }</span>
 <span class="cl">    default void ingredient(String name, String amount) { }</span>
@@ -1476,12 +1520,11 @@
 <span class="cl">            }</span>
 <span class="cl">        }</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>The authors give three consequences. A product's internal representation can vary, because the director sees only the abstract builder: a new representation is a new builder. Construction and representation are kept in separate code, each concrete builder holding everything needed to make one kind of product, so different directors can reuse the same builders; the book imagines a reader for SGML driving the very converters written for RTF. And construction is under finer control, since the product is made a step at a time under the director and collected only when finished, so the builder's interface follows the construction process more closely than the other creational patterns' interfaces do.</p><p>Implementation adds three points. The builder's interface must be general enough for every concrete builder, and the key question is how parts are assembled: usually appending each result to the product is enough, but sometimes a builder must reach parts it made earlier, as when a parse tree is built from the leaves up and the builder returns child nodes to the director, which passes them back for their parent. Products often get no common abstract class, because representations as unlike as plain text and an interactive widget have little to share, and the client, which chose the builder, knows what it will get. And in C++ the build operations are left as empty methods rather than pure virtual ones, so a builder overrides only the parts it cares about; the sketch does the same with Java 8's default methods.</p><p>The Sample Code turns the maze routine into a builder interface that can make a maze, numbered rooms and doors between them, a standard builder that makes real mazes, and a counting builder that makes nothing at all and only tallies the parts it would have made; read it in the book. The known uses are the RTF converter of ET++; three builders in Smalltalk-80, the compiler's parser driving a program-node builder, the class builder, and the byte-code stream that assembles a compiled method; and the Service Configurator of the Adaptive Communications Environment, whose configuration-language parser is the director. The related patterns: Abstract Factory also makes complex objects, but it is about families and returns each product at once, where Builder assembles one product in steps and returns it at the end; and what a builder builds is often a Composite.</p><p>Now the lab, on a recipe book rather than a text converter. The app reads recipes from three sources, a markup file, a web form and a scanned card, and makes four representations of each: a printed page, a shopping list, a spoken walkthrough for the kitchen and an index card. If every pairing of a source with an output were its own class, MarkupToPage, FormToShoppingList and so on, the preset <code>recipe-formats</code> counts <span data-say="3 times 4 equals 12">3 × 4 = 12</span> combinations and 12 + 1 = 13 classes with their abstract base. Split into an abstract reader with 3 directors and an abstract builder with 4 concrete builders, it is (3 + 1) + (4 + 1) = 9 classes, a ratio of 13/9, about 1.4 times. Each reader holds 1 reference, to its builder. The lab counts readers and builders only; the products, a page or a list of strings, are the same in either design.</p><p>The same preset adds one output, a nutrition card. As pairings it costs 3 new classes, one per source, taking the design from 13 to 16; as a builder it costs 1, from 9 to 10. The preset <code>recipe-new-source</code> adds a source instead, an import from a website, which costs 4 pairings, 13 to 17, against 1 new director, 9 to 10: the second consequence in numbers, a new director reusing every builder already written. The preset <code>recipe-one-source</code> is the fair counterweight. With a single markup reader and the four outputs there are 4 combinations, 4 + 1 = 5 classes as pairings and (1 + 1) + (4 + 1) = 7 split, a ratio of 5/7: when only one side varies, the split adds classes, and what it buys is room for the other side to vary later.</p><h3>Exercise</h3><ul><li>A quiz app exports its quizzes. It reads them from two sources, <span class="math" data-say="sheet">sheet</span> and <span class="math" data-say="editor">editor</span>, and builds three representations: <span class="math" data-say="web minus page">web-page</span>, <span class="math" data-say="print minus sheet">print-sheet</span> and <span class="math" data-say="answer minus key">answer-key</span>.</li><li>Next term it must also build <span class="math" data-say="audio">audio</span>, a read-aloud version.</li></ul><p>By hand, count the combinations, the classes with one class per pairing and with directors and builders, and the classes <code>audio</code> adds to each design. Then check in the lab, with the aspects in the order reader, builder.</p><p>A builder is an object handed to the director. The next lesson, Factory Method, reads the chapter's one class creational pattern, in which a class leaves the choice of what to create to its own subclasses.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>The authors give three consequences. A product's internal representation can vary, because the director sees only the abstract builder: a new representation is a new builder. Construction and representation are kept in separate code, each concrete builder holding everything needed to make one kind of product, so different directors can reuse the same builders; the book imagines a reader for SGML driving the very converters written for RTF. And construction is under finer control, since the product is made a step at a time under the director and collected only when finished, so the builder's interface follows the construction process more closely than the other creational patterns' interfaces do.</p><p>Implementation adds three points. The builder's interface must be general enough for every concrete builder, and the key question is how parts are assembled: usually appending each result to the product is enough, but sometimes a builder must reach parts it made earlier, as when a parse tree is built from the leaves up and the builder returns child nodes to the director, which passes them back for their parent. Products often get no common abstract class, because representations as unlike as plain text and an interactive widget have little to share, and the client, which chose the builder, knows what it will get. And in C++ the build operations are left as empty methods rather than pure virtual ones, so a builder overrides only the parts it cares about; the sketch does the same with Java 8's default methods.</p><p>The Sample Code turns the maze routine into a builder interface that can make a maze, numbered rooms and doors between them, a standard builder that makes real mazes, and a counting builder that makes nothing at all and only tallies the parts it would have made; read it in the book. The known uses are the RTF converter of ET++; three builders in Smalltalk-80, the compiler's parser driving a program-node builder, the class builder, and the byte-code stream that assembles a compiled method; and the Service Configurator of the Adaptive Communications Environment, whose configuration-language parser is the director. The related patterns: Abstract Factory also makes complex objects, but it is about families and returns each product at once, where Builder assembles one product in steps and returns it at the end; and what a builder builds is often a Composite.</p><p>Now the lab, on a recipe book rather than a text converter. The app reads recipes from three sources, a markup file, a web form and a scanned card, and makes four representations of each: a printed page, a shopping list, a spoken walkthrough for the kitchen and an index card. If every pairing of a source with an output were its own class, MarkupToPage, FormToShoppingList and so on, the preset <code>recipe-formats</code> counts <span data-say="3 times 4 equals 12">3 × 4 = 12</span> combinations and 12 + 1 = 13 classes with their abstract base. Split into an abstract reader with 3 directors and an abstract builder with 4 concrete builders, it is (3 + 1) + (4 + 1) = 9 classes, a ratio of 13/9, about 1.4 times. Each reader holds 1 reference, to its builder. The lab counts readers and builders only; the products, a page or a list of strings, are the same in either design.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Classes</h2></div><p>every combination a subclass, or one hierarchy per aspect</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Classes</strong><span>every combination a subclass, or one hierarchy per aspect</span></div>
       </div>
@@ -1489,10 +1532,10 @@
       <div class="table-wrap" id="gclTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gclTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one aspect that varies, then its variants (2 to 4 aspects, 1 to 8 variants each); every name is a class and is used once. Combinations = the product of the variant counts. With one subclass per combination the design has that product + 1 classes (one abstract base). With one hierarchy per aspect, joined by composition, each aspect has 1 abstract class + 1 concrete class per variant, so the design has the sum of the variant counts + the number of aspects; the client holds the first aspect's abstract class, and each of its objects holds one reference per other aspect. The ratio is the first count over the second. One new variant of the added aspect adds the product of the other aspects' counts under subclassing and 1 class under composition; neither design edits an existing class for it.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Pairings against directors and builders</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Pairings against directors and builders</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gclPreset">Worked example</label>
           <select id="gclPreset"><option value="recipe-formats" selected>A recipe book: three sources, four outputs, one more output</option><option value="recipe-new-source">The same recipe book gaining a fourth source</option><option value="recipe-one-source">One source, four outputs</option></select>
@@ -1515,12 +1558,15 @@
           <div class="kpi"><span>A new variant: classes added by composition</span><strong id="gclAddCompose">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The same preset adds one output, a nutrition card. As pairings it costs 3 new classes, one per source, taking the design from 13 to 16; as a builder it costs 1, from 9 to 10. The preset <code>recipe-new-source</code> adds a source instead, an import from a website, which costs 4 pairings, 13 to 17, against 1 new director, 9 to 10: the second consequence in numbers, a new director reusing every builder already written. The preset <code>recipe-one-source</code> is the fair counterweight. With a single markup reader and the four outputs there are 4 combinations, 4 + 1 = 5 classes as pairings and (1 + 1) + (4 + 1) = 7 split, a ratio of 5/7: when only one side varies, the split adds classes, and what it buys is room for the other side to vary later.</p><h3>Exercise</h3><ul><li>A quiz app exports its quizzes. It reads them from two sources, <span class="math" data-say="sheet">sheet</span> and <span class="math" data-say="editor">editor</span>, and builds three representations: <span class="math" data-say="web minus page">web-page</span>, <span class="math" data-say="print minus sheet">print-sheet</span> and <span class="math" data-say="answer minus key">answer-key</span>.</li><li>Next term it must also build <span class="math" data-say="audio">audio</span>, a read-aloud version.</li></ul><p>By hand, count the combinations, the classes with one class per pairing and with directors and builders, and the classes <code>audio</code> adds to each design. Then check in the lab, with the aspects in the order reader, builder.</p><p>A builder is an object handed to the director. The next lesson, Factory Method, reads the chapter's one class creational pattern, in which a class leaves the choice of what to create to its own subclasses.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Splitting a process from its outputs</h2></div><p>Four steps, the last of them on code of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the construction process</h3><p>Name the code that walks an input or a plan and decides which part comes next. That is a director, and there may be several.</p></article><article class="card concept-card"><div class="icon">2</div><h3>List the parts and the representations</h3><p>Write one builder operation per part the process can announce, and name each representation you need. An output that ignores most parts overrides few operations.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count both designs</h3><p>Pairings give directors <span data-say="times">×</span> builders + 1 classes; the split gives (directors + 1) + (builders + 1). Add one of each side and see which design grows by a product and which by one class.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on your own code</h3><p>Find an exporter, a report generator or a parser in a system you know. Count its inputs and its outputs, type them into the lab as reader and builder, and say whether its code today is written per pairing or split.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Splitting a process from its outputs</h2>
+      <p class="lead-in">Four steps, the last of them on code of your own.</p>
+      <ol class="key-ideas method"><li><strong>Find the construction process.</strong> Name the code that walks an input or a plan and decides which part comes next. That is a director, and there may be several.</li><li><strong>List the parts and the representations.</strong> Write one builder operation per part the process can announce, and name each representation you need. An output that ignores most parts overrides few operations.</li><li><strong>Count both designs.</strong> Pairings give directors <span data-say="times">×</span> builders + 1 classes; the split gives (directors + 1) + (builders + 1). Add one of each side and see which design grows by a product and which by one class.</li><li><strong>Do it on your own code.</strong> Find an exporter, a report generator or a parser in a system you know. Count its inputs and its outputs, type them into the lab as reader and builder, and say whether its code today is written per pairing or split.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1539,17 +1585,16 @@ a nutrition card as pairings: 3 classes
 as a builder: 1 class, 9 → 10</div><p>Neither design edits an existing class for the new output, as the rules say; the difference is how many new classes repeat the parsing of each source.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Putting the construction process inside the builder</strong><span>If each builder walks the input itself, every new output repeats the parsing, which is the one-class-per-pairing design under another name; on the recipe book the lab counts 3 new classes for one output that way against 1. The director owns the process and the builder only answers its calls, which is what lets the book's SGML reader reuse the RTF converters.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every builder to implement every part</strong><span>The abstract builder's operations do nothing by default, so a builder overrides only the parts it represents; the book's ASCII converter, like the shopping list here, ignores most of what the director announces.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Asking the director for the result</strong><span>The director knows the steps, not the product's type. The client chose the builder, so the client asks the builder for what it built, and different builders may return wholly unrelated types.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can split a construction process from its representations and count both designs.</strong><p>Given the sources and outputs of a design, state the classes with one class per pairing and with directors and builders, what a new source and a new output each add, and the three consequences the authors list.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts directors and builders from the sources and outputs you state, and leaves the products out. It cannot tell whether your outputs really come from one construction process, or whether a second source will ever arrive; with a single source the split costs classes, and the case for it rests on what is expected to vary.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Putting the construction process inside the builder</strong><span>If each builder walks the input itself, every new output repeats the parsing, which is the one-class-per-pairing design under another name; on the recipe book the lab counts 3 new classes for one output that way against 1. The director owns the process and the builder only answers its calls, which is what lets the book's SGML reader reuse the RTF converters.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting every builder to implement every part</strong><span>The abstract builder's operations do nothing by default, so a builder overrides only the parts it represents; the book's ASCII converter, like the shopping list here, ignores most of what the director announces.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Asking the director for the result</strong><span>The director knows the steps, not the product's type. The client chose the builder, so the client asks the builder for what it built, and different builders may return wholly unrelated types.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can split a construction process from its representations and count both designs.</strong><p>Given the sources and outputs of a design, state the classes with one class per pairing and with directors and builders, what a new source and a new output each add, and the three consequences the authors list.</p></div></div><div class="note"><strong>Note:</strong> The lab counts directors and builders from the sources and outputs you state, and leaves the products out. It cannot tell whether your outputs really come from one construction process, or whether a second source will ever arrive; with a single source the split costs classes, and the case for it rests on what is expected to vary.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Builder</summary><p>An object with an operation for each part a complex product can have. A concrete builder decides how each part is represented, and keeps the product it is assembling until it is asked for it.</p></details><details class="recall"><summary>Director</summary><p>The object that knows the construction process: it walks its input and tells the builder, step by step, which part comes next. It never learns what the builder makes of those calls.</p></details><details class="recall"><summary>Representation</summary><p>What the construction produces: a page, a shopping list, a spoken walkthrough. Different builders give different representations of the same input, and their products need not share a parent class.</p></details></div>
+      <h3>Summary</h3>
       <p>Builder separates the steps that construct a complex object from the representation those steps produce. Read the pattern, then count the classes a recipe book needs when every source and output pairing is a class of its own, and when sources are directors and outputs are builders.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Builder.</strong> An object with an operation for each part a complex product can have. A concrete builder decides how each part is represented, and keeps the product it is assembling until it is asked for it.</li><li><strong>Director.</strong> The object that knows the construction process: it walks its input and tells the builder, step by step, which part comes next. It never learns what the builder makes of those calls.</li><li><strong>Representation.</strong> What the construction produces: a page, a shopping list, a spoken walkthrough. Different builders give different representations of the same input, and their products need not share a parent class.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a director knows the steps. a builder knows the representation. one process, many representations. take the product from the builder. empty defaults, override what you need. A new output is one builder" tabindex="0" role="region" aria-label="Mathematical notation">a director knows the steps
 a builder knows the representation
 one process, many representations
@@ -2325,11 +2370,40 @@ a new output is one builder</div><figcaption>Builder in six lines</figcaption></
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2397,7 +2471,7 @@ a new output is one builder</div><figcaption>Builder in six lines</figcaption></
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

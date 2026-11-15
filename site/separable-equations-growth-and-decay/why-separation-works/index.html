@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Separable Equations, Growth and Decay</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Separating variables</p>
       <h1>Why Separation Works</h1>
       <p class="lesson-lede">Integrating <span data-say="g of y times y prime">g(y)·y′</span> with respect to t is legitimate because the chain rule says G(y(t)) has exactly that derivative.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The chain rule gives the derivative of G(y(t))</li><li>Reading it backwards integrates the left side</li><li>The differentials are shorthand, not quantities</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The method as a consequence of the chain rule</h2>
-      <article class="prose reading"><p>&ldquo;The Chain Rule&rdquo; in Rates of Change and the Derivative was checked exactly on polynomials: if <span class="math" data-say="u equals y of t">u = y(t)</span> and <span class="math" data-say="F">F</span> is a function of <span class="math" data-say="u">u</span>, the rate of <span class="math" data-say="F of y of t">F(y(t))</span> is <span class="math" data-say="F prime of y">F′(y)</span> times <span class="math" data-say="y prime">y′</span>. Here <span class="math" data-say="F">F</span> is an antiderivative <span class="math" data-say="G">G</span>, so <span class="math" data-say="G prime equals g">G′ = g</span>, and the rate is <span class="math" data-say="g of y times y prime">g(y)·y′</span>. Nothing about <span class="math" data-say="y">y</span> is assumed beyond having a derivative.</p><div class="thm"><span class="label">Theorem &middot; Separation</span><p>Suppose <span class="math" data-say="G prime equals g">G′ = g</span> and <span class="math" data-say="H prime equals h">H′ = h</span>, and <span class="math" data-say="y">y</span> is differentiable on an interval. Then <span class="math" data-say="g of y times y prime equals h of t">g(y)·y′ = h(t)</span> on that interval exactly when <span class="math" data-say="G of y of t minus H of t">G(y(t)) − H(t)</span> is constant on it.</p></div><div class="proof"><p>By the chain rule, the rate of <span class="math" data-say="G of y of t minus H of t">G(y(t)) − H(t)</span> is <span class="math" data-say="g of y times y prime minus h of t">g(y)·y′ − h(t)</span>.</p><p>That is zero for every <span class="math" data-say="t">t</span> in the interval exactly when the equation holds. A function whose rate is zero on an interval does not change on it &mdash; the fact behind the constant of integration in Accumulation and the Integral &mdash; so <span class="math" data-say="G of y of t minus H of t equals C">G(y(t)) − H(t) = C</span>, one number.</p><p><span class="qed">&#9633;</span></p></div><p>So the relation <span class="math" data-say="G of y equals H of t plus C">G(y) = H(t) + C</span> is not a heuristic. Along a solution it holds with some constant, and the proof also runs the other way: a differentiable <span class="math" data-say="y">y</span> that satisfies the relation satisfies the equation, wherever <span class="math" data-say="g of y">g(y)</span> makes sense. That second direction is what a check uses.</p><h3>Checking by differentiating the relation</h3><p>Take the relation <span class="math" data-say="y squared equals t squared plus 4">y² = t² + 4</span>. Differentiate both sides with respect to <span class="math" data-say="t">t</span>, remembering that <span class="math" data-say="y">y</span> depends on <span class="math" data-say="t">t</span>: the left side gives <span class="math" data-say="2 y times y prime">2y·y′</span> by the chain rule, the right side gives <span class="math" data-say="2 t">2t</span>. So <span class="math" data-say="2 y times y prime equals 2 t">2y·y′ = 2t</span>, which is <span class="math" data-say="y times y prime equals t">y·y′ = t</span>, the equation we started with.</p><div class="mathblock" data-say="y squared over 2 equals t squared over 2 plus 2. d over d t of the left side, y times y prime. d over d t of the right side, t. y times y prime equals t, the equation again. explicit form, y equals the square root of the quantity t squared plus 4. y prime equals t over the square root of the quantity t squared plus 4. y times y prime equals the square root of the quantity t squared plus 4, times t over the square root of the quantity t squared plus 4, equals t" tabindex="0" role="region" aria-label="Mathematical notation">y²/2 = t²/2 + 2
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The method as a consequence of the chain rule</h2><div class="prose reading"><p>&ldquo;The Chain Rule&rdquo; in Rates of Change and the Derivative was checked exactly on polynomials: if <span class="math" data-say="u equals y of t">u = y(t)</span> and <span class="math" data-say="F">F</span> is a function of <span class="math" data-say="u">u</span>, the rate of <span class="math" data-say="F of y of t">F(y(t))</span> is <span class="math" data-say="F prime of y">F′(y)</span> times <span class="math" data-say="y prime">y′</span>. Here <span class="math" data-say="F">F</span> is an antiderivative <span class="math" data-say="G">G</span>, so <span class="math" data-say="G prime equals g">G′ = g</span>, and the rate is <span class="math" data-say="g of y times y prime">g(y)·y′</span>. Nothing about <span class="math" data-say="y">y</span> is assumed beyond having a derivative.</p><div class="thm"><span class="label">Theorem &middot; Separation</span><p>Suppose <span class="math" data-say="G prime equals g">G′ = g</span> and <span class="math" data-say="H prime equals h">H′ = h</span>, and <span class="math" data-say="y">y</span> is differentiable on an interval. Then <span class="math" data-say="g of y times y prime equals h of t">g(y)·y′ = h(t)</span> on that interval exactly when <span class="math" data-say="G of y of t minus H of t">G(y(t)) − H(t)</span> is constant on it.</p></div><div class="proof"><p>By the chain rule, the rate of <span class="math" data-say="G of y of t minus H of t">G(y(t)) − H(t)</span> is <span class="math" data-say="g of y times y prime minus h of t">g(y)·y′ − h(t)</span>.</p><p>That is zero for every <span class="math" data-say="t">t</span> in the interval exactly when the equation holds. A function whose rate is zero on an interval does not change on it &mdash; the fact behind the constant of integration in Accumulation and the Integral &mdash; so <span class="math" data-say="G of y of t minus H of t equals C">G(y(t)) − H(t) = C</span>, one number.</p><p><span class="qed">&#9633;</span></p></div><p>So the relation <span class="math" data-say="G of y equals H of t plus C">G(y) = H(t) + C</span> is not a heuristic. Along a solution it holds with some constant, and the proof also runs the other way: a differentiable <span class="math" data-say="y">y</span> that satisfies the relation satisfies the equation, wherever <span class="math" data-say="g of y">g(y)</span> makes sense. That second direction is what a check uses.</p><h3>Checking by differentiating the relation</h3><p>Take the relation <span class="math" data-say="y squared equals t squared plus 4">y² = t² + 4</span>. Differentiate both sides with respect to <span class="math" data-say="t">t</span>, remembering that <span class="math" data-say="y">y</span> depends on <span class="math" data-say="t">t</span>: the left side gives <span class="math" data-say="2 y times y prime">2y·y′</span> by the chain rule, the right side gives <span class="math" data-say="2 t">2t</span>. So <span class="math" data-say="2 y times y prime equals 2 t">2y·y′ = 2t</span>, which is <span class="math" data-say="y times y prime equals t">y·y′ = t</span>, the equation we started with.</p><div class="mathblock" data-say="y squared over 2 equals t squared over 2 plus 2. d over d t of the left side, y times y prime. d over d t of the right side, t. y times y prime equals t, the equation again. explicit form, y equals the square root of the quantity t squared plus 4. y prime equals t over the square root of the quantity t squared plus 4. y times y prime equals the square root of the quantity t squared plus 4, times t over the square root of the quantity t squared plus 4, equals t" tabindex="0" role="region" aria-label="Mathematical notation">y²/2 = t²/2 + 2
 
   d/dt of the left side:    y·y′
   d/dt of the right side:   t
@@ -1401,12 +1445,11 @@
 explicit form  y = √(t² + 4):
 
   y′ = t/√(t² + 4)
-  y·y′ = √(t² + 4)·t/√(t² + 4) = t</div><p>The explicit form is checked the same way, with one more use of the chain rule for the square root. The check view of the lab does the differentiation with exact fractions: it shows <span class="math" data-say="G prime equals g">G′ = g</span>, <span class="math" data-say="H prime equals h">H′ = h</span>, and, where the relation can be solved for <span class="math" data-say="y">y</span>, the composite <span class="math" data-say="G of y of t">G(y(t))</span> differentiated. The tile reads <span class="math" data-say="equal">equal</span> when the result is the equation and a dash when there is nothing to compare.</p><div class="example"><span class="label">Example &middot; The reciprocal preset</span><p>For <span class="math" data-say="the quantity 1 over y squared, times y prime equals t">(1/y²)·y′ = t</span> the relation is <span class="math" data-say="negative 1 over y equals t squared over 2 minus 1">−1/y = t²/2 − 1</span>. The derivative of <span class="math" data-say="negative 1 over y">−1/y</span> with respect to <span class="math" data-say="t">t</span> is <span class="math" data-say="y prime over y squared">y′/y²</span>, by the chain rule, and the derivative of <span class="math" data-say="t squared over 2 minus 1">t²/2 − 1</span> is <span class="math" data-say="t">t</span>. So <span class="math" data-say="y prime over y squared equals t">y′/y² = t</span>, which is <span class="math" data-say="the quantity 1 over y squared, times y prime equals t">(1/y²)·y′ = t</span>.</p></div><div class="example"><span class="label">Example &middot; The cube preset</span><p>For <span class="math" data-say="3 y squared times y prime equals 2 t plus 1">3y²·y′ = 2t + 1</span> the relation is <span class="math" data-say="y cubed equals t squared plus t plus 1">y³ = t² + t + 1</span>. The derivative of <span class="math" data-say="y cubed">y³</span> is <span class="math" data-say="3 y squared times y prime">3y²·y′</span> and the derivative of the right side is <span class="math" data-say="2 t plus 1">2t + 1</span>, so the equation comes straight back. The lab does not solve this relation for <span class="math" data-say="y">y</span>, which would take a cube root, and the check does not need it to.</p></div><p>Whenever a lesson in this course reports a solution, this is the test: differentiate it and compare. It catches a lost sign, a missing factor of <span class="math" data-say="y prime">y′</span> and a wrong constant, and it needs no knowledge of how the answer was found.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Separable equations</h2></div><p>Both sides integrated exactly</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+  y·y′ = √(t² + 4)·t/√(t² + 4) = t</div><p>The explicit form is checked the same way, with one more use of the chain rule for the square root. The check view of the lab does the differentiation with exact fractions: it shows <span class="math" data-say="G prime equals g">G′ = g</span>, <span class="math" data-say="H prime equals h">H′ = h</span>, and, where the relation can be solved for <span class="math" data-say="y">y</span>, the composite <span class="math" data-say="G of y of t">G(y(t))</span> differentiated. The tile reads <span class="math" data-say="equal">equal</span> when the result is the equation and a dash when there is nothing to compare.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Separable equations</h2></div><p>Both sides integrated exactly</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Separable equations</strong><span>∫g(y) dy = ∫h(t) dt, exactly</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the solution, drawn</span><span class="tone-amber"><i class="legend-swatch"></i>the initial value</span></div>
@@ -1415,10 +1458,10 @@ explicit form  y = √(t² + 4):
       <div class="table-wrap" style="margin-top:12px;" id="spTable" tabindex="0" role="region" aria-label="Data table"></div>
       <div class="status-banner" id="spStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Differentiate the answer and get the equation back</h3>
-          <p>The table lists the differentiation, step by step, and the Chain-rule check tile says equal when the derivative of the relation is the equation. Pick each preset and read the rows. The view is set to the check; the select beside the tiles switches back to the solution.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Differentiate the answer and get the equation back</h3>
+            <p>The table lists the differentiation, step by step, and the Chain-rule check tile says equal when the derivative of the relation is the equation. Pick each preset and read the rows. The view is set to the check; the select beside the tiles switches back to the solution.</p>
         <div class="field">
           <label for="spPreset">Equation g(y)·y' = h(t)</label>
           <select id="spPreset"><option value="circle" selected>y·y′ = t, y(0) = 2</option><option value="recip">(1/y²)·y′ = t, y(0) = 1</option><option value="poly">3y²·y′ = 2t + 1, y(0) = 1</option></select>
@@ -1450,12 +1493,15 @@ explicit form  y = √(t² + 4):
         </div>
         <p class="small-copy" style="margin:0;">g is a polynomial in y, or exactly 1/y or 1/y^2; h is a polynomial in t.</p>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="example"><span class="label">Example &middot; The reciprocal preset</span><p>For <span class="math" data-say="the quantity 1 over y squared, times y prime equals t">(1/y²)·y′ = t</span> the relation is <span class="math" data-say="negative 1 over y equals t squared over 2 minus 1">−1/y = t²/2 − 1</span>. The derivative of <span class="math" data-say="negative 1 over y">−1/y</span> with respect to <span class="math" data-say="t">t</span> is <span class="math" data-say="y prime over y squared">y′/y²</span>, by the chain rule, and the derivative of <span class="math" data-say="t squared over 2 minus 1">t²/2 − 1</span> is <span class="math" data-say="t">t</span>. So <span class="math" data-say="y prime over y squared equals t">y′/y² = t</span>, which is <span class="math" data-say="the quantity 1 over y squared, times y prime equals t">(1/y²)·y′ = t</span>.</p></div><div class="example"><span class="label">Example &middot; The cube preset</span><p>For <span class="math" data-say="3 y squared times y prime equals 2 t plus 1">3y²·y′ = 2t + 1</span> the relation is <span class="math" data-say="y cubed equals t squared plus t plus 1">y³ = t² + t + 1</span>. The derivative of <span class="math" data-say="y cubed">y³</span> is <span class="math" data-say="3 y squared times y prime">3y²·y′</span> and the derivative of the right side is <span class="math" data-say="2 t plus 1">2t + 1</span>, so the equation comes straight back. The lab does not solve this relation for <span class="math" data-say="y">y</span>, which would take a cube root, and the check does not need it to.</p></div><p>Whenever a lesson in this course reports a solution, this is the test: differentiate it and compare. It catches a lost sign, a missing factor of <span class="math" data-say="y prime">y′</span> and a wrong constant, and it needs no knowledge of how the answer was found.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Checking a solution by differentiating it</h2></div><p>Four moves, and none of them needs to know how the answer was found.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Differentiate the left side with respect to t</h3><p>Every <span class="math" data-say="y">y</span> is a function of <span class="math" data-say="t">t</span>, so each term picks up a factor <span class="math" data-say="y prime">y′</span> from the chain rule: <span class="math" data-say="y squared">y²</span> becomes <span class="math" data-say="2 y times y prime">2y·y′</span> and <span class="math" data-say="1 over y">1/y</span> becomes <span class="math" data-say="negative y prime over y squared">−y′/y²</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Differentiate the right side</h3><p>It is a function of <span class="math" data-say="t">t</span> alone, so this is an ordinary derivative, and the constant disappears.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compare with the original equation</h3><p>Equal after rearranging means the relation is consistent with the equation. Unequal means a sign or a factor was lost, and the difference tells you which.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the starting point</h3><p>Substitute <span class="math" data-say="t sub 0, y sub 0">(t₀, y₀)</span> into the relation. The derivative check says nothing about the constant, and this is the line that catches a wrong <span class="math" data-say="C">C</span>.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Checking a solution by differentiating it</h2>
+      <p class="lead-in">Four moves, and none of them needs to know how the answer was found.</p>
+      <ol class="key-ideas method"><li><strong>Differentiate the left side with respect to t.</strong> Every <span class="math" data-say="y">y</span> is a function of <span class="math" data-say="t">t</span>, so each term picks up a factor <span class="math" data-say="y prime">y′</span> from the chain rule: <span class="math" data-say="y squared">y²</span> becomes <span class="math" data-say="2 y times y prime">2y·y′</span> and <span class="math" data-say="1 over y">1/y</span> becomes <span class="math" data-say="negative y prime over y squared">−y′/y²</span>.</li><li><strong>Differentiate the right side.</strong> It is a function of <span class="math" data-say="t">t</span> alone, so this is an ordinary derivative, and the constant disappears.</li><li><strong>Compare with the original equation.</strong> Equal after rearranging means the relation is consistent with the equation. Unequal means a sign or a factor was lost, and the difference tells you which.</li><li><strong>Check the starting point.</strong> Substitute <span class="math" data-say="t sub 0, y sub 0">(t₀, y₀)</span> into the relation. The derivative check says nothing about the constant, and this is the line that catches a wrong <span class="math" data-say="C">C</span>.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1477,17 +1523,16 @@ formula    y = √(t² + 4)
 point      y(0) = √4 = 2       as required</div><p>Two checks, two different jobs. The derivative check confirms that the relation's rate is the equation's rate; the point check confirms the constant. Either one alone leaves room for a wrong answer, and together they leave none.</p><p>The same relation also holds for <span class="math" data-say="y equals negative the square root of the quantity t squared plus 4">y = −√(t² + 4)</span>, which has the same square and the opposite sign. Both pass the derivative check, and only one passes the point check for a given initial value. That is the subject of the next lesson.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking dy and dt were cancelled, so the method is a trick</strong><span>The mistaken model is that <span class="math" data-say="d y over d t">dy/dt</span> is a fraction, multiplied by the differential of <span class="math" data-say="t">t</span> to leave the differential of <span class="math" data-say="y">y</span>, and the whole method is an algebraic sleight that happens to work. It works for a reason: <span class="math" data-say="y times y prime">y·y′</span> is the derivative of <span class="math" data-say="y squared over 2">y²/2</span>, and the lab's check view differentiates the answer and gets <span class="math" data-say="y times y prime equals t">y·y′ = t</span> back with exact fractions. The notation <span class="math" data-say="the integral of g d y equals the integral of h d t">∫g dy = ∫h dt</span> is a record of that fact. The test of whether you have the idea is whether you can differentiate your own answer and find the factor <span class="math" data-say="y prime">y′</span> in it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the factor <span data-say="y prime">y′</span> when differentiating</strong><span>Writing the derivative of <span class="math" data-say="y squared">y²</span> as <span class="math" data-say="2 y">2y</span> treats <span class="math" data-say="y">y</span> as the variable. It is the variable only when you differentiate with respect to <span class="math" data-say="y">y</span>. With respect to <span class="math" data-say="t">t</span>, the inside function moves at rate <span class="math" data-say="y prime">y′</span>, and the factor is there. Without it the check shows a mismatch for every preset.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the derivative check as a check of the constant</strong><span>The constant differentiates to zero, so a wrong <span class="math" data-say="C">C</span> passes every derivative check. A solution is verified by two tests: the derivative gives the equation back, and the initial point satisfies the relation.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can differentiate an implicit relation and show that the equation comes back.</strong><p>You should be able to state the chain rule for <span class="math" data-say="G of y of t">G(y(t))</span>, say why it justifies integrating <span class="math" data-say="g of y times y prime">g(y)·y′</span>, differentiate a relation in <span class="math" data-say="y">y</span> and <span class="math" data-say="t">t</span> with the factor <span class="math" data-say="y prime">y′</span> in the right places, and explain why the derivative check cannot catch a wrong constant.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> A relation such as <span class="math" data-say="y squared equals t squared plus 4">y² = t² + 4</span> is the middle of a solution, not its end. &ldquo;Implicit and Explicit Solutions&rdquo; takes it the rest of the way: solving for <span class="math" data-say="y">y</span>, choosing the branch the initial value demands, and saying on which interval the answer exists.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking dy and dt were cancelled, so the method is a trick</strong><span>The mistaken model is that <span class="math" data-say="d y over d t">dy/dt</span> is a fraction, multiplied by the differential of <span class="math" data-say="t">t</span> to leave the differential of <span class="math" data-say="y">y</span>, and the whole method is an algebraic sleight that happens to work. It works for a reason: <span class="math" data-say="y times y prime">y·y′</span> is the derivative of <span class="math" data-say="y squared over 2">y²/2</span>, and the lab's check view differentiates the answer and gets <span class="math" data-say="y times y prime equals t">y·y′ = t</span> back with exact fractions. The notation <span class="math" data-say="the integral of g d y equals the integral of h d t">∫g dy = ∫h dt</span> is a record of that fact. The test of whether you have the idea is whether you can differentiate your own answer and find the factor <span class="math" data-say="y prime">y′</span> in it.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Dropping the factor <span data-say="y prime">y′</span> when differentiating</strong><span>Writing the derivative of <span class="math" data-say="y squared">y²</span> as <span class="math" data-say="2 y">2y</span> treats <span class="math" data-say="y">y</span> as the variable. It is the variable only when you differentiate with respect to <span class="math" data-say="y">y</span>. With respect to <span class="math" data-say="t">t</span>, the inside function moves at rate <span class="math" data-say="y prime">y′</span>, and the factor is there. Without it the check shows a mismatch for every preset.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the derivative check as a check of the constant</strong><span>The constant differentiates to zero, so a wrong <span class="math" data-say="C">C</span> passes every derivative check. A solution is verified by two tests: the derivative gives the equation back, and the initial point satisfies the relation.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can differentiate an implicit relation and show that the equation comes back.</strong><p>You should be able to state the chain rule for <span class="math" data-say="G of y of t">G(y(t))</span>, say why it justifies integrating <span class="math" data-say="g of y times y prime">g(y)·y′</span>, differentiate a relation in <span class="math" data-say="y">y</span> and <span class="math" data-say="t">t</span> with the factor <span class="math" data-say="y prime">y′</span> in the right places, and explain why the derivative check cannot catch a wrong constant.</p></div></div><div class="note"><strong>Note:</strong> A relation such as <span class="math" data-say="y squared equals t squared plus 4">y² = t² + 4</span> is the middle of a solution, not its end. &ldquo;Implicit and Explicit Solutions&rdquo; takes it the rest of the way: solving for <span class="math" data-say="y">y</span>, choosing the branch the initial value demands, and saying on which interval the answer exists.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The chain rule gives the derivative of G(y(t))</summary><p>If <span class="math" data-say="G prime equals g">G′ = g</span> and <span class="math" data-say="y">y</span> is a function of <span class="math" data-say="t">t</span>, then <span class="math" data-say="G of y of t">G(y(t))</span> has the derivative <span class="math" data-say="g of y times y prime">g(y)·y′</span>. For <span class="math" data-say="G of y equals y squared over 2">G(y) = y²/2</span> that is <span class="math" data-say="y times y prime">y·y′</span>. The factor <span class="math" data-say="y prime">y′</span> is not decoration: it is the rate at which the inside function moves, and it is why the <span class="math" data-say="y prime">y′</span> stays with the <span class="math" data-say="y">y</span>.</p></details><details class="recall"><summary>Reading it backwards integrates the left side</summary><p>The left side <span class="math" data-say="g of y times y prime">g(y)·y′</span>, viewed as a function of <span class="math" data-say="t">t</span>, is the derivative of <span class="math" data-say="G of y of t">G(y(t))</span>. The right side <span class="math" data-say="h of t">h(t)</span> is the derivative of <span class="math" data-say="H of t">H(t)</span>. Two functions with equal derivatives on an interval differ by a constant, which is the <span class="math" data-say="C">C</span>.</p></details><details class="recall"><summary>The differentials are shorthand, not quantities</summary><p><span class="math" data-say="the integral of g d y equals the integral of h d t">∫g dy = ∫h dt</span> is a convenient way to write the result. In this course <span class="math" data-say="d y over d t">dy/dt</span> means <span class="math" data-say="y prime">y′</span>, one symbol, and nothing is cancelled to get from the equation to the relation. The chain rule is what is being used, and it holds whether or not you ever write a differential.</p></details></div>
+      <h3>Summary</h3>
       <p>The method of &ldquo;Separable Equations&rdquo; integrates <span class="math" data-say="y times y prime">y·y′</span> as though it were the derivative of something, and it is: of <span class="math" data-say="y squared over 2">y²/2</span>, by the chain rule. Read backwards, the chain rule is the whole justification. Differentiating the implicit relation gives the equation back, which is also how a solution is checked. The lab's check view performs that differentiation exactly, line by line, and prints whether the result equals the right-hand side.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The chain rule gives the derivative of G(y(t)).</strong> If <span class="math" data-say="G prime equals g">G′ = g</span> and <span class="math" data-say="y">y</span> is a function of <span class="math" data-say="t">t</span>, then <span class="math" data-say="G of y of t">G(y(t))</span> has the derivative <span class="math" data-say="g of y times y prime">g(y)·y′</span>. For <span class="math" data-say="G of y equals y squared over 2">G(y) = y²/2</span> that is <span class="math" data-say="y times y prime">y·y′</span>. The factor <span class="math" data-say="y prime">y′</span> is not decoration: it is the rate at which the inside function moves, and it is why the <span class="math" data-say="y prime">y′</span> stays with the <span class="math" data-say="y">y</span>.</li><li><strong>Reading it backwards integrates the left side.</strong> The left side <span class="math" data-say="g of y times y prime">g(y)·y′</span>, viewed as a function of <span class="math" data-say="t">t</span>, is the derivative of <span class="math" data-say="G of y of t">G(y(t))</span>. The right side <span class="math" data-say="h of t">h(t)</span> is the derivative of <span class="math" data-say="H of t">H(t)</span>. Two functions with equal derivatives on an interval differ by a constant, which is the <span class="math" data-say="C">C</span>.</li><li><strong>The differentials are shorthand, not quantities.</strong> <span class="math" data-say="the integral of g d y equals the integral of h d t">∫g dy = ∫h dt</span> is a convenient way to write the result. In this course <span class="math" data-say="d y over d t">dy/dt</span> means <span class="math" data-say="y prime">y′</span>, one symbol, and nothing is cancelled to get from the equation to the relation. The chain rule is what is being used, and it holds whether or not you ever write a differential.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="G of y of t has rate g of y times y prime, chain rule. G of y equals H of t plus C, differentiated gives. g of y times y prime equals h of t, the equation back. d y over d t is one symbol for y prime, not a fraction" tabindex="0" role="region" aria-label="Mathematical notation">G(y(t)) has rate g(y)·y′   chain rule
 G(y) = H(t) + C   differentiated gives
 g(y)·y′ = h(t)   the equation back
@@ -3743,11 +3788,40 @@ dy/dt is one symbol for y′, not a fraction</div><figcaption>Why the method is 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3815,7 +3889,7 @@ dy/dt is one symbol for y′, not a fraction</div><figcaption>Why the method is 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

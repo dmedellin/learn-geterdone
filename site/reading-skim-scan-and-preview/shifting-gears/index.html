@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,25 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Skimming, Scanning and Previewing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Reading strategically</p>
       <h1>Shifting Gears</h1>
       <p class="lesson-lede">Read a passage whose second half is far denser than its first, time each half, and see whether you changed speed by choice.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Gears</li><li>A rate per section</li><li>Chosen or forced</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two sections, two rates</h2>
-      <article class="prose reading"><p>The drill is one passage in two sections. The first is a story: a retired woman, her grandson and a vegetable plot that will not grow. The second is the soil laboratory's report on that plot, written the way such reports are. Read section one, press Next section, read section two and press Done; the lab times each. A box then asks whether your attention left the text, and six questions follow, three on each section. Change speed between the sections if the text asks you to: that is the exercise. The reading is logged as a test of a mixed passage, so it stays out of the medians set against your standard baselines.</p><p>The panel gives a rate for each section, its words over its seconds, and then the whole passage's rate and effective rate. The list under the drill shows which questions you got right; the last three are on the report.</p><div class="mathblock" data-say="flexible, 292 times 60 over 60 equals 292, 286 times 60 over 104 equals 165. rigid, 292 times 60 over 73 equals 240, 286 times 60 over 72 is approximately 238.3" tabindex="0" role="region" aria-label="Mathematical notation">flexible   292 × 60 / 60 = 292     286 × 60 / 104 = 165
-rigid      292 × 60 / 73 = 240     286 × 60 / 72 ≈ 238.3</div><p>The <strong>flexible</strong> preset is a reader who took the 292-word story at 292 words a minute, slowed to 165 for the 286-word report, and got 5 of 6: the whole passage at about 211.5 words a minute, and an effective rate of about 176.2. The <strong>rigid</strong> preset held one speed, 240 and about 238.3, got all three story questions and one of the three report questions, 4 of 6: a whole rate of about 239.2 and an effective rate of about 159.4. The rigid reader finished sooner and understood less, and the whole loss was in the dense section.</p><p>A slower second section is not by itself a shift of gear. A reader whose rate fell to 165 and whose report questions fell too did not choose to slow down; the text slowed them and still beat them. A shift is a choice when the rate falls and the questions on the hard section hold. That is why the drill asks about both sections, and why the attention box is there: a slow section with your mind elsewhere is a lapse, not a gear.</p><p>Carver (1990) put his five gears at about 600, 450, 300, 200 and 138 standard-length words a minute for the college students he studied, and he found that most readers seldom use them. They hold a nearly constant rate, their rauding rate, across ordinary texts, and when a text is harder, their understanding tends to give way rather than their speed. His advice (Carver 1992) was to shift deliberately: down into the learning gear for what must be learned, up into skimming for what need only be skimmed.</p><p>So the rigid preset is not a poor reader. By Carver's account it is the usual one. This lesson asks you to do the unusual thing on purpose, and the drill is how you see whether you did. His figures are in six-character words for students on his materials; the comparison that matters here is between your own two sections.</p><p>That ends the course on reading less of a text, and reading it in the right gear. Words, Knowledge and Difficulty, the next course, asks what makes a text hard in the first place, starting with your own rate on an easy passage and a hard one.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two sections, two rates</h2><div class="prose reading"><p>The drill is one passage in two sections. The first is a story: a retired woman, her grandson and a vegetable plot that will not grow. The second is the soil laboratory's report on that plot, written the way such reports are. Read section one, press Next section, read section two and press Done; the lab times each. A box then asks whether your attention left the text, and six questions follow, three on each section. Change speed between the sections if the text asks you to: that is the exercise. The reading is logged as a test of a mixed passage, so it stays out of the medians set against your standard baselines.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Timed reading drill</h2></div><p>rate, comprehension and the effective rate, measured on your own reading</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Timed reading drill</strong><span>rate, comprehension and the effective rate, measured on your own reading</span></div>
       </div>
@@ -1414,10 +1456,10 @@ rigid      292 × 60 / 73 = 240     286 × 60 / 72 ≈ 238.3</div><p>The <strong
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="drTable"></table></div>
       <div class="status-banner" id="drStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Your reading, in numbers</h3>
-          <p>Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Your reading, in numbers</h3>
+            <p>Your measurement: press Start, read, press Done, answer the questions, press Score, and the boxes fill with what you did. Before you do, the boxes hold a worked example; the tiles compute from the boxes either way.</p>
         <div class="field">
           <label for="drPreset">Worked example</label>
           <select id="drPreset"><option value="flexible" selected>Story 292, report 165, 5 of 6</option><option value="rigid">One speed, 4 of 6</option></select>
@@ -1454,12 +1496,16 @@ rigid      292 × 60 / 73 = 240     286 × 60 / 72 ≈ 238.3</div><p>The <strong
           <div class="kpi"><span>Effective rate</span><strong id="drErr">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The panel gives a rate for each section, its words over its seconds, and then the whole passage's rate and effective rate. The list under the drill shows which questions you got right; the last three are on the report.</p><div class="mathblock" data-say="flexible, 292 times 60 over 60 equals 292, 286 times 60 over 104 equals 165. rigid, 292 times 60 over 73 equals 240, 286 times 60 over 72 is approximately 238.3" tabindex="0" role="region" aria-label="Mathematical notation">flexible   292 × 60 / 60 = 292     286 × 60 / 104 = 165
+rigid      292 × 60 / 73 = 240     286 × 60 / 72 ≈ 238.3</div><p>The <strong>flexible</strong> preset is a reader who took the 292-word story at 292 words a minute, slowed to 165 for the 286-word report, and got 5 of 6: the whole passage at about 211.5 words a minute, and an effective rate of about 176.2. The <strong>rigid</strong> preset held one speed, 240 and about 238.3, got all three story questions and one of the three report questions, 4 of 6: a whole rate of about 239.2 and an effective rate of about 159.4. The rigid reader finished sooner and understood less, and the whole loss was in the dense section.</p><p>A slower second section is not by itself a shift of gear. A reader whose rate fell to 165 and whose report questions fell too did not choose to slow down; the text slowed them and still beat them. A shift is a choice when the rate falls and the questions on the hard section hold. That is why the drill asks about both sections, and why the attention box is there: a slow section with your mind elsewhere is a lapse, not a gear.</p><p>Carver (1990) put his five gears at about 600, 450, 300, 200 and 138 standard-length words a minute for the college students he studied, and he found that most readers seldom use them. They hold a nearly constant rate, their rauding rate, across ordinary texts, and when a text is harder, their understanding tends to give way rather than their speed. His advice (Carver 1992) was to shift deliberately: down into the learning gear for what must be learned, up into skimming for what need only be skimmed.</p><p>So the rigid preset is not a poor reader. By Carver's account it is the usual one. This lesson asks you to do the unusual thing on purpose, and the drill is how you see whether you did. His figures are in six-character words for students on his materials; the comparison that matters here is between your own two sections.</p><p>That ends the course on reading less of a text, and reading it in the right gear. Words, Knowledge and Difficulty, the next course, asks what makes a text hard in the first place, starting with your own rate on an easy passage and a hard one.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Shifting gear on purpose</h2></div><p>Five steps, on any text whose difficulty changes.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Name the gear before you start</h3><p>For each part of the text, decide what it is for: to be skimmed, read, or learned.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Time the parts</h3><p>Mark where the hard part starts, and time each part separately.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check the hard part</h3><p>With the text hidden, write down three facts from the hard part. If you cannot, you did not shift; the text carried you.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the rates</h3><p>If the hard part was slower and you kept its facts, that was a shift. If it was slower and you lost them, slow down further next time, or reread the part on purpose.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Finish with today's reading from The Daily Drill.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Shifting gear on purpose</h2>
+      <p class="lead-in">Five steps, on any text whose difficulty changes.</p>
+      <ol class="key-ideas method"><li><strong>Name the gear before you start.</strong> For each part of the text, decide what it is for: to be skimmed, read, or learned.</li><li><strong>Time the parts.</strong> Mark where the hard part starts, and time each part separately.</li><li><strong>Check the hard part.</strong> With the text hidden, write down three facts from the hard part. If you cannot, you did not shift; the text carried you.</li><li><strong>Compare the rates.</strong> If the hard part was slower and you kept its facts, that was a shift. If it was slower and you lost them, slow down further next time, or reread the part on purpose.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Finish with today's reading from The Daily Drill.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1476,17 +1522,16 @@ whole       578 × 60 / 164 ≈ 211.5 words a minute
 effective   578 × 60 / 164 × 5/6 ≈ 176.2</div><p>The reader spent 104 of the 164 seconds on the report, almost two-thirds of the time on half the words, and kept most of it. The whole-passage rate alone would have hidden both the shift and what it bought.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a good reader holds one fast speed</strong><span>Carver found that most readers do hold one speed, their rauding rate, across ordinary texts, and seldom shift gear; he recommended shifting deliberately, slowing for what must be learned and speeding up for what need only be skimmed. The rigid preset held about 240 through both sections and lost two of the three report questions.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting any slowdown as a shift</strong><span>A dense section slows everyone. It was a shift if the questions on it held; in the flexible preset the reader slowed to 165 and got five of six, and that is the difference.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Judging by the whole-passage rate</strong><span>The rigid preset's whole rate, about 239.2, beats the flexible preset's 211.5; its effective rate, about 159.4 against 176.2, does not. The rate and the questions for each section are what show a gear.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can tell a chosen shift from a collapse.</strong><p>Given the words and seconds for each section and the questions right on each, compute both section rates, and say whether the reader shifted gear by choice, slower on the hard part with its questions kept, or was slowed by it and lost them.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> One passage in two sections, read once. The second section is harder and also second, so part of any slowdown may be the drill's length rather than the difficulty. Carver's gears are in standard-length words for college students on his materials; the comparison that matters is between your own two sections.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing a good reader holds one fast speed</strong><span>Carver found that most readers do hold one speed, their rauding rate, across ordinary texts, and seldom shift gear; he recommended shifting deliberately, slowing for what must be learned and speeding up for what need only be skimmed. The rigid preset held about 240 through both sections and lost two of the three report questions.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Counting any slowdown as a shift</strong><span>A dense section slows everyone. It was a shift if the questions on it held; in the flexible preset the reader slowed to 165 and got five of six, and that is the difference.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Judging by the whole-passage rate</strong><span>The rigid preset's whole rate, about 239.2, beats the flexible preset's 211.5; its effective rate, about 159.4 against 176.2, does not. The rate and the questions for each section are what show a gear.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can tell a chosen shift from a collapse.</strong><p>Given the words and seconds for each section and the questions right on each, compute both section rates, and say whether the reader shifted gear by choice, slower on the hard part with its questions kept, or was slowed by it and lost them.</p></div></div><div class="note"><strong>Note:</strong> One passage in two sections, read once. The second section is harder and also second, so part of any slowdown may be the drill's length rather than the difficulty. Carver's gears are in standard-length words for college students on his materials; the comparison that matters is between your own two sections.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Gears</summary><p>Carver (1990) described five: scanning, skimming, rauding (his word for ordinary reading for understanding), learning and memorising, each slower than the last. Shifting gear means choosing one to fit the text and the purpose.</p></details><details class="recall"><summary>A rate per section</summary><p>The drill times each section, so the panel can give each its own rate. The rate for the whole passage is a blend of the two and hides the shift.</p></details><details class="recall"><summary>Chosen or forced</summary><p>A dense section slows everyone down. The slowdown was a choice if the facts of that section were kept, and a collapse if they were lost. Only the questions on each section can tell the two apart.</p></details></div>
+      <h3>Summary</h3>
       <p>Read a story about a failing vegetable plot, then the soil laboratory's report on it, timed separately, with questions on both. Compute the rate of each section and say whether a slower second section was a shift of gear the reader chose or a collapse the text forced.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Gears.</strong> Carver (1990) described five: scanning, skimming, rauding (his word for ordinary reading for understanding), learning and memorising, each slower than the last. Shifting gear means choosing one to fit the text and the purpose.</li><li><strong>A rate per section.</strong> The drill times each section, so the panel can give each its own rate. The rate for the whole passage is a blend of the two and hides the shift.</li><li><strong>Chosen or forced.</strong> A dense section slows everyone down. The slowdown was a choice if the facts of that section were kept, and a collapse if they were lost. Only the questions on each section can tell the two apart.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="section rate equals words times 60 over seconds. a shift, slower, and the facts kept. a collapse, slower, and facts lost. most readers hold one rate Carver" tabindex="0" role="region" aria-label="Mathematical notation">section rate = words × 60 / seconds
 a shift: slower, and the facts kept
 a collapse: slower, and facts lost
@@ -2466,11 +2511,40 @@ most readers hold one rate (Carver)</div><figcaption>Gears in four lines</figcap
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2538,7 +2612,7 @@ most readers hold one rate (Carver)</div><figcaption>Gears in four lines</figcap
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

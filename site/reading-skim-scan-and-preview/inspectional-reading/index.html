@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,25 +1424,23 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Skimming, Scanning and Previewing</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Reading strategically</p>
       <h1>Inspectional Reading</h1>
       <p class="lesson-lede">Inspect the front and back matter of a book against a five-minute limit, and find out what it is about, how it is built and where a topic is treated.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Inspectional reading</li><li>Where the structure lives</li><li>A decision, not a summary</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Five minutes with a book</h2>
-      <article class="prose reading"><p>The drill is the front and back matter of a book that does not exist: The Patient Orchard, a grower's history of the apple, with its title page, contents, preface and part of its index, 586 words in all. Press Start and a prompt asks a question about the book, such as which chapter deals with the insects that attack apple trees. Click the word in the document that answers it, or Tab to it and press Enter. There are five questions, and the document disappears after five minutes, 300 seconds, whether you have finished or not; press Skip this one for a question you cannot answer. The result is logged as an inspection, not a reading.</p><p>The questions are not about apples. They are about the book: which edition it is, how it is divided, who it is written for, and where a topic sits in it. Those are the questions an inspection answers, and the answers are all in pages most readers turn past.</p><div class="mathblock" data-say="five-minutes, 300 over 4 equals 75 seconds per target found. thorough, 210 over 5 equals 42 seconds per target found" tabindex="0" role="region" aria-label="Mathematical notation">five-minutes   300 / 4 = 75 s per target found
-thorough       210 / 5 = 42 s per target found</div><p>The <strong>five-minutes</strong> preset is a reader who found four of the five answers before the limit ran out: 300 / 4 = 75 seconds per answer found. The <strong>thorough</strong> preset found all five in 210 seconds, 42 seconds an answer, which is what it can look like when a reader goes through the whole contents and the preface at the first prompt, and finds the later answers already known.</p><p>Adler and Van Doren's How to Read a Book, in its 1972 revision, names four levels of reading, elementary, inspectional, analytical and syntopical, and puts inspection before any careful reading. Its first part, which they call systematic skimming, is what this drill does: the title page, the preface, the contents and the index, looked at on purpose, with questions in mind.</p><p>The preface of The Patient Orchard is the part a hurried reader skips, and it answers the most. It says the book is written mainly for growers with a small garden, that the chapter on pests was largely rewritten for this edition, and that a reader who wants only practical advice can begin with the fourth and fifth chapters and the calendar. That last sentence is the best thing an inspection can find: a reason not to start on page one.</p><p>Seconds per target found, which the panel here labels seconds per right answer, is the same arithmetic as in Scanning for a Target, and it means something a little different here, because these targets need a moment's thought about where a book would put a thing. The panel also prints the words passed over per second, which is beside the point for an inspection: it is not trying to cover the text.</p><p>The drill is a book's front and back matter without the book, so it leaves out a step Adler and Van Doren also recommend, dipping into a few pages and reading the last pages of the main text. On a real book, add that, and keep the limit.</p><p>An inspection decides about one book. Triaging a Reading List decides about a pile of documents at once, against a time budget.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Inspectional reading</h2></div><p>a search for a known form, timed</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Five minutes with a book</h2><div class="prose reading"><p>The drill is the front and back matter of a book that does not exist: The Patient Orchard, a grower's history of the apple, with its title page, contents, preface and part of its index, 586 words in all. Press Start and a prompt asks a question about the book, such as which chapter deals with the insects that attack apple trees. Click the word in the document that answers it, or Tab to it and press Enter. There are five questions, and the document disappears after five minutes, 300 seconds, whether you have finished or not; press Skip this one for a question you cannot answer. The result is logged as an inspection, not a reading.</p><p>The questions are not about apples. They are about the book: which edition it is, how it is divided, who it is written for, and where a topic sits in it. Those are the questions an inspection answers, and the answers are all in pages most readers turn past.</p><div class="mathblock" data-say="five-minutes, 300 over 4 equals 75 seconds per target found. thorough, 210 over 5 equals 42 seconds per target found" tabindex="0" role="region" aria-label="Mathematical notation">five-minutes   300 / 4 = 75 s per target found
+thorough       210 / 5 = 42 s per target found</div><p>The <strong>five-minutes</strong> preset is a reader who found four of the five answers before the limit ran out: 300 / 4 = 75 seconds per answer found. The <strong>thorough</strong> preset found all five in 210 seconds, 42 seconds an answer, which is what it can look like when a reader goes through the whole contents and the preface at the first prompt, and finds the later answers already known.</p><p>Adler and Van Doren's How to Read a Book, in its 1972 revision, names four levels of reading, elementary, inspectional, analytical and syntopical, and puts inspection before any careful reading. Its first part, which they call systematic skimming, is what this drill does: the title page, the preface, the contents and the index, looked at on purpose, with questions in mind.</p><p>The preface of The Patient Orchard is the part a hurried reader skips, and it answers the most. It says the book is written mainly for growers with a small garden, that the chapter on pests was largely rewritten for this edition, and that a reader who wants only practical advice can begin with the fourth and fifth chapters and the calendar. That last sentence is the best thing an inspection can find: a reason not to start on page one.</p><p>Seconds per target found, which the panel here labels seconds per right answer, is the same arithmetic as in Scanning for a Target, and it means something a little different here, because these targets need a moment's thought about where a book would put a thing. The panel also prints the words passed over per second, which is beside the point for an inspection: it is not trying to cover the text.</p><p>The drill is a book's front and back matter without the book, so it leaves out a step Adler and Van Doren also recommend, dipping into a few pages and reading the last pages of the main text. On a real book, add that, and keep the limit.</p><p>An inspection decides about one book. Triaging a Reading List decides about a pile of documents at once, against a time budget.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Inspectional reading</h2></div><p>a search for a known form, timed</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Inspectional reading</strong><span>a search for a known form, timed</span></div>
       </div>
@@ -1414,10 +1457,10 @@ thorough       210 / 5 = 42 s per target found</div><p>The <strong>five-minutes<
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scTable"></table></div>
       <div class="status-banner" id="scStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The search, in numbers</h3>
-          <p>Your measurement: the boxes fill when the inspection ends, at the fifth question or at 300 seconds; before that they hold a worked example. Each target is a question about the book, answered by clicking the word in the document that answers it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The search, in numbers</h3>
+            <p>Your measurement: the boxes fill when the inspection ends, at the fifth question or at 300 seconds; before that they hold a worked example. Each target is a question about the book, answered by clicking the word in the document that answers it.</p>
         <div class="field">
           <label for="scPreset">Worked example</label>
           <select id="scPreset"><option value="five-minutes" selected>Four of five when the five minutes ran out</option><option value="thorough">Five of five in 210 seconds</option></select>
@@ -1449,12 +1492,14 @@ thorough       210 / 5 = 42 s per target found</div><p>The <strong>five-minutes<
           <div class="kpi"><span>Wrong clicks</span><strong id="scWrong">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Inspecting a book of your own</h2></div><p>Five steps, five minutes for the first four.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write three questions and set five minutes</h3><p>Before you open the book: what is it about, how is it organised, and where does it treat the topic you care about?</p></article><article class="card concept-card"><div class="icon">2</div><h3>Title, contents, preface</h3><p>Read the title and subtitle, the whole contents, and the preface or introduction for who the book is for and which parts it says to read first.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Index, and a dip</h3><p>Look up two topics in the index and see how many pages each gets; read a page from the middle and the last pages of the main text.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Write the decision</h3><p>One sentence on what the book is about, one on its plan, and the decision: read all of it, read named chapters, or put it back.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Then today&#x27;s Daily Drill</h3><p>Finish with today's reading from The Daily Drill.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Inspecting a book of your own</h2>
+      <p class="lead-in">Five steps, five minutes for the first four.</p>
+      <ol class="key-ideas method"><li><strong>Write three questions and set five minutes.</strong> Before you open the book: what is it about, how is it organised, and where does it treat the topic you care about?</li><li><strong>Title, contents, preface.</strong> Read the title and subtitle, the whole contents, and the preface or introduction for who the book is for and which parts it says to read first.</li><li><strong>Index, and a dip.</strong> Look up two topics in the index and see how many pages each gets; read a page from the middle and the last pages of the main text.</li><li><strong>Write the decision.</strong> One sentence on what the book is about, one on its plan, and the decision: read all of it, read named chapters, or put it back.</li><li><strong>Then today&#x27;s Daily Drill.</strong> Finish with today's reading from The Daily Drill.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1470,17 +1515,16 @@ seconds             300
 per target found    300 / 4 = 75 s</div><p>The fifth answer is missing, but the 300 seconds are not: each answer the reader did find cost 75 of them. The thorough preset's 42 seconds an answer is what the same document can cost a reader who reads the contents and preface through at the start.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking reading a book to mean starting at page one</strong><span>Adler and Van Doren put an inspection first, and it decides whether the book needs a whole reading at all. The Patient Orchard's preface tells a reader who wants practical advice to begin at chapter four, on page 63; one who started at page one would reach that advice sixty-two pages later.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Skipping the preface</strong><span>It is the part of the front matter that most often says who a book is for and which parts matter. In the drill it answers one question outright and tells you how the book's two halves, history and practice, relate.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Inspecting without questions</strong><span>Five minutes of browsing leave an impression; five minutes with questions, what is it, how is it built, where is my topic, leave a decision. Write the questions before you open the book.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can inspect a book and decide about it within the limit.</strong><p>Given a book's title page, contents, preface and index, answer five structural questions about it, such as what it is about, how it is organised, who it is for, where a topic is treated and which edition it is, within five minutes, and say whether to read it all, in part or not.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> An imaginary book, five questions and a limit: the drill measures how quickly you find structural facts in front and back matter, not how well you judge a real book, which also needs a look inside. The prompts come one at a time, so the drill is more guided than an inspection on your own.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking reading a book to mean starting at page one</strong><span>Adler and Van Doren put an inspection first, and it decides whether the book needs a whole reading at all. The Patient Orchard's preface tells a reader who wants practical advice to begin at chapter four, on page 63; one who started at page one would reach that advice sixty-two pages later.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Skipping the preface</strong><span>It is the part of the front matter that most often says who a book is for and which parts matter. In the drill it answers one question outright and tells you how the book's two halves, history and practice, relate.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Inspecting without questions</strong><span>Five minutes of browsing leave an impression; five minutes with questions, what is it, how is it built, where is my topic, leave a decision. Write the questions before you open the book.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can inspect a book and decide about it within the limit.</strong><p>Given a book's title page, contents, preface and index, answer five structural questions about it, such as what it is about, how it is organised, who it is for, where a topic is treated and which edition it is, within five minutes, and say whether to read it all, in part or not.</p></div></div><div class="note"><strong>Note:</strong> An imaginary book, five questions and a limit: the drill measures how quickly you find structural facts in front and back matter, not how well you judge a real book, which also needs a look inside. The prompts come one at a time, so the drill is more guided than an inspection on your own.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Inspectional reading</summary><p>Adler and Van Doren (1972) made it the second of four levels of reading: a short, deliberate look at a book to find out what kind of book it is, what it is about and how it is organised, before deciding how, or whether, to read it.</p></details><details class="recall"><summary>Where the structure lives</summary><p>The title and subtitle say what the book claims to be; the contents give its plan; the preface often says who it is for and which parts to read first; the index says where a topic is treated and how many pages it gets.</p></details><details class="recall"><summary>A decision, not a summary</summary><p>What an inspection produces is a decision: read the book, read some of its chapters, or put it back. Five minutes on a book you then decide not to read is the cheapest reading you will do.</p></details></div>
+      <h3>Summary</h3>
       <p>Before reading a book, find out whether it needs reading and how. Inspect the title page, contents, preface and index of an imaginary book about apples for up to five minutes, find five structural answers in them, and compute the seconds per answer found.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Inspectional reading.</strong> Adler and Van Doren (1972) made it the second of four levels of reading: a short, deliberate look at a book to find out what kind of book it is, what it is about and how it is organised, before deciding how, or whether, to read it.</li><li><strong>Where the structure lives.</strong> The title and subtitle say what the book claims to be; the contents give its plan; the preface often says who it is for and which parts to read first; the index says where a topic is treated and how many pages it gets.</li><li><strong>A decision, not a summary.</strong> What an inspection produces is a decision: read the book, read some of its chapters, or put it back. Five minutes on a book you then decide not to read is the cheapest reading you will do.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="inspect a book before you read it. title, contents, preface, index. per target equals seconds over targets found. then, read it all, in part, or not" tabindex="0" role="region" aria-label="Mathematical notation">inspect a book before you read it
 title, contents, preface, index
 per target = seconds / targets found
@@ -2524,11 +2568,40 @@ then: read it all, in part, or not</div><figcaption>Inspection in four lines</fi
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2596,7 +2669,7 @@ then: read it all, in part, or not</div><figcaption>Inspection in four lines</fi
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

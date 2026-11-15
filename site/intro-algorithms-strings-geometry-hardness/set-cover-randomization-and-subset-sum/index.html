@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,30 +1478,28 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Strings, Geometry and Hardness</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 35 · Approximation Algorithms</p>
       <h1>Set Cover, Randomization and Subset Sum</h1>
       <p class="lesson-lede">Greedy set cover is within a harmonic number of the optimum, a random assignment satisfies 7/8 of a 3-CNF formula&#x27;s clauses in expectation, and trimming a list of sums buys accuracy with time.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A charge</li><li>An expected ratio</li><li>Trimming</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s argument first, then the count</h2>
-      <article class="prose reading"><p>&ldquo;That is, we can trade computation time for the quality of the approximation.&rdquo; The chapter's opening says this of approximation schemes, and its last section delivers one. Before that come two other kinds of guarantee: a ratio that grows slowly with the input, and a ratio that holds on average over the algorithm's own coin flips. This lesson reads sections 35.3 to 35.5 and ends the read-along.</p><p>Section 35.3 states the set-covering problem: given a finite X and some subsets of it, F, whose union is X; find the smallest subfamily whose union is still X. It generalizes vertex cover, so it is NP-hard. GREEDY-SET-COVER repeatedly takes the set that covers the most elements not yet covered, until none remain, and can be implemented in time polynomial in <span data-say="the size of X">|X|</span> and <span data-say="the size of F">|F|</span>.</p><p>Theorem 35.4 bounds it by H(max <span data-say="the size of S">|S|</span>), the harmonic number of the size of the largest set, where H(d) = 1 + 1/2 + … + 1/d. The proof charges each element 1/k when it is first covered by a set that covers k new elements, so that the charges add up to the number of sets greedy takes. It then shows that the elements of any one set S, an optimal set included, pay at most <span data-say="H of the size of S">H(|S|)</span> in total, because when j of S's elements remain uncovered greedy takes a set covering at least j new elements. Summing over an optimal cover gives the ratio, and since <span data-say="the size of S, is at most the size of X">|S| ≤ |X|</span>, Corollary 35.5 adds that the ratio is at most <span data-say="ln the size of X, plus 1">ln |X| + 1</span>.</p><p>Section 35.4 shows two more techniques. For MAX-3-CNF satisfiability, where every clause has exactly three distinct literals and none holds a variable with its negation, set each variable true with probability 1/2. A clause fails only if all three literals are false, with probability 1/8, so by linearity of expectation 7/8 of the clauses are satisfied on average. No assignment satisfies more than all of them, so the expected ratio is at most 8/7 (Theorem 35.6). The section's second technique is linear programming: relax weighted vertex cover to fractions between 0 and 1, solve, and put a vertex in the cover when its value is at least 1/2. Every edge's constraint forces one end to 1/2 or more, and the rounding at most doubles the cost, a 2-approximation (Theorem 35.7).</p><p>Section 35.5 finishes with subset sum as an optimization: the largest sum of a subset of S that does not exceed t. The exact method keeps a sorted list of every reachable sum up to t, merging the list with a copy shifted by each new element; the list can double each time. APPROX-SUBSET-SUM trims the list after each merge with <span data-say="delta equals epsilon over 2 n">δ = ε/(2n)</span>, and Theorem 35.8 shows that the answer is within <span data-say="1 plus epsilon">1 + ε</span> of the optimum and that every list stays short enough for a running time polynomial in n and <span data-say="1 over epsilon">1/ε</span>: a fully polynomial-time approximation scheme. Here is a trim on numbers of the lesson's own, S = {12, 20, 31, 45}, <span data-say="t equals 70, epsilon equals 0.4">t = 70, ε = 0.4</span>, so <span data-say="delta equals 0.4 over 8 equals 0.05">δ = 0.4/8 = 0.05</span>.</p><div class="mathblock" data-say="after 12, 0, 12. after 20, 0, 12, 20, 32. after 31, merged 0, 12, 20, 31, 32, 43, 51, 63. 32 is at most 1.05 times 31, so 32 is dropped. after 45, merged list, then 45 is at most 1.05 times 43 and 65 is at most 1.05 times 63 dropped. kept up to 70, 0, 12, 20, 31, 43, 51, 57, 63. answer 63, optimum 20 plus 45 equals 65, 65 over 63 is at most 1.4" tabindex="0" role="region" aria-label="Mathematical notation">after 12:  0, 12
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s argument first, then the count</h2><div class="prose reading"><p>&ldquo;That is, we can trade computation time for the quality of the approximation.&rdquo; The chapter's opening says this of approximation schemes, and its last section delivers one. Before that come two other kinds of guarantee: a ratio that grows slowly with the input, and a ratio that holds on average over the algorithm's own coin flips. This lesson reads sections 35.3 to 35.5 and ends the read-along.</p><p>Section 35.3 states the set-covering problem: given a finite X and some subsets of it, F, whose union is X; find the smallest subfamily whose union is still X. It generalizes vertex cover, so it is NP-hard. GREEDY-SET-COVER repeatedly takes the set that covers the most elements not yet covered, until none remain, and can be implemented in time polynomial in <span data-say="the size of X">|X|</span> and <span data-say="the size of F">|F|</span>.</p><p>Theorem 35.4 bounds it by H(max <span data-say="the size of S">|S|</span>), the harmonic number of the size of the largest set, where H(d) = 1 + 1/2 + … + 1/d. The proof charges each element 1/k when it is first covered by a set that covers k new elements, so that the charges add up to the number of sets greedy takes. It then shows that the elements of any one set S, an optimal set included, pay at most <span data-say="H of the size of S">H(|S|)</span> in total, because when j of S's elements remain uncovered greedy takes a set covering at least j new elements. Summing over an optimal cover gives the ratio, and since <span data-say="the size of S, is at most the size of X">|S| ≤ |X|</span>, Corollary 35.5 adds that the ratio is at most <span data-say="ln the size of X, plus 1">ln |X| + 1</span>.</p><p>Section 35.4 shows two more techniques. For MAX-3-CNF satisfiability, where every clause has exactly three distinct literals and none holds a variable with its negation, set each variable true with probability 1/2. A clause fails only if all three literals are false, with probability 1/8, so by linearity of expectation 7/8 of the clauses are satisfied on average. No assignment satisfies more than all of them, so the expected ratio is at most 8/7 (Theorem 35.6). The section's second technique is linear programming: relax weighted vertex cover to fractions between 0 and 1, solve, and put a vertex in the cover when its value is at least 1/2. Every edge's constraint forces one end to 1/2 or more, and the rounding at most doubles the cost, a 2-approximation (Theorem 35.7).</p><p>Section 35.5 finishes with subset sum as an optimization: the largest sum of a subset of S that does not exceed t. The exact method keeps a sorted list of every reachable sum up to t, merging the list with a copy shifted by each new element; the list can double each time. APPROX-SUBSET-SUM trims the list after each merge with <span data-say="delta equals epsilon over 2 n">δ = ε/(2n)</span>, and Theorem 35.8 shows that the answer is within <span data-say="1 plus epsilon">1 + ε</span> of the optimum and that every list stays short enough for a running time polynomial in n and <span data-say="1 over epsilon">1/ε</span>: a fully polynomial-time approximation scheme. Here is a trim on numbers of the lesson's own, S = {12, 20, 31, 45}, <span data-say="t equals 70, epsilon equals 0.4">t = 70, ε = 0.4</span>, so <span data-say="delta equals 0.4 over 8 equals 0.05">δ = 0.4/8 = 0.05</span>.</p><div class="mathblock" data-say="after 12, 0, 12. after 20, 0, 12, 20, 32. after 31, merged 0, 12, 20, 31, 32, 43, 51, 63. 32 is at most 1.05 times 31, so 32 is dropped. after 45, merged list, then 45 is at most 1.05 times 43 and 65 is at most 1.05 times 63 dropped. kept up to 70, 0, 12, 20, 31, 43, 51, 57, 63. answer 63, optimum 20 plus 45 equals 65, 65 over 63 is at most 1.4" tabindex="0" role="region" aria-label="Mathematical notation">after 12:  0, 12
 after 20:  0, 12, 20, 32
 after 31:  merged 0, 12, 20, 31, 32, 43, 51, 63
            32 ≤ 1.05 · 31, so 32 is dropped
 after 45:  merged list, then 45 ≤ 1.05 · 43 and 65 ≤ 1.05 · 63 dropped
            kept up to 70:  0, 12, 20, 31, 43, 51, 57, 63
-answer 63;  optimum 20 + 45 = 65;  65/63 ≤ 1.4</div><p>The trim threw away 65, the optimum itself, because 63 was within 5 per cent of it, and the answer lost about 3 per cent where <span data-say="epsilon">ε</span> allowed 40. The Algorithms lessons Charging Every Element and Accuracy by the Epsilon run greedy set cover and an approximation scheme for knapsack, a different scheme from the book's trimming.</p><p>Now the lab, which runs greedy set cover on the family you type and prints the universe and sets, the sets greedy took in order, the optimum by searching every subfamily, the realised ratio, a harmonic number H over the size of the universe, the bound H times the optimum, whether the answer is within it, and whether the charges add up to the answer. Its bound uses <span data-say="H of the size of X">H(|X|)</span>, which is Corollary 35.5's coarser form: H(max <span data-say="the size of S">|S|</span>) is never larger, and the lesson computes it beside the lab's.</p><p>Its presets: <code>trap</code> has 7 elements and 3 sets; greedy takes all 3, the optimum is 2, the ratio 3/2, against a bound of 363/70 from <span data-say="H sub 7 equals 363 over 140">H₇ = 363/140</span>. <code>trap10</code> is the same trap on 10 elements, again 3 against 2. <code>clean</code> is a partition into 2 sets, and greedy is optimal with charges 2 against 2. <code>overlap</code> has five overlapping triples and greedy finds an optimal cover of 2. <code>singletons</code> has one big set and the singletons under it; greedy takes the big set, and the bound is <span data-say="H sub 5 equals 137 over 60">H₅ = 137/60</span>.</p><p>Then type the lesson's family: <span class="math" data-say="1 2 3 4, 5 6 7 8, 1 2 5 6 7">1 2 3 4; 5 6 7 8; 1 2 5 6 7</span>. Greedy takes S3 first, five new elements charged 1/5 each; then S1, which adds 3 and 4 at 1/2 each; then S2, which adds only 8, charged 1. The charges add to 3, the optimum is 2 (S1 and S2), and the ratio is 3/2. The lab's bound is <span data-say="2 times H sub 8 equals 761 over 140">2·H₈ = 761/140</span>, about 5.44; the book's is <span data-say="2 times H of 5 equals 137 over 30">2·H(5) = 137/30</span>, about 4.57. Both hold with room to spare, which is what a bound over every input usually looks like on one of them.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, s 1 is set to 1, 2, 3, 4 s 2 is set to 1, 3, 5 s 3 is set to 2, 4, 6" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">S1 = {1, 2, 3, 4}   S2 = {1, 3, 5}   S3 = {2, 4, 6}</span></code></pre><p>Run GREEDY-SET-COVER by hand, giving the charge each element pays. Find the optimum, the realised ratio and the book's bound <span data-say="2 times H of max the size of S">2·H(max |S|)</span>. Then type the family as <span class="math" data-say="1 2 3 4, 1 3 5, 2 4 6">1 2 3 4; 1 3 5; 2 4 6</span> and compare.</p><p>That ends the read-along of Parts I to VII. Part VIII of the book, the appendices on summations, sets, counting and probability and matrices, is the background these lessons leaned on; and the Algorithms Subject's course Intractability and Approximation takes the last two chapters further, with branch and bound and parameterized algorithms.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Greedy set cover: every element pays, and the prices add up</h2></div><p>A set covering k new elements charges each of them 1/k — the charges add to the answer, and each one has its own allowance</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+answer 63;  optimum 20 + 45 = 65;  65/63 ≤ 1.4</div><p>The trim threw away 65, the optimum itself, because 63 was within 5 per cent of it, and the answer lost about 3 per cent where <span data-say="epsilon">ε</span> allowed 40. The Algorithms lessons Charging Every Element and Accuracy by the Epsilon run greedy set cover and an approximation scheme for knapsack, a different scheme from the book's trimming.</p><p>Now the lab, which runs greedy set cover on the family you type and prints the universe and sets, the sets greedy took in order, the optimum by searching every subfamily, the realised ratio, a harmonic number H over the size of the universe, the bound H times the optimum, whether the answer is within it, and whether the charges add up to the answer. Its bound uses <span data-say="H of the size of X">H(|X|)</span>, which is Corollary 35.5's coarser form: H(max <span data-say="the size of S">|S|</span>) is never larger, and the lesson computes it beside the lab's.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Greedy set cover: every element pays, and the prices add up</h2></div><p>A set covering k new elements charges each of them 1/k — the charges add to the answer, and each one has its own allowance</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Greedy set cover: every element pays, and the prices add up</strong><span>a set that covers k new elements charges each of them 1/k, so the charges are the answer</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the charge an element paid</span><span class="tone-purple"><i class="legend-swatch"></i>the most it was allowed to pay</span><span class="tone-green"><i class="legend-swatch"></i>the optimum</span><span class="tone-red"><i class="legend-swatch"></i>the bound, H times the optimum</span></div>
@@ -1465,10 +1508,10 @@ answer 63;  optimum 20 + 45 = 65;  65/63 ≤ 1.4</div><p>The trim threw away 65,
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scTrace"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="scChain"></table></div>
       <div class="status-banner" id="scStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Step through greedy&#x27;s choices and add up the charges</h3>
-          <p>Type sets as elements separated by spaces, and sets separated by semicolons. The lab runs greedy, prices every element at 1/k when it is one of k new elements, finds the optimum by searching every subfamily, and bounds the cover by H over the universe. Type the lesson's family, then the exercise's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Step through greedy&#x27;s choices and add up the charges</h3>
+            <p>Type sets as elements separated by spaces, and sets separated by semicolons. The lab runs greedy, prices every element at 1/k when it is one of k new elements, finds the optimum by searching every subfamily, and bounds the cover by H over the universe. Type the lesson's family, then the exercise's.</p>
         <div class="field">
           <label for="scPreset">Worked example</label>
           <select id="scPreset"><option value="trap" selected>seven elements, three sets</option><option value="trap10">ten elements, the same trap one size up</option><option value="clean">a partition into two sets</option><option value="overlap">five triples on five elements, heavy overlap</option><option value="singletons">one big set and the singletons under it</option></select>
@@ -1492,12 +1535,15 @@ answer 63;  optimum 20 + 45 = 65;  65/63 ≤ 1.4</div><p>The trim threw away 65,
           <div class="kpi"><span>The charges add to the answer</span><strong id="scCharges">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="scHint" style="margin:0;">A set is <span class="tt">1 2 3</span>, and sets are separated by a semicolon. The universe is whatever appears. At each step take the set covering the most <em>new</em> elements; if it covers <span class="tt">k</span> of them, charge each one <span class="tt">1/k</span>. The charges add to the number of sets taken, because each set costs 1 and hands its whole cost out. The analysis then bounds each charge separately, and the bound on the sum is <span class="tt">H</span> times the optimum.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Its presets: <code>trap</code> has 7 elements and 3 sets; greedy takes all 3, the optimum is 2, the ratio 3/2, against a bound of 363/70 from <span data-say="H sub 7 equals 363 over 140">H₇ = 363/140</span>. <code>trap10</code> is the same trap on 10 elements, again 3 against 2. <code>clean</code> is a partition into 2 sets, and greedy is optimal with charges 2 against 2. <code>overlap</code> has five overlapping triples and greedy finds an optimal cover of 2. <code>singletons</code> has one big set and the singletons under it; greedy takes the big set, and the bound is <span data-say="H sub 5 equals 137 over 60">H₅ = 137/60</span>.</p><p>Then type the lesson's family: <span class="math" data-say="1 2 3 4, 5 6 7 8, 1 2 5 6 7">1 2 3 4; 5 6 7 8; 1 2 5 6 7</span>. Greedy takes S3 first, five new elements charged 1/5 each; then S1, which adds 3 and 4 at 1/2 each; then S2, which adds only 8, charged 1. The charges add to 3, the optimum is 2 (S1 and S2), and the ratio is 3/2. The lab's bound is <span data-say="2 times H sub 8 equals 761 over 140">2·H₈ = 761/140</span>, about 5.44; the book's is <span data-say="2 times H of 5 equals 137 over 30">2·H(5) = 137/30</span>, about 4.57. Both hold with room to spare, which is what a bound over every input usually looks like on one of them.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, s 1 is set to 1, 2, 3, 4 s 2 is set to 1, 3, 5 s 3 is set to 2, 4, 6" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">S1 = {1, 2, 3, 4}   S2 = {1, 3, 5}   S3 = {2, 4, 6}</span></code></pre><p>Run GREEDY-SET-COVER by hand, giving the charge each element pays. Find the optimum, the realised ratio and the book's bound <span data-say="2 times H of max the size of S">2·H(max |S|)</span>. Then type the family as <span class="math" data-say="1 2 3 4, 1 3 5, 2 4 6">1 2 3 4; 1 3 5; 2 4 6</span> and compare.</p><p>That ends the read-along of Parts I to VII. Part VIII of the book, the appendices on summations, sets, counting and probability and matrices, is the background these lessons leaned on; and the Algorithms Subject's course Intractability and Approximation takes the last two chapters further, with branch and bound and parameterized algorithms.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Running greedy set cover and checking its bound</h2></div><p>Four steps run the algorithm and the book's bound; the fifth is a family of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Take the set with the most new elements</h3><p>Among the sets, find the one containing the most elements not yet covered. Break a tie any way you like, and note how you broke it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Charge its new elements</h3><p>If it covers k new elements, each pays 1/k. Repeat until every element is covered; the number of sets taken equals the sum of the charges.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the book&#x27;s bound</h3><p>Find the largest set's size d and the harmonic number H(d) = 1 + 1/2 + … + 1/d. The cover has at most H(d) times as many sets as an optimal one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare with the optimum on small families</h3><p>Try subfamilies of increasing size until one covers everything. Divide greedy's count by it for the realised ratio, and check it is at most H(d).</p></article><article class="card concept-card"><div class="icon">5</div><h3>Build a trap of your own</h3><p>Write a family on ten elements where greedy takes at least one more set than the optimum, type it into the lab, and record the two counts, the charges and both bounds, H(max <span data-say="the size of S">|S|</span>) by hand and the lab's H over the universe.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Running greedy set cover and checking its bound</h2>
+      <p class="lead-in">Four steps run the algorithm and the book's bound; the fifth is a family of your own.</p>
+      <ol class="key-ideas method"><li><strong>Take the set with the most new elements.</strong> Among the sets, find the one containing the most elements not yet covered. Break a tie any way you like, and note how you broke it.</li><li><strong>Charge its new elements.</strong> If it covers k new elements, each pays 1/k. Repeat until every element is covered; the number of sets taken equals the sum of the charges.</li><li><strong>Compute the book&#x27;s bound.</strong> Find the largest set's size d and the harmonic number H(d) = 1 + 1/2 + … + 1/d. The cover has at most H(d) times as many sets as an optimal one.</li><li><strong>Compare with the optimum on small families.</strong> Try subfamilies of increasing size until one covers everything. Divide greedy's count by it for the realised ratio, and check it is at most H(d).</li><li><strong>Build a trap of your own.</strong> Write a family on ten elements where greedy takes at least one more set than the optimum, type it into the lab, and record the two counts, the charges and both bounds, H(max <span data-say="the size of S">|S|</span>) by hand and the lab's H over the universe.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1517,17 +1563,16 @@ book: H(5) = 137/60;  2·H(5) = 137/30
 lab: H(8) = 761/280;  2·H(8) = 761/140</div><p>Look at the charges inside the optimal set S2: 5, 6 and 7 paid 1/5 each and 8 paid 1, a total of 8/5, well under H(4) = 25/12, the most the proof allows a set of four elements to pay. The same holds for S1: 1/5 + 1/5 + 1/2 + 1/2 = 7/5. Adding the two gives 3, greedy's count, and the proof's argument is that this sum can never exceed the optimum times H of the largest set.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting greedy to be optimal because it is greedy</strong><span>Chapter 16's greedy algorithms were optimal because their problems had the greedy-choice property. Set cover does not. On the lesson's family greedy's first choice, the largest set, is in no optimal cover, and it ends with 3 sets where 2 suffice. What section 35.3 proves is a bound, H(max <span data-say="the size of S">|S|</span>), not optimality.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading 8/7 as a guarantee on every run</strong><span>The ratio for MAX-3-CNF is about the expected number of satisfied clauses over the algorithm's coin flips. A single run can do worse than 7/8 of the clauses; the theorem says that on average it does not. Repeating the algorithm, or fixing variables one at a time by conditional expectation, are ways to turn the average into a certainty.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking an approximation scheme is free accuracy</strong><span>Each halving of <span data-say="epsilon">ε</span> roughly doubles the trimmed lists and the running time. The scheme is fully polynomial because the cost grows polynomially in <span data-say="1 over epsilon">1/ε</span>, not because it does not grow. In the lesson's trim, <span data-say="epsilon equals 0.4">ε = 0.4</span> kept 8 sums where the exact method would have kept 11 of the 16 subset sums at or below 70.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run and bound greedy set cover, and trim a list.</strong><p>For a family of three to five sets, run greedy with its charges, compute H(max <span data-say="the size of S">|S|</span>) and the bound, and compare with the optimum; compute the expected satisfied clauses of a random assignment; and trim a sorted list of sums for a given <span data-say="delta">δ</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab's optimum is an exhaustive search over subfamilies, so it handles only small families, and its bound uses H over the universe, which is looser than the book's H(max <span data-say="the size of S">|S|</span>). It runs neither the randomized MAX-3-CNF algorithm nor the trimming scheme. Its counts are about the family you type; the ratio H(max <span data-say="the size of S">|S|</span>) is the book's proof about every family.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Expecting greedy to be optimal because it is greedy</strong><span>Chapter 16's greedy algorithms were optimal because their problems had the greedy-choice property. Set cover does not. On the lesson's family greedy's first choice, the largest set, is in no optimal cover, and it ends with 3 sets where 2 suffice. What section 35.3 proves is a bound, H(max <span data-say="the size of S">|S|</span>), not optimality.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading 8/7 as a guarantee on every run</strong><span>The ratio for MAX-3-CNF is about the expected number of satisfied clauses over the algorithm's coin flips. A single run can do worse than 7/8 of the clauses; the theorem says that on average it does not. Repeating the algorithm, or fixing variables one at a time by conditional expectation, are ways to turn the average into a certainty.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking an approximation scheme is free accuracy</strong><span>Each halving of <span data-say="epsilon">ε</span> roughly doubles the trimmed lists and the running time. The scheme is fully polynomial because the cost grows polynomially in <span data-say="1 over epsilon">1/ε</span>, not because it does not grow. In the lesson's trim, <span data-say="epsilon equals 0.4">ε = 0.4</span> kept 8 sums where the exact method would have kept 11 of the 16 subset sums at or below 70.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run and bound greedy set cover, and trim a list.</strong><p>For a family of three to five sets, run greedy with its charges, compute H(max <span data-say="the size of S">|S|</span>) and the bound, and compare with the optimum; compute the expected satisfied clauses of a random assignment; and trim a sorted list of sums for a given <span data-say="delta">δ</span>.</p></div></div><div class="note"><strong>Note:</strong> The lab's optimum is an exhaustive search over subfamilies, so it handles only small families, and its bound uses H over the universe, which is looser than the book's H(max <span data-say="the size of S">|S|</span>). It runs neither the randomized MAX-3-CNF algorithm nor the trimming scheme. Its counts are about the family you type; the ratio H(max <span data-say="the size of S">|S|</span>) is the book's proof about every family.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A charge</summary><p>When greedy takes a set that covers k new elements, each of those elements is charged 1/k. The charges add up to the number of sets taken, and bounding the charges paid by the elements of any one set bounds the whole cover.</p></details><details class="recall"><summary>An expected ratio</summary><p>A randomized algorithm has ratio <span data-say="rho of n">ρ(n)</span> when the expected cost of its answer is within a factor <span data-say="rho of n">ρ(n)</span> of the optimum. Setting each variable of a 3-CNF formula true or false with probability 1/2 leaves a clause unsatisfied with probability 1/8.</p></details><details class="recall"><summary>Trimming</summary><p>Removing from a sorted list of subset sums every value y that some kept value z represents, meaning <span data-say="z is at most y is at most the quantity 1 plus delta, times z">z ≤ y ≤ (1 + δ)·z</span>. The list stays short, and every removed sum is approximated within a factor <span data-say="1 plus delta">1 + δ</span>.</p></details></div>
+      <h3>Summary</h3>
       <p>Sections 35.3 to 35.5: GREEDY-SET-COVER and its ratio H(max <span data-say="the size of S">|S|</span>), the randomized 8/7-approximation for MAX-3-CNF satisfiability, rounding a linear program for weighted vertex cover, and the fully polynomial-time approximation scheme for subset sum that trims its lists of sums. Run greedy set cover on a family written for the lesson, add up the charges, and trim a list of sums by hand.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A charge.</strong> When greedy takes a set that covers k new elements, each of those elements is charged 1/k. The charges add up to the number of sets taken, and bounding the charges paid by the elements of any one set bounds the whole cover.</li><li><strong>An expected ratio.</strong> A randomized algorithm has ratio <span data-say="rho of n">ρ(n)</span> when the expected cost of its answer is within a factor <span data-say="rho of n">ρ(n)</span> of the optimum. Setting each variable of a 3-CNF formula true or false with probability 1/2 leaves a clause unsatisfied with probability 1/8.</li><li><strong>Trimming.</strong> Removing from a sorted list of subset sums every value y that some kept value z represents, meaning <span data-say="z is at most y is at most the quantity 1 plus delta, times z">z ≤ y ≤ (1 + δ)·z</span>. The list stays short, and every removed sum is approximated within a factor <span data-say="1 plus delta">1 + δ</span>.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="greedy, take the set covering most new. the ratio, H of the largest set&#x27;s size, is at most the natural log of the size of X, plus 1. each new element pays 1 over new elements. random assignment, 7 over 8 of clauses expected. weighted cover, round the LP at 1 over 2. trim, drop y if some z is at most y is at most the quantity 1 plus delta, times z. delta equals epsilon over 2 n gives ratio 1 plus epsilon" tabindex="0" role="region" aria-label="Mathematical notation">greedy: take the set covering most new
 ratio H(max |S|) ≤ ln |X| + 1
 each new element pays 1/(new elements)
@@ -3547,11 +3592,40 @@ trim: drop y if some z ≤ y ≤ (1 + δ)·z
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3619,7 +3693,7 @@ trim: drop y if some z ≤ y ≤ (1 + δ)·z
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

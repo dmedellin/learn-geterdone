@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,51 +1478,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">A Case Study: Designing a Document Editor</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 2 · A Case Study: Designing a Document Editor</p>
       <h1>Design Problems and Document Structure</h1>
       <p class="lesson-lede">Seven design problems in one editor, and the first of them solved by building the document from parts that can be treated the same as the whole.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Recursive composition</li><li>Glyph</li><li>Composite</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The seven problems, then the first of them</h2>
-      <article class="prose reading"><p>&ldquo;A common way to represent hierarchically structured information is through a technique called recursive composition, which entails building increasingly complex elements out of simpler ones.&rdquo; That is the technique Section 2.2 of Chapter 2, A Case Study: Designing a Document Editor, settles on for its first problem. The chapter follows one design, an editor called Lexi, from problem to pattern, and shows eight of the catalog's patterns at work in it before the catalog begins. Read sections 2.1 and 2.2 in your own copy first.</p><p>Lexi is a WYSIWYG editor, showing the page as it will print and mixing text and pictures freely, and the authors credit its design to Doc, an editor Calder built. Section 2.1 lists seven problems the design has to solve: how to represent the document; how to format it into lines and columns; how to add and remove decorations such as borders and scroll bars; how to support more than one look-and-feel standard; how to run on more than one window system; how to give menus and buttons a single way to reach scattered operations and undo them; and how to add analyses such as spelling checking while changing as few classes as possible. Each of the following sections, and each lesson of this course, takes one problem: its goals and constraints first, then a design, then the pattern the design is an instance of.</p><p>The first problem touches everything else, because editing, formatting, display and analysis all walk the document's representation. The authors want the representation to match the document's physical structure, the way its text and pictures are laid out into lines, columns and tables, so that a user can treat a table or a diagram as one thing. It has to hold that structure, draw it, and map a point on the screen back to the element under it. Two constraints follow. Text and graphics should be handled alike, with no second set of mechanisms for either; and a single element and a group of elements should be handled alike, so that the tenth thing in a line may be one letter or an elaborate diagram without the line caring. Against the second, the authors note at once, some analyses do care: nobody checks the spelling of a polygon. That tension returns in the last lesson.</p><p>Recursive composition meets both constraints. Letters and pictures are tiled into a line, lines stacked into a column, columns into a page, and every element, visible or structural, is an object. That has two implications the authors draw out: the objects need classes, and the classes need compatible interfaces, which in C++ means a common base class. A footnote adds a caution worth keeping: most editors of the time did not use an object per character, presumably for efficiency, and the authors point to Flyweight as the way to share such objects, a lesson in Structural Patterns.</p><p>The base class is Glyph. A glyph has three responsibilities: it draws itself in a window; it knows the rectangle it occupies and whether a point falls inside it, which is how a click finds its target; and it knows its children and its parent, with operations to insert, remove and fetch a child. A glyph that has children is asked to reach them through its own child operation rather than through the list or array that holds them, so that the container can change without touching the operations that loop over it. The section closes by naming the pattern, Composite, and sending the reader to it.</p><p>Read as a tool, Composite has three roles: a Component interface, Leaf classes with no children, and Composite classes that hold components and pass an operation on to each one. The catalog lists the benefits, a simple client and new kinds of component that work with existing structures, and the cost: a design so general that the type system can no longer restrict what goes inside a composite. Its Implementation section adds a choice the lab counts. Declare the child operations on every component, as Lexi's Glyph does, and every part is treated alike, but a client can ask a leaf for a child it cannot have; declare them on the composite only, and the compiler catches that mistake, at the price of two interfaces. The authors call these transparency and safety. The sketch below, a recipe book in Java, takes the safe side.</p><pre class="codeblock" data-say="line 1, comment, Every part of the recipe book answers one question how long?. line 2, interface book part. line 3, int minutes. line 5, final class recipe implements book part. line 6, private final int minutes. line 7, recipe of int minutes this dot minutes is set to minutes. line 8, public int minutes return minutes. line 10, final class section implements book part. line 11, private final list of book part parts is set to new array list. line 12, void add of book part part parts dot add of part, comment, on Section only. line 13, public int minutes. line 14, int sum is set to 0. line 15, for book part part in parts. line 16, sum is increased by part dot minutes, comment, a recipe or a whole section. line 18, return sum" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Every part of the recipe book answers one question: how long?</span>
-<span class="cl">interface BookPart {</span>
-<span class="cl">    int minutes();</span>
-<span class="cl">}</span>
-<span class="cl">final class Recipe implements BookPart {</span>
-<span class="cl">    private final int minutes;</span>
-<span class="cl">    Recipe(int minutes) { this.minutes = minutes; }</span>
-<span class="cl">    public int minutes() { return minutes; }</span>
-<span class="cl">}</span>
-<span class="cl">final class Section implements BookPart {</span>
-<span class="cl">    private final List&lt;BookPart&gt; parts = new ArrayList&lt;&gt;();</span>
-<span class="cl">    void add(BookPart part) { parts.add(part); }   // on Section only</span>
-<span class="cl">    public int minutes() {</span>
-<span class="cl">        int sum = 0;</span>
-<span class="cl">        for (BookPart part : parts) {</span>
-<span class="cl">            sum += part.minutes();   // a recipe or a whole section</span>
-<span class="cl">        }</span>
-<span class="cl">        return sum;</span>
-<span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count, on the recipe book rather than Lexi's pages. The preset <code>recipe-book</code> has 10 nodes: 4 sections, which are the composites, and 6 leaves, five recipes valued in minutes and a cover photo valued at 0. One operation on the book, asking how long everything takes, makes 10 calls: 1 from the client and 9 forwarded by sections to their parts. It totals 345 minutes, and the table gives each section's subtotal: breads 135, cakes 210, and the layer cakes inside cakes 175. The depth is 3, from the book through cakes and layer to a recipe. The photo answers the question too, with 0, which is the uniform treatment of text and graphics in a number. The preset also asks pitta and layer to add a child: layer does, and under the safe declaration pitta's call does not compile.</p><p>The preset <code>talk-outline</code> is a talk's slides, 7 nodes with 2 parts as composites and 5 leaves, one of them a video clip: 7 calls, 17.5 minutes, depth 2. It is set to the transparent declaration, and asks the slide close and the part method to add a child. Method does; close's call is accepted by the interface, and the slide must either ignore it or fail at run time. Switch the declaration to safe and the same request becomes a compile error. Which you want is the trade-off the catalog leaves to you.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, mix, minus, list, minus. line 2, side minus A, mix, list, minus. line 3, t 1, side minus A, track, 3.5. line 4, t 2, side minus A, track, 4.25. line 5, side minus b, mix, list, minus. line 6, t 3, side minus b, track, 5. line 7, encore, side minus b, list, minus. line 8, t 4, encore, track, 2.75. line 9, t 5, mix, track, 6" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">mix, -, List, -;</span>
-<span class="cl">side-a, mix, List, -;</span>
-<span class="cl">t1, side-a, Track, 3.5;</span>
-<span class="cl">t2, side-a, Track, 4.25;</span>
-<span class="cl">side-b, mix, List, -;</span>
-<span class="cl">t3, side-b, Track, 5;</span>
-<span class="cl">encore, side-b, List, -;</span>
-<span class="cl">t4, encore, Track, 2.75;</span>
-<span class="cl">t5, mix, Track, 6</span></code></pre><p>A mixtape, in the lab's record form: node, parent, kind, minutes. By hand, count the calls one operation on <code>mix</code> makes and the total it returns, and give the subtotal of <code>side-b</code>. Then type the records into the lab to check.</p><p>The structure is in place, but nothing yet says how a stream of parts is broken into lines. The next lesson, Formatting, reads Section 2.3, where the line-breaking algorithm becomes an object of its own.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A tree of parts</h2></div><p>one operation over a whole and its parts</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The seven problems, then the first of them</h2><div class="prose reading"><p>&ldquo;A common way to represent hierarchically structured information is through a technique called recursive composition, which entails building increasingly complex elements out of simpler ones.&rdquo; That is the technique Section 2.2 of Chapter 2, A Case Study: Designing a Document Editor, settles on for its first problem. The chapter follows one design, an editor called Lexi, from problem to pattern, and shows eight of the catalog's patterns at work in it before the catalog begins. Read sections 2.1 and 2.2 in your own copy first.</p><p>Lexi is a WYSIWYG editor, showing the page as it will print and mixing text and pictures freely, and the authors credit its design to Doc, an editor Calder built. Section 2.1 lists seven problems the design has to solve: how to represent the document; how to format it into lines and columns; how to add and remove decorations such as borders and scroll bars; how to support more than one look-and-feel standard; how to run on more than one window system; how to give menus and buttons a single way to reach scattered operations and undo them; and how to add analyses such as spelling checking while changing as few classes as possible. Each of the following sections, and each lesson of this course, takes one problem: its goals and constraints first, then a design, then the pattern the design is an instance of.</p><p>The first problem touches everything else, because editing, formatting, display and analysis all walk the document's representation. The authors want the representation to match the document's physical structure, the way its text and pictures are laid out into lines, columns and tables, so that a user can treat a table or a diagram as one thing. It has to hold that structure, draw it, and map a point on the screen back to the element under it. Two constraints follow. Text and graphics should be handled alike, with no second set of mechanisms for either; and a single element and a group of elements should be handled alike, so that the tenth thing in a line may be one letter or an elaborate diagram without the line caring. Against the second, the authors note at once, some analyses do care: nobody checks the spelling of a polygon. That tension returns in the last lesson.</p><p>Recursive composition meets both constraints. Letters and pictures are tiled into a line, lines stacked into a column, columns into a page, and every element, visible or structural, is an object. That has two implications the authors draw out: the objects need classes, and the classes need compatible interfaces, which in C++ means a common base class. A footnote adds a caution worth keeping: most editors of the time did not use an object per character, presumably for efficiency, and the authors point to Flyweight as the way to share such objects, a lesson in Structural Patterns.</p><p>The base class is Glyph. A glyph has three responsibilities: it draws itself in a window; it knows the rectangle it occupies and whether a point falls inside it, which is how a click finds its target; and it knows its children and its parent, with operations to insert, remove and fetch a child. A glyph that has children is asked to reach them through its own child operation rather than through the list or array that holds them, so that the container can change without touching the operations that loop over it. The section closes by naming the pattern, Composite, and sending the reader to it.</p><p>Read as a tool, Composite has three roles: a Component interface, Leaf classes with no children, and Composite classes that hold components and pass an operation on to each one. The catalog lists the benefits, a simple client and new kinds of component that work with existing structures, and the cost: a design so general that the type system can no longer restrict what goes inside a composite. Its Implementation section adds a choice the lab counts. Declare the child operations on every component, as Lexi's Glyph does, and every part is treated alike, but a client can ask a leaf for a child it cannot have; declare them on the composite only, and the compiler catches that mistake, at the price of two interfaces. The authors call these transparency and safety. The sketch below, a recipe book in Java, takes the safe side.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A tree of parts</h2></div><p>one operation over a whole and its parts</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A tree of parts</strong><span>one operation over a whole and its parts</span></div>
       </div>
@@ -1485,10 +1501,10 @@
       <div class="table-wrap" id="gtrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gtrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one node: its name, its parent (- for the root; exactly one root), its kind (a class name) and its value, a decimal for a leaf and - for a composite. A leaf has no children; a composite may have none. Children are taken in record order. A kind is either a leaf class or a composite class, never both. Depth counts the edges on the longest path down from the root (a root alone is at depth 0). One operation on the root makes one call per node: the client's call on the root, and one call from each composite to each of its children. The total is the sum of the leaf values, exactly; a composite's subtotal is the sum of the leaves below it, and its calls are the nodes in its subtree. A composite asked to add a child does. A leaf asked to: under the safe declaration (add declared only on the composite class) the call does not compile; under the transparent one (add declared on every component) it compiles, and the leaf ignores it or fails at run time.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One operation over a whole and its parts</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One operation over a whole and its parts</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gtrPreset">Worked example</label>
           <select id="gtrPreset"><option value="recipe-book" selected>A recipe book in minutes, safe declaration</option><option value="talk-outline">A talk's slide outline, transparent declaration</option></select>
@@ -1516,12 +1532,42 @@
           <div class="kpi"><span>Composites asked to add a child (they do)</span><strong id="gtrAskTaken">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><pre class="codeblock" data-say="line 1, comment, Every part of the recipe book answers one question how long?. line 2, interface book part. line 3, int minutes. line 5, final class recipe implements book part. line 6, private final int minutes. line 7, recipe of int minutes this dot minutes is set to minutes. line 8, public int minutes return minutes. line 10, final class section implements book part. line 11, private final list of book part parts is set to new array list. line 12, void add of book part part parts dot add of part, comment, on Section only. line 13, public int minutes. line 14, int sum is set to 0. line 15, for book part part in parts. line 16, sum is increased by part dot minutes, comment, a recipe or a whole section. line 18, return sum" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Every part of the recipe book answers one question: how long?</span>
+<span class="cl">interface BookPart {</span>
+<span class="cl">    int minutes();</span>
+<span class="cl">}</span>
+<span class="cl">final class Recipe implements BookPart {</span>
+<span class="cl">    private final int minutes;</span>
+<span class="cl">    Recipe(int minutes) { this.minutes = minutes; }</span>
+<span class="cl">    public int minutes() { return minutes; }</span>
+<span class="cl">}</span>
+<span class="cl">final class Section implements BookPart {</span>
+<span class="cl">    private final List&lt;BookPart&gt; parts = new ArrayList&lt;&gt;();</span>
+<span class="cl">    void add(BookPart part) { parts.add(part); }   // on Section only</span>
+<span class="cl">    public int minutes() {</span>
+<span class="cl">        int sum = 0;</span>
+<span class="cl">        for (BookPart part : parts) {</span>
+<span class="cl">            sum += part.minutes();   // a recipe or a whole section</span>
+<span class="cl">        }</span>
+<span class="cl">        return sum;</span>
+<span class="cl">    }</span>
+<span class="cl">}</span></code></pre><p>Now the count, on the recipe book rather than Lexi's pages. The preset <code>recipe-book</code> has 10 nodes: 4 sections, which are the composites, and 6 leaves, five recipes valued in minutes and a cover photo valued at 0. One operation on the book, asking how long everything takes, makes 10 calls: 1 from the client and 9 forwarded by sections to their parts. It totals 345 minutes, and the table gives each section's subtotal: breads 135, cakes 210, and the layer cakes inside cakes 175. The depth is 3, from the book through cakes and layer to a recipe. The photo answers the question too, with 0, which is the uniform treatment of text and graphics in a number. The preset also asks pitta and layer to add a child: layer does, and under the safe declaration pitta's call does not compile.</p><p>The preset <code>talk-outline</code> is a talk's slides, 7 nodes with 2 parts as composites and 5 leaves, one of them a video clip: 7 calls, 17.5 minutes, depth 2. It is set to the transparent declaration, and asks the slide close and the part method to add a child. Method does; close's call is accepted by the interface, and the slide must either ignore it or fail at run time. Switch the declaration to safe and the same request becomes a compile error. Which you want is the trade-off the catalog leaves to you.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, mix, minus, list, minus. line 2, side minus A, mix, list, minus. line 3, t 1, side minus A, track, 3.5. line 4, t 2, side minus A, track, 4.25. line 5, side minus b, mix, list, minus. line 6, t 3, side minus b, track, 5. line 7, encore, side minus b, list, minus. line 8, t 4, encore, track, 2.75. line 9, t 5, mix, track, 6" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">mix, -, List, -;</span>
+<span class="cl">side-a, mix, List, -;</span>
+<span class="cl">t1, side-a, Track, 3.5;</span>
+<span class="cl">t2, side-a, Track, 4.25;</span>
+<span class="cl">side-b, mix, List, -;</span>
+<span class="cl">t3, side-b, Track, 5;</span>
+<span class="cl">encore, side-b, List, -;</span>
+<span class="cl">t4, encore, Track, 2.75;</span>
+<span class="cl">t5, mix, Track, 6</span></code></pre><p>A mixtape, in the lab's record form: node, parent, kind, minutes. By hand, count the calls one operation on <code>mix</code> makes and the total it returns, and give the subtotal of <code>side-b</code>. Then type the records into the lab to check.</p><p>The structure is in place, but nothing yet says how a stream of parts is broken into lines. The next lesson, Formatting, reads Section 2.3, where the line-breaking algorithm becomes an object of its own.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting one operation over a tree of parts</h2></div><p>Four steps, the last of them on a structure of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort the nodes into leaves and composites</h3><p>A node with a value is a leaf; a node that holds others is a composite. Write each composite's children in the order given.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the calls</h3><p>One call from the client reaches the root; each composite then makes one call per child. The total is one call per node, whatever the shape.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the leaves</h3><p>The operation's result at the root is the sum of the leaf values, and each composite's subtotal is the sum of the leaves below it. A leaf worth 0 still answers.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a structure of your own</h3><p>Take a folder tree, an organisation chart or a bill of materials you know and write five to ten of its parts as node, parent, kind, value. Count the calls and the total, and say which child operations you would declare on every part and which on the groups only.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting one operation over a tree of parts</h2>
+      <p class="lead-in">Four steps, the last of them on a structure of your own.</p>
+      <ol class="key-ideas method"><li><strong>Sort the nodes into leaves and composites.</strong> A node with a value is a leaf; a node that holds others is a composite. Write each composite's children in the order given.</li><li><strong>Count the calls.</strong> One call from the client reaches the root; each composite then makes one call per child. The total is one call per node, whatever the shape.</li><li><strong>Add the leaves.</strong> The operation's result at the root is the sum of the leaf values, and each composite's subtotal is the sum of the leaves below it. A leaf worth 0 still answers.</li><li><strong>Do it on a structure of your own.</strong> Take a folder tree, an organisation chart or a bill of materials you know and write five to ten of its parts as node, parent, kind, value. Count the calls and the total, and say which child operations you would declare on every part and which on the groups only.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1541,17 +1587,16 @@ calls: 1 + 3 + 2 + 2 + 2 = 10
 minutes: 0 + 95 + 40 + 55 + 120 + 35 = 345</div><p>Every node receives exactly one call, so the count is the number of nodes. The client made one of them; it never needed to know that cakes holds a section inside it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing one case for a single element and another for a group</strong><span>That is the design the second constraint of Section 2.2 rules out: the tenth element of a line may be a letter or a whole diagram, and the line should not have to ask. With one interface for leaves and composites, the client's single call reaches every part, as the lab's 10 calls on the recipe book show; with two, every client grows a type test.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking an object per character as the book&#x27;s advice for any editor</strong><span>The authors note in a footnote that most editors of their day did not do it, presumably for efficiency, that Calder showed it could be done, and that Flyweight is the way to share such objects. Lexi's design is chosen for flexibility in an example; its cost is a question the reader still has to weigh.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking uniform treatment means no operation may tell kinds apart</strong><span>Section 2.2 names the opposing constraint itself: spelling and hyphenation care whether a part is a letter. The chapter does not drop uniformity to meet it; Section 2.8 lets an analysis distinguish kinds without type tests, through Visitor.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count one operation over a tree of parts by hand.</strong><p>Given a tree as node, parent, kind and value, state its leaves, composites and depth, the calls one operation on the root makes and its total, and say what the safe and transparent declarations do with a leaf asked to add a child.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts calls and adds leaf values on the tree as stated; it does not add the children it is asked to add. It cannot say whether your structure should be a tree of objects at all, or whether one object per smallest part is affordable, which the authors themselves leave open.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Writing one case for a single element and another for a group</strong><span>That is the design the second constraint of Section 2.2 rules out: the tenth element of a line may be a letter or a whole diagram, and the line should not have to ask. With one interface for leaves and composites, the client's single call reaches every part, as the lab's 10 calls on the recipe book show; with two, every client grows a type test.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Taking an object per character as the book&#x27;s advice for any editor</strong><span>The authors note in a footnote that most editors of their day did not do it, presumably for efficiency, that Calder showed it could be done, and that Flyweight is the way to share such objects. Lexi's design is chosen for flexibility in an example; its cost is a question the reader still has to weigh.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Thinking uniform treatment means no operation may tell kinds apart</strong><span>Section 2.2 names the opposing constraint itself: spelling and hyphenation care whether a part is a letter. The chapter does not drop uniformity to meet it; Section 2.8 lets an analysis distinguish kinds without type tests, through Visitor.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count one operation over a tree of parts by hand.</strong><p>Given a tree as node, parent, kind and value, state its leaves, composites and depth, the calls one operation on the root makes and its total, and say what the safe and transparent declarations do with a leaf asked to add a child.</p></div></div><div class="note"><strong>Note:</strong> The lab counts calls and adds leaf values on the tree as stated; it does not add the children it is asked to add. It cannot say whether your structure should be a tree of objects at all, or whether one object per smallest part is affordable, which the authors themselves leave open.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Recursive composition</summary><p>Building complex elements out of simpler ones, and those out of simpler ones again: a line out of letters and pictures, a column out of lines, a page out of columns. Each level is made of parts of the same general sort as itself.</p></details><details class="recall"><summary>Glyph</summary><p>Lexi's abstract class for anything that can appear in a document, from a single letter to a whole column. Every glyph can draw itself, report the space it occupies and whether a point falls inside it, and give access to its children and its parent.</p></details><details class="recall"><summary>Composite</summary><p>The pattern that recursive composition becomes: a common Component interface shared by Leaf objects and by Composite objects that hold other components, so that a client treats one part and a whole structure of parts in the same way. It has a lesson of its own, Composite, in Structural Patterns.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 2 sets out seven design problems in Lexi, a WYSIWYG editor, and solves the first, how to represent a document, by recursive composition. Read why the authors want one interface for a single element and a group of them, then send one operation down a recipe book's tree and count the calls it makes and what it totals.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Recursive composition.</strong> Building complex elements out of simpler ones, and those out of simpler ones again: a line out of letters and pictures, a column out of lines, a page out of columns. Each level is made of parts of the same general sort as itself.</li><li><strong>Glyph.</strong> Lexi's abstract class for anything that can appear in a document, from a single letter to a whole column. Every glyph can draw itself, report the space it occupies and whether a point falls inside it, and give access to its children and its parent.</li><li><strong>Composite.</strong> The pattern that recursive composition becomes: a common Component interface shared by Leaf objects and by Composite objects that hold other components, so that a client treats one part and a whole structure of parts in the same way. It has a lesson of its own, Composite, in Structural Patterns.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="seven problems, one design. build the complex out of the simple. a part and a group share one interface. draw, know your bounds, know your children. a call on the root reaches every node. where to declare add, safety or uniformity" tabindex="0" role="region" aria-label="Mathematical notation">seven problems, one design
 build the complex out of the simple
 a part and a group share one interface
@@ -2358,11 +2403,40 @@ where to declare add: safety or uniformity</div><figcaption>Document structure i
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2430,7 +2504,7 @@ where to declare add: safety or uniformity</div><figcaption>Document structure i
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

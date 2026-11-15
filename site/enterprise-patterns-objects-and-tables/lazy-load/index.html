@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Objects and Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 11 · Object-Relational Behavioral Patterns</p>
       <h1>Lazy Load</h1>
       <p class="lesson-lede">Leave a marker where related data would go, and load it only when something asks, which saves what is never used and costs a query for each thing that is.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Lazy Load</li><li>Ripple loading</li><li>A statement and a row</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then the rule of thumb</h2>
-      <article class="prose reading"><p>&ldquo;As many people know, if you're lazy about doing things you'll win when it turns out you don't need to do them at all.&rdquo; That is Lazy Load's own summary of itself, in Chapter 11, and the lesson reads it with Chapter 3's Reading in Data. Read both in your own copy first.</p><p>You have probably seen a list page that is fast with ten rows and slow with fifty, and found in the log one query for the list and then one more for each row. Chapter 11 starts from the opposite habit. It is handy, it says, to load an object's related objects with it, so that the developer using it need not load them by hand; taken to its conclusion, loading one object pulls a huge graph out of the database when only a few of its objects are needed. A Lazy Load interrupts that, leaving a marker so that the data is loaded only when it is used.</p><p>The pattern gives four ways to leave the marker. <em>Lazy initialization</em>, which the book takes from Kent Beck, checks a field on every access and loads it the first time; it is the simplest, and ties the object to the database, so it suits Active Record and the gateways. A <em>virtual proxy</em>, from the Gang of Four's book, is an object that looks like the real one and loads it when called, at the risk of several proxies with different identities for one object. A <em>value holder</em> wraps the object and hands it over on request; a <em>ghost</em> is the real object holding only its key, which loads the rest on first touch. Fowler adds that in practice two degrees of laziness are enough: a complete load, and enough to identify each item in a list.</p><p>Then the warning. Fill a collection with lazy objects and look at them one by one, and each of them makes its own trip to the database where one trip could have fetched them all: ripple loading. Fowler's cure is to make the collection itself the lazy thing, and load all its contents when it is first touched. A related remedy, from the pattern's discussion of use cases, is to give different use cases different loaders, one that loads the lines with the order and one that waits. When to Use It puts the decision plainly: Lazy Load is worth considering when the data needs an extra call and is not used whenever the main object is, and Fowler's own preference is not to add it until he thinks he needs it.</p><p>Chapter 3's Reading in Data sets the other side of the scale. Its rule of thumb, the book's illustration, is that one query bringing back more rows than you need is usually better than fifty separate ones, and that joins can pull several tables back in one query, though databases are optimized for up to three or four joins in a query. Fowler then tells you to profile on your own database, because every rule of thumb has its surprising exceptions.</p><p>Here is lazy initialization written for this lesson. The <span class="math" data-say="order">Order</span> keeps its lines in a list (line 5) and a flag saying whether they have been loaded (line 6). The first call of <span class="math" data-say="lines">lines()</span> finds the flag false on line 13, asks the mapper for the lines on line 14, and sets the flag on line 15; every later call skips straight to line 17. The flag is the marker because the list is created empty and stays a real list (line 5), so there is no null to test. It is also the shape Chapter 11 points to wherever null is a legal loaded value, when a null test would go back to the database on every call.</p><pre class="codeblock" data-say="line 1, comment, Loads an order&#x27;s lines the first time something asks.. line 2, class order. line 3, private final long id. line 4, private final line mapper mapper. line 5, private final list of line lines is set to new array list. line 6, private boolean lines loaded is set to false. line 7, order of long id, line mapper mapper. line 8, this dot id is set to id. line 9, this dot mapper is set to mapper. line 12, list of line lines throws SQL exception. line 13, if not lines loaded. line 14, lines dot add all of mapper dot lines of of id. line 15, lines loaded is set to true. line 17, return lines" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Loads an order&#x27;s lines the first time something asks.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then the rule of thumb</h2><div class="prose reading"><p>&ldquo;As many people know, if you're lazy about doing things you'll win when it turns out you don't need to do them at all.&rdquo; That is Lazy Load's own summary of itself, in Chapter 11, and the lesson reads it with Chapter 3's Reading in Data. Read both in your own copy first.</p><p>You have probably seen a list page that is fast with ten rows and slow with fifty, and found in the log one query for the list and then one more for each row. Chapter 11 starts from the opposite habit. It is handy, it says, to load an object's related objects with it, so that the developer using it need not load them by hand; taken to its conclusion, loading one object pulls a huge graph out of the database when only a few of its objects are needed. A Lazy Load interrupts that, leaving a marker so that the data is loaded only when it is used.</p><p>The pattern gives four ways to leave the marker. <em>Lazy initialization</em>, which the book takes from Kent Beck, checks a field on every access and loads it the first time; it is the simplest, and ties the object to the database, so it suits Active Record and the gateways. A <em>virtual proxy</em>, from the Gang of Four's book, is an object that looks like the real one and loads it when called, at the risk of several proxies with different identities for one object. A <em>value holder</em> wraps the object and hands it over on request; a <em>ghost</em> is the real object holding only its key, which loads the rest on first touch. Fowler adds that in practice two degrees of laziness are enough: a complete load, and enough to identify each item in a list.</p><p>Then the warning. Fill a collection with lazy objects and look at them one by one, and each of them makes its own trip to the database where one trip could have fetched them all: ripple loading. Fowler's cure is to make the collection itself the lazy thing, and load all its contents when it is first touched. A related remedy, from the pattern's discussion of use cases, is to give different use cases different loaders, one that loads the lines with the order and one that waits. When to Use It puts the decision plainly: Lazy Load is worth considering when the data needs an extra call and is not used whenever the main object is, and Fowler's own preference is not to add it until he thinks he needs it.</p><p>Chapter 3's Reading in Data sets the other side of the scale. Its rule of thumb, the book's illustration, is that one query bringing back more rows than you need is usually better than fifty separate ones, and that joins can pull several tables back in one query, though databases are optimized for up to three or four joins in a query. Fowler then tells you to profile on your own database, because every rule of thumb has its surprising exceptions.</p><p>Here is lazy initialization written for this lesson. The <span class="math" data-say="order">Order</span> keeps its lines in a list (line 5) and a flag saying whether they have been loaded (line 6). The first call of <span class="math" data-say="lines">lines()</span> finds the flag false on line 13, asks the mapper for the lines on line 14, and sets the flag on line 15; every later call skips straight to line 17. The flag is the marker because the list is created empty and stays a real list (line 5), so there is no null to test. It is also the shape Chapter 11 points to wherever null is a legal loaded value, when a null test would go back to the database on every call.</p><pre class="codeblock" data-say="line 1, comment, Loads an order&#x27;s lines the first time something asks.. line 2, class order. line 3, private final long id. line 4, private final line mapper mapper. line 5, private final list of line lines is set to new array list. line 6, private boolean lines loaded is set to false. line 7, order of long id, line mapper mapper. line 8, this dot id is set to id. line 9, this dot mapper is set to mapper. line 12, list of line lines throws SQL exception. line 13, if not lines loaded. line 14, lines dot add all of mapper dot lines of of id. line 15, lines loaded is set to true. line 17, return lines" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Loads an order&#x27;s lines the first time something asks.</span>
 <span class="cl">class Order {</span>
 <span class="cl">    private final long id;</span>
 <span class="cl">    private final LineMapper mapper;</span>
@@ -1463,12 +1507,11 @@
 <span class="cl">        }</span>
 <span class="cl">        return lines;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab reads parents as records of a name, how many children each has and whether its children are used, with a batch size, and prints one tile per strategy as statements and rows. <em>Lazy</em> is one query for the parents and one for each used parent's children. <em>Lazy in batches</em>, the lab's variant rather than one of the book's, fetches the used parents' children a batch of parents at a time. <em>Two queries</em> reads the parents and then every child. <em>One join</em> is a left outer join: one statement, a row for each child, and one row for a parent with none.</p><p>In <code>orders-and-lines</code> five orders have 3, 0, 5, 2 and 4 lines, and only the first, third and fifth are used, with a batch of 2. Lazy loading issues <span class="math" data-say="4 statements, 17 rows">4 statements, 17 rows</span>; in batches, <span class="math" data-say="3 statements, 17 rows">3 statements, 17 rows</span>; two queries, <span class="math" data-say="2 statements, 19 rows">2 statements, 19 rows</span>; the join, <span class="math" data-say="1 statement, 15 rows">1 statement, 15 rows</span>. In <code>every-order-used</code> the same orders are all used: lazy is now <span class="math" data-say="6 statements, 19 rows">6 statements, 19 rows</span>, batches <span class="math" data-say="4 statements, 19 rows">4 statements, 19 rows</span>, and two queries and the join are unchanged, 2 and 19, 1 and 15. When everything is used, laziness reads no fewer rows and sends three times the statements.</p><p>Two things the tiles do not show. The join's 15 rows are fewer than two queries' 19 because the orders are not read separately, but each of its rows repeats the order's columns beside the line's, and the lab counts rows, not their width. And a statement's cost depends on your network and database, which no count here measures; Fowler's advice is to profile it.</p><h3>Exercise</h3><p>Six parents have <span class="math" data-say="A, 10, yes, b, 0, no, c, 2, no, d, 6, yes, e, 1, no, f, 3, yes">a, 10, yes; b, 0, no; c, 2, no; d, 6, yes; e, 1, no; f, 3, yes</span> (name, children, used), and the batch is 3. By hand, give the statements and rows of each of the four strategies, then check them in the lab.</p><p>Loading an order's lines means finding the rows that hold the order's key. The next lesson, Identity Field and Foreign Keys, reads how those keys are chosen and in what order the rows that hold them can be written.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Loading from the database</h2></div><p>statements and rows to load an object graph</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The lab reads parents as records of a name, how many children each has and whether its children are used, with a batch size, and prints one tile per strategy as statements and rows. <em>Lazy</em> is one query for the parents and one for each used parent's children. <em>Lazy in batches</em>, the lab's variant rather than one of the book's, fetches the used parents' children a batch of parents at a time. <em>Two queries</em> reads the parents and then every child. <em>One join</em> is a left outer join: one statement, a row for each child, and one row for a parent with none.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Loading from the database</h2></div><p>statements and rows to load an object graph</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Loading from the database</strong><span>statements and rows to load an object graph</span></div>
       </div>
@@ -1476,10 +1519,10 @@
       <div class="table-wrap" id="ldTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ldTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Lazy load: one query for the parents, then one for each used parent's children. In batches: the used parents' children, the batch size of parents at a time. Two queries: the parents, then every child. One join: a left outer join, one statement, one row a child, and a parent with no children still one row.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Statements and rows to load orders and their lines</h3>
-          <p>A count over the situation the lesson states. Each record is a parent, how many children it has, and whether its children are used. The lab counts the statements and rows four loading strategies issue; the batched strategy is the lab's, not the book's. It counts rows, not their width. The orders are the lesson's, and illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Statements and rows to load orders and their lines</h3>
+            <p>A count over the situation the lesson states. Each record is a parent, how many children it has, and whether its children are used. The lab counts the statements and rows four loading strategies issue; the batched strategy is the lab's, not the book's. It counts rows, not their width. The orders are the lesson's, and illustrative.</p>
         <div class="field">
           <label for="ldPreset">Worked example</label>
           <select id="ldPreset"><option value="orders-and-lines" selected>Five orders, three of them used, batch of 2</option><option value="every-order-used">The same five orders, every one used</option></select>
@@ -1499,12 +1542,15 @@
           <div class="kpi"><span>One join</span><strong id="ldJoin">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>In <code>orders-and-lines</code> five orders have 3, 0, 5, 2 and 4 lines, and only the first, third and fifth are used, with a batch of 2. Lazy loading issues <span class="math" data-say="4 statements, 17 rows">4 statements, 17 rows</span>; in batches, <span class="math" data-say="3 statements, 17 rows">3 statements, 17 rows</span>; two queries, <span class="math" data-say="2 statements, 19 rows">2 statements, 19 rows</span>; the join, <span class="math" data-say="1 statement, 15 rows">1 statement, 15 rows</span>. In <code>every-order-used</code> the same orders are all used: lazy is now <span class="math" data-say="6 statements, 19 rows">6 statements, 19 rows</span>, batches <span class="math" data-say="4 statements, 19 rows">4 statements, 19 rows</span>, and two queries and the join are unchanged, 2 and 19, 1 and 15. When everything is used, laziness reads no fewer rows and sends three times the statements.</p><p>Two things the tiles do not show. The join's 15 rows are fewer than two queries' 19 because the orders are not read separately, but each of its rows repeats the order's columns beside the line's, and the lab counts rows, not their width. And a statement's cost depends on your network and database, which no count here measures; Fowler's advice is to profile it.</p><h3>Exercise</h3><p>Six parents have <span class="math" data-say="A, 10, yes, b, 0, no, c, 2, no, d, 6, yes, e, 1, no, f, 3, yes">a, 10, yes; b, 0, no; c, 2, no; d, 6, yes; e, 1, no; f, 3, yes</span> (name, children, used), and the batch is 3. By hand, give the statements and rows of each of the four strategies, then check them in the lab.</p><p>Loading an order's lines means finding the rows that hold the order's key. The next lesson, Identity Field and Foreign Keys, reads how those keys are chosen and in what order the rows that hold them can be written.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting four ways of loading</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Total the parents and children</h3><p>Count the parents, those whose children are used, the children of the used parents, and all the children.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the lazy strategies</h3><p>Lazy is 1 + the used parents statements, returning the parents plus the used children. In batches it is 1 + the used parents divided by the batch, rounded up, with the same rows.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Count the eager strategies</h3><p>Two queries is always 2 statements, returning the parents plus every child. The join is 1 statement, one row a child, with one row for each parent that has no children.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a list page of your own</h3><p>Take one list page in a system you know, count its queries from a log with the list at 10 rows and at 50, and write in one sentence whether it ripple-loads.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting four ways of loading</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Total the parents and children.</strong> Count the parents, those whose children are used, the children of the used parents, and all the children.</li><li><strong>Count the lazy strategies.</strong> Lazy is 1 + the used parents statements, returning the parents plus the used children. In batches it is 1 + the used parents divided by the batch, rounded up, with the same rows.</li><li><strong>Count the eager strategies.</strong> Two queries is always 2 statements, returning the parents plus every child. The join is 1 statement, one row a child, with one row for each parent that has no children.</li><li><strong>Do it on a list page of your own.</strong> Take one list page in a system you know, count its queries from a log with the list at 10 rows and at 50, and write in one sentence whether it ripple-loads.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1524,17 +1570,16 @@ two queries: 2 statements, 5 + 14 rows
 join: 3 + 1 + 5 + 2 + 4, so 15 rows</div><p>Laziness saved the 2 lines of the unused o4, and cost two more statements than two queries. Which matters more depends on what a statement costs on your connection, which the lesson does not know.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing lazy loading always loads less</strong><span>On this view a lazy design can only win, because it never reads more than is asked for. On the lesson's illustration, <code>every-order-used</code>, every order's lines are used: lazy loading and two queries return the same 19 rows, and the lazy strategy takes 1 + 5 = 6 statements where two queries take 2. Laziness saves only what is not used, and Fowler's When to Use It is about exactly that judgement.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making each item of a collection lazy</strong><span>A collection of lazy objects, each loading itself, is the shape that ripple loads: one query per item as the list is walked. Fowler's cure is to make the collection the lazy thing and load all of it at once when first touched; a related remedy is to give the use case that walks the list a loader that reads it eagerly.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the join&#x27;s rows as its whole cost</strong><span>The join returns the fewest rows in both presets, 15 against 19, and one statement. But each of those rows carries the parent's columns as well as the child's, the lab counts rows and not their width, and Chapter 3 notes that databases are optimized for up to three or four joins in a query.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count four loading strategies by hand.</strong><p>Given parents, their child counts and which parents' children are used, compute the statements and rows lazily, lazily in batches, with two queries and with one join.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts statements and rows; it does not time them, so it cannot say whether four short queries cost more than one longer one on your network. It also counts every row alike, though a join's rows are wider, and its batched strategy is the lab's variant rather than one the chapter describes.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing lazy loading always loads less</strong><span>On this view a lazy design can only win, because it never reads more than is asked for. On the lesson's illustration, <code>every-order-used</code>, every order's lines are used: lazy loading and two queries return the same 19 rows, and the lazy strategy takes 1 + 5 = 6 statements where two queries take 2. Laziness saves only what is not used, and Fowler's When to Use It is about exactly that judgement.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Making each item of a collection lazy</strong><span>A collection of lazy objects, each loading itself, is the shape that ripple loads: one query per item as the list is walked. Fowler's cure is to make the collection the lazy thing and load all of it at once when first touched; a related remedy is to give the use case that walks the list a loader that reads it eagerly.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading the join&#x27;s rows as its whole cost</strong><span>The join returns the fewest rows in both presets, 15 against 19, and one statement. But each of those rows carries the parent's columns as well as the child's, the lab counts rows and not their width, and Chapter 3 notes that databases are optimized for up to three or four joins in a query.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can count four loading strategies by hand.</strong><p>Given parents, their child counts and which parents' children are used, compute the statements and rows lazily, lazily in batches, with two queries and with one join.</p></div></div><div class="note"><strong>Note:</strong> The lab counts statements and rows; it does not time them, so it cannot say whether four short queries cost more than one longer one on your network. It also counts every row alike, though a join's rows are wider, and its batched strategy is the lab's variant rather than one the chapter describes.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Lazy Load</summary><p>A stand-in for data not yet read, which fetches it the first time it is used. It leaves a marker in the object structure, and the data is loaded only when something follows the marker. Chapter 11 builds it four ways: lazy initialization, a virtual proxy, a value holder and a ghost.</p></details><details class="recall"><summary>Ripple loading</summary><p>Fowler's name for the danger of a collection of lazy objects looked at one at a time: each one goes to the database separately, where one query could have read them all. He has seen it cripple an application's performance.</p></details><details class="recall"><summary>A statement and a row</summary><p>The two things this lesson counts. A statement is one query sent to the database, and costs a round trip whatever it returns; a row is one record it returns. A lazy strategy trades rows not read for statements sent.</p></details></div>
+      <h3>Summary</h3>
       <p>A Lazy Load stands in for data not yet read and fetches it on first use. Chapter 11 gives four ways to build one and warns of ripple loading, a query for each lazy object in a collection; Chapter 3's Reading in Data gives the rules of thumb on queries and joins. Count the statements and rows four loading strategies issue for the same orders and lines.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Lazy Load.</strong> A stand-in for data not yet read, which fetches it the first time it is used. It leaves a marker in the object structure, and the data is loaded only when something follows the marker. Chapter 11 builds it four ways: lazy initialization, a virtual proxy, a value holder and a ghost.</li><li><strong>Ripple loading.</strong> Fowler's name for the danger of a collection of lazy objects looked at one at a time: each one goes to the database separately, where one query could have read them all. He has seen it cripple an application's performance.</li><li><strong>A statement and a row.</strong> The two things this lesson counts. A statement is one query sent to the database, and costs a round trip whatever it returns; a row is one record it returns. A lazy strategy trades rows not read for statements sent.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="a marker that loads data when asked. lazy, 1 plus one query per parent used. two queries, parents, then every child. a join, one statement, one row a child. saves only what is never used. ripple loading, a query per object" tabindex="0" role="region" aria-label="Mathematical notation">a marker that loads data when asked
 lazy: 1 + one query per parent used
 two queries: parents, then every child
@@ -2205,11 +2250,40 @@ ripple loading: a query per object</div><figcaption>Lazy Load in six lines</figc
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2277,7 +2351,7 @@ ripple loading: a query per object</div><figcaption>Lazy Load in six lines</figc
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

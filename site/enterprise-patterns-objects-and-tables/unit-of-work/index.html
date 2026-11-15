@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Objects and Tables</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 11 · Object-Relational Behavioral Patterns</p>
       <h1>Unit of Work</h1>
       <p class="lesson-lede">Keep a record of what a business transaction created, changed and deleted, and write it all at commit, once per object.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The behavioral problem</li><li>Unit of Work</li><li>Caller and object registration</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The chapter&#x27;s problem first, then the pattern</h2>
-      <article class="prose reading"><p>&ldquo;Instead of the application programmer invoking explicit save methods, the programmer tells the unit of work to commit.&rdquo; That sentence is from Chapter 3, The Behavioral Problem, and it is the whole of the pattern this lesson reads: Unit of Work, in Chapter 11. Read the section and the pattern in your own copy first.</p><p>You have probably written a save that runs as it goes: load the order, change its status, write it; add a line, write it; change your mind about the line, delete it. Each step is correct, and the database sees every one of them. Chapter 3's argument starts there. When people talk about object-relational mapping, Fowler says, they talk about structure, how tables relate to objects, but the harder part is behavior: once you have loaded a number of objects and changed some, you must know which ones to write back. With a couple of records that is easy. With many, some of them new, it becomes an exercise, because a new row's key may be needed before the rows that refer to it can be written.</p><p>His answer is an object that does the remembering. A Unit of Work keeps track of the objects read and the objects created, changed or deleted, and at commit it works out the database work itself: it starts a transaction, runs any concurrency check (the offline locks of a later course), and writes the changes out. Chapter 3 calls it the controller of the database mapping, behavior that without it lives scattered through the domain layer.</p><p>Unit of Work is a pattern to look up as well as an argument, and Chapter 11 gives its choices. With <em>caller registration</em> the code that changes an object must remember to register it, and an object nobody registered is silently not written; Fowler thinks that causes more confusion than it is worth. With <em>object registration</em> a load registers the object as clean and its setters register it as dirty, which still leaves the object's author a call to remember. The <em>unit of work controller</em> handles every read, keeps a copy of each object, and compares at commit, which costs time at commit but lets it update only the fields that changed. The pattern also gives the commit a place to order the writes for the database's keys, which is the subject of Identity Field and Foreign Keys, and to send them as one batch. The pattern's worked example, with object registration, is David Rice's, and is better read in the book.</p><p>Its When to Use It sets out the alternatives. The simplest is to save each object whenever you alter it, and the book's illustration of what that costs is one object altered at three points in a piece of work: three writes where a single write of its last state would do. Keeping the changed objects in variables works for a few, and works with a Transaction Script, but soon becomes unmanageable; a dirty flag on each object works if you can find all the dirty ones, which in a Domain Model's network of objects is hard. The great strength of the pattern, Fowler concludes, is that it keeps all this in one place.</p><p>Here is a Unit of Work written for this lesson. It holds one map from object to mark (line 4), and <span class="math" data-say="mark">mark</span> on lines 5 to 10 decides what a new mark does to the old one: a NEW or REMOVED object keeps its mark (line 7), a NEW object then removed becomes GONE (line 8), and anything else takes the mark asked for. The commit on lines 11 to 19 walks the map once and writes an INSERT, an UPDATE or a DELETE for each mark; GONE matches no case and writes nothing. A loaded object never marked is not in the map at all.</p><pre class="codeblock" data-say="line 1, comment, Remembers what changed writes it all at commit. GONE never written.. line 2, class unit of work. line 3, enum mark new, dirty, removed, gone. line 4, private final map of entity and mark pending is set to new linked hash map. line 5, void mark of entity e, mark asked. line 6, mark now is set to pending dot get of e. line 7, boolean kept is set to now equals mark dot new or now equals mark dot removed. line 8, boolean undone is set to now equals mark dot new and asked equals mark dot removed. line 9, pending dot put of e, undone, if so, mark dot gone, otherwise, kept, if so, now, otherwise, asked. line 11, void commit of mapper db. line 12, for map dot entry of entity and mark p in pending dot entry set. line 13, switch p dot get value. line 14, case new, db dot insert of p dot get key, break. line 15, case dirty, db dot update of p dot get key, break. line 16, case removed, db dot delete of p dot get key, break" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Remembers what changed; writes it all at commit. GONE: never written.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The chapter&#x27;s problem first, then the pattern</h2><div class="prose reading"><p>&ldquo;Instead of the application programmer invoking explicit save methods, the programmer tells the unit of work to commit.&rdquo; That sentence is from Chapter 3, The Behavioral Problem, and it is the whole of the pattern this lesson reads: Unit of Work, in Chapter 11. Read the section and the pattern in your own copy first.</p><p>You have probably written a save that runs as it goes: load the order, change its status, write it; add a line, write it; change your mind about the line, delete it. Each step is correct, and the database sees every one of them. Chapter 3's argument starts there. When people talk about object-relational mapping, Fowler says, they talk about structure, how tables relate to objects, but the harder part is behavior: once you have loaded a number of objects and changed some, you must know which ones to write back. With a couple of records that is easy. With many, some of them new, it becomes an exercise, because a new row's key may be needed before the rows that refer to it can be written.</p><p>His answer is an object that does the remembering. A Unit of Work keeps track of the objects read and the objects created, changed or deleted, and at commit it works out the database work itself: it starts a transaction, runs any concurrency check (the offline locks of a later course), and writes the changes out. Chapter 3 calls it the controller of the database mapping, behavior that without it lives scattered through the domain layer.</p><p>Unit of Work is a pattern to look up as well as an argument, and Chapter 11 gives its choices. With <em>caller registration</em> the code that changes an object must remember to register it, and an object nobody registered is silently not written; Fowler thinks that causes more confusion than it is worth. With <em>object registration</em> a load registers the object as clean and its setters register it as dirty, which still leaves the object's author a call to remember. The <em>unit of work controller</em> handles every read, keeps a copy of each object, and compares at commit, which costs time at commit but lets it update only the fields that changed. The pattern also gives the commit a place to order the writes for the database's keys, which is the subject of Identity Field and Foreign Keys, and to send them as one batch. The pattern's worked example, with object registration, is David Rice's, and is better read in the book.</p><p>Its When to Use It sets out the alternatives. The simplest is to save each object whenever you alter it, and the book's illustration of what that costs is one object altered at three points in a piece of work: three writes where a single write of its last state would do. Keeping the changed objects in variables works for a few, and works with a Transaction Script, but soon becomes unmanageable; a dirty flag on each object works if you can find all the dirty ones, which in a Domain Model's network of objects is hard. The great strength of the pattern, Fowler concludes, is that it keeps all this in one place.</p><p>Here is a Unit of Work written for this lesson. It holds one map from object to mark (line 4), and <span class="math" data-say="mark">mark</span> on lines 5 to 10 decides what a new mark does to the old one: a NEW or REMOVED object keeps its mark (line 7), a NEW object then removed becomes GONE (line 8), and anything else takes the mark asked for. The commit on lines 11 to 19 walks the map once and writes an INSERT, an UPDATE or a DELETE for each mark; GONE matches no case and writes nothing. A loaded object never marked is not in the map at all.</p><pre class="codeblock" data-say="line 1, comment, Remembers what changed writes it all at commit. GONE never written.. line 2, class unit of work. line 3, enum mark new, dirty, removed, gone. line 4, private final map of entity and mark pending is set to new linked hash map. line 5, void mark of entity e, mark asked. line 6, mark now is set to pending dot get of e. line 7, boolean kept is set to now equals mark dot new or now equals mark dot removed. line 8, boolean undone is set to now equals mark dot new and asked equals mark dot removed. line 9, pending dot put of e, undone, if so, mark dot gone, otherwise, kept, if so, now, otherwise, asked. line 11, void commit of mapper db. line 12, for map dot entry of entity and mark p in pending dot entry set. line 13, switch p dot get value. line 14, case new, db dot insert of p dot get key, break. line 15, case dirty, db dot update of p dot get key, break. line 16, case removed, db dot delete of p dot get key, break" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// Remembers what changed; writes it all at commit. GONE: never written.</span>
 <span class="cl">class UnitOfWork {</span>
 <span class="cl">    enum Mark { NEW, DIRTY, REMOVED, GONE }</span>
 <span class="cl">    private final Map&lt;Entity, Mark&gt; pending = new LinkedHashMap&lt;&gt;();</span>
@@ -1464,12 +1508,11 @@
 <span class="cl">            }</span>
 <span class="cl">        }</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab reads a script of <span class="math" data-say="load">load</span>, <span class="math" data-say="new">new</span>, <span class="math" data-say="change">change</span> and <span class="math" data-say="delete">delete</span> records, one object each, and prints five tiles: the writes made if every new, change and delete is written at once; the writes at commit, by the rules beside the lab; the writes saved, with their share of the immediate ones; the statements at commit; and the objects loaded and never changed, which the commit leaves alone. The preset <code>edit-an-order</code> loads <span class="math" data-say="order 7">order7</span>, changes it, creates <span class="math" data-say="line 1">line1</span> and <span class="math" data-say="line 2">line2</span>, changes <span class="math" data-say="order 7">order7</span> again, deletes <span class="math" data-say="line 2">line2</span>, loads <span class="math" data-say="customer 3">customer3</span> and changes <span class="math" data-say="line 1">line1</span>. Written at once that is 6 writes; at commit it is 2, <span class="math" data-say="insert line 1, update order 7">INSERT line1; UPDATE order7</span>, saving <span data-say="4, 2 over 3 is approximately 66.7 percent">4, 2/3 ≈ 66.7%</span>, and <span class="math" data-say="customer 3">customer3</span> is the 1 object left clean.</p><p>That is Fowler's argument in a number. The line that was added and deleted never reaches the database at all; <span class="math" data-say="order 7">order7</span>, changed twice, is written once in its final state; <span class="math" data-say="line 1">line1</span> is one INSERT however often it changed after it was made. The lab lists the writes grouped by kind, inserts, then updates, then deletes, while the snippet's commit writes them in the order the objects were first marked, so it would issue the UPDATE first. They are the same statements either way. Neither order is chosen for the database's keys, and the lab's banner says so.</p><p>The second preset, <code>delete-loaded</code>, deletes an object that came from the database: it loads <span class="math" data-say="a 1">a1</span> and <span class="math" data-say="a 2">a2</span>, changes <span class="math" data-say="a 1">a1</span>, deletes <span class="math" data-say="a 2">a2</span> and changes <span class="math" data-say="a 1">a1</span> again. That is 3 writes at once and 2 at commit, <span class="math" data-say="update a 1, delete a 2">UPDATE a1; DELETE a2</span>, saving <span data-say="1, 1 over 3 is approximately 33.3 percent">1, 1/3 ≈ 33.3%</span>, with nothing left clean. A loaded object that is deleted still costs its DELETE; only a row that never existed costs nothing.</p><h3>Exercise</h3><p>A business transaction runs this script: <span class="math" data-say="load, invoice 4, new, payment 1, change, invoice 4, change, invoice 4, load, account 2, change, account 2, new, note 1, delete, note 1, change, payment 1">load, invoice4; new, payment1; change, invoice4; change, invoice4; load, account2; change, account2; new, note1; delete, note1; change, payment1</span>. By hand, count the writes made at once, list the statements a Unit of Work writes at commit, inserts first, and give the writes saved as a share. Then type the script into the lab to check.</p><p>A Unit of Work writes each row once; putting those writes in an order the keys allow is for Identity Field and Foreign Keys. The next lesson, Identity Map, takes the other half of the behavioral problem: loading the same row twice.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Unit of Work</h2></div><p>writes at once against writes at commit</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The lab reads a script of <span class="math" data-say="load">load</span>, <span class="math" data-say="new">new</span>, <span class="math" data-say="change">change</span> and <span class="math" data-say="delete">delete</span> records, one object each, and prints five tiles: the writes made if every new, change and delete is written at once; the writes at commit, by the rules beside the lab; the writes saved, with their share of the immediate ones; the statements at commit; and the objects loaded and never changed, which the commit leaves alone. The preset <code>edit-an-order</code> loads <span class="math" data-say="order 7">order7</span>, changes it, creates <span class="math" data-say="line 1">line1</span> and <span class="math" data-say="line 2">line2</span>, changes <span class="math" data-say="order 7">order7</span> again, deletes <span class="math" data-say="line 2">line2</span>, loads <span class="math" data-say="customer 3">customer3</span> and changes <span class="math" data-say="line 1">line1</span>. Written at once that is 6 writes; at commit it is 2, <span class="math" data-say="insert line 1, update order 7">INSERT line1; UPDATE order7</span>, saving <span data-say="4, 2 over 3 is approximately 66.7 percent">4, 2/3 ≈ 66.7%</span>, and <span class="math" data-say="customer 3">customer3</span> is the 1 object left clean.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Unit of Work</h2></div><p>writes at once against writes at commit</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Unit of Work</strong><span>writes at once against writes at commit</span></div>
       </div>
@@ -1477,10 +1520,10 @@
       <div class="table-wrap" id="uwTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="uwTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Written at once, every new, change and delete is a write. At commit: created and deleted, nothing; created, one INSERT; loaded and deleted, one DELETE; loaded and changed (any number of times), one UPDATE; loaded only, nothing (clean). INSERTs come first, then UPDATEs, then DELETEs, each in the order the script first names the object.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Writes at once against writes at commit</h3>
-          <p>A count over the situation the lesson states. Each record is one step of a business transaction: load, new, change or delete, and the object it acts on. The lab counts the writes if each step is written at once and the writes a Unit of Work makes at commit. The scripts are the lesson's, and illustrative.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Writes at once against writes at commit</h3>
+            <p>A count over the situation the lesson states. Each record is one step of a business transaction: load, new, change or delete, and the object it acts on. The lab counts the writes if each step is written at once and the writes a Unit of Work makes at commit. The scripts are the lesson's, and illustrative.</p>
         <div class="field">
           <label for="uwPreset">Worked example</label>
           <select id="uwPreset"><option value="edit-an-order" selected>Edit an order: two lines added, one deleted, the order changed twice</option><option value="delete-loaded">Delete a loaded object, and change another twice</option></select>
@@ -1497,12 +1540,15 @@
           <div class="kpi"><span>Loaded and never changed</span><strong id="uwClean">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>That is Fowler's argument in a number. The line that was added and deleted never reaches the database at all; <span class="math" data-say="order 7">order7</span>, changed twice, is written once in its final state; <span class="math" data-say="line 1">line1</span> is one INSERT however often it changed after it was made. The lab lists the writes grouped by kind, inserts, then updates, then deletes, while the snippet's commit writes them in the order the objects were first marked, so it would issue the UPDATE first. They are the same statements either way. Neither order is chosen for the database's keys, and the lab's banner says so.</p><p>The second preset, <code>delete-loaded</code>, deletes an object that came from the database: it loads <span class="math" data-say="a 1">a1</span> and <span class="math" data-say="a 2">a2</span>, changes <span class="math" data-say="a 1">a1</span>, deletes <span class="math" data-say="a 2">a2</span> and changes <span class="math" data-say="a 1">a1</span> again. That is 3 writes at once and 2 at commit, <span class="math" data-say="update a 1, delete a 2">UPDATE a1; DELETE a2</span>, saving <span data-say="1, 1 over 3 is approximately 33.3 percent">1, 1/3 ≈ 33.3%</span>, with nothing left clean. A loaded object that is deleted still costs its DELETE; only a row that never existed costs nothing.</p><h3>Exercise</h3><p>A business transaction runs this script: <span class="math" data-say="load, invoice 4, new, payment 1, change, invoice 4, change, invoice 4, load, account 2, change, account 2, new, note 1, delete, note 1, change, payment 1">load, invoice4; new, payment1; change, invoice4; change, invoice4; load, account2; change, account2; new, note1; delete, note1; change, payment1</span>. By hand, count the writes made at once, list the statements a Unit of Work writes at commit, inserts first, and give the writes saved as a share. Then type the script into the lab to check.</p><p>A Unit of Work writes each row once; putting those writes in an order the keys allow is for Identity Field and Foreign Keys. The next lesson, Identity Map, takes the other half of the behavioral problem: loading the same row twice.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Counting the writes a commit saves</h2></div><p>Four steps, the last of them on a system of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Count the immediate writes</h3><p>Go through the script and count every new, change and delete. A load writes nothing. That count is what a save-as-you-go design sends to the database.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Give each object its final mark</h3><p>For each object, note whether it was loaded or created, and whether it was changed or deleted after that. Created and deleted is nothing; created is one INSERT; loaded and deleted is one DELETE; loaded and changed is one UPDATE; loaded only is clean.</p></article><article class="card concept-card"><div class="icon">3</div><h3>List the statements at commit</h3><p>Write the INSERTs, then the UPDATEs, then the DELETEs, each in the order the script first names the object, and count them. The writes saved are the immediate count less this one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a request of your own</h3><p>Take one request in a system you know that changes several rows, list the statements it issues from a database log, and mark those a Unit of Work would merge or drop. Write down both counts.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Counting the writes a commit saves</h2>
+      <p class="lead-in">Four steps, the last of them on a system of your own.</p>
+      <ol class="key-ideas method"><li><strong>Count the immediate writes.</strong> Go through the script and count every new, change and delete. A load writes nothing. That count is what a save-as-you-go design sends to the database.</li><li><strong>Give each object its final mark.</strong> For each object, note whether it was loaded or created, and whether it was changed or deleted after that. Created and deleted is nothing; created is one INSERT; loaded and deleted is one DELETE; loaded and changed is one UPDATE; loaded only is clean.</li><li><strong>List the statements at commit.</strong> Write the INSERTs, then the UPDATEs, then the DELETEs, each in the order the script first names the object, and count them. The writes saved are the immediate count less this one.</li><li><strong>Do it on a request of your own.</strong> Take one request in a system you know that changes several rows, list the statements it issues from a database log, and mark those a Unit of Work would merge or drop. Write down both counts.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1522,17 +1568,16 @@ customer3: loaded only: clean
 at commit: 2 writes, so 4 saved</div><p>The two writes are the row that is new and the row that changed, each in its final state. Nothing about the database decided that; the script did, and a Unit of Work only had to remember it.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a Unit of Work for a database transaction</strong><span>On this view the Unit of Work is the transaction, open from the first load to the commit. It is not. It is a record of changes held in memory, which becomes a short system transaction at commit; until then the loads have read the database, but nothing has been written to it. Chapter 11 makes the point against saving as you go: it would keep a database transaction running from the first change to the last, which cannot work when one business transaction stretches over several requests.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that saving each change at once is safer</strong><span>It can feel safer to write each change the moment it is made, so that nothing is lost. On the lesson's illustration, <code>edit-an-order</code>, saving at once inserts <span class="math" data-say="line 2">line2</span> and then deletes it, and updates <span class="math" data-say="order 7">order7</span> twice; the Unit of Work writes neither the insert nor the delete of <span class="math" data-say="line 2">line2</span>, and updates <span class="math" data-say="order 7">order7</span> once. Nothing is lost by waiting, because the commit writes the final state of every object it was told about.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the commit to order the writes for you</strong><span>The lab's commit, like the snippet's, writes each object once, but in an order set by the kind of write or by when the object was first marked, not by the database's keys. A line written before its order can break a foreign key. Chapter 11 makes the Unit of Work the obvious home for that ordering, and Identity Field and Foreign Keys counts how.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a commit&#x27;s statements from a script by hand.</strong><p>Given a script of loads, creations, changes and deletions, count the immediate writes, list the statements a Unit of Work writes at commit in the lab's order, and give the writes it saves as a share.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab counts the statements a script implies; it does not time them, lock anything or check another session's changes, all of which the real commit does. It also cannot tell whether a change was registered: in the lab every step is seen, which is what object registration and the controller try to guarantee and caller registration does not.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Taking a Unit of Work for a database transaction</strong><span>On this view the Unit of Work is the transaction, open from the first load to the commit. It is not. It is a record of changes held in memory, which becomes a short system transaction at commit; until then the loads have read the database, but nothing has been written to it. Chapter 11 makes the point against saving as you go: it would keep a database transaction running from the first change to the last, which cannot work when one business transaction stretches over several requests.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking that saving each change at once is safer</strong><span>It can feel safer to write each change the moment it is made, so that nothing is lost. On the lesson's illustration, <code>edit-an-order</code>, saving at once inserts <span class="math" data-say="line 2">line2</span> and then deletes it, and updates <span class="math" data-say="order 7">order7</span> twice; the Unit of Work writes neither the insert nor the delete of <span class="math" data-say="line 2">line2</span>, and updates <span class="math" data-say="order 7">order7</span> once. Nothing is lost by waiting, because the commit writes the final state of every object it was told about.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting the commit to order the writes for you</strong><span>The lab's commit, like the snippet's, writes each object once, but in an order set by the kind of write or by when the object was first marked, not by the database's keys. A line written before its order can break a foreign key. Chapter 11 makes the Unit of Work the obvious home for that ordering, and Identity Field and Foreign Keys counts how.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can list a commit&#x27;s statements from a script by hand.</strong><p>Given a script of loads, creations, changes and deletions, count the immediate writes, list the statements a Unit of Work writes at commit in the lab's order, and give the writes it saves as a share.</p></div></div><div class="note"><strong>Note:</strong> The lab counts the statements a script implies; it does not time them, lock anything or check another session's changes, all of which the real commit does. It also cannot tell whether a change was registered: in the lab every step is seen, which is what object registration and the controller try to guarantee and caller registration does not.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The behavioral problem</summary><p>Chapter 3's name for getting objects to load and save themselves: once you have loaded a number of objects and changed some of them, you must know which ones to write back, and in what order. Fowler finds it harder than the structural question of how tables and objects correspond.</p></details><details class="recall"><summary>Unit of Work</summary><p>An object that keeps a list of everything a business transaction has created, changed or deleted. At commit it opens a transaction, does any concurrency check, and writes the changes; the application never calls an update itself.</p></details><details class="recall"><summary>Caller and object registration</summary><p>Two ways the Unit of Work learns of a change. With caller registration the code that changes an object must remember to register it; with object registration the object's own setters do it. A third, the unit of work controller, takes a copy of each object as it is read and compares at commit.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3's behavioral problem is keeping track of which loaded objects must be written back, and Unit of Work is its answer: register each new, changed and deleted object as it happens, and let one object decide at commit what to write. Count the writes a script of changes makes immediately and at commit, and which ones the commit never needs.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The behavioral problem.</strong> Chapter 3's name for getting objects to load and save themselves: once you have loaded a number of objects and changed some of them, you must know which ones to write back, and in what order. Fowler finds it harder than the structural question of how tables and objects correspond.</li><li><strong>Unit of Work.</strong> An object that keeps a list of everything a business transaction has created, changed or deleted. At commit it opens a transaction, does any concurrency check, and writes the changes; the application never calls an update itself.</li><li><strong>Caller and object registration.</strong> Two ways the Unit of Work learns of a change. With caller registration the code that changes an object must remember to register it; with object registration the object's own setters do it. A third, the unit of work controller, takes a copy of each object as it is read and compares at commit.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="register each change as it happens. write at commit, once per object. created, then deleted, never written. loaded and changed, one update. created, one insert, however changed. loaded only, clean, nothing written" tabindex="0" role="region" aria-label="Mathematical notation">register each change as it happens
 write at commit, once per object
 created, then deleted: never written
@@ -2225,11 +2270,40 @@ loaded only: clean, nothing written</div><figcaption>Unit of Work in six lines</
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2297,7 +2371,7 @@ loaded only: clean, nothing written</div><figcaption>Unit of Work in six lines</
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,36 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Dynamic Programming and Sequential Decisions</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; The recursion, backwards</p>
       <h1>Filling the Table from the End</h1>
       <p class="lesson-lede">Solve a staged network backwards, keep every tie, and check the recursion against an enumeration of every path it stands for.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>A node&#x27;s value is a number, and it is not a route</li><li>Backwards is forced, not stylistic</li><li>The saving is that each node is priced once</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>One sentence, written down at every node</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; A staged network and its value function</span><p>A <strong>staged network</strong> is a list of stages, each holding some nodes, together with <strong>arcs</strong> that only ever run forward: an arc may join a node in one stage to a node in any later stage, never to one in the same stage or an earlier one. Each arc carries a <strong>cost</strong>.</p><p>The <strong>value function</strong> <span class="math" data-say="f">f</span> gives each node the cheapest total from that node to the finish: <span class="math" data-say="f of w equals 0">f(w) = 0</span> for every node in the last stage, and <span class="math" data-say="f of v equals min">f(v) = min</span> over arcs out of <span class="math" data-say="v">v</span> of <span class="math" data-say="c of v and w plus f of w">c(v,w) + f(w)</span> otherwise. An <strong>argmin</strong> at <span class="math" data-say="v">v</span> is an arc attaining that minimum; there may be more than one.</p></div><p>The lab takes the stages as names separated by semicolons and the arcs one clause each, tail then <span class="math" data-say="greater-than">></span> then head then cost. An arc that runs backwards or sideways is refused with the two stage numbers named, because that is a modelling error rather than a typing one: a network with a cycle in it has no last stage to start from and the recursion has nowhere to bottom out.</p><div class="mathblock" data-say="stages, A, B C, D E, F. arcs, A is greater than B 0, A is greater than C 4, B is greater than D 7, B is greater than E 4, C is greater than D 3, C is greater than E 2, D is greater than F 1, E is greater than F 4. filled from the END. f of F equals 0, last stage. f of D equals 1 plus f of F equals 1. f of E equals 4 plus f of F equals 4. f of B equals the min of 7 plus 1 and, 4 plus 4 equals the min of 8 and 8 equals 8, TIE, D and E both. f of C equals the min of 3 plus 1 and, 2 plus 4 equals the min of 4 and 6 equals 4, D. f of A equals the min of 0 plus 8 and, 4 plus 4 equals the min of 8 and 8 equals 8, TIE, B and C both. six values written, and the answer is f of A equals 8" tabindex="0" role="region" aria-label="Mathematical notation">stages   A ; B C ; D E ; F
-arcs     A&gt;B 0   A&gt;C 4   B&gt;D 7   B&gt;E 4   C&gt;D 3   C&gt;E 2   D&gt;F 1   E&gt;F 4
-
-filled from the END:
-
-   f(F) = 0                                          last stage
-   f(D) = 1 + f(F) = 1
-   f(E) = 4 + f(F) = 4
-   f(B) = min( 7 + 1 ,  4 + 4 ) = min( 8 , 8 ) = 8   TIE: D and E both
-   f(C) = min( 3 + 1 ,  2 + 4 ) = min( 4 , 6 ) = 4   D
-   f(A) = min( 0 + 8 ,  4 + 4 ) = min( 8 , 8 ) = 8   TIE: B and C both
-
-six values written, and the answer is f(A) = 8</div><p>Read the last two lines again. <span class="math" data-say="f of A">f(A)</span> is 8 and there are two ways to attain it, and <span class="math" data-say="f of B">f(B)</span> is 8 with two ways to attain that. Following the argmins forward from <span class="math" data-say="A">A</span> therefore produces three routes and not one: <span class="math" data-say="A B D F">A B D F</span>, <span class="math" data-say="A B E F">A B E F</span> and <span class="math" data-say="A C D F">A C D F</span>. The lab prices each of them again from the arcs before printing it, and all three come to 8.</p><h3>The enumeration beside it, and what it is for</h3><p>This network has four paths in total. Walked forwards and priced independently they come to 8, 8, 8 and 10, so the best is 8 and exactly three paths attain it. That agrees with the recursion, which is the point: the lab runs both and prints both, and shows nothing as an answer when they disagree. The enumeration is an oracle, not an alternative algorithm &mdash; it is exponential on purpose, and offering it as a way to solve these problems would undo the lesson.</p><div class="example"><span class="label">Example &middot; One arc cost, and the number of best answers</span><p>Change <span class="math" data-say="A is greater than B">A>B</span> from 0 to 2 and nothing else. Every value in the table is the same except <span class="math" data-say="f of A">f(A)</span>, which becomes <span class="math" data-say="the min of 2 plus 8 and 4 plus 4 equals 8">min(2 + 8, 4 + 4) = 8</span> &mdash; still 8, but now attained only through <span class="math" data-say="C">C</span>. The tie at <span class="math" data-say="B">B</span> is still there, <span class="math" data-say="f of B">f(B)</span> is still 8 with <span class="math" data-say="D">D</span> and <span class="math" data-say="E">E</span> both attaining it, and the four paths now cost 10, 10, 8 and 10.</p><p>So the answer is the same number and one route instead of three, and the tie that remains is on no optimal route at all. A recursion that dropped ties would give identical output on both networks. That is worth sitting with: the two cases are one arc cost apart, and nothing in the value 8 distinguishes them.</p></div><h3>An arc that skips a stage</h3><p>Add <span class="math" data-say="A is greater than E 3">A>E 3</span> to the original network. The recursion needs no adjustment at all: <span class="math" data-say="f of E">f(E)</span> is already settled when <span class="math" data-say="f of A">f(A)</span> is written, because <span class="math" data-say="E">E</span> lives in a later stage, and the new candidate is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>. That beats 8, so <span class="math" data-say="f of A">f(A)</span> becomes 7 and the single optimal route is <span class="math" data-say="A E F">A E F</span>. Walking all five paths forwards agrees. What makes this work is not a special case in the code but the ordering: a value is written only once everything it depends on is final, and a forward jump does not disturb that.</p><div class="example"><span class="label">Example &middot; Where the stages actually come from</span><p>In a routing problem the stages are given: they are the columns of the map. In most of the problems on this course they are not. A stage is whatever index makes the arcs run one way &mdash; an activity, a time period, a candidate, a number of periods left &mdash; and choosing it is choosing the model.</p><p>That is why this lesson comes first and why it is the easiest one here. Everything about the recursion is visible because the hard half has been done for you. The rest of the course does the hard half.</p></div><p>One last property, easy to miss because it looks like an implementation detail: a value is written once and never revised. If you find yourself wanting to go back and improve <span class="math" data-say="f">f</span> at a node already filled in, either the ordering is wrong or the state is &mdash; and the second of those is the subject of everything that follows.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Filling the table from the end</h2></div><p>Every value the recursion writes, beside every path it stands for</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>One sentence, written down at every node</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; A staged network and its value function</span><p>A <strong>staged network</strong> is a list of stages, each holding some nodes, together with <strong>arcs</strong> that only ever run forward: an arc may join a node in one stage to a node in any later stage, never to one in the same stage or an earlier one. Each arc carries a <strong>cost</strong>.</p><p>The <strong>value function</strong> <span class="math" data-say="f">f</span> gives each node the cheapest total from that node to the finish: <span class="math" data-say="f of w equals 0">f(w) = 0</span> for every node in the last stage, and <span class="math" data-say="f of v equals min">f(v) = min</span> over arcs out of <span class="math" data-say="v">v</span> of <span class="math" data-say="c of v and w plus f of w">c(v,w) + f(w)</span> otherwise. An <strong>argmin</strong> at <span class="math" data-say="v">v</span> is an arc attaining that minimum; there may be more than one.</p></div><p>The lab takes the stages as names separated by semicolons and the arcs one clause each, tail then <span class="math" data-say="greater-than">></span> then head then cost. An arc that runs backwards or sideways is refused with the two stage numbers named, because that is a modelling error rather than a typing one: a network with a cycle in it has no last stage to start from and the recursion has nowhere to bottom out.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Filling the table from the end</h2></div><p>Every value the recursion writes, beside every path it stands for</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Filling the table from the end</strong><span>the value of being somewhere is the step plus the value of where it leads</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>an arc the recursion chose</span><span class="tone-purple"><i class="legend-swatch"></i>a tie, kept rather than resolved</span><span class="tone-green"><i class="legend-swatch"></i>the value of each node</span><span class="tone-line-strong"><i class="legend-swatch"></i>an arc it did not choose</span></div>
@@ -1417,10 +1448,10 @@ six values written, and the answer is f(A) = 8</div><p>Read the last two lines a
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stTable"></table></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stPaths"></table></div>
       <div class="status-banner" id="stStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Type a staged network and watch it fill from the last stage back</h3>
-          <p>The table is filled backwards and every argmin is kept; the routes it reconstructs are then priced again from the arcs, and every path is walked forwards and priced independently. Nothing is shown as an answer unless all three agree. This example has three optimal routes and a tie at two different nodes. The example above it in the list is the same network with one arc cost changed, and it has one optimal route and a tie that lies off it; the one below adds an arc that skips a stage.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Type a staged network and watch it fill from the last stage back</h3>
+            <p>The table is filled backwards and every argmin is kept; the routes it reconstructs are then priced again from the arcs, and every path is walked forwards and priced independently. Nothing is shown as an answer unless all three agree. This example has three optimal routes and a tie at two different nodes. The example above it in the list is the same network with one arc cost changed, and it has one optimal route and a tie that lies off it; the one below adds an arc that skips a stage.</p>
         <div class="field">
           <label for="stPreset">Worked example</label>
           <select id="stPreset"><option value="tie">one optimal route, and a tie that is not on it</option><option value="several" selected>three routes, all optimal</option><option value="skip">an arc that skips a stage</option></select>
@@ -1446,12 +1477,27 @@ six values written, and the answer is f(A) = 8</div><p>Read the last two lines a
           <div class="kpi"><span>Nodes with a tie</span><strong id="stTies">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="stHint" style="margin:0;">The table is filled from the last stage backwards, and a node's value never changes once it is written &mdash; that is the whole reason the recursion is cheaper than the enumeration beside it. Every argmin is kept, not the first one found, because &ldquo;the optimal policy is unique&rdquo; is false and the ties are where it is false.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><div class="mathblock" data-say="stages, A, B C, D E, F. arcs, A is greater than B 0, A is greater than C 4, B is greater than D 7, B is greater than E 4, C is greater than D 3, C is greater than E 2, D is greater than F 1, E is greater than F 4. filled from the END. f of F equals 0, last stage. f of D equals 1 plus f of F equals 1. f of E equals 4 plus f of F equals 4. f of B equals the min of 7 plus 1 and, 4 plus 4 equals the min of 8 and 8 equals 8, TIE, D and E both. f of C equals the min of 3 plus 1 and, 2 plus 4 equals the min of 4 and 6 equals 4, D. f of A equals the min of 0 plus 8 and, 4 plus 4 equals the min of 8 and 8 equals 8, TIE, B and C both. six values written, and the answer is f of A equals 8" tabindex="0" role="region" aria-label="Mathematical notation">stages   A ; B C ; D E ; F
+arcs     A&gt;B 0   A&gt;C 4   B&gt;D 7   B&gt;E 4   C&gt;D 3   C&gt;E 2   D&gt;F 1   E&gt;F 4
+
+filled from the END:
+
+   f(F) = 0                                          last stage
+   f(D) = 1 + f(F) = 1
+   f(E) = 4 + f(F) = 4
+   f(B) = min( 7 + 1 ,  4 + 4 ) = min( 8 , 8 ) = 8   TIE: D and E both
+   f(C) = min( 3 + 1 ,  2 + 4 ) = min( 4 , 6 ) = 4   D
+   f(A) = min( 0 + 8 ,  4 + 4 ) = min( 8 , 8 ) = 8   TIE: B and C both
+
+six values written, and the answer is f(A) = 8</div><p>Read the last two lines again. <span class="math" data-say="f of A">f(A)</span> is 8 and there are two ways to attain it, and <span class="math" data-say="f of B">f(B)</span> is 8 with two ways to attain that. Following the argmins forward from <span class="math" data-say="A">A</span> therefore produces three routes and not one: <span class="math" data-say="A B D F">A B D F</span>, <span class="math" data-say="A B E F">A B E F</span> and <span class="math" data-say="A C D F">A C D F</span>. The lab prices each of them again from the arcs before printing it, and all three come to 8.</p><h3>The enumeration beside it, and what it is for</h3><p>This network has four paths in total. Walked forwards and priced independently they come to 8, 8, 8 and 10, so the best is 8 and exactly three paths attain it. That agrees with the recursion, which is the point: the lab runs both and prints both, and shows nothing as an answer when they disagree. The enumeration is an oracle, not an alternative algorithm &mdash; it is exponential on purpose, and offering it as a way to solve these problems would undo the lesson.</p><div class="example"><span class="label">Example &middot; One arc cost, and the number of best answers</span><p>Change <span class="math" data-say="A is greater than B">A>B</span> from 0 to 2 and nothing else. Every value in the table is the same except <span class="math" data-say="f of A">f(A)</span>, which becomes <span class="math" data-say="the min of 2 plus 8 and 4 plus 4 equals 8">min(2 + 8, 4 + 4) = 8</span> &mdash; still 8, but now attained only through <span class="math" data-say="C">C</span>. The tie at <span class="math" data-say="B">B</span> is still there, <span class="math" data-say="f of B">f(B)</span> is still 8 with <span class="math" data-say="D">D</span> and <span class="math" data-say="E">E</span> both attaining it, and the four paths now cost 10, 10, 8 and 10.</p><p>So the answer is the same number and one route instead of three, and the tie that remains is on no optimal route at all. A recursion that dropped ties would give identical output on both networks. That is worth sitting with: the two cases are one arc cost apart, and nothing in the value 8 distinguishes them.</p></div><h3>An arc that skips a stage</h3><p>Add <span class="math" data-say="A is greater than E 3">A>E 3</span> to the original network. The recursion needs no adjustment at all: <span class="math" data-say="f of E">f(E)</span> is already settled when <span class="math" data-say="f of A">f(A)</span> is written, because <span class="math" data-say="E">E</span> lives in a later stage, and the new candidate is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>. That beats 8, so <span class="math" data-say="f of A">f(A)</span> becomes 7 and the single optimal route is <span class="math" data-say="A E F">A E F</span>. Walking all five paths forwards agrees. What makes this work is not a special case in the code but the ordering: a value is written only once everything it depends on is final, and a forward jump does not disturb that.</p><div class="example"><span class="label">Example &middot; Where the stages actually come from</span><p>In a routing problem the stages are given: they are the columns of the map. In most of the problems on this course they are not. A stage is whatever index makes the arcs run one way &mdash; an activity, a time period, a candidate, a number of periods left &mdash; and choosing it is choosing the model.</p><p>That is why this lesson comes first and why it is the easiest one here. Everything about the recursion is visible because the hard half has been done for you. The rest of the course does the hard half.</p></div><p>One last property, easy to miss because it looks like an implementation detail: a value is written once and never revised. If you find yourself wanting to go back and improve <span class="math" data-say="f">f</span> at a node already filled in, either the ordering is wrong or the state is &mdash; and the second of those is the subject of everything that follows.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Filling a table backwards by hand</h2></div><p>Five steps, and the last two are the ones people skip. Doing them in this order means you never revise a value.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that every arc runs forward</h3><p>Stage numbers on the tail and the head, and the head's must be larger. If any arc fails this there is no last stage to start from and the recursion has no base case. The lab refuses such an arc by name rather than drawing it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Set the last stage to zero and work leftwards</h3><p>One column at a time, right to left. Within a column the order does not matter, because nothing in a stage depends on anything else in it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>At each node, price every arc out of it and record every argmin</h3><p><span class="math" data-say="c of v and w plus f of w">c(v,w) + f(w)</span> for each arc, then the minimum &mdash; and then a second pass for any other arc attaining it. Writing down only the first is where the ties go.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Reconstruct the routes by walking the argmins forward</h3><p>From the start, branching wherever a node has more than one argmin. This is the step that turns a table of numbers into something you can act on, and it is the step at which a reader discovers the answer is a set.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Price each reconstructed route again, from the arcs</h3><p>Add the arc costs along it and check the total against the value at the start. The recursion and the reconstruction are two pieces of arithmetic, and only the second one produces the thing you were actually asked for.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Filling a table backwards by hand</h2>
+      <p class="lead-in">Five steps, and the last two are the ones people skip. Doing them in this order means you never revise a value.</p>
+      <ol class="key-ideas method"><li><strong>Check that every arc runs forward.</strong> Stage numbers on the tail and the head, and the head's must be larger. If any arc fails this there is no last stage to start from and the recursion has no base case. The lab refuses such an arc by name rather than drawing it.</li><li><strong>Set the last stage to zero and work leftwards.</strong> One column at a time, right to left. Within a column the order does not matter, because nothing in a stage depends on anything else in it.</li><li><strong>At each node, price every arc out of it and record every argmin.</strong> <span class="math" data-say="c of v and w plus f of w">c(v,w) + f(w)</span> for each arc, then the minimum &mdash; and then a second pass for any other arc attaining it. Writing down only the first is where the ties go.</li><li><strong>Reconstruct the routes by walking the argmins forward.</strong> From the start, branching wherever a node has more than one argmin. This is the step that turns a table of numbers into something you can act on, and it is the step at which a reader discovers the answer is a set.</li><li><strong>Price each reconstructed route again, from the arcs.</strong> Add the arc costs along it and check the total against the value at the start. The recursion and the reconstruction are two pieces of arithmetic, and only the second one produces the thing you were actually asked for.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1491,17 +1537,16 @@ six values written, and the answer is f(A) = 8</div><p>Read the last two lines a
    nodes with a tie          B, A                     B</div><p>The two columns agree on the answer and disagree on how many answers there are. Nothing in the number 8 carries that difference, and neither does the drawing unless the ties are drawn &mdash; which is why the lab colours a tied arc differently from a chosen one and reports the tied nodes as a field of their own.</p><p>For a rehearsal, put <span class="math" data-say="A is greater than B">A>B</span> back to 0 and change <span class="math" data-say="D is greater than F">D>F</span> from 1 to 2 instead. Work out by hand what happens to <span class="math" data-say="f of D">f(D)</span>, <span class="math" data-say="f of B">f(B)</span>, <span class="math" data-say="f of C">f(C)</span> and <span class="math" data-say="f of A">f(A)</span>, and how many optimal routes survive, before you let the lab tell you. The answer is still 8 and there is now exactly one route; the third rehearsal below is the one that goes the other way.</p><p>The harder rehearsal: add an arc from <span class="math" data-say="A">A</span> straight to <span class="math" data-say="F">F</span> and give it a cost of 9, then 8, then 7. At 9 nothing changes; at 8 the set of optimal routes grows by one; at 7 every other route stops being optimal and the answer becomes a single arc. Three regimes, one number, and the recursion never needed to be told that the arc skipped two stages.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recording the first argmin and calling it the argmin</strong><span>This is the defect that survives every check. The value is right, the route printed is a genuinely optimal route, and the page looks finished &mdash; it has simply stopped saying that there are others. On the network in the lab it turns three correct answers into one, and a reader who later needs a second-best route, or has a tie-break criterion the model did not include, has been quietly deprived of the thing they needed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trying to fill the table forwards</strong><span>A forward pass computes, for each node, the cheapest way to <em>reach</em> it. That is a perfectly good quantity and it is not this one, and the two coincide only because a shortest path is reversible. The moment the arcs mean something asymmetric &mdash; an action taken, an amount spent &mdash; the forward quantity answers a different question. Fill backwards and the definition keeps you honest.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing the saving is about this network</strong><span>Six values against four paths is not a saving and the lab says so. The reason to care is the shape: add a stage with <span class="math" data-say="k">k</span> nodes and the paths multiply by something like <span class="math" data-say="k">k</span> while the values grow by <span class="math" data-say="k">k</span>. At the sizes on this page you can check the recursion by hand against the enumeration, which is the only reason the enumeration is there.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fill a small staged network backwards, list every optimal route, and say which nodes have ties and whether those ties matter.</strong><p>You should be able to write <span class="math" data-say="f">f</span> at each node from the last stage back, record every argmin rather than one, reconstruct the routes by walking forward, price each of them again from the arcs, and explain why changing a single arc cost can change the number of optimal routes without changing the answer.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything here was solved on a network somebody else had already drawn: the stages were given, so the hardest modelling decision on this course had already been made. The next lesson, &ldquo;The State Is What Is Left&rdquo;, takes that away. There is no network in it until you build one, the nodes have to be invented, and the whole difficulty moves from the arithmetic to the question of what a node should mean.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recording the first argmin and calling it the argmin</strong><span>This is the defect that survives every check. The value is right, the route printed is a genuinely optimal route, and the page looks finished &mdash; it has simply stopped saying that there are others. On the network in the lab it turns three correct answers into one, and a reader who later needs a second-best route, or has a tie-break criterion the model did not include, has been quietly deprived of the thing they needed.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Trying to fill the table forwards</strong><span>A forward pass computes, for each node, the cheapest way to <em>reach</em> it. That is a perfectly good quantity and it is not this one, and the two coincide only because a shortest path is reversible. The moment the arcs mean something asymmetric &mdash; an action taken, an amount spent &mdash; the forward quantity answers a different question. Fill backwards and the definition keeps you honest.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Believing the saving is about this network</strong><span>Six values against four paths is not a saving and the lab says so. The reason to care is the shape: add a stage with <span class="math" data-say="k">k</span> nodes and the paths multiply by something like <span class="math" data-say="k">k</span> while the values grow by <span class="math" data-say="k">k</span>. At the sizes on this page you can check the recursion by hand against the enumeration, which is the only reason the enumeration is there.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can fill a small staged network backwards, list every optimal route, and say which nodes have ties and whether those ties matter.</strong><p>You should be able to write <span class="math" data-say="f">f</span> at each node from the last stage back, record every argmin rather than one, reconstruct the routes by walking forward, price each of them again from the arcs, and explain why changing a single arc cost can change the number of optimal routes without changing the answer.</p></div></div><div class="note"><strong>Note:</strong> Everything here was solved on a network somebody else had already drawn: the stages were given, so the hardest modelling decision on this course had already been made. The next lesson, &ldquo;The State Is What Is Left&rdquo;, takes that away. There is no network in it until you build one, the nodes have to be invented, and the whole difficulty moves from the arithmetic to the question of what a node should mean.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>A node&#x27;s value is a number, and it is not a route</summary><p>What the recursion writes at each node is one quantity: the best total from there to the finish. It does not contain a path and cannot be asked for one. The routes are recovered at the end by walking the argmins forward from the start, and a node may have several argmins, so what comes back is a set of routes rather than a route. Reading the value as though it were a plan is what makes ties invisible.</p></details><details class="recall"><summary>Backwards is forced, not stylistic</summary><p><span class="math" data-say="f of v">f(v)</span> is defined in terms of <span class="math" data-say="f of w">f(w)</span> for the nodes <span class="math" data-say="v">v</span> can reach, so it can only be written once those are settled. That is the whole reason the last stage comes first: its value is zero by definition, and every other value is built on values already final. A forward pass would need the answer before it could compute it, which is why the forward object in this lesson is an enumeration and not a second method.</p></details><details class="recall"><summary>The saving is that each node is priced once</summary><p>Walking every path prices each path separately, and paths multiply as stages are added. The recursion prices each node once, and nodes add. On the network in the lab the two counts are 4 paths against 6 node values, which is no saving at all &mdash; and that is deliberate, because at this size you can check the recursion against the thing it replaces by eye. The saving is a shape, not a number.</p></details></div>
+      <h3>Summary</h3>
       <p>The value of being somewhere is the cost of the next step plus the value of where that step leads. Write that down at every node, fill it in from the last stage back, and a routing problem falls out in one pass. The formula is the easy half. The half this lesson is built on is what the table does <em>not</em> contain: it holds one number per node and no route at all, so the routes have to be reconstructed afterwards &mdash; and when two continuations are worth the same, there is more than one of them.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>A node&#x27;s value is a number, and it is not a route.</strong> What the recursion writes at each node is one quantity: the best total from there to the finish. It does not contain a path and cannot be asked for one. The routes are recovered at the end by walking the argmins forward from the start, and a node may have several argmins, so what comes back is a set of routes rather than a route. Reading the value as though it were a plan is what makes ties invisible.</li><li><strong>Backwards is forced, not stylistic.</strong> <span class="math" data-say="f of v">f(v)</span> is defined in terms of <span class="math" data-say="f of w">f(w)</span> for the nodes <span class="math" data-say="v">v</span> can reach, so it can only be written once those are settled. That is the whole reason the last stage comes first: its value is zero by definition, and every other value is built on values already final. A forward pass would need the answer before it could compute it, which is why the forward object in this lesson is an enumeration and not a second method.</li><li><strong>The saving is that each node is priced once.</strong> Walking every path prices each path separately, and paths multiply as stages are added. The recursion prices each node once, and nodes add. On the network in the lab the two counts are 4 paths against 6 node values, which is no saving at all &mdash; and that is deliberate, because at this size you can check the recursion against the thing it replaces by eye. The saving is a shape, not a number.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="f of v equals the min over arcs v to w of the quantity c of v and w plus f of w, , f of w equals 0 in the last stage. filled from the LAST stage back, so every f of w is settled before f of v is written. the value at the start is the answer, the ROUTE comes back from the argmins. a node with two argmins is a TIE, and a tie on the route means two best answers. arcs, A is greater than B 0, A is greater than C 4, B is greater than D 7, B is greater than E 4, C is greater than D 3, C is greater than E 2, D is greater than F 1, E is greater than F 4, value 8. change A is greater than B from 0 to 2 and the three optimal routes collapse to one" tabindex="0" role="region" aria-label="Mathematical notation">f(v) = min over arcs v&gt;w of [ c(v,w) + f(w) ],        f(w) = 0 in the last stage
 filled from the LAST stage back, so every f(w) is settled before f(v) is written
 the value at the start is the answer; the ROUTE comes back from the argmins
@@ -2927,11 +2972,40 @@ change A&gt;B from 0 to 2 and the three optimal routes collapse to one</div><fig
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2999,7 +3073,7 @@ change A&gt;B from 0 to 2 and the three optimal routes collapse to one</div><fig
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

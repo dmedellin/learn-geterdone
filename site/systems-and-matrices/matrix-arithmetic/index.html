@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Systems and Matrices</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Matrices</p>
       <h1>Matrix Products</h1>
       <p class="lesson-lede">Decide whether a matrix product exists, state its size, and compute each row-column entry.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Addition is entrywise and needs matching sizes</li><li>The product runs rows against columns</li><li>AB and BA are different questions</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Matrix products, after an entrywise warm-up</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Size and equality</span><p>An <span class="math" data-say="m times n">m × n</span> matrix has <span class="math" data-say="m">m</span> rows and <span class="math" data-say="n">n</span> columns. Two matrices are <strong>equal</strong> when they have the same size and agree in every position. There is no notion of two matrices of different sizes being equal.</p></div><div class="defbox"><span class="label">Definition &middot; Sum and scalar multiple</span><p>For matrices of the same size, <span class="math" data-say="A plus B">A + B</span> is the matrix whose entry in each position is the sum of the entries of <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> in that position. For a number <span class="math" data-say="k">k</span>, the matrix <span class="math" data-say="kA">kA</span> has every entry of <span class="math" data-say="A">A</span> multiplied by <span class="math" data-say="k">k</span>.</p><p>A number acting on a matrix this way is called a <strong>scalar</strong>, to distinguish it from a <span class="math" data-say="1 times 1">1 × 1</span> matrix, which is a different object.</p></div><div class="mathblock" data-say="a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">A =   2  −1   0          B =   1   6  −2
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Matrix products, after an entrywise warm-up</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Size and equality</span><p>An <span class="math" data-say="m times n">m × n</span> matrix has <span class="math" data-say="m">m</span> rows and <span class="math" data-say="n">n</span> columns. Two matrices are <strong>equal</strong> when they have the same size and agree in every position. There is no notion of two matrices of different sizes being equal.</p></div><div class="defbox"><span class="label">Definition &middot; Sum and scalar multiple</span><p>For matrices of the same size, <span class="math" data-say="A plus B">A + B</span> is the matrix whose entry in each position is the sum of the entries of <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> in that position. For a number <span class="math" data-say="k">k</span>, the matrix <span class="math" data-say="kA">kA</span> has every entry of <span class="math" data-say="A">A</span> multiplied by <span class="math" data-say="k">k</span>.</p><p>A number acting on a matrix this way is called a <strong>scalar</strong>, to distinguish it from a <span class="math" data-say="1 times 1">1 × 1</span> matrix, which is a different object.</p></div><div class="mathblock" data-say="a table, shown on the page" tabindex="0" role="region" aria-label="Mathematical notation">A =   2  −1   0          B =   1   6  −2
       4   3   5                0  −3   1
 
 A + B =   3   5  −2          3A =    6  −3    0
@@ -1413,22 +1457,21 @@ CD =    2  −5             DC exists too, and is 3 × 3
 
 at (1, 2, 3):    1(1) + 1(2) + 1(3)  =   6    ✓
                  2(1) − 1(2) + 3(3)  =   9    ✓
-                −1(1) + 2(2) + 4(3)  =  15    ✓</div><p>Even when both products exist, order must be preserved: <span class="math" data-say="AB">AB</span> and <span class="math" data-say="BA">BA</span> can have different sizes or different entries. The arithmetic lesson here is deliberately narrow &mdash; decide existence, state the output size, and build each entry from the named row and column. “Inverse Matrices” introduces the identity and inverse when a system needs a matrix operation to be undone.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Matrix arithmetic</h2></div><p>Sum, difference, scalar multiple and product, with every entry derived</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+                −1(1) + 2(2) + 4(3)  =  15    ✓</div><p>Even when both products exist, order must be preserved: <span class="math" data-say="AB">AB</span> and <span class="math" data-say="BA">BA</span> can have different sizes or different entries. The arithmetic lesson here is deliberately narrow &mdash; decide existence, state the output size, and build each entry from the named row and column. “Inverse Matrices” introduces the identity and inverse when a system needs a matrix operation to be undone.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Matrix arithmetic</h2></div><p>Sum, difference, scalar multiple and product, with every entry derived</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong id="maTitle">Matrix</strong><span id="maSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>every entry derived</span><span class="tone-amber"><i class="legend-swatch"></i>AB against BA</span></div>
       </div>
       <div id="maWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="maStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Multiply two matrices</h3>
-          <p>Set the two sizes first: the lab refuses a product whose inner dimensions disagree, which is the shape rule delivered as an error message. Then swap the factors and compare <span class="math" data-say="AB">AB</span> with <span class="math" data-say="BA">BA</span>.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Multiply two matrices</h3>
+            <p>Set the two sizes first: the lab refuses a product whose inner dimensions disagree, which is the shape rule delivered as an error message. Then swap the factors and compare <span class="math" data-say="AB">AB</span> with <span class="math" data-say="BA">BA</span>.</p>
         <div class="field" id="maFieldPreset">
           <label for="maPreset">Worked example</label>
           <select id="maPreset"><option value="0">AB and BA are both defined and different</option><option value="1">adding needs the same shape, and these do not have it</option><option value="2">a 2 by 3 times a 3 by 2</option><option value="3">multiplying by the identity changes nothing</option><option value="4">two matrices that are not zero whose product is</option><option value="5">scaling by 1/2</option></select>
@@ -1455,12 +1498,14 @@ at (1, 2, 3):    1(1) + 1(2) + 1(3)  =   6    ✓
           <div class="kpi"><span id="maK3Lab">&mdash;</span><strong id="maK3">&mdash;</strong></div>
         </div>
         <p class="small-copy" id="maHint" style="margin:0;">Rows are separated by <code>;</code> and entries by spaces, so <code>2 1 -1; -3 -1 2; -2 1 2</code> is a 3 by 3. Fractions such as <code>-1/2</code> are entries like any other, and stay exact through every operation below.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a product</h2></div><p>Four moves. The first one is written down, not done in your head.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check the sizes and write down the size of the answer</h3><p><span class="math" data-say="the quantity m times n, times the quantity n times p">(m × n)(n × p)</span> gives <span class="math" data-say="m times p">m × p</span>. If the inner numbers differ there is nothing to compute, and "the product does not exist" is the complete answer.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take one row and one column at a time</h3><p>For the entry in row <span class="math" data-say="i">i</span>, column <span class="math" data-say="j">j</span>, run along row <span class="math" data-say="i">i</span> of the left matrix and down column <span class="math" data-say="j">j</span> of the right one, multiplying in pairs. Say the position out loud before starting it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the products and place the entry</h3><p>The number of products equals the shared inner dimension, so an inner dimension of <span class="math" data-say="3">3</span> means three products every time. Counting them is a free check on whether a term was skipped.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Never assume AB equals BA</h3><p>If the question asks for <span class="math" data-say="BA">BA</span>, compute <span class="math" data-say="BA">BA</span>. Swapping the factors is not a simplification; it is a different calculation with a different answer.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a product</h2>
+      <p class="lead-in">Four moves. The first one is written down, not done in your head.</p>
+      <ol class="key-ideas method"><li><strong>Check the sizes and write down the size of the answer.</strong> <span class="math" data-say="the quantity m times n, times the quantity n times p">(m × n)(n × p)</span> gives <span class="math" data-say="m times p">m × p</span>. If the inner numbers differ there is nothing to compute, and "the product does not exist" is the complete answer.</li><li><strong>Take one row and one column at a time.</strong> For the entry in row <span class="math" data-say="i">i</span>, column <span class="math" data-say="j">j</span>, run along row <span class="math" data-say="i">i</span> of the left matrix and down column <span class="math" data-say="j">j</span> of the right one, multiplying in pairs. Say the position out loud before starting it.</li><li><strong>Add the products and place the entry.</strong> The number of products equals the shared inner dimension, so an inner dimension of <span class="math" data-say="3">3</span> means three products every time. Counting them is a free check on whether a term was skipped.</li><li><strong>Never assume AB equals BA.</strong> If the question asks for <span class="math" data-say="BA">BA</span>, compute <span class="math" data-say="BA">BA</span>. Swapping the factors is not a simplification; it is a different calculation with a different answer.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1487,17 +1532,16 @@ BA =   3   4
        1   2</div><p><span class="math" data-say="B">B</span> here is a swapper. Multiplying <span class="math" data-say="A">A</span> on the right by it exchanged the columns of <span class="math" data-say="A">A</span>; multiplying on the left exchanged the rows. That is a fair picture of the general situation &mdash; which side you multiply on decides whether rows or columns are acted on &mdash; and it is why the order is part of the expression rather than a detail of how it was written down.</p><p>Neither product is the entrywise one, which would have been <span class="math" data-say="0">0</span>, <span class="math" data-say="2">2</span>, <span class="math" data-say="3">3</span>, <span class="math" data-say="0">0</span>. That matrix is not <span class="math" data-say="AB">AB</span>, is not <span class="math" data-say="BA">BA</span>, and answers no question asked in this course.</p><p>Faded rehearsal: let <span class="math" data-say="C">C</span> be <span class="math" data-say="2 times 3">2 × 3</span> with rows <span class="math" data-say="1, 0, negative 2">(1, 0, −2)</span> and <span class="math" data-say="3, 1, 4">(3, 1, 4)</span>, and let <span class="math" data-say="D">D</span> be <span class="math" data-say="3 times 1">3 × 1</span> with column <span class="math" data-say="2, negative 1, 5">(2, −1, 5)</span>. The shape decision is supplied: <span class="math" data-say="CD">CD</span> exists and is <span class="math" data-say="2 times 1">2 × 1</span>. Compute its two entries by naming each row of <span class="math" data-say="C">C</span> against the column of <span class="math" data-say="D">D</span>, then explain from the dimensions why <span class="math" data-say="DC">DC</span> does not exist.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying entry by entry</strong><span>The matrix of products of matching entries is a real operation with real uses, and it is not <span class="math" data-say="AB">AB</span>. For the two matrices in the worked example it would give <span class="math" data-say="0">0</span>, <span class="math" data-say="2">2</span>, <span class="math" data-say="3">3</span>, <span class="math" data-say="0">0</span>, which is neither product.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a correct number in the wrong position</strong><span>An entry is named before it is computed: row <span class="math" data-say="i">i</span> of the left matrix against column <span class="math" data-say="j">j</span> of the right. Using the right row with the wrong column can produce impeccable arithmetic in a matrix that answers a different product.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming AB exists because BA does</strong><span>A <span class="math" data-say="3 times 2">3 × 2</span> times a <span class="math" data-say="2 times 5">2 × 5</span> is fine; the same two matrices in the other order pair <span class="math" data-say="5">5</span> against <span class="math" data-say="3">3</span> and there is no product at all. Write the two sizes down before reaching for the arithmetic.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the size of the answer is the first thing you write.</strong><p>Before computing a single entry, write <span class="math" data-say="m times p">m × p</span> down. It catches an impossible product before any arithmetic happens, it tells you how many entries you owe, and it is the habit that makes <span class="math" data-say="A x equals b">Ax = b</span> in “Inverse Matrices” read as one equation rather than as three.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Writing a system as <span class="math" data-say="A x equals b">Ax = b</span> invites the obvious move: divide by <span class="math" data-say="A">A</span>. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by <span class="math" data-say="A">A</span>. “Determinants and Cramer's Rule” produces the single number that decides whether such a matrix exists, and “Inverse Matrices” defines it as <span class="math" data-say="A inverse">A⁻¹</span>, constructs it by row reduction, and turns the system into <span class="math" data-say="x equals A inverse b">x = A⁻¹b</span> &mdash; which is the reason this course did “Gaussian Elimination” first.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying entry by entry</strong><span>The matrix of products of matching entries is a real operation with real uses, and it is not <span class="math" data-say="AB">AB</span>. For the two matrices in the worked example it would give <span class="math" data-say="0">0</span>, <span class="math" data-say="2">2</span>, <span class="math" data-say="3">3</span>, <span class="math" data-say="0">0</span>, which is neither product.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a correct number in the wrong position</strong><span>An entry is named before it is computed: row <span class="math" data-say="i">i</span> of the left matrix against column <span class="math" data-say="j">j</span> of the right. Using the right row with the wrong column can produce impeccable arithmetic in a matrix that answers a different product.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming AB exists because BA does</strong><span>A <span class="math" data-say="3 times 2">3 × 2</span> times a <span class="math" data-say="2 times 5">2 × 5</span> is fine; the same two matrices in the other order pair <span class="math" data-say="5">5</span> against <span class="math" data-say="3">3</span> and there is no product at all. Write the two sizes down before reaching for the arithmetic.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the size of the answer is the first thing you write.</strong><p>Before computing a single entry, write <span class="math" data-say="m times p">m × p</span> down. It catches an impossible product before any arithmetic happens, it tells you how many entries you owe, and it is the habit that makes <span class="math" data-say="A x equals b">Ax = b</span> in “Inverse Matrices” read as one equation rather than as three.</p></div></div><div class="note"><strong>Note:</strong> Writing a system as <span class="math" data-say="A x equals b">Ax = b</span> invites the obvious move: divide by <span class="math" data-say="A">A</span>. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by <span class="math" data-say="A">A</span>. “Determinants and Cramer's Rule” produces the single number that decides whether such a matrix exists, and “Inverse Matrices” defines it as <span class="math" data-say="A inverse">A⁻¹</span>, constructs it by row reduction, and turns the system into <span class="math" data-say="x equals A inverse b">x = A⁻¹b</span> &mdash; which is the reason this course did “Gaussian Elimination” first.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Addition is entrywise and needs matching sizes</summary><p><span class="math" data-say="A plus B">A + B</span> exists only when <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> have the same number of rows and the same number of columns, and then it is what it looks like. Every rule of addition from Foundations of Algebra carries over, one position at a time.</p></details><details class="recall"><summary>The product runs rows against columns</summary><p>Multiply each entry of row <span class="math" data-say="i">i</span> of <span class="math" data-say="A">A</span> by the matching entry of column <span class="math" data-say="j">j</span> of <span class="math" data-say="B">B</span> and add the results. The row length of <span class="math" data-say="A">A</span> must equal the column height of <span class="math" data-say="B">B</span>, and that requirement is the whole of the shape rule.</p></details><details class="recall"><summary>AB and BA are different questions</summary><p>They can have different sizes; one can exist while the other does not; and even when both are <span class="math" data-say="n times n">n × n</span> they are usually different matrices. Every rearrangement that quietly used commutativity has to be re-earned here.</p></details></div>
+      <h3>Summary</h3>
       <p>Addition and scaling are a short entrywise warm-up. The product is the new operation: the entry in row <span class="math" data-say="i">i</span> and column <span class="math" data-say="j">j</span> of <span class="math" data-say="AB">AB</span> is built from the whole of row <span class="math" data-say="i">i</span> and the whole of column <span class="math" data-say="j">j</span>, and the order of the factors changes the answer.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Addition is entrywise and needs matching sizes.</strong> <span class="math" data-say="A plus B">A + B</span> exists only when <span class="math" data-say="A">A</span> and <span class="math" data-say="B">B</span> have the same number of rows and the same number of columns, and then it is what it looks like. Every rule of addition from Foundations of Algebra carries over, one position at a time.</li><li><strong>The product runs rows against columns.</strong> Multiply each entry of row <span class="math" data-say="i">i</span> of <span class="math" data-say="A">A</span> by the matching entry of column <span class="math" data-say="j">j</span> of <span class="math" data-say="B">B</span> and add the results. The row length of <span class="math" data-say="A">A</span> must equal the column height of <span class="math" data-say="B">B</span>, and that requirement is the whole of the shape rule.</li><li><strong>AB and BA are different questions.</strong> They can have different sizes; one can exist while the other does not; and even when both are <span class="math" data-say="n times n">n × n</span> they are usually different matrices. Every rearrangement that quietly used commutativity has to be re-earned here.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A plus B, same size, entry by entry. kA, every entry multiplied by k. A m times n, times, B n times p, equals, AB m times p, inner sizes must agree. AB in row i, column j, equals, row i of A against column j of B" tabindex="0" role="region" aria-label="Mathematical notation">A + B                       same size, entry by entry
 kA                          every entry multiplied by k
 A (m × n)  times  B (n × p)  =  AB (m × p)     inner sizes must agree
@@ -3393,11 +3437,40 @@ AB in row i, column j  =  row i of A against column j of B</div><figcaption>Thre
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3465,7 +3538,7 @@ AB in row i, column j  =  row i of A against column j of B</div><figcaption>Thre
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

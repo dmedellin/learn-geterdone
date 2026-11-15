@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,31 +1424,29 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Foundations of Algebra</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Building expressions</p>
       <h1>The Distributive Law</h1>
       <p class="lesson-lede">The one property that connects addition and multiplication.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>It is an axiom, not a consequence</li><li>The factor outside reaches every term inside</li><li>Only multiplication distributes over addition</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The law, and where it stops</h2>
-      <article class="prose reading"><div class="thm"><span class="label">Theorem &middot; The distributive law</span><p>For all real numbers <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>, <span class="math" data-say="A times the quantity b plus c, equals A b plus A c">a(b + c) = ab + ac</span>.</p><p>Multiplication is commutative, so the same statement holds with the factor on the other side: <span class="math" data-say="the quantity b plus c, times A equals b A plus c A">(b + c)a = ba + ca</span>.</p></div><p>One picture, for anyone who wants the law to feel inevitable rather than assumed: a rectangle <span class="math" data-say="3">3</span> units high and <span class="math" data-say="x plus 4">x + 4</span> units wide can be cut into a <span class="math" data-say="3">3</span> by <span class="math" data-say="x">x</span> piece and a <span class="math" data-say="3">3</span> by <span class="math" data-say="4">4</span> piece. Its area is <span class="math" data-say="3 times the quantity x plus 4">3(x + 4)</span> and it is also <span class="math" data-say="3 x plus 12">3x + 12</span>. The picture is a reason to believe the law, not a proof of it &mdash; it says nothing about negative or fractional lengths, which the law covers and rectangles do not.</p><h3>Subtraction, and the invisible minus one</h3><p>The law is stated for addition, and that is enough, because <span class="math" data-say="b minus c equals b plus negative c">b − c = b + (−c)</span>. Distributing over a subtraction is distributing over the sum of <span class="math" data-say="b">b</span> and <span class="math" data-say="negative c">−c</span>:</p><div class="mathblock" data-say="3 times the quantity x plus 4, equals, 3 times x plus 3 times 4, equals, 3 x plus 12. negative 2 times the quantity x minus 5, equals, the quantity negative 2, times x plus the quantity negative 2, times the quantity negative 5, equals, negative 2 x plus 10. negative the quantity x minus 7, equals, the quantity negative 1, times x plus the quantity negative 1, times the quantity negative 7, equals, negative x plus 7. the quantity 1 over 2, times the quantity 4 x minus 6, equals the quantity 1 over 2, times 4 x plus the quantity 1 over 2, times the quantity negative 6, equals 2 x minus 3" tabindex="0" role="region" aria-label="Mathematical notation">3(x + 4)     =  3·x + 3·4          =  3x + 12
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The law, and where it stops</h2><div class="prose reading"><div class="thm"><span class="label">Theorem &middot; The distributive law</span><p>For all real numbers <span class="math" data-say="A">a</span>, <span class="math" data-say="b">b</span> and <span class="math" data-say="c">c</span>, <span class="math" data-say="A times the quantity b plus c, equals A b plus A c">a(b + c) = ab + ac</span>.</p><p>Multiplication is commutative, so the same statement holds with the factor on the other side: <span class="math" data-say="the quantity b plus c, times A equals b A plus c A">(b + c)a = ba + ca</span>.</p></div><p>One picture, for anyone who wants the law to feel inevitable rather than assumed: a rectangle <span class="math" data-say="3">3</span> units high and <span class="math" data-say="x plus 4">x + 4</span> units wide can be cut into a <span class="math" data-say="3">3</span> by <span class="math" data-say="x">x</span> piece and a <span class="math" data-say="3">3</span> by <span class="math" data-say="4">4</span> piece. Its area is <span class="math" data-say="3 times the quantity x plus 4">3(x + 4)</span> and it is also <span class="math" data-say="3 x plus 12">3x + 12</span>. The picture is a reason to believe the law, not a proof of it &mdash; it says nothing about negative or fractional lengths, which the law covers and rectangles do not.</p><h3>Subtraction, and the invisible minus one</h3><p>The law is stated for addition, and that is enough, because <span class="math" data-say="b minus c equals b plus negative c">b − c = b + (−c)</span>. Distributing over a subtraction is distributing over the sum of <span class="math" data-say="b">b</span> and <span class="math" data-say="negative c">−c</span>:</p><div class="mathblock" data-say="3 times the quantity x plus 4, equals, 3 times x plus 3 times 4, equals, 3 x plus 12. negative 2 times the quantity x minus 5, equals, the quantity negative 2, times x plus the quantity negative 2, times the quantity negative 5, equals, negative 2 x plus 10. negative the quantity x minus 7, equals, the quantity negative 1, times x plus the quantity negative 1, times the quantity negative 7, equals, negative x plus 7. the quantity 1 over 2, times the quantity 4 x minus 6, equals the quantity 1 over 2, times 4 x plus the quantity 1 over 2, times the quantity negative 6, equals 2 x minus 3" tabindex="0" role="region" aria-label="Mathematical notation">3(x + 4)     =  3·x + 3·4          =  3x + 12
 −2(x − 5)    =  (−2)·x + (−2)·(−5) =  −2x + 10
 −(x − 7)     =  (−1)·x + (−1)·(−7) =  −x + 7
 (1/2)(4x − 6) = (1/2)(4x) + (1/2)(−6) = 2x − 3</div><p>Line three is the one to study. A minus sign in front of a bracket is a factor of <span class="math" data-say="negative 1">−1</span>, and it multiplies <em>every</em> term inside. <span class="math" data-say="negative the quantity x minus 7">−(x − 7)</span> is <span class="math" data-say="negative x plus 7">−x + 7</span>; it is not <span class="math" data-say="negative x minus 7">−x − 7</span>. Nothing here is being remembered &mdash; each sign is computed, and <span class="math" data-say="the quantity negative 1, times the quantity negative 7, equals plus 7">(−1)(−7) = +7</span> is a fact from “Properties of the Real Numbers”.</p><p>The habit worth forming is to write the <span class="math" data-say="negative 1">−1</span> in. It costs a symbol and converts a sign question into a multiplication, which you can do.</p><h3>More terms, and more factors</h3><p>The law places no limit on how many terms are inside the bracket, because it can be applied repeatedly:</p><div class="mathblock" data-say="2 times the quantity x plus y plus 3, equals, 2 x plus 2 y plus 6. the quantity x plus 2, times the quantity x minus 3, equals, x times the quantity x minus 3, plus 2 times the quantity x minus 3, distribute the sum first. equals, x squared minus 3 x plus 2 x minus 6. equals, x squared minus x minus 6, then collect" tabindex="0" role="region" aria-label="Mathematical notation">2(x + y + 3)   =  2x + 2y + 6
 
 (x + 2)(x − 3) =  x(x − 3) + 2(x − 3)        distribute the sum first
                =  x² − 3x + 2x − 6
-               =  x² − x − 6                 then collect</div><p>The second line is the law used twice: once to split <span class="math" data-say="x plus 2">(x + 2)</span> off, and once inside each piece. There is no separate rule for multiplying two brackets; there is this law, applied again. Polynomials and Factoring does this at length and gives it a name.</p><h3>Four things that are not the distributive law</h3><ul><li><strong>Squaring over a sum.</strong> <span class="math" data-say="the quantity A plus b, squared">(a + b)²</span> is not <span class="math" data-say="A squared plus b squared">a² + b²</span>. At <span class="math" data-say="A equals 1, b equals 3">a = 1, b = 3</span> the left side is <span class="math" data-say="16">16</span> and the right side is <span class="math" data-say="10">10</span>.</li><li><strong>Roots over a sum.</strong> <span class="math" data-say="the square root of the quantity A plus b">√(a + b)</span> is not <span class="math" data-say="the square root of A plus the square root of b">√a + √b</span>. At <span class="math" data-say="A equals 9, b equals 16">a = 9, b = 16</span> the left side is <span class="math" data-say="the square root of 25 equals 5">√25 = 5</span> and the right side is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>.</li><li><strong>Multiplication over multiplication.</strong> <span class="math" data-say="A times the quantity b c">a(bc)</span> is not <span class="math" data-say="A b times A c">(ab)(ac)</span>. At <span class="math" data-say="A equals 2, b equals 3, c equals 4">a = 2, b = 3, c = 4</span> the left side is <span class="math" data-say="24">24</span> and the right side is <span class="math" data-say="48">48</span>. The law distributes multiplication over <em>addition</em>, and over nothing else.</li><li><strong>A sum in a denominator.</strong> <span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> is not <span class="math" data-say="12 over x plus 12 over 6">12/x + 12/6</span>. At <span class="math" data-say="x equals 6">x = 6</span> the left side is <span class="math" data-say="1">1</span> and the right side is <span class="math" data-say="2 plus 2 equals 4">2 + 2 = 4</span>.</li></ul><p>The last one deserves its own sentence, because division is where the law is genuinely one-sided. <span class="math" data-say="the quantity x plus 6, over 2">(x + 6)/2</span> <em>does</em> split, giving <span class="math" data-say="x over 2 plus 3">x/2 + 3</span>, and the reason is that dividing by <span class="math" data-say="2">2</span> is multiplying by <span class="math" data-say="1 over 2">1/2</span>, so the law applies with <span class="math" data-say="A equals 1 over 2">a = 1/2</span>. But <span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> is <span class="math" data-say="12">12</span> times <span class="math" data-say="1 over the quantity x plus 6">1/(x + 6)</span>, and <span class="math" data-say="1 over the quantity x plus 6">1/(x + 6)</span> is not <span class="math" data-say="1 over x plus 1 over 6">1/x + 1/6</span>. A sum you are dividing splits; a sum you are dividing <em>by</em> does not.</p><div class="example"><span class="label">Example &middot; The law read right to left</span><p><span class="math" data-say="A b plus A c equals A times the quantity b plus c">ab + ac = a(b + c)</span> is the same statement written backwards, and read that way it is called factoring. <span class="math" data-say="6 x plus 15">6x + 15</span> is <span class="math" data-say="3 times the quantity 2 x plus 5">3(2x + 5)</span>, because both terms share a factor of <span class="math" data-say="3">3</span>. Polynomials and Factoring is largely the study of how to find the <span class="math" data-say="A">a</span> when nobody tells you what it is.</p></div></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Multiplying out</h2></div><p>Every term against every term</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+               =  x² − x − 6                 then collect</div><p>The second line is the law used twice: once to split <span class="math" data-say="x plus 2">(x + 2)</span> off, and once inside each piece. There is no separate rule for multiplying two brackets; there is this law, applied again. Polynomials and Factoring does this at length and gives it a name.</p><h3>Four things that are not the distributive law</h3><ul><li><strong>Squaring over a sum.</strong> <span class="math" data-say="the quantity A plus b, squared">(a + b)²</span> is not <span class="math" data-say="A squared plus b squared">a² + b²</span>. At <span class="math" data-say="A equals 1, b equals 3">a = 1, b = 3</span> the left side is <span class="math" data-say="16">16</span> and the right side is <span class="math" data-say="10">10</span>.</li><li><strong>Roots over a sum.</strong> <span class="math" data-say="the square root of the quantity A plus b">√(a + b)</span> is not <span class="math" data-say="the square root of A plus the square root of b">√a + √b</span>. At <span class="math" data-say="A equals 9, b equals 16">a = 9, b = 16</span> the left side is <span class="math" data-say="the square root of 25 equals 5">√25 = 5</span> and the right side is <span class="math" data-say="3 plus 4 equals 7">3 + 4 = 7</span>.</li><li><strong>Multiplication over multiplication.</strong> <span class="math" data-say="A times the quantity b c">a(bc)</span> is not <span class="math" data-say="A b times A c">(ab)(ac)</span>. At <span class="math" data-say="A equals 2, b equals 3, c equals 4">a = 2, b = 3, c = 4</span> the left side is <span class="math" data-say="24">24</span> and the right side is <span class="math" data-say="48">48</span>. The law distributes multiplication over <em>addition</em>, and over nothing else.</li><li><strong>A sum in a denominator.</strong> <span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> is not <span class="math" data-say="12 over x plus 12 over 6">12/x + 12/6</span>. At <span class="math" data-say="x equals 6">x = 6</span> the left side is <span class="math" data-say="1">1</span> and the right side is <span class="math" data-say="2 plus 2 equals 4">2 + 2 = 4</span>.</li></ul><p>The last one deserves its own sentence, because division is where the law is genuinely one-sided. <span class="math" data-say="the quantity x plus 6, over 2">(x + 6)/2</span> <em>does</em> split, giving <span class="math" data-say="x over 2 plus 3">x/2 + 3</span>, and the reason is that dividing by <span class="math" data-say="2">2</span> is multiplying by <span class="math" data-say="1 over 2">1/2</span>, so the law applies with <span class="math" data-say="A equals 1 over 2">a = 1/2</span>. But <span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> is <span class="math" data-say="12">12</span> times <span class="math" data-say="1 over the quantity x plus 6">1/(x + 6)</span>, and <span class="math" data-say="1 over the quantity x plus 6">1/(x + 6)</span> is not <span class="math" data-say="1 over x plus 1 over 6">1/x + 1/6</span>. A sum you are dividing splits; a sum you are dividing <em>by</em> does not.</p><div class="example"><span class="label">Example &middot; The law read right to left</span><p><span class="math" data-say="A b plus A c equals A times the quantity b plus c">ab + ac = a(b + c)</span> is the same statement written backwards, and read that way it is called factoring. <span class="math" data-say="6 x plus 15">6x + 15</span> is <span class="math" data-say="3 times the quantity 2 x plus 5">3(2x + 5)</span>, because both terms share a factor of <span class="math" data-say="3">3</span>. Polynomials and Factoring is largely the study of how to find the <span class="math" data-say="A">a</span> when nobody tells you what it is.</p></div></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Multiplying out</h2></div><p>Every term against every term</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Multiplying out</strong><span id="exSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>each product</span><span class="tone-green"><i class="legend-swatch"></i>collected</span></div>
@@ -1411,10 +1454,10 @@
       <div class="lab-stage" id="exStage"></div>
       <div id="exWork" style="margin-top:12px;"></div>
       <div class="status-banner" id="exStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Two factors, every product</h3>
-          <p>Enter the two factors and the lab multiplies every term of the first by every term of the second, in a grid, before collecting. Before selecting a new pair, predict the number and signs of the grid entries. A missing cell diagnoses incomplete distribution; a wrong sign diagnoses the multiplication that made it.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Two factors, every product</h3>
+            <p>Enter the two factors and the lab multiplies every term of the first by every term of the second, in a grid, before collecting. Before selecting a new pair, predict the number and signs of the grid entries. A missing cell diagnoses incomplete distribution; a wrong sign diagnoses the multiplication that made it.</p>
         <div class="field">
           <label for="exPreset">Product</label>
           <select id="exPreset"><option value="3|x + 4">3(x + 4)</option><option value="-2|x - 5">-2(x - 5)</option><option value="-1|x - 7">-(x - 7)</option><option value="x + 2|x - 3">(x + 2)(x - 3)</option><option value="2x - 1|3x + 4">(2x - 1)(3x + 4)</option><option value="1/2|4x - 6">(1/2)(4x - 6)</option></select>
@@ -1429,12 +1472,14 @@
         </div>
         <div class="kpi-grid"><div class="kpi"><span>Products</span><strong id="exK1">&mdash;</strong></div><div class="kpi"><span>Before collecting</span><strong id="exK2">&mdash;</strong></div><div class="kpi"><span>After collecting</span><strong id="exK3">&mdash;</strong></div></div>
         <p class="small-copy" style="margin:0;">Each factor is an expression: <code>2x - 1</code> and <code>3x + 4</code>. A single number is a perfectly good factor.</p>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Distributing without losing a sign</h2></div><p>The first two steps exist entirely to make the third one arithmetic rather than memory.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the outside factor with its sign</h3><p>If the bracket has nothing but a minus in front of it, write <span class="math" data-say="negative 1">(−1)</span>. An invisible factor is the one that gets applied to only half the bracket.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Rewrite every subtraction inside as an addition</h3><p><span class="math" data-say="x minus 7">x − 7</span> becomes <span class="math" data-say="x plus negative 7">x + (−7)</span>. Now every term inside carries its own sign and there is no subtraction left to mishandle.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply the outside factor by each term in turn</h3><p>One term at a time, left to right, writing each product down before moving on. Count the products against the number of terms in the bracket; they must match.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check at one value</h3><p>Substitute a convenient number, <span class="math" data-say="x equals 1">x = 1</span> usually, into the original and into your answer. Disagreement proves you are wrong; agreement is not a proof that you are right, but it catches nearly every sign error.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Distributing without losing a sign</h2>
+      <p class="lead-in">The first two steps exist entirely to make the third one arithmetic rather than memory.</p>
+      <ol class="key-ideas method"><li><strong>Write the outside factor with its sign.</strong> If the bracket has nothing but a minus in front of it, write <span class="math" data-say="negative 1">(−1)</span>. An invisible factor is the one that gets applied to only half the bracket.</li><li><strong>Rewrite every subtraction inside as an addition.</strong> <span class="math" data-say="x minus 7">x − 7</span> becomes <span class="math" data-say="x plus negative 7">x + (−7)</span>. Now every term inside carries its own sign and there is no subtraction left to mishandle.</li><li><strong>Multiply the outside factor by each term in turn.</strong> One term at a time, left to right, writing each product down before moving on. Count the products against the number of terms in the bracket; they must match.</li><li><strong>Check at one value.</strong> Substitute a convenient number, <span class="math" data-say="x equals 1">x = 1</span> usually, into the original and into your answer. Disagreement proves you are wrong; agreement is not a proof that you are right, but it catches nearly every sign error.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1459,17 +1504,16 @@ check line 3 at x = 1:
         answer     −1 + 7                =  6</div><p>In lines 2 and 3 the sign that flipped is on the second term, and it flipped because a negative times a negative is positive. Writing <span class="math" data-say="negative 2 x minus 10">−2x − 10</span> or <span class="math" data-say="negative x minus 7">−x − 7</span> is what happens when the outside factor is applied to the first term and then merely copied onto the second.</p><p>The checks test one value of <span class="math" data-say="x">x</span> each. That is enough to expose a wrong sign and not enough to establish that two expressions agree everywhere &mdash; what establishes that is the law itself, which is why the law is stated for all real numbers and the check is called a check.</p><p>Fade two of the products for <span class="math" data-say="negative 3 times the quantity 2 x minus 5">−3(2x − 5)</span>: write <span class="math" data-say="the quantity negative 3, times 2 x">(−3)(2x)</span> and leave the second product blank before finishing. The expansion is <span class="math" data-say="negative 6 x plus 15">−6x + 15</span>. <span class="math" data-say="negative 6 x minus 15">−6x − 15</span> kept the inner sign instead of multiplying it; <span class="math" data-say="negative 6 x minus 5">−6x − 5</span> also failed to send the outside factor to every term.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Distributing to the first term only</strong><span><span class="math" data-say="negative 2 times the quantity x minus 5">−2(x − 5)</span> is <span class="math" data-say="negative 2 x plus 10">−2x + 10</span>, not <span class="math" data-say="negative 2 x minus 5">−2x − 5</span>. The factor outside multiplies every term inside, and the terms after the first are the ones that get forgotten, because by then the eye has moved on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Splitting a sum that is in the denominator</strong><span><span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> is not <span class="math" data-say="12 over x plus 2">12/x + 2</span>. Reciprocals do not distribute over addition. <span class="math" data-say="the quantity x plus 6, over 2">(x + 6)/2</span> does split, and the difference between the two shapes is which side of the fraction bar the sum is on.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting squares and roots to distribute</strong><span><span class="math" data-say="the quantity A plus b, squared">(a + b)²</span> is <span class="math" data-say="A squared plus 2 A b plus b squared">a² + 2ab + b²</span>, not <span class="math" data-say="A squared plus b squared">a² + b²</span>, and <span class="math" data-say="the square root of the quantity A plus b">√(a + b)</span> is not <span class="math" data-say="the square root of A plus the square root of b">√a + √b</span>. Both are checked in one line with small numbers, and both are wrong every time except in special cases such as <span class="math" data-say="b equals 0">b = 0</span>.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when <span class="math" data-say="negative the quantity x minus 3">−(x − 3)</span> gives <span class="math" data-say="negative x plus 3">−x + 3</span> with no pause and no doubt.</strong><p>Expand <span class="math" data-say="negative 4 times the quantity 3 x minus 2 y plus 5">−4(3x − 2y + 5)</span> and <span class="math" data-say="the quantity 2 x minus 3, times the quantity x plus 4">(2x − 3)(x + 4)</span>, showing one product for every grid cell. Then use a numerical counterexample to explain why <span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> cannot split although <span class="math" data-say="the quantity x plus 6, over 2">(x + 6)/2</span> can. That shape distinction is what keeps Rational and Radical Expressions from becoming guesswork.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Read the law right to left and it becomes factoring, which is most of Polynomials and Factoring. Read it left to right with two brackets and it becomes polynomial multiplication. Both directions are this one property, which is a reasonable argument for spending more time on it than it appears to deserve.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Distributing to the first term only</strong><span><span class="math" data-say="negative 2 times the quantity x minus 5">−2(x − 5)</span> is <span class="math" data-say="negative 2 x plus 10">−2x + 10</span>, not <span class="math" data-say="negative 2 x minus 5">−2x − 5</span>. The factor outside multiplies every term inside, and the terms after the first are the ones that get forgotten, because by then the eye has moved on.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Splitting a sum that is in the denominator</strong><span><span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> is not <span class="math" data-say="12 over x plus 2">12/x + 2</span>. Reciprocals do not distribute over addition. <span class="math" data-say="the quantity x plus 6, over 2">(x + 6)/2</span> does split, and the difference between the two shapes is which side of the fraction bar the sum is on.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting squares and roots to distribute</strong><span><span class="math" data-say="the quantity A plus b, squared">(a + b)²</span> is <span class="math" data-say="A squared plus 2 A b plus b squared">a² + 2ab + b²</span>, not <span class="math" data-say="A squared plus b squared">a² + b²</span>, and <span class="math" data-say="the square root of the quantity A plus b">√(a + b)</span> is not <span class="math" data-say="the square root of A plus the square root of b">√a + √b</span>. Both are checked in one line with small numbers, and both are wrong every time except in special cases such as <span class="math" data-say="b equals 0">b = 0</span>.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when <span class="math" data-say="negative the quantity x minus 3">−(x − 3)</span> gives <span class="math" data-say="negative x plus 3">−x + 3</span> with no pause and no doubt.</strong><p>Expand <span class="math" data-say="negative 4 times the quantity 3 x minus 2 y plus 5">−4(3x − 2y + 5)</span> and <span class="math" data-say="the quantity 2 x minus 3, times the quantity x plus 4">(2x − 3)(x + 4)</span>, showing one product for every grid cell. Then use a numerical counterexample to explain why <span class="math" data-say="12 over the quantity x plus 6">12/(x + 6)</span> cannot split although <span class="math" data-say="the quantity x plus 6, over 2">(x + 6)/2</span> can. That shape distinction is what keeps Rational and Radical Expressions from becoming guesswork.</p></div></div><div class="note"><strong>Note:</strong> Read the law right to left and it becomes factoring, which is most of Polynomials and Factoring. Read it left to right with two brackets and it becomes polynomial multiplication. Both directions are this one property, which is a reasonable argument for spending more time on it than it appears to deserve.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>It is an axiom, not a consequence</summary><p>Nothing proves <span class="math" data-say="A times the quantity b plus c, equals A b plus A c">a(b + c) = ab + ac</span> from the other properties &mdash; it is one of the assumed properties of the real numbers, stated in “Properties of the Real Numbers”. That is worth knowing, because it means the law is exactly as broad as it is stated and not one case broader.</p></details><details class="recall"><summary>The factor outside reaches every term inside</summary><p>Every term, not the first one. When the factor is an invisible <span class="math" data-say="negative 1">−1</span>, as in <span class="math" data-say="negative the quantity x minus 7">−(x − 7)</span>, this is the single most common error in school algebra and it produces answers that look entirely reasonable.</p></details><details class="recall"><summary>Only multiplication distributes over addition</summary><p>Squaring does not, taking a root does not, and a sum in a denominator does not. Each of those has the shape of the law and none of them is the law; one numerical test settles each in seconds.</p></details></div>
+      <h3>Summary</h3>
       <p>Commutativity and associativity rearrange within a single operation. Distribution is the only property that lets multiplication and addition talk to each other, which makes it the licence behind expanding, factoring and very nearly every rearrangement you will make.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>It is an axiom, not a consequence.</strong> Nothing proves <span class="math" data-say="A times the quantity b plus c, equals A b plus A c">a(b + c) = ab + ac</span> from the other properties &mdash; it is one of the assumed properties of the real numbers, stated in “Properties of the Real Numbers”. That is worth knowing, because it means the law is exactly as broad as it is stated and not one case broader.</li><li><strong>The factor outside reaches every term inside.</strong> Every term, not the first one. When the factor is an invisible <span class="math" data-say="negative 1">−1</span>, as in <span class="math" data-say="negative the quantity x minus 7">−(x − 7)</span>, this is the single most common error in school algebra and it produces answers that look entirely reasonable.</li><li><strong>Only multiplication distributes over addition.</strong> Squaring does not, taking a root does not, and a sum in a denominator does not. Each of those has the shape of the law and none of them is the law; one numerical test settles each in seconds.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A times the quantity b plus c, equals, A b plus A c, the law. A times the quantity b minus c, equals, A b minus A c, because b minus c equals b plus negative c. negative the quantity x minus 7, equals, negative x plus 7, the factor outside is negative 1. the quantity x plus 6, over 2, equals, x over 2 plus 3, BUT, 12 over the quantity x plus 6, is not equal to 12 over x plus 2" tabindex="0" role="region" aria-label="Mathematical notation">a(b + c)   =  ab + ac              the law
 a(b − c)   =  ab − ac              because b − c = b + (−c)
 −(x − 7)   =  −x + 7               the factor outside is −1
@@ -2811,11 +2855,40 @@ a(b − c)   =  ab − ac              because b − c = b + (−c)
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2883,7 +2956,7 @@ a(b − c)   =  ab − ac              because b − c = b + (−c)
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

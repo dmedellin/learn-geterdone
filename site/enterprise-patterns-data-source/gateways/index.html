@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Talking to the Database</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 10 · Data Source Architectural Patterns</p>
       <h1>Gateways</h1>
       <p class="lesson-lede">Put all the SQL for a table in one class, a gateway, so the rest of the application knows nothing about SQL and a schema change is edited in one place.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Gateway</li><li>Table Data Gateway</li><li>Record Set</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The narrative&#x27;s case, the pattern, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The rest of the application needs to know nothing about SQL, and all the SQL that accesses the database is easy to find.&rdquo; That sentence, from Chapter 3's section Architectural Patterns, is the promise of every pattern in this course. This lesson reads that section as an argument, and then Chapter 18's Gateway and Chapter 10's Table Data Gateway as tools. Read them in your own copy first.</p><p>Fowler's case begins with SQL itself. It is everywhere in enterprise software, he says, and still a trap: many application developers do not know it well and write poor queries; every way of embedding it in a programming language is somewhat awkward; and database administrators want to find the SQL that touches a table, so as to tune it and arrange its indexes. So separate the SQL from the domain logic and put it in classes of its own, one for each table, each a Gateway to its table. He adds that he does this even in small scripts of his own, because he finds the separation that helpful.</p><p>He then lays out the choice the rest of the course reads. A gateway can have one instance per row, a Row Data Gateway, or one per table, a Table Data Gateway, which returns a Record Set and is the obvious partner for Table Module. A simple Domain Model whose classes match the tables can let each object load and save itself, an Active Record; a rich one wants a Data Mapper, a layer that keeps the objects and the tables apart. He calls the choice far-reaching and hard to refactor, and strongly affected by how you built the domain logic, which is why the previous course came first.</p><p>The section closes on what all this costs. Weighing object databases, which need no mapping, Fowler puts the cost of the alternative at about a third of all programming effort, carried on into maintenance. He says that this rests on anecdote, and that he knows of no controlled test. Treat it as an estimate, which your own records can check.</p><p>Gateway, in Chapter 18, is the general tool. Wrap the special API of an external resource, JDBC and SQL for a database, in a class whose interface looks like any other object's, and let everything else go through it. Keep it minimal: adapt the resource, give tests a place to substitute a stand-in, and leave any cleverer logic to its callers. One clear benefit, the pattern says, is that swapping the resource means changing only the gateway, and nothing beyond it. It adds that the simplicity and the place for a test stand-in are worth having even if the resource never changes.</p><p>Table Data Gateway, in Chapter 10, is that tool for one table: finds, inserts, updates and deletes, each mapping its parameters into SQL. Its trickiest question is what a query returns. A map works, but Fowler calls it bad form: it gives up type checks at compile time, so a mistyped key is found only when it fails. A Data Transfer Object is better, at the cost of another class; the Record Set itself is conceptually messy but very effective where tools are built around it; and with a Domain Model the gateway can return domain objects, which he is reluctant to do, because each side then depends on the other. The book notes that Alur, Crupi and Malks's Data Access Object is this pattern under another name. And where a team does all its access through stored procedures, Fowler treats the set of procedures for a table as its Table Data Gateway, and would still wrap the calls in an in-memory one.</p><p>The lesson's snippet is a small Table Data Gateway for a <span class="math" data-say="price">price</span> table. In JDBC, <span class="math" data-say="prepare statement">prepareStatement</span> compiles a SQL statement with a question mark as its placeholder, <span class="math" data-say="set string">setString</span> fills the placeholder, and <span class="math" data-say="execute query">executeQuery</span> runs the statement and returns a <span class="math" data-say="result set">ResultSet</span>, whose <span class="math" data-say="next">next</span> moves to the first row if there is one. A caller asks for <span class="math" data-say="find cents">findCents</span> and never sees a column name.</p><pre class="codeblock" data-say="line 1, comment, All the SQL for the price table, in one class.. line 2, class price gateway. line 3, private final connection db. line 5, price gateway of connection db. line 6, this dot db is set to db. line 9, long find cents of string sku throws SQL exception. line 10, prepared statement s is set to db dot prepare statement. line 11, SELECT cents FROM price WHERE sku ?. line 12, s dot set string of 1, sku. line 13, result set rs is set to s dot execute query. line 14, return rs dot next, if so, rs dot get long of 1, otherwise, minus 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// All the SQL for the price table, in one class.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The narrative&#x27;s case, the pattern, then the count</h2><div class="prose reading"><p>&ldquo;The rest of the application needs to know nothing about SQL, and all the SQL that accesses the database is easy to find.&rdquo; That sentence, from Chapter 3's section Architectural Patterns, is the promise of every pattern in this course. This lesson reads that section as an argument, and then Chapter 18's Gateway and Chapter 10's Table Data Gateway as tools. Read them in your own copy first.</p><p>Fowler's case begins with SQL itself. It is everywhere in enterprise software, he says, and still a trap: many application developers do not know it well and write poor queries; every way of embedding it in a programming language is somewhat awkward; and database administrators want to find the SQL that touches a table, so as to tune it and arrange its indexes. So separate the SQL from the domain logic and put it in classes of its own, one for each table, each a Gateway to its table. He adds that he does this even in small scripts of his own, because he finds the separation that helpful.</p><p>He then lays out the choice the rest of the course reads. A gateway can have one instance per row, a Row Data Gateway, or one per table, a Table Data Gateway, which returns a Record Set and is the obvious partner for Table Module. A simple Domain Model whose classes match the tables can let each object load and save itself, an Active Record; a rich one wants a Data Mapper, a layer that keeps the objects and the tables apart. He calls the choice far-reaching and hard to refactor, and strongly affected by how you built the domain logic, which is why the previous course came first.</p><p>The section closes on what all this costs. Weighing object databases, which need no mapping, Fowler puts the cost of the alternative at about a third of all programming effort, carried on into maintenance. He says that this rests on anecdote, and that he knows of no controlled test. Treat it as an estimate, which your own records can check.</p><p>Gateway, in Chapter 18, is the general tool. Wrap the special API of an external resource, JDBC and SQL for a database, in a class whose interface looks like any other object's, and let everything else go through it. Keep it minimal: adapt the resource, give tests a place to substitute a stand-in, and leave any cleverer logic to its callers. One clear benefit, the pattern says, is that swapping the resource means changing only the gateway, and nothing beyond it. It adds that the simplicity and the place for a test stand-in are worth having even if the resource never changes.</p><p>Table Data Gateway, in Chapter 10, is that tool for one table: finds, inserts, updates and deletes, each mapping its parameters into SQL. Its trickiest question is what a query returns. A map works, but Fowler calls it bad form: it gives up type checks at compile time, so a mistyped key is found only when it fails. A Data Transfer Object is better, at the cost of another class; the Record Set itself is conceptually messy but very effective where tools are built around it; and with a Domain Model the gateway can return domain objects, which he is reluctant to do, because each side then depends on the other. The book notes that Alur, Crupi and Malks's Data Access Object is this pattern under another name. And where a team does all its access through stored procedures, Fowler treats the set of procedures for a table as its Table Data Gateway, and would still wrap the calls in an in-memory one.</p><p>The lesson's snippet is a small Table Data Gateway for a <span class="math" data-say="price">price</span> table. In JDBC, <span class="math" data-say="prepare statement">prepareStatement</span> compiles a SQL statement with a question mark as its placeholder, <span class="math" data-say="set string">setString</span> fills the placeholder, and <span class="math" data-say="execute query">executeQuery</span> runs the statement and returns a <span class="math" data-say="result set">ResultSet</span>, whose <span class="math" data-say="next">next</span> moves to the first row if there is one. A caller asks for <span class="math" data-say="find cents">findCents</span> and never sees a column name.</p><pre class="codeblock" data-say="line 1, comment, All the SQL for the price table, in one class.. line 2, class price gateway. line 3, private final connection db. line 5, price gateway of connection db. line 6, this dot db is set to db. line 9, long find cents of string sku throws SQL exception. line 10, prepared statement s is set to db dot prepare statement. line 11, SELECT cents FROM price WHERE sku ?. line 12, s dot set string of 1, sku. line 13, result set rs is set to s dot execute query. line 14, return rs dot next, if so, rs dot get long of 1, otherwise, minus 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// All the SQL for the price table, in one class.</span>
 <span class="cl">class PriceGateway {</span>
 <span class="cl">    private final Connection db;</span>
 <span class="cl"></span>
@@ -1460,22 +1504,21 @@
 <span class="cl">        ResultSet rs = s.executeQuery();</span>
 <span class="cl">        return rs.next() ? rs.getLong(1) : -1;</span>
 <span class="cl">    }</span>
-<span class="cl">}</span></code></pre><p>Now the count. The lab reads a design as records <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>, one for each class that uses another, and you name what changes. Its first tile lists what depends on the changed name directly; its second lists everything the change reaches by following the dependencies back. In <code>sql-everywhere</code> four classes, <span class="math" data-say="cart">cart</span>, <span class="math" data-say="checkout">checkout</span>, <span class="math" data-say="report">report</span> and <span class="math" data-say="admin">admin</span>, each hold their own SQL against <span class="math" data-say="price table">price-table</span>. Change the table and the lab prints 4: admin, cart, checkout, report for both tiles: a column rename is edited in four classes, and found by searching for it.</p><p>In <code>one-gateway</code> each of the four depends on <span class="math" data-say="pricegateway">pricegateway</span> instead, and only the gateway depends on the table. The direct tile falls to 1: pricegateway, the one class a rename is edited in. The second tile prints 5: admin, cart, checkout, pricegateway, report, and that figure is an upper bound: it is what the change would reach if it got past the gateway's interface, if <span class="math" data-say="find cents">findCents</span> itself had to change. A rename the gateway absorbs stops at the gateway, which is the quotation's claim. Whether a given change is absorbed is the question the count leaves to you.</p><h3>Exercise</h3><ul><li>Four classes and a table: <span class="math" data-say="signup uses member table, profile uses member table, mailer uses member table, profile uses mailer">signup, member-table; profile, member-table; mailer, member-table; profile, mailer</span>, with <span class="math" data-say="member table">member-table</span> the name that changes.</li><li>The same classes redrawn so that each depends on a <span class="math" data-say="membergateway">membergateway</span>, which alone depends on <span class="math" data-say="member table">member-table</span>; <span class="math" data-say="profile">profile</span> still uses <span class="math" data-say="mailer">mailer</span>.</li></ul><p>For each design, list by hand the classes a column rename must be edited in, and then what the change would reach if the gateway's interface had to change too. Mind <span class="math" data-say="profile">profile</span>, which reaches the table two ways. Type the records into the lab afterwards to check.</p><p>Fowler's first gateway has one instance per table. The next lesson, Row Data Gateway, and Reading in Data, reads the one with an instance per row, and what Chapter 3 says about the finders that load it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">}</span></code></pre><p>Now the count. The lab reads a design as records <span class="math" data-say="dependent, then what it depends on">dependent, dependency</span>, one for each class that uses another, and you name what changes. Its first tile lists what depends on the changed name directly; its second lists everything the change reaches by following the dependencies back. In <code>sql-everywhere</code> four classes, <span class="math" data-say="cart">cart</span>, <span class="math" data-say="checkout">checkout</span>, <span class="math" data-say="report">report</span> and <span class="math" data-say="admin">admin</span>, each hold their own SQL against <span class="math" data-say="price table">price-table</span>. Change the table and the lab prints 4: admin, cart, checkout, report for both tiles: a column rename is edited in four classes, and found by searching for it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Counting dependencies</h2></div><p>what a change reaches</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Counting dependencies</strong><span>what a change reaches</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dgTable"></table></div>
       <div class="status-banner" id="dgStatus" style="margin-top:12px;" aria-live="polite"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Where a schema change is edited</h3>
-          <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class or table that changes. The first tile lists the classes that depend on it directly, the ones a column rename is edited in; the second lists everything the change reaches, an upper bound that holds only if the change gets past a gateway's interface. The designs are the lesson's.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Where a schema change is edited</h3>
+            <p>A count over the structure the lesson states. Each record is one dependency, written dependent, dependency. Name the class or table that changes. The first tile lists the classes that depend on it directly, the ones a column rename is edited in; the second lists everything the change reaches, an upper bound that holds only if the change gets past a gateway's interface. The designs are the lesson's.</p>
         <div class="field">
           <label for="dgPreset">Worked example</label>
           <select id="dgPreset"><option value="sql-everywhere" selected>SQL everywhere: four classes query the price table</option><option value="one-gateway">One gateway: the four classes go through pricegateway</option></select>
@@ -1493,12 +1536,15 @@
           <div class="kpi"><span>Reached in all</span><strong id="dgAffected">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>In <code>one-gateway</code> each of the four depends on <span class="math" data-say="pricegateway">pricegateway</span> instead, and only the gateway depends on the table. The direct tile falls to 1: pricegateway, the one class a rename is edited in. The second tile prints 5: admin, cart, checkout, pricegateway, report, and that figure is an upper bound: it is what the change would reach if it got past the gateway's interface, if <span class="math" data-say="find cents">findCents</span> itself had to change. A rename the gateway absorbs stops at the gateway, which is the quotation's claim. Whether a given change is absorbed is the question the count leaves to you.</p><h3>Exercise</h3><ul><li>Four classes and a table: <span class="math" data-say="signup uses member table, profile uses member table, mailer uses member table, profile uses mailer">signup, member-table; profile, member-table; mailer, member-table; profile, mailer</span>, with <span class="math" data-say="member table">member-table</span> the name that changes.</li><li>The same classes redrawn so that each depends on a <span class="math" data-say="membergateway">membergateway</span>, which alone depends on <span class="math" data-say="member table">member-table</span>; <span class="math" data-say="profile">profile</span> still uses <span class="math" data-say="mailer">mailer</span>.</li></ul><p>For each design, list by hand the classes a column rename must be edited in, and then what the change would reach if the gateway's interface had to change too. Mind <span class="math" data-say="profile">profile</span>, which reaches the table two ways. Type the records into the lab afterwards to check.</p><p>Fowler's first gateway has one instance per table. The next lesson, Row Data Gateway, and Reading in Data, reads the one with an instance per row, and what Chapter 3 says about the finders that load it.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Finding where a schema change is edited</h2></div><p>Four steps, the last of them on a table of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the SQL</h3><p>Search the code for the table's name and list every class that holds SQL against it, whatever else the class does.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the dependencies</h3><p>Write one record for each, <span class="math" data-say="class, table">class, table</span>, and one for each class that uses another. The classes that depend on the table directly are the ones a column rename is edited in.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Redraw it through a gateway</h3><p>Make every class depend on one gateway, and the gateway alone on the table. Count the direct dependents again, and note what the change would reach if the gateway's interface had to change.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count it in a system you know</h3><p>Take one table in a system you know, search the code for its name, and count the files that hold SQL against it. Write the figure, and say in one sentence whether a single gateway holds all of them.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Finding where a schema change is edited</h2>
+      <p class="lead-in">Four steps, the last of them on a table of your own.</p>
+      <ol class="key-ideas method"><li><strong>Find the SQL.</strong> Search the code for the table's name and list every class that holds SQL against it, whatever else the class does.</li><li><strong>Write the dependencies.</strong> Write one record for each, <span class="math" data-say="class, table">class, table</span>, and one for each class that uses another. The classes that depend on the table directly are the ones a column rename is edited in.</li><li><strong>Redraw it through a gateway.</strong> Make every class depend on one gateway, and the gateway alone on the table. Count the direct dependents again, and note what the change would reach if the gateway's interface had to change.</li><li><strong>Count it in a system you know.</strong> Take one table in a system you know, search the code for its name, and count the files that hold SQL against it. Write the figure, and say in one sentence whether a single gateway holds all of them.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1517,17 +1563,16 @@ a rename is edited in pricegateway: 1
 if its interface changed: 5 reached</div><p>The gateway is one more class, and it is the only one a rename touches. The five classes reached are what would follow if <span class="math" data-say="find cents">findCents</span> had to change; a rename it absorbs never reaches them.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a gateway is one more class, so a schema change costs more</strong><span>A gateway does add a class, and on the lesson's illustration that class is the whole point: a column rename is edited in four classes without it and in one with it. The quotation's claim is not that the code gets smaller but that the SQL becomes easy to find and the rest of the application stops knowing it. The five classes the lab reaches through the gateway are reached only if its interface changes too.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a gateway to hide that there is a database</strong><span>That is Data Mapper's promise, not Gateway's. A Table Data Gateway that returns a Record Set hands its callers the table's own shape, and a Row Data Gateway mirrors one row field for field. A gateway hides the SQL and the API; the domain code still thinks in tables. Chapter 3 says that is too little indirection for a rich Domain Model, and does not recommend a gateway as a Domain Model's primary persistence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing the data-source pattern first</strong><span>Architectural Patterns says the choice is strongly affected by how you design the domain logic. Table Data Gateway is the obvious choice with a Table Module, a gateway of either kind suits a Transaction Script, and a Domain Model wants an Active Record or a Data Mapper. Picking the gateway before the domain pattern decides the harder question by accident.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say where a schema change is edited.</strong><p>Given classes that hold SQL against one table, list the classes a column rename must be edited in, then redraw them through a gateway and list them again, saying what the change would reach if the gateway's interface changed.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab follows the dependencies you state; it cannot find SQL in code, and it cannot tell whether a change stops at a gateway's interface, which is why its second tile is an upper bound.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a gateway is one more class, so a schema change costs more</strong><span>A gateway does add a class, and on the lesson's illustration that class is the whole point: a column rename is edited in four classes without it and in one with it. The quotation's claim is not that the code gets smaller but that the SQL becomes easy to find and the rest of the application stops knowing it. The five classes the lab reaches through the gateway are reached only if its interface changes too.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Expecting a gateway to hide that there is a database</strong><span>That is Data Mapper's promise, not Gateway's. A Table Data Gateway that returns a Record Set hands its callers the table's own shape, and a Row Data Gateway mirrors one row field for field. A gateway hides the SQL and the API; the domain code still thinks in tables. Chapter 3 says that is too little indirection for a rich Domain Model, and does not recommend a gateway as a Domain Model's primary persistence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Choosing the data-source pattern first</strong><span>Architectural Patterns says the choice is strongly affected by how you design the domain logic. Table Data Gateway is the obvious choice with a Table Module, a gateway of either kind suits a Transaction Script, and a Domain Model wants an Active Record or a Data Mapper. Picking the gateway before the domain pattern decides the harder question by accident.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say where a schema change is edited.</strong><p>Given classes that hold SQL against one table, list the classes a column rename must be edited in, then redraw them through a gateway and list them again, saying what the change would reach if the gateway's interface changed.</p></div></div><div class="note"><strong>Note:</strong> The lab follows the dependencies you state; it cannot find SQL in code, and it cannot tell whether a change stops at a gateway's interface, which is why its second tile is an upper bound.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Gateway</summary><p>An object that wraps access to something outside the program, such as a database table, behind an interface that looks like an ordinary object's. Chapter 18 says to keep it as small as it can be: it adapts the resource and gives a place to substitute a stand-in for tests.</p></details><details class="recall"><summary>Table Data Gateway</summary><p>A gateway of which one object serves a whole table. Every query and every change to that table is written in it, and the rest of the program asks it rather than writing SQL. It normally keeps no data of its own between calls.</p></details><details class="recall"><summary>Record Set</summary><p>A general-purpose in-memory table: rows and columns laid out the way the database lays them out. Many environments of the time provided one, and user-interface controls worked with it directly; a Table Data Gateway's finders can return one.</p></details></div>
+      <h3>Summary</h3>
       <p>Chapter 3 opens its architectural patterns with the case for taking SQL out of the domain logic and putting it in a Gateway, one class per table. Read that case with Chapter 18's Gateway and Chapter 10's Table Data Gateway, then count the classes a column rename is edited in when four classes hold SQL against a table, and when one gateway does.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Gateway.</strong> An object that wraps access to something outside the program, such as a database table, behind an interface that looks like an ordinary object's. Chapter 18 says to keep it as small as it can be: it adapts the resource and gives a place to substitute a stand-in for tests.</li><li><strong>Table Data Gateway.</strong> A gateway of which one object serves a whole table. Every query and every change to that table is written in it, and the rest of the program asks it rather than writing SQL. It normally keeps no data of its own between calls.</li><li><strong>Record Set.</strong> A general-purpose in-memory table: rows and columns laid out the way the database lays them out. Many environments of the time provided one, and user-interface controls worked with it directly; a Table Data Gateway's finders can return one.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="keep sql out of the domain logic. a gateway wraps an awkward resource. table data gateway, an object a table. a rename is edited where the sql is. direct dependents, the classes to edit. reached in all, an upper bound" tabindex="0" role="region" aria-label="Mathematical notation">keep SQL out of the domain logic
 a gateway wraps an awkward resource
 table data gateway: an object a table
@@ -2248,11 +2293,40 @@ reached in all: an upper bound</div><figcaption>Architectural Patterns and Gatew
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2320,7 +2394,7 @@ reached in all: an upper bound</div><figcaption>Architectural Patterns and Gatew
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

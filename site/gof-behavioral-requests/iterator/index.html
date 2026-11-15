@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1433,19 +1478,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Behavioral Patterns I: Requests, Languages and Traversal</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 5 · Behavioral Patterns</p>
       <h1>Iterator</h1>
       <p class="lesson-lede">An object that walks an aggregate&#x27;s elements one at a time, so the aggregate need not expose how it stores them and can be walked in more than one order.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Aggregate</li><li>External and internal iterator</li><li>Traversal order</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The pattern first, then its variants, then the count</h2>
-      <article class="prose reading"><p>&ldquo;The key idea in this pattern is to take the responsibility for access and traversal out of the list object and put it into an iterator object.&rdquo; That sentence from Iterator's Motivation is the whole pattern; the rest of the section is about the choices it opens. This lesson reads the pattern section by section. Read it in your own copy first.</p><p>The motivation is a list. It should let you reach its elements without showing how it keeps them, and you may want to walk it in different ways, or twice at once, without adding an operation to the list for every kind of walk. So an iterator object keeps track of the current element and offers operations to start, advance, test for the end and read the current item. Then the authors go a step further: if clients should not depend on which kind of list they hold, both the lists and the iterators need abstract classes, and each list creates its own iterator through a factory method, which connects the two hierarchies.</p><p>The participants, as you would apply them. An Iterator defines the interface for reaching and walking elements; a ConcreteIterator implements it and keeps the position in the walk; an Aggregate defines the operation that creates an iterator; a ConcreteAggregate returns the right ConcreteIterator. The pattern applies when clients should get at what an aggregate holds without learning how it holds it, when one aggregate must be walked in several ways or by several walks at once, and when different kinds of aggregate should be walked through one interface, which the book calls polymorphic iteration.</p><pre class="codeblock" data-say="line 1, comment, An external iterator the client asks for each node in turn.. line 2, final class pre order implements iterator of part. line 3, private final deque of part pending is set to new array deque. line 5, pre order of part root pending dot push of root. line 7, public boolean has next return not pending dot is empty. line 9, public part next. line 10, if pending dot is empty throw new no such element exception. line 11, part p is set to pending dot pop. line 12, list of part kids is set to p dot children. line 13, for int i is set to kids dot size minus 1, i is at least 0, i is decremented. line 14, pending dot push of kids dot get of i, comment, the first child ends on top. line 16, return p" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// An external iterator: the client asks for each node in turn.</span>
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The pattern first, then its variants, then the count</h2><div class="prose reading"><p>&ldquo;The key idea in this pattern is to take the responsibility for access and traversal out of the list object and put it into an iterator object.&rdquo; That sentence from Iterator's Motivation is the whole pattern; the rest of the section is about the choices it opens. This lesson reads the pattern section by section. Read it in your own copy first.</p><p>The motivation is a list. It should let you reach its elements without showing how it keeps them, and you may want to walk it in different ways, or twice at once, without adding an operation to the list for every kind of walk. So an iterator object keeps track of the current element and offers operations to start, advance, test for the end and read the current item. Then the authors go a step further: if clients should not depend on which kind of list they hold, both the lists and the iterators need abstract classes, and each list creates its own iterator through a factory method, which connects the two hierarchies.</p><p>The participants, as you would apply them. An Iterator defines the interface for reaching and walking elements; a ConcreteIterator implements it and keeps the position in the walk; an Aggregate defines the operation that creates an iterator; a ConcreteAggregate returns the right ConcreteIterator. The pattern applies when clients should get at what an aggregate holds without learning how it holds it, when one aggregate must be walked in several ways or by several walks at once, and when different kinds of aggregate should be walked through one interface, which the book calls polymorphic iteration.</p><pre class="codeblock" data-say="line 1, comment, An external iterator the client asks for each node in turn.. line 2, final class pre order implements iterator of part. line 3, private final deque of part pending is set to new array deque. line 5, pre order of part root pending dot push of root. line 7, public boolean has next return not pending dot is empty. line 9, public part next. line 10, if pending dot is empty throw new no such element exception. line 11, part p is set to pending dot pop. line 12, list of part kids is set to p dot children. line 13, for int i is set to kids dot size minus 1, i is at least 0, i is decremented. line 14, pending dot push of kids dot get of i, comment, the first child ends on top. line 16, return p" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// An external iterator: the client asks for each node in turn.</span>
 <span class="cl">final class PreOrder implements Iterator&lt;Part&gt; {</span>
 <span class="cl">    private final Deque&lt;Part&gt; pending = new ArrayDeque&lt;&gt;();</span>
 <span class="cl"></span>
@@ -1469,19 +1513,11 @@
 <span class="cl">}</span>
 <span class="cl"></span>
 <span class="cl">// Internal: the client hands the aggregate an operation.</span>
-<span class="cl">quiz.forEachInPreOrder(p -&gt; print(p.name()));</span></code></pre><p>Here the book shows its date. It calls internal iterators weak in C++, which in 1995 had no anonymous functions or closures, and its sample builds one by subclassing. Java 8's lambdas make the internal form the short one, as the second half of the sketch shows. The standard Java collections answer the robustness question differently again: most of their iterators detect a change made behind their back and throw, rather than adjusting. The remaining issues are extra operations such as previous, the cost of polymorphic iterators in C++ and a Proxy that frees them, privileged access, iterators for composites, which must keep a path through the tree, and a null iterator that is always done, handy at a tree's leaves. The Sample Code builds list iterators forwards and backwards and an internal traverser; Known Uses include Smalltalk's collection methods and streams. Related Patterns: Composite, Factory Method and Memento.</p><p>Now the lab, on a quiz app's question bank: a quiz of sections, sections holding questions and other sections. On the preset <code>quiz</code>, 10 nodes, the three orders are: pre-order quiz, warmup, q1, q2, main, q3, bonus, q4, q5, q6; post-order q1, q2, warmup, q3, q4, bonus, q5, main, q6, quiz; level-order quiz, warmup, main, q6, q1, q2, q3, bonus, q5, q4. The bonus question q4, the deepest node, is 8th in pre-order, 5th in post-order and last, 10th, in level-order. Pre-order suits printing the quiz as a contents page, post-order totalling marks from the bottom up, level-order showing the top level first.</p><p>The preset <code>round</code> is a single section of four questions, a list rather than a tree. There pre-order and level-order coincide, round, a1, a2, a3, a4, and post-order differs only in putting the section last; finding a3 gives positions 4, 3 and 4 of 5. The orders part company only when the structure has depth, which is why the book says composites often need more than one kind of iterator.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, node, parent, kind, value. line 2, catalogue, minus, shelf, minus. line 3, fiction, catalogue, shelf, minus. line 4, f 1, fiction, book, 1. line 5, f 2, fiction, book, 1. line 6, science, catalogue, shelf, minus. line 7, s 1, science, book, 1. line 8, maps, catalogue, book, 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// node, parent, kind, value</span>
-<span class="cl">catalogue, -, Shelf, -;</span>
-<span class="cl">fiction, catalogue, Shelf, -;</span>
-<span class="cl">f1, fiction, Book, 1;</span>
-<span class="cl">f2, fiction, Book, 1;</span>
-<span class="cl">science, catalogue, Shelf, -;</span>
-<span class="cl">s1, science, Book, 1;</span>
-<span class="cl">maps, catalogue, Book, 1</span></code></pre><p>A library catalogue of shelves and books. By hand, write its pre-order, post-order and level-order, and the position of s1 in each. Then type the records into the lab to check, and say which order the sketch's stack produces and what you would change for each of the other two.</p><p>An iterator walks a structure on behalf of a client. The next lesson, Mediator, is about objects that would otherwise all talk to each other directly.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A tree of parts</h2></div><p>one tree, three orders of visiting it</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+<span class="cl">quiz.forEachInPreOrder(p -&gt; print(p.name()));</span></code></pre><p>Here the book shows its date. It calls internal iterators weak in C++, which in 1995 had no anonymous functions or closures, and its sample builds one by subclassing. Java 8's lambdas make the internal form the short one, as the second half of the sketch shows. The standard Java collections answer the robustness question differently again: most of their iterators detect a change made behind their back and throw, rather than adjusting. The remaining issues are extra operations such as previous, the cost of polymorphic iterators in C++ and a Proxy that frees them, privileged access, iterators for composites, which must keep a path through the tree, and a null iterator that is always done, handy at a tree's leaves. The Sample Code builds list iterators forwards and backwards and an internal traverser; Known Uses include Smalltalk's collection methods and streams. Related Patterns: Composite, Factory Method and Memento.</p><p>Now the lab, on a quiz app's question bank: a quiz of sections, sections holding questions and other sections. On the preset <code>quiz</code>, 10 nodes, the three orders are: pre-order quiz, warmup, q1, q2, main, q3, bonus, q4, q5, q6; post-order q1, q2, warmup, q3, q4, bonus, q5, main, q6, quiz; level-order quiz, warmup, main, q6, q1, q2, q3, bonus, q5, q4. The bonus question q4, the deepest node, is 8th in pre-order, 5th in post-order and last, 10th, in level-order. Pre-order suits printing the quiz as a contents page, post-order totalling marks from the bottom up, level-order showing the top level first.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>A tree of parts</h2></div><p>one tree, three orders of visiting it</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>A tree of parts</strong><span>one tree, three orders of visiting it</span></div>
       </div>
@@ -1489,10 +1525,10 @@
       <div class="table-wrap" id="gtrTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="gtrTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> Each record is one node: its name, its parent (- for the root; exactly one root), its kind (a class name) and its value, a decimal for a leaf and - for a composite. A leaf has no children; a composite may have none. Children are taken in record order. A kind is either a leaf class or a composite class, never both. Depth counts the edges on the longest path down from the root (a root alone is at depth 0). Pre-order visits a node, then each child's subtree in order; post-order visits each child's subtree in order, then the node; level-order visits the root, then every node at depth 1, then depth 2, each level left to right in record order of the children. Positions count from 1.</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>One structure, three traversals</h3>
-          <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>One structure, three traversals</h3>
+            <p>A count over the small design the lesson states. The lab counts one consequence of applying a pattern or not; whether the pattern fits is weighed in the book, against what in the design is expected to vary.</p>
         <div class="field">
           <label for="gtrPreset">Worked example</label>
           <select id="gtrPreset"><option value="quiz" selected>A quiz app's question bank, finding the bonus question</option><option value="round">One round of four questions: a list, not a tree</option></select>
@@ -1513,12 +1549,22 @@
           <div class="kpi"><span>The node to find, by position</span><strong id="gtrFind">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>The preset <code>round</code> is a single section of four questions, a list rather than a tree. There pre-order and level-order coincide, round, a1, a2, a3, a4, and post-order differs only in putting the section last; finding a3 gives positions 4, 3 and 4 of 5. The orders part company only when the structure has depth, which is why the book says composites often need more than one kind of iterator.</p><h3>Exercise</h3><pre class="codeblock" data-say="line 1, comment, node, parent, kind, value. line 2, catalogue, minus, shelf, minus. line 3, fiction, catalogue, shelf, minus. line 4, f 1, fiction, book, 1. line 5, f 2, fiction, book, 1. line 6, science, catalogue, shelf, minus. line 7, s 1, science, book, 1. line 8, maps, catalogue, book, 1" tabindex="0" role="region" aria-label="Code listing"><code><span class="cl">// node, parent, kind, value</span>
+<span class="cl">catalogue, -, Shelf, -;</span>
+<span class="cl">fiction, catalogue, Shelf, -;</span>
+<span class="cl">f1, fiction, Book, 1;</span>
+<span class="cl">f2, fiction, Book, 1;</span>
+<span class="cl">science, catalogue, Shelf, -;</span>
+<span class="cl">s1, science, Book, 1;</span>
+<span class="cl">maps, catalogue, Book, 1</span></code></pre><p>A library catalogue of shelves and books. By hand, write its pre-order, post-order and level-order, and the position of s1 in each. Then type the records into the lab to check, and say which order the sketch's stack produces and what you would change for each of the other two.</p><p>An iterator walks a structure on behalf of a client. The next lesson, Mediator, is about objects that would otherwise all talk to each other directly.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Walking a tree by hand</h2></div><p>Four steps, the last of them on a structure of your own.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the tree with its children in order</h3><p>Write each node under its parent, children left to right in the order given. The order of children is part of the structure; change it and every traversal changes.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write pre-order and post-order</h3><p>Pre-order: write a node, then walk each child's subtree in turn. Post-order: walk each child's subtree, then write the node. Both go deep before they go across.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Write level-order</h3><p>Write the root, then every node at depth 1 left to right, then depth 2, and so on. It goes across before it goes deep, and needs a queue where the other two need a stack.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Do it on a structure of your own</h3><p>Take a nested structure you work with: a folder tree, a menu, an organisation chart. Write it as records, get its three orders, and say which order your code needs and whether that code walks it with an external or an internal iterator.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Walking a tree by hand</h2>
+      <p class="lead-in">Four steps, the last of them on a structure of your own.</p>
+      <ol class="key-ideas method"><li><strong>Draw the tree with its children in order.</strong> Write each node under its parent, children left to right in the order given. The order of children is part of the structure; change it and every traversal changes.</li><li><strong>Write pre-order and post-order.</strong> Pre-order: write a node, then walk each child's subtree in turn. Post-order: walk each child's subtree, then write the node. Both go deep before they go across.</li><li><strong>Write level-order.</strong> Write the root, then every node at depth 1 left to right, then depth 2, and so on. It goes across before it goes deep, and needs a queue where the other two need a stack.</li><li><strong>Do it on a structure of your own.</strong> Take a nested structure you work with: a folder tree, a menu, an organisation chart. Write it as records, get its three orders, and say which order your code needs and whether that code walks it with an external or an internal iterator.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1537,17 +1583,16 @@ depth 3: q4
 q4: eighth, fifth and tenth of 10</div><p>Level-order is the root followed by the three depth lists in turn. The lab's positions count from 1.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a tree has one natural order</strong><span>Pre-order, post-order and level-order are all complete walks of the same tree, and the authors make it a consequence of the pattern that the walk can vary by changing the iterator. On the lesson's illustration the bonus question is 8th, 5th or 10th depending on the iterator; which order is right depends on what the walk is for.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Changing an aggregate while walking it</strong><span>Adding or removing elements mid-walk can visit one twice or skip one. A robust iterator is designed for it; most iterators are not, and Java's standard ones throw when they detect it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Putting every traversal on the aggregate&#x27;s interface</strong><span>An operation on the list for each kind of walk bloats it and still allows only one walk at a time. The pattern puts each traversal in its own iterator class, created by the aggregate.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can walk a tree in three orders by hand.</strong><p>Given a tree as records, write its pre-order, post-order and level-order and a node's place in each, and say who controls the iteration and who defines the traversal in an iterator you use.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab lists the orders of a tree stated with its children in order. It cannot show a robust iterator, a walk interrupted by a change, or the cost of keeping a path through a deep composite; those are the Implementation section's questions.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking a tree has one natural order</strong><span>Pre-order, post-order and level-order are all complete walks of the same tree, and the authors make it a consequence of the pattern that the walk can vary by changing the iterator. On the lesson's illustration the bonus question is 8th, 5th or 10th depending on the iterator; which order is right depends on what the walk is for.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Changing an aggregate while walking it</strong><span>Adding or removing elements mid-walk can visit one twice or skip one. A robust iterator is designed for it; most iterators are not, and Java's standard ones throw when they detect it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Putting every traversal on the aggregate&#x27;s interface</strong><span>An operation on the list for each kind of walk bloats it and still allows only one walk at a time. The pattern puts each traversal in its own iterator class, created by the aggregate.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can walk a tree in three orders by hand.</strong><p>Given a tree as records, write its pre-order, post-order and level-order and a node's place in each, and say who controls the iteration and who defines the traversal in an iterator you use.</p></div></div><div class="note"><strong>Note:</strong> The lab lists the orders of a tree stated with its children in order. It cannot show a robust iterator, a walk interrupted by a change, or the cost of keeping a path through a deep composite; those are the Implementation section's questions.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Aggregate</summary><p>An object that holds other objects, such as a list, a set or a tree, and can be asked for an iterator over them. A ConcreteAggregate returns the iterator class that knows its representation.</p></details><details class="recall"><summary>External and internal iterator</summary><p>With an external iterator the client asks for each element in turn and decides when to stop. With an internal iterator the client hands over an operation and the iterator applies it to every element. Booch called them active and passive.</p></details><details class="recall"><summary>Traversal order</summary><p>The order in which an iterator visits a structure's elements. On a tree, pre-order visits a node before its children, post-order after them, and level-order visits every node at one depth before going deeper.</p></details></div>
+      <h3>Summary</h3>
       <p>Iterator moves the job of walking a collection out of the collection and into an object of its own. Read who controls the iteration, who defines the traversal and what makes an iterator robust, then walk a quiz app's question bank in pre-order, post-order and level-order and find one question's place in each.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Aggregate.</strong> An object that holds other objects, such as a list, a set or a tree, and can be asked for an iterator over them. A ConcreteAggregate returns the iterator class that knows its representation.</li><li><strong>External and internal iterator.</strong> With an external iterator the client asks for each element in turn and decides when to stop. With an internal iterator the client hands over an operation and the iterator applies it to every element. Booch called them active and passive.</li><li><strong>Traversal order.</strong> The order in which an iterator visits a structure's elements. On a tree, pre-order visits a node before its children, post-order after them, and level-order visits every node at one depth before going deeper.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="walk it without seeing inside. the iterator keeps the position. several walks can be in progress. one tree, more than one order. external, the client drives. internal, the iterator drives" tabindex="0" role="region" aria-label="Mathematical notation">walk it without seeing inside
 the iterator keeps the position
 several walks can be in progress
@@ -2343,11 +2388,40 @@ internal: the iterator drives</div><figcaption>Iterator in six lines</figcaption
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2415,7 +2489,7 @@ internal: the iterator drives</div><figcaption>Iterator in six lines</figcaption
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

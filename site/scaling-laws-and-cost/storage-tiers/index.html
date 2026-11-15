@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,19 +1424,18 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Scaling Laws and Cost</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; What bytes cost</p>
       <h1>Storage Tiers and the Access Break-even</h1>
       <p class="lesson-lede">Compute the access rate at which a cold tier stops paying, and the age at which a decaying access profile reaches it.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>The saving is monthly and the cost is per access</li><li>Age is a proxy for access rate, and only a proxy</li><li>Everything old going cold is a real way to lose money</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>Two prices, a retrieval charge, and the rate where they meet</h2>
-      <article class="prose reading"><div class="defbox"><span class="label">Definition &middot; Access break-even</span><p>Let <span class="math" data-say="h">h</span> be the hot price per gigabyte-month, <span class="math" data-say="c">c</span> the cold price per gigabyte-month and <span class="math" data-say="t">t</span> the retrieval charge per gigabyte read back from cold. A gigabyte read <span class="math" data-say="A">a</span> times a month costs <span class="math" data-say="h">h</span> hot and <span class="math" data-say="c plus A times t">c + a·t</span> cold, so cold is cheaper exactly when</p><p><span class="math" data-say="A is less than A star equals the quantity h minus c, over t">a < a* = (h − c)/t</span>.</p><p><span class="math" data-say="c">c</span> on this page is the cold-tier price throughout and is never a server count.</p></div><p>At <span class="math" data-say="h equals $0.023">h = $0.023</span>, <span class="math" data-say="c equals $0.004">c = $0.004</span> and <span class="math" data-say="t equals $0.010">t = $0.010</span> the break-even is <span class="math" data-say="the quantity 0.023 minus 0.004, over 0.010 equals 19 over 10">(0.023 − 0.004)/0.010 = 19/10</span>, or <span class="math" data-say="1.9">1.9</span> reads a gigabyte a month. A gigabyte read twice a month belongs hot; one read once a month belongs cold; and the difference between those two cases is a third of a cent, which is why this is done for petabytes rather than for gigabytes.</p><div class="mathblock" data-say="h equals $0.023 over GB-month, c equals $0.004 over GB-month, t equals $0.010 over GB read. A star equals the quantity h minus c, over t equals the quantity 0.023 minus 0.004, over 0.010 equals 1.9 equals 19 over 10 reads over GB-month. reads by age, halving each month, 8, 4, 2, 1, 1 over 2, 1 over 4, and so on. age, reads, all hot, cold, keep plus read back, tier. m 0, 8, $23.00, $4.00 plus $80.00 equals $84.00, hot. m 1, 4, $23.00, $4.00 plus $40.00 equals $44.00, hot. m 2, 2, $23.00, $4.00 plus $20.00 equals $24.00, hot. m 3, 1, $23.00, $4.00 plus $10.00 equals $14.00, cold. m 4, 1 over 2, $23.00, $4.00 plus, $5.00 equals, $9.00, cold. m 23, 1 over 2 to the power 20, $23.00, $4.00 plus, $0.00 equals, $4.00, cold" tabindex="0" role="region" aria-label="Mathematical notation">h = $0.023/GB-month    c = $0.004/GB-month    t = $0.010/GB read
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>Two prices, a retrieval charge, and the rate where they meet</h2><div class="prose reading"><div class="defbox"><span class="label">Definition &middot; Access break-even</span><p>Let <span class="math" data-say="h">h</span> be the hot price per gigabyte-month, <span class="math" data-say="c">c</span> the cold price per gigabyte-month and <span class="math" data-say="t">t</span> the retrieval charge per gigabyte read back from cold. A gigabyte read <span class="math" data-say="A">a</span> times a month costs <span class="math" data-say="h">h</span> hot and <span class="math" data-say="c plus A times t">c + a·t</span> cold, so cold is cheaper exactly when</p><p><span class="math" data-say="A is less than A star equals the quantity h minus c, over t">a < a* = (h − c)/t</span>.</p><p><span class="math" data-say="c">c</span> on this page is the cold-tier price throughout and is never a server count.</p></div><p>At <span class="math" data-say="h equals $0.023">h = $0.023</span>, <span class="math" data-say="c equals $0.004">c = $0.004</span> and <span class="math" data-say="t equals $0.010">t = $0.010</span> the break-even is <span class="math" data-say="the quantity 0.023 minus 0.004, over 0.010 equals 19 over 10">(0.023 − 0.004)/0.010 = 19/10</span>, or <span class="math" data-say="1.9">1.9</span> reads a gigabyte a month. A gigabyte read twice a month belongs hot; one read once a month belongs cold; and the difference between those two cases is a third of a cent, which is why this is done for petabytes rather than for gigabytes.</p><div class="mathblock" data-say="h equals $0.023 over GB-month, c equals $0.004 over GB-month, t equals $0.010 over GB read. A star equals the quantity h minus c, over t equals the quantity 0.023 minus 0.004, over 0.010 equals 1.9 equals 19 over 10 reads over GB-month. reads by age, halving each month, 8, 4, 2, 1, 1 over 2, 1 over 4, and so on. age, reads, all hot, cold, keep plus read back, tier. m 0, 8, $23.00, $4.00 plus $80.00 equals $84.00, hot. m 1, 4, $23.00, $4.00 plus $40.00 equals $44.00, hot. m 2, 2, $23.00, $4.00 plus $20.00 equals $24.00, hot. m 3, 1, $23.00, $4.00 plus $10.00 equals $14.00, cold. m 4, 1 over 2, $23.00, $4.00 plus, $5.00 equals, $9.00, cold. m 23, 1 over 2 to the power 20, $23.00, $4.00 plus, $0.00 equals, $4.00, cold" tabindex="0" role="region" aria-label="Mathematical notation">h = $0.023/GB-month    c = $0.004/GB-month    t = $0.010/GB read
 
 a* = (h − c)/t = (0.023 − 0.004)/0.010 = 1.9 = 19/10 reads/GB-month
 
@@ -1403,12 +1447,11 @@ reads by age, halving each month:   8, 4, 2, 1, 1/2, 1/4, …
  m 2        2        $23.00          $4.00 + $20.00 = $24.00     hot
  m 3        1        $23.00          $4.00 + $10.00 = $14.00     cold
  m 4        1/2      $23.00          $4.00 +  $5.00 =  $9.00     cold
- m 23    1/2²⁰       $23.00          $4.00 +  $0.00 =  $4.00     cold</div><p>Each row above is a bucket of <span class="math" data-say="1000">1 000</span> gigabytes, one for every month of the archive&rsquo;s twenty-four-month retention, which is why the hot column is a flat <span class="math" data-say="$23.00">$23.00</span>. The verdict flips between month two and month three, and nothing about the flip is approximate: it is a comparison of two exact figures at each integer age.</p><h3>The age boundary is found by counting, not by solving</h3><p>The access profile here is <span class="math" data-say="8 times the quantity 1 over 2, to the power m">8 × (1/2)ᵐ</span> reads a gigabyte in month <span class="math" data-say="m">m</span>, and the boundary is the smallest <span class="math" data-say="m">m</span> with <span class="math" data-say="8 times the quantity 1 over 2, to the power m is less than 19 over 10">8 × (1/2)ᵐ < 19/10</span>. Evaluating that at each integer gives <span class="math" data-say="8, 4, 2, 1">8, 4, 2, 1</span> &mdash; the crossing is at <span class="math" data-say="m equals 3">m = 3</span>. A logarithm would give <span class="math" data-say="2.07 and so on">2.07…</span> and then need rounding in a direction that has to be argued for; the search needs no argument.</p><div class="example"><span class="label">Example &middot; The whole archive, both ways</span><p>Twenty-four monthly buckets of <span class="math" data-say="1000 gigabytes">1 000 GB</span> is <span class="math" data-say="24000 gigabytes">24 000 GB</span>. All hot: <span class="math" data-say="24000 times $0.023 equals $552.00">24 000 × $0.023 = $552.00</span> a month. Tiered at month three: three hot buckets at <span class="math" data-say="$23.00">$23.00</span> is <span class="math" data-say="$69.00">$69.00</span>, twenty-one cold buckets at <span class="math" data-say="$4.00">$4.00</span> is <span class="math" data-say="$84.00">$84.00</span>, and the reads on those cold buckets come to about <span class="math" data-say="$20.00">$20.00</span>, for <span class="math" data-say="$173.00">$173.00</span> in all. The saving is <span class="math" data-say="$379.00">$379.00</span> a month, and <span class="math" data-say="21000 gigabytes">21 000 GB</span> moved to earn it.</p></div><h3>The two ways the calculation goes wrong</h3><p>Moving too early is the expensive one. The month-zero bucket read eight times a gigabyte costs <span class="math" data-say="$84.00">$84.00</span> cold against <span class="math" data-say="$23.00">$23.00</span> hot: tiering it more than triples its bill. Anyone applying &ldquo;archive anything over thirty days&rdquo; to a profile whose reads have not yet decayed is doing exactly this.</p><p>Moving too late is cheap and dull. Leaving the month-twenty-three bucket hot costs <span class="math" data-say="$23.00">$23.00</span> instead of <span class="math" data-say="$4.00">$4.00</span>, a loss of <span class="math" data-say="$19.00">$19.00</span> a month on that bucket. It is real money at scale and it never causes an incident, which is why it is the error that survives in production for years.</p><p>One quantity is deliberately absent from <span class="math" data-say="A star">a*</span>: the amount of data. The break-even is a rate per gigabyte, so it is the same for a terabyte and a petabyte. Volume decides how much the decision is worth, not which way it goes &mdash; and that is why the archive-wide figures above are a separate calculation from the break-even itself.</p><p>Retrieval latency is not priced here at all. A cold tier that takes hours to restore is a different product from one that responds in milliseconds, and if the access has a deadline the cheaper tier may be unusable at any price. This page decides cost; the deadline is a constraint applied before it.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Storage tiers and the access break-even</h2></div><p>Cold is cheaper to keep and dearer to read, and a* is where those meet</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+ m 23    1/2²⁰       $23.00          $4.00 +  $0.00 =  $4.00     cold</div><p>Each row above is a bucket of <span class="math" data-say="1000">1 000</span> gigabytes, one for every month of the archive&rsquo;s twenty-four-month retention, which is why the hot column is a flat <span class="math" data-say="$23.00">$23.00</span>. The verdict flips between month two and month three, and nothing about the flip is approximate: it is a comparison of two exact figures at each integer age.</p><h3>The age boundary is found by counting, not by solving</h3><p>The access profile here is <span class="math" data-say="8 times the quantity 1 over 2, to the power m">8 × (1/2)ᵐ</span> reads a gigabyte in month <span class="math" data-say="m">m</span>, and the boundary is the smallest <span class="math" data-say="m">m</span> with <span class="math" data-say="8 times the quantity 1 over 2, to the power m is less than 19 over 10">8 × (1/2)ᵐ < 19/10</span>. Evaluating that at each integer gives <span class="math" data-say="8, 4, 2, 1">8, 4, 2, 1</span> &mdash; the crossing is at <span class="math" data-say="m equals 3">m = 3</span>. A logarithm would give <span class="math" data-say="2.07 and so on">2.07…</span> and then need rounding in a direction that has to be argued for; the search needs no argument.</p><div class="example"><span class="label">Example &middot; The whole archive, both ways</span><p>Twenty-four monthly buckets of <span class="math" data-say="1000 gigabytes">1 000 GB</span> is <span class="math" data-say="24000 gigabytes">24 000 GB</span>. All hot: <span class="math" data-say="24000 times $0.023 equals $552.00">24 000 × $0.023 = $552.00</span> a month. Tiered at month three: three hot buckets at <span class="math" data-say="$23.00">$23.00</span> is <span class="math" data-say="$69.00">$69.00</span>, twenty-one cold buckets at <span class="math" data-say="$4.00">$4.00</span> is <span class="math" data-say="$84.00">$84.00</span>, and the reads on those cold buckets come to about <span class="math" data-say="$20.00">$20.00</span>, for <span class="math" data-say="$173.00">$173.00</span> in all. The saving is <span class="math" data-say="$379.00">$379.00</span> a month, and <span class="math" data-say="21000 gigabytes">21 000 GB</span> moved to earn it.</p></div><h3>The two ways the calculation goes wrong</h3><p>Moving too early is the expensive one. The month-zero bucket read eight times a gigabyte costs <span class="math" data-say="$84.00">$84.00</span> cold against <span class="math" data-say="$23.00">$23.00</span> hot: tiering it more than triples its bill. Anyone applying &ldquo;archive anything over thirty days&rdquo; to a profile whose reads have not yet decayed is doing exactly this.</p><p>Moving too late is cheap and dull. Leaving the month-twenty-three bucket hot costs <span class="math" data-say="$23.00">$23.00</span> instead of <span class="math" data-say="$4.00">$4.00</span>, a loss of <span class="math" data-say="$19.00">$19.00</span> a month on that bucket. It is real money at scale and it never causes an incident, which is why it is the error that survives in production for years.</p><p>One quantity is deliberately absent from <span class="math" data-say="A star">a*</span>: the amount of data. The break-even is a rate per gigabyte, so it is the same for a terabyte and a petabyte. Volume decides how much the decision is worth, not which way it goes &mdash; and that is why the archive-wide figures above are a separate calculation from the break-even itself.</p><p>Retrieval latency is not priced here at all. A cold tier that takes hours to restore is a different product from one that responds in milliseconds, and if the access has a deadline the cheaper tier may be unusable at any price. This page decides cost; the deadline is a constraint applied before it.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Storage tiers and the access break-even</h2></div><p>Cold is cheaper to keep and dearer to read, and a* is where those meet</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Storage tiers</strong><span>the break-even is a price difference over a retrieval charge</span></div>
         <div class="inline-legend"><span class="tone-amber"><i class="legend-swatch"></i>read often enough to stay hot</span><span class="tone-cyan"><i class="legend-swatch"></i>cold enough to move</span><span class="tone-green"><i class="legend-swatch"></i>a*, the break-even access rate</span></div>
@@ -1416,10 +1459,10 @@ reads by age, halving each month:   8, 4, 2, 1, 1/2, 1/4, …
       <div class="lab-stage" id="tiStage" tabindex="0" role="region" aria-label="Reads per GB-month falling with age, against the break-even access rate."><svg id="tiBars" style="min-width:520px" viewBox="0 0 520 196" role="img" aria-label="A decaying bar chart of access rates crossed by a dashed break-even line."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tiTable"></table></div>
       <div class="status-banner" id="tiStatus" style="margin-top:12px;"></div>
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>Set both prices, the retrieval charge and the decay</h3>
-          <p><span class="math" data-say="A star equals the quantity h o t minus cold, over retrieval">a* = (hot − cold)/retrieval</span> is exact, and the age at which the profile reaches it is an integer search over exact powers of the decay factor &mdash; not a curve read off by eye. Here <span class="math" data-say="c">c</span> is the cold-tier price and is never a server count. Slow the decay and watch the boundary slide later while <span class="math" data-say="A star">a*</span> does not move at all.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>Set both prices, the retrieval charge and the decay</h3>
+            <p><span class="math" data-say="A star equals the quantity h o t minus cold, over retrieval">a* = (hot − cold)/retrieval</span> is exact, and the age at which the profile reaches it is an integer search over exact powers of the decay factor &mdash; not a curve read off by eye. Here <span class="math" data-say="c">c</span> is the cold-tier price and is never a server count. Slow the decay and watch the boundary slide later while <span class="math" data-say="A star">a*</span> does not move at all.</p>
         <div class="field" id="tiPresetField">
           <label for="tiPreset">Worked example</label>
           <select id="tiPreset"><option value="log-archive" selected>logs: 2.3¢ hot, 0.4¢ cold, 1¢ a GB to read — a* = 1.9 reads a GB-month</option><option value="expensive-retrieval">deep archive: 0.1¢ cold, but 5¢ a GB to read — a* falls to 0.44</option><option value="slow-decay">a media library whose reads only fall 10% a month — nothing is ever cold enough</option><option value="cold-on-arrival">a compliance dump read twice a year — cold from month zero</option></select>
@@ -1453,12 +1496,14 @@ reads by age, halving each month:   8, 4, 2, 1, 1/2, 1/4, …
           <div class="kpi"><span>Data moved</span><strong id="tiMoved">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding what to tier</h2></div><p>One division, then one pass over the ages. The archive-wide figures come last.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Compute <span class="math" data-say="A star equals the quantity h minus c, over t">a* = (h − c)/t</span> and state its units</h3><p>Reads per gigabyte per month. Units matter here because the numerator is a monthly price difference and the denominator is a per-read charge, and getting them the wrong way up gives a plausible-looking number that is a month per read.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Write the access profile as a rate at each age</h3><p>Reads per gigabyte per month at age <span class="math" data-say="0, 1, 2, and so on">0, 1, 2, …</span>. This is the step that usually has to be measured rather than assumed, and a profile that does not decay is a finding: it means there is no age boundary to find.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the first age below <span class="math" data-say="A star">a*</span> by evaluating, not by taking a logarithm</h3><p><span class="math" data-say="8, 4, 2, 1">8, 4, 2, 1</span> against <span class="math" data-say="1.9">1.9</span> gives month three. Every comparison is between two exact numbers, so there is no rounding to argue about and no direction to justify.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Cost the whole archive on both plans</h3><p>All hot, and tiered at the boundary. Include the retrieval charges on the cold buckets &mdash; they are the term the plan is trading against, and a saving computed without them is not a saving.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Check the deadline before you commit to the boundary</h3><p>A restore time is a constraint, not a cost. If the data is needed within seconds and the cold tier answers in hours, the arithmetic above is irrelevant for that data however favourable it looks.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Deciding what to tier</h2>
+      <p class="lead-in">One division, then one pass over the ages. The archive-wide figures come last.</p>
+      <ol class="key-ideas method"><li><strong>Compute <span class="math" data-say="A star equals the quantity h minus c, over t">a* = (h − c)/t</span> and state its units.</strong> Reads per gigabyte per month. Units matter here because the numerator is a monthly price difference and the denominator is a per-read charge, and getting them the wrong way up gives a plausible-looking number that is a month per read.</li><li><strong>Write the access profile as a rate at each age.</strong> Reads per gigabyte per month at age <span class="math" data-say="0, 1, 2, and so on">0, 1, 2, …</span>. This is the step that usually has to be measured rather than assumed, and a profile that does not decay is a finding: it means there is no age boundary to find.</li><li><strong>Find the first age below <span class="math" data-say="A star">a*</span> by evaluating, not by taking a logarithm.</strong> <span class="math" data-say="8, 4, 2, 1">8, 4, 2, 1</span> against <span class="math" data-say="1.9">1.9</span> gives month three. Every comparison is between two exact numbers, so there is no rounding to argue about and no direction to justify.</li><li><strong>Cost the whole archive on both plans.</strong> All hot, and tiered at the boundary. Include the retrieval charges on the cold buckets &mdash; they are the term the plan is trading against, and a saving computed without them is not a saving.</li><li><strong>Check the deadline before you commit to the boundary.</strong> A restore time is a constraint, not a cost. If the data is needed within seconds and the cold tier answers in hours, the arithmetic above is irrelevant for that data however favourable it looks.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1494,17 +1539,16 @@ whole archive, 24 buckets = 24 000 GB:
    moved                                             21 000 GB</div><p>The <span class="math" data-say="m equals 2">m = 2</span> row is the one worth pausing on. Two reads a gigabyte is above the break-even of <span class="math" data-say="1.9">1.9</span> by a tenth, and the bill agrees by a dollar: <span class="math" data-say="$24.00">$24.00</span> cold against <span class="math" data-say="$23.00">$23.00</span> hot. A break-even is a crossing, and a bucket sitting a tenth of a read above it really does cost more in the cheaper tier.</p><p>The retrieval line on the tiered plan is what a saving computed from storage prices alone would have left out. It is small here &mdash; about <span class="math" data-say="$20.00">$20.00</span> against a <span class="math" data-say="$379.00">$379.00</span> saving &mdash; only because the boundary was chosen where reads had already decayed. Move the boundary to month zero and that line becomes the whole bill.</p><p>For a faded attempt, slow the decay so that reads fall to <span class="math" data-say="70 percent">70%</span> of the previous month rather than <span class="math" data-say="50 percent">50%</span>. Predict first whether <span class="math" data-say="A star">a*</span> moves, then find the new boundary age by evaluating the profile, and read the new saving off the lab.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Tiering by age without checking the rate</strong><span>Age is a proxy for access rate and the decision is about the rate. On this profile a thirty-day rule moves a bucket still read four times a gigabyte a month, whose cold bill is <span class="math" data-say="$44.00">$44.00</span> against <span class="math" data-say="$23.00">$23.00</span> hot. When the decay is slower, the same rule is wrong for longer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Computing the saving from the storage prices alone</strong><span><span class="math" data-say="h o t minus cold">hot − cold</span> is <span class="math" data-say="$0.019">$0.019</span> a gigabyte-month and looks like the whole prize. The retrieval charges are the other half of the trade and they are what the break-even is built from; a saving quoted without them is the answer to a question about data nobody ever reads.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math" data-say="c">c</span> as a machine count</strong><span>Every other course on this path uses <span class="math" data-say="c">c</span> for a count of something. Here it is the cold-tier price per gigabyte-month, it appears in <span class="math" data-say="A star equals the quantity h minus c, over t">a* = (h − c)/t</span>, and it is a price throughout. The lab prints it as a price in dollars for this reason.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a tiering decision is stated as an access rate and an age is only how it gets applied.</strong><p>You should be able to compute <span class="math" data-say="A star equals the quantity h minus c, over t">a* = (h − c)/t</span> with its units, evaluate a decaying access profile at each integer age to find the first one below it, and cost the whole archive on both plans with the retrieval charges included.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Bytes held are one half of what a system pays for. The other half is bytes moved, and the next question about them is whether to spend processor time shrinking them first. &ldquo;Compress or Not&rdquo; makes that a single equality too, and the surprise in it is that the size of the file cancels out of the answer completely.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Tiering by age without checking the rate</strong><span>Age is a proxy for access rate and the decision is about the rate. On this profile a thirty-day rule moves a bucket still read four times a gigabyte a month, whose cold bill is <span class="math" data-say="$44.00">$44.00</span> against <span class="math" data-say="$23.00">$23.00</span> hot. When the decay is slower, the same rule is wrong for longer.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Computing the saving from the storage prices alone</strong><span><span class="math" data-say="h o t minus cold">hot − cold</span> is <span class="math" data-say="$0.019">$0.019</span> a gigabyte-month and looks like the whole prize. The retrieval charges are the other half of the trade and they are what the break-even is built from; a saving quoted without them is the answer to a question about data nobody ever reads.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading <span class="math" data-say="c">c</span> as a machine count</strong><span>Every other course on this path uses <span class="math" data-say="c">c</span> for a count of something. Here it is the cold-tier price per gigabyte-month, it appears in <span class="math" data-say="A star equals the quantity h minus c, over t">a* = (h − c)/t</span>, and it is a price throughout. The lab prints it as a price in dollars for this reason.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a tiering decision is stated as an access rate and an age is only how it gets applied.</strong><p>You should be able to compute <span class="math" data-say="A star equals the quantity h minus c, over t">a* = (h − c)/t</span> with its units, evaluate a decaying access profile at each integer age to find the first one below it, and cost the whole archive on both plans with the retrieval charges included.</p></div></div><div class="note"><strong>Note:</strong> Bytes held are one half of what a system pays for. The other half is bytes moved, and the next question about them is whether to spend processor time shrinking them first. &ldquo;Compress or Not&rdquo; makes that a single equality too, and the surprise in it is that the size of the file cancels out of the answer completely.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>The saving is monthly and the cost is per access</summary><p>Moving a gigabyte from hot to cold saves <span class="math" data-say="h o t minus cold">hot − cold</span> every month it stays there, and costs <span class="math" data-say="retrieval">retrieval</span> every time it is read back. Those are different units, and setting them equal is what produces a rate: <span class="math" data-say="A star equals the quantity h o t minus cold, over retrieval">a* = (hot − cold)/retrieval</span> reads per gigabyte per month. Below that rate cold is cheaper; above it, the retrieval charges swallow the saving.</p></details><details class="recall"><summary>Age is a proxy for access rate, and only a proxy</summary><p>Data is tiered by age because access usually decays with age, not because old bytes are cheaper to store. The decision is always about the rate: here reads halve each month from eight per gigabyte, so <span class="math" data-say="A star">a*</span> is crossed at month three, and that is the age boundary. A profile that does not decay has no boundary at all.</p></details><details class="recall"><summary>Everything old going cold is a real way to lose money</summary><p>At month zero a gigabyte is read eight times, which costs <span class="math" data-say="$0.080">$0.080</span> in retrieval against a <span class="math" data-say="$0.019">$0.019</span> saving. Moving it costs four times what keeping it hot would have. The rule that works is not &ldquo;old goes cold&rdquo; but &ldquo;below <span class="math" data-say="A star">a*</span> goes cold&rdquo;, and on this profile those coincide only from month three.</p></details></div>
+      <h3>Summary</h3>
       <p>A cold tier is cheaper to keep and dearer to read. Setting the monthly saving equal to the retrieval charges gives one access rate, <span class="math" data-say="A star">a*</span>, above which cold costs more than hot. Data is then tiered by age, because access rates fall with age &mdash; and the age at which the profile crosses <span class="math" data-say="A star">a*</span> is the boundary.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>The saving is monthly and the cost is per access.</strong> Moving a gigabyte from hot to cold saves <span class="math" data-say="h o t minus cold">hot − cold</span> every month it stays there, and costs <span class="math" data-say="retrieval">retrieval</span> every time it is read back. Those are different units, and setting them equal is what produces a rate: <span class="math" data-say="A star equals the quantity h o t minus cold, over retrieval">a* = (hot − cold)/retrieval</span> reads per gigabyte per month. Below that rate cold is cheaper; above it, the retrieval charges swallow the saving.</li><li><strong>Age is a proxy for access rate, and only a proxy.</strong> Data is tiered by age because access usually decays with age, not because old bytes are cheaper to store. The decision is always about the rate: here reads halve each month from eight per gigabyte, so <span class="math" data-say="A star">a*</span> is crossed at month three, and that is the age boundary. A profile that does not decay has no boundary at all.</li><li><strong>Everything old going cold is a real way to lose money.</strong> At month zero a gigabyte is read eight times, which costs <span class="math" data-say="$0.080">$0.080</span> in retrieval against a <span class="math" data-say="$0.019">$0.019</span> saving. Moving it costs four times what keeping it hot would have. The rule that works is not &ldquo;old goes cold&rdquo; but &ldquo;below <span class="math" data-say="A star">a*</span> goes cold&rdquo;, and on this profile those coincide only from month three.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="A star equals the quantity h o t minus cold, over retrieval equals the quantity $0.023 minus $0.004, over $0.010 equals 19 over 10 reads a GB-month. reads halve with age, 8, 4, 2, 1, and so on, a star is crossed at month 3. month 2, $23.00 hot, against, $4.00 plus $20.00 equals $24.00 cold, stay hot. month 3, $23.00 hot, against, $4.00 plus $10.00 equals $14.00 cold, go cold. 21000 of 24000 gigabytes move, $552.00 goes to $173.00 a month, saving $379.00. c is the cold-tier price throughout, and is never a server count" tabindex="0" role="region" aria-label="Mathematical notation">a* = (hot − cold)/retrieval = ($0.023 − $0.004)/$0.010 = 19/10 reads a GB-month
 reads halve with age:  8, 4, 2, 1, …    a* is crossed at month 3
 month 2   $23.00 hot   against   $4.00 + $20.00 = $24.00 cold   stay hot
@@ -2955,11 +2999,40 @@ c is the cold-tier price throughout, and is never a server count</div><figcaptio
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -3027,7 +3100,7 @@ c is the cold-tier price throughout, and is never a server count</div><figcaptio
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,24 +1424,22 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">The Division of Labour</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Introduction and Plan of the Work</p>
       <h1>The Annual Labour of Every Nation</h1>
       <p class="lesson-lede">A nation is well supplied by what its labour produces for each head, and that depends on skill first and on how many work second.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Wealth is a yearly flow of necessaries</li><li>Produce per head, not produce</li><li>Two circumstances regulate the proportion</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The opening sentence, then the contrast between nations</h2>
-      <article class="prose reading"><p><strong>Introduction and Plan of the Work.</strong> The first sentence says that the annual labour &ldquo;of every nation is the fund which originally supplies it with all the necessaries and conveniencies of life which it annually consumes, and which consist always either in the immediate produce of that labour, or in what is purchased with that produce from other nations.&rdquo;</p><p>Take it a phrase at a time. A <em>fund</em> is a store you draw on, and Smith means a store that is refilled every year: nothing here is a treasure laid up once. <em>Necessaries and conveniencies</em> is his plain phrase for what we would call goods: what you need to live and what makes living easier. And the last clause matters for later books: a nation can have its supply from its own labour or from what that labour buys abroad. Smith is already saying that foreign trade is a way of turning the nation's own work into things it wants, a thesis that Book IV argues at length.</p><p>The next sentence turns the fund into a quotient. The nation will be better or worse supplied according as this produce &ldquo;bears a greater or smaller proportion to the number of those who are to consume it&rdquo;. Write that as a sum and you have the lab for this lesson: <span class="math" data-say="produce per head equals produce over population">produce per head = produce / population</span>. A rich country is one in which that quotient is large, and a poor country is one in which it is small, whatever the country's size.</p><p>Then Smith names what regulates the quotient: &ldquo;first, by the skill, dexterity, and judgment with which its labour is generally applied; and, secondly, by the proportion between the number of those who are employed in useful labour, and that of those who are not so employed.&rdquo; Those two are the two factors on the right-hand side of <span class="math" data-say="produce per head equals share at work times output per worker">produce per head = share at work × output per worker</span>, which you get by writing the produce as workers times output and dividing by the whole population. Mind the order, because it is the reverse of Smith's. His first circumstance, skill, is the second factor: how much each worker turns out in the year. His second circumstance is the first factor: the fraction of the people at useful work.</p><div class="defbox"><span class="label">Definition &middot; Useful labour</span><p>The Introduction's word for work that supplies the nation's necessaries and conveniencies, set against the work of those who &ldquo;are not so employed&rdquo;. Book II, Chapter 3 draws a sharper line between productive and unproductive labour, and the course on accumulation reads it; here the word means only what it says: labour whose result is something the people consume.</p></div><p>Now the portraits. &ldquo;Among the savage nations of hunters and fishers, every individual who is able to work is more or less employed in useful labour&rdquo;, and yet Smith says such nations are so poor that they are often driven, or think themselves driven, to abandon their infants and their old people. &ldquo;Among civilized and thriving nations, on the contrary, though a great number of people do not labour at all, many of whom consume the produce of ten times, frequently of a hundred times, more labour than the greater part of those who work; yet the produce of the whole labour of the society is so great, that all are often abundantly supplied.&rdquo;</p><p>The lab puts numbers on the contrast, with figures written for this lesson because Smith gives none. In the first preset, <code>contrast</code>, a hunters' nation has 100 people, 60 of them at work, each turning out 2 units a year; a civilized nation has 100 people, only 40 at work, each turning out 12. The hunters' produce is 120 units, <span class="math" data-say="6 over 5">6/5</span> a head. The civilized nation's is 480, <span class="math" data-say="24 over 5">24/5</span> a head: four times as much for each person, with a third fewer at work. Take the second preset, <code>few-at-work</code>, and let only 20 of the 100 work: the produce falls to 240 and <span class="math" data-say="12 over 5">12/5</span> a head, and the civilized people are still twice as well supplied as the hunters. That is Smith's claim that the first circumstance seems to matter more than the second, put into figures of the lesson's own.</p><p>The third preset, <code>same-skill</code>, shows the other half, and Smith does not deny it. Give both nations the same output of 2 a worker and the nation with more at work wins: the hunters' 120 units against the other's 80. The share at work does matter. One way to see why Smith ranks it second, though he does not put it so: a difference in skill can be of any size, while the share at work is a fraction and cannot exceed one.</p><p>The portrait of the &ldquo;savage&rdquo; deserves a second look, because it is the weakest part of the passage and Smith's readers have said so. It is a conjecture built from travellers' reports, one stage in a story he tells of societies passing from hunting to herding, farming and commerce. The anthropologist Marshall Sahlins argued in 1972, drawing on other scholars' field studies of present-day hunting peoples, that they often worked few hours and wanted little, so that poverty is not the right word for how they lived. Others answered that small present-day groups cannot stand for all the past. The lab does not decide between them. It takes Smith's contrast as a stated pair of nations and computes what the opening sentence implies for them.</p><p>Last, the plan. The first book is to explain the &ldquo;causes of this improvement in the productive powers of labour&rdquo; and how the produce is shared among the ranks of the people. The second, on capital stock, explains why the number of useful labourers depends on how much stock sets them to work. The third explains how the policy of Europe came to favour towns over the country, and the fourth examines the theories that grew up round that policy. The fifth is about the revenue of the sovereign. This Subject follows him through all five.</p><div class="defbox"><span class="label">Definition &middot; Money and measures, once</span><p>This lesson counts in plain units, but the rest of the book is in the money of Smith's day. Twelve pence (written d, from the Latin denarius) make a shilling (s), and twenty shillings make a pound (£), so a pound is two hundred and forty pence. A farthing is a quarter of a penny. A sum such as £2 3s 6d is read two pounds, three shillings and sixpence, and comes to 522 pence. The pound of money took its name from a pound weight of silver, and the two are different things: when Smith speaks of ounces or a pound weight of silver he means a weight of metal, and the second course works out how far the money pound drifted from it. Corn is sold by the quarter, which is eight bushels. The lessons repeat a unit where a figure needs it, and the labs say which unit they use.</p></div><p>That is the whole Introduction: one sentence that says what to measure, one that says what moves it, and a map of the road. The next lesson goes straight to Smith's account of his first circumstance, skill, with the most famous factory in economics, a workshop of ten men making pins.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The division of labour</h2></div><p>produce per head from the share at work and the output of each</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The opening sentence, then the contrast between nations</h2><div class="prose reading"><p><strong>Introduction and Plan of the Work.</strong> The first sentence says that the annual labour &ldquo;of every nation is the fund which originally supplies it with all the necessaries and conveniencies of life which it annually consumes, and which consist always either in the immediate produce of that labour, or in what is purchased with that produce from other nations.&rdquo;</p><p>Take it a phrase at a time. A <em>fund</em> is a store you draw on, and Smith means a store that is refilled every year: nothing here is a treasure laid up once. <em>Necessaries and conveniencies</em> is his plain phrase for what we would call goods: what you need to live and what makes living easier. And the last clause matters for later books: a nation can have its supply from its own labour or from what that labour buys abroad. Smith is already saying that foreign trade is a way of turning the nation's own work into things it wants, a thesis that Book IV argues at length.</p><p>The next sentence turns the fund into a quotient. The nation will be better or worse supplied according as this produce &ldquo;bears a greater or smaller proportion to the number of those who are to consume it&rdquo;. Write that as a sum and you have the lab for this lesson: <span class="math" data-say="produce per head equals produce over population">produce per head = produce / population</span>. A rich country is one in which that quotient is large, and a poor country is one in which it is small, whatever the country's size.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>The division of labour</h2></div><p>produce per head from the share at work and the output of each</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>The division of labour</strong><span>produce per head from the share at work and the output of each</span></div>
       </div>
@@ -1404,10 +1447,10 @@
       <div class="table-wrap" id="wdvTableBox" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="wdvTable"></table></div>
       <p class="small-copy" style="margin-top:12px;"><strong>How the lab counts.</strong> A nation's annual produce is its workers times the output of each a year; produce per head divides it by the whole population, workers or not. Smith gives the rule (Introduction): supply per head depends on the skill of the labour and the proportion of people usefully employed. The share at work is workers over population, exact. Nations are listed in the order given; the better supplied is the highest produce per head (equal ones tie), and the ratio is the highest per head over the next highest (the earlier given wins a tie for second place).</p>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>What a nation has for each head</h3>
-          <p>A figure computed from the quantities the lesson states. Each nation's population, the number at useful work and the output of each go in; the lab multiplies, divides and compares. Try the three presets in turn and watch which factor moves the produce per head.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>What a nation has for each head</h3>
+            <p>A figure computed from the quantities the lesson states. Each nation's population, the number at useful work and the output of each go in; the lab multiplies, divides and compares. Try the three presets in turn and watch which factor moves the produce per head.</p>
         <div class="field">
           <label for="wdvPreset">Worked example</label>
           <select id="wdvPreset"><option value="contrast" selected>A hunters' nation and a civilized one, written for this lesson</option><option value="few-at-work">Only 20 in 100 at work in the civilized nation, written for this lesson</option><option value="same-skill">The same output a worker in both, written for this lesson</option></select>
@@ -1424,12 +1467,15 @@
           <div class="kpi"><span>Best per head over the next</span><strong id="wdvRatio">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>Then Smith names what regulates the quotient: &ldquo;first, by the skill, dexterity, and judgment with which its labour is generally applied; and, secondly, by the proportion between the number of those who are employed in useful labour, and that of those who are not so employed.&rdquo; Those two are the two factors on the right-hand side of <span class="math" data-say="produce per head equals share at work times output per worker">produce per head = share at work × output per worker</span>, which you get by writing the produce as workers times output and dividing by the whole population. Mind the order, because it is the reverse of Smith's. His first circumstance, skill, is the second factor: how much each worker turns out in the year. His second circumstance is the first factor: the fraction of the people at useful work.</p><div class="defbox"><span class="label">Definition &middot; Useful labour</span><p>The Introduction's word for work that supplies the nation's necessaries and conveniencies, set against the work of those who &ldquo;are not so employed&rdquo;. Book II, Chapter 3 draws a sharper line between productive and unproductive labour, and the course on accumulation reads it; here the word means only what it says: labour whose result is something the people consume.</p></div><p>Now the portraits. &ldquo;Among the savage nations of hunters and fishers, every individual who is able to work is more or less employed in useful labour&rdquo;, and yet Smith says such nations are so poor that they are often driven, or think themselves driven, to abandon their infants and their old people. &ldquo;Among civilized and thriving nations, on the contrary, though a great number of people do not labour at all, many of whom consume the produce of ten times, frequently of a hundred times, more labour than the greater part of those who work; yet the produce of the whole labour of the society is so great, that all are often abundantly supplied.&rdquo;</p><p>The lab puts numbers on the contrast, with figures written for this lesson because Smith gives none. In the first preset, <code>contrast</code>, a hunters' nation has 100 people, 60 of them at work, each turning out 2 units a year; a civilized nation has 100 people, only 40 at work, each turning out 12. The hunters' produce is 120 units, <span class="math" data-say="6 over 5">6/5</span> a head. The civilized nation's is 480, <span class="math" data-say="24 over 5">24/5</span> a head: four times as much for each person, with a third fewer at work. Take the second preset, <code>few-at-work</code>, and let only 20 of the 100 work: the produce falls to 240 and <span class="math" data-say="12 over 5">12/5</span> a head, and the civilized people are still twice as well supplied as the hunters. That is Smith's claim that the first circumstance seems to matter more than the second, put into figures of the lesson's own.</p><p>The third preset, <code>same-skill</code>, shows the other half, and Smith does not deny it. Give both nations the same output of 2 a worker and the nation with more at work wins: the hunters' 120 units against the other's 80. The share at work does matter. One way to see why Smith ranks it second, though he does not put it so: a difference in skill can be of any size, while the share at work is a fraction and cannot exceed one.</p><p>The portrait of the &ldquo;savage&rdquo; deserves a second look, because it is the weakest part of the passage and Smith's readers have said so. It is a conjecture built from travellers' reports, one stage in a story he tells of societies passing from hunting to herding, farming and commerce. The anthropologist Marshall Sahlins argued in 1972, drawing on other scholars' field studies of present-day hunting peoples, that they often worked few hours and wanted little, so that poverty is not the right word for how they lived. Others answered that small present-day groups cannot stand for all the past. The lab does not decide between them. It takes Smith's contrast as a stated pair of nations and computes what the opening sentence implies for them.</p><p>Last, the plan. The first book is to explain the &ldquo;causes of this improvement in the productive powers of labour&rdquo; and how the produce is shared among the ranks of the people. The second, on capital stock, explains why the number of useful labourers depends on how much stock sets them to work. The third explains how the policy of Europe came to favour towns over the country, and the fourth examines the theories that grew up round that policy. The fifth is about the revenue of the sovereign. This Subject follows him through all five.</p><div class="defbox"><span class="label">Definition &middot; Money and measures, once</span><p>This lesson counts in plain units, but the rest of the book is in the money of Smith's day. Twelve pence (written d, from the Latin denarius) make a shilling (s), and twenty shillings make a pound (£), so a pound is two hundred and forty pence. A farthing is a quarter of a penny. A sum such as £2 3s 6d is read two pounds, three shillings and sixpence, and comes to 522 pence. The pound of money took its name from a pound weight of silver, and the two are different things: when Smith speaks of ounces or a pound weight of silver he means a weight of metal, and the second course works out how far the money pound drifted from it. Corn is sold by the quarter, which is eight bushels. The lessons repeat a unit where a figure needs it, and the labs say which unit they use.</p></div><p>That is the whole Introduction: one sentence that says what to measure, one that says what moves it, and a map of the road. The next lesson goes straight to Smith's account of his first circumstance, skill, with the most famous factory in economics, a workshop of ten men making pins.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a nation&#x27;s supply per head</h2></div><p>Four steps, the same for any nation whose three figures you know.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the share at work</h3><p>Divide the number at useful labour by the whole population. Everyone is in the denominator, the old, the young and the idle, because they all consume.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Fix the output of a worker</h3><p>State what one worker turns out in a year, in some one unit. Smith's first circumstance, skill, lives here: a more skilful or better-equipped worker has a larger number.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply, then divide</h3><p>The produce is the workers times the output of each. Divide it by the population and you have the produce per head, which equals the share at work times the output.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare, one change at a time</h3><p>Set two nations side by side, or one nation before and after, and change either the share at work or the output, not both. Whichever moves the produce per head more is the one that matters more in that case.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a nation&#x27;s supply per head</h2>
+      <p class="lead-in">Four steps, the same for any nation whose three figures you know.</p>
+      <ol class="key-ideas method"><li><strong>Find the share at work.</strong> Divide the number at useful labour by the whole population. Everyone is in the denominator, the old, the young and the idle, because they all consume.</li><li><strong>Fix the output of a worker.</strong> State what one worker turns out in a year, in some one unit. Smith's first circumstance, skill, lives here: a more skilful or better-equipped worker has a larger number.</li><li><strong>Multiply, then divide.</strong> The produce is the workers times the output of each. Divide it by the population and you have the produce per head, which equals the share at work times the output.</li><li><strong>Compare, one change at a time.</strong> Set two nations side by side, or one nation before and after, and change either the share at work or the output, not both. Whichever moves the produce per head more is the one that matters more in that case.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1447,17 +1493,16 @@ civilized per head:  480 / 100 = 24/5
 ratio:  (24/5) / (6/5) = 4</div><p>The civilized nation has 40 at work against the hunters' 60 and is four times better supplied, because each of its workers makes six times as much. Cut its workers to 20 and the ratio halves to 2, which is still better than one. The figures are the lesson's, and the next lessons ask where the factor of six comes from.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more people at work always means more wealth</strong><span>The share at work is one of two factors, and the other can dominate it. In the <code>contrast</code> preset the nation with fewer at work has four times the supply per head. Counting heads at work tells you about one factor and nothing about the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the produce as the wealth, not the produce per head</strong><span>A nation of 1,000 people with a produce of 3,000 units is worse supplied than one of 100 with a produce of 600, though its produce is five times larger. Smith's test is the proportion the produce bears to those who consume it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the lesson&#x27;s nations as Smith&#x27;s figures</strong><span>Smith gives no numbers in the Introduction. The populations, the workers and the outputs are written for the lesson so that the factor Smith names can be seen to move, and nothing in them is a measurement of any real people.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a nation&#x27;s supply per head and say which factor moved it.</strong><p>Given a population, the number at useful work and the output of each, compute the produce and the produce per head, and state which of Smith's two circumstances accounts for a difference between two nations.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The lab computes what Smith's opening sentence implies for the figures it is given. It cannot say how many people in a real country are at useful work, because that depends on what counts as useful, and Book II, Chapter 3 is a dispute about exactly that. It cannot measure the output of a worker either, since the units are the lesson's, and the picture of the hunters is a conjecture that later observers have challenged. What the arithmetic does show is the shape of the claim: skill is a multiplier of any size and the share at work is a fraction.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking more people at work always means more wealth</strong><span>The share at work is one of two factors, and the other can dominate it. In the <code>contrast</code> preset the nation with fewer at work has four times the supply per head. Counting heads at work tells you about one factor and nothing about the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading the produce as the wealth, not the produce per head</strong><span>A nation of 1,000 people with a produce of 3,000 units is worse supplied than one of 100 with a produce of 600, though its produce is five times larger. Smith's test is the proportion the produce bears to those who consume it.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating the lesson&#x27;s nations as Smith&#x27;s figures</strong><span>Smith gives no numbers in the Introduction. The populations, the workers and the outputs are written for the lesson so that the factor Smith names can be seen to move, and nothing in them is a measurement of any real people.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a nation&#x27;s supply per head and say which factor moved it.</strong><p>Given a population, the number at useful work and the output of each, compute the produce and the produce per head, and state which of Smith's two circumstances accounts for a difference between two nations.</p></div></div><div class="note"><strong>Note:</strong> The lab computes what Smith's opening sentence implies for the figures it is given. It cannot say how many people in a real country are at useful work, because that depends on what counts as useful, and Book II, Chapter 3 is a dispute about exactly that. It cannot measure the output of a worker either, since the units are the lesson's, and the picture of the hunters is a conjecture that later observers have challenged. What the arithmetic does show is the shape of the claim: skill is a multiplier of any size and the share at work is a fraction.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Wealth is a yearly flow of necessaries</summary><p>Smith does not begin with gold, land or a treasury. The wealth of a nation is the yearly produce of its labour, together with whatever that produce buys from other nations: the &ldquo;necessaries and conveniencies of life&rdquo; that the people consume in a year.</p></details><details class="recall"><summary>Produce per head, not produce</summary><p>A large produce shared among a great many people can leave each short, and a small one shared among few can leave each well supplied. What matters is the proportion the produce bears to the number who are to consume it.</p></details><details class="recall"><summary>Two circumstances regulate the proportion</summary><p>First the skill, dexterity and judgment with which labour is applied; second the proportion between those employed in useful labour and those who are not. Smith says the first seems to matter more, and Book I opens with it.</p></details></div>
+      <h3>Summary</h3>
       <p>Smith opens the book with a sum before he has a figure: the produce of a nation's labour, divided by the number who consume it, is what the nation has to live on. Compute that produce per head from a population, the share at work and the output of each worker, and see why a nation in which many do no work can still supply its poorest better than one in which nearly all do.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Wealth is a yearly flow of necessaries.</strong> Smith does not begin with gold, land or a treasury. The wealth of a nation is the yearly produce of its labour, together with whatever that produce buys from other nations: the &ldquo;necessaries and conveniencies of life&rdquo; that the people consume in a year.</li><li><strong>Produce per head, not produce.</strong> A large produce shared among a great many people can leave each short, and a small one shared among few can leave each well supplied. What matters is the proportion the produce bears to the number who are to consume it.</li><li><strong>Two circumstances regulate the proportion.</strong> First the skill, dexterity and judgment with which labour is applied; second the proportion between those employed in useful labour and those who are not. Smith says the first seems to matter more, and Book I opens with it.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="produce per head equals share at work times output. produce equals workers times output per worker. per head equals produce over population. supply turns on skill and share at work. Smith, skill seems to matter the more" tabindex="0" role="region" aria-label="Mathematical notation">produce per head = share at work × output
 produce = workers × output per worker
 per head = produce / population
@@ -2327,11 +2372,40 @@ Smith: skill seems to matter the more</div><figcaption>The opening sum in five l
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2399,7 +2473,7 @@ Smith: skill seems to matter the more</div><figcaption>The opening sum in five l
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 

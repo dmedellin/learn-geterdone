@@ -273,6 +273,23 @@ def _block(kind, payload):
     raise KeyError("unknown body block %r" % kind)
 
 
+_LAB_WORD = re.compile(r"\blabs?\b", re.I)
+
+
+def lab_position(body):
+    """Where the lab goes in a lesson's body: the index of the block it follows.
+
+    docs/LESSON-LAYOUT-BACKLOG.md L-10. The lab sits right after the first
+    paragraph or list that mentions it, which is where the text starts to use
+    it; a lesson whose text never mentions the lab gets it after the reading.
+    """
+    for i, (kind, payload) in enumerate(body):
+        if kind in ("p", "ul", "ol") and _LAB_WORD.search(
+                payload if isinstance(payload, str) else " ".join(payload)):
+            return i + 1
+    return len(body)
+
+
 def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
     """One lesson: /<course-slug>/<lesson-slug>/ ."""
     return lesson_page_with_lab(
@@ -321,55 +338,45 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         '\n    <main id="main">\n',
     ]
 
-    # -- the head: one preview, not four -------------------------------------
-    # docs/LESSON-LAYOUT-BACKLOG.md L-1, L-2. The kicker carries what the
-    # breadcrumb does not (the chapter), the lede is the lesson's authored
-    # one-line description, and the actions row is left for Listen, which
-    # readout.py inserts. The long summary and the key block are not dropped:
-    # they close the lesson in the summary section below.
+    # -- the lesson bar: where you are, and Listen ---------------------------
+    # docs/LESSON-LAYOUT-BACKLOG.md L-8. It stays on screen while the reader
+    # scrolls, names the course, marks the part of the lesson in view (the
+    # script at the foot of this page sets aria-current) and holds Listen,
+    # which readout.py places in .bar-actions.
+    parts.append(
+        '    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">\n'
+        '      <a class="bar-course" href="../">%s</a>\n'
+        '      <ol class="bar-steps">'
+        '<li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li>'
+        '<li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>\n'
+        '      <div class="bar-actions"></div>\n'
+        "    </nav>\n" % esc(course["title"])
+    )
+
+    # -- the head: one sentence, then the text --------------------------------
+    # L-1. The kicker carries what the breadcrumb does not (the chapter) and
+    # the lede is the lesson's authored one-line description. The long summary,
+    # the key ideas and the key block close the lesson in the recap below.
     parts.append(
         '    <section class="lesson-head" data-ui="hero">\n'
         '      <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; %s</p>\n'
         "      <h1>%s</h1>\n"
         '      <p class="lesson-lede">%s</p>\n'
-        '      <div class="hero-actions" data-ui="primary-actions"></div>\n'
         "    </section>\n"
         % (esc(lesson["module"]), esc(lesson["title"]), esc_inline(lesson["one_line"]))
     )
 
-    # -- in brief: the three key ideas by name. Three short lines are the one
-    # advance organizer the reading needs; what each idea says is in the
-    # summary at the end, where it is a recap rather than a fourth preview.
-    brief = "".join("<li>%s</li>" % esc_inline(t) for t, _body in lesson["concepts"])
-    parts.append(
-        '    <section class="section reading-col in-brief" aria-labelledby="inBrief">\n'
-        '      <h2 id="inBrief">In brief</h2>\n'
-        "      <ul>%s</ul>\n"
-        "    </section>\n" % brief
-    )
-
-    # -- the written material ----------------------------------------------
-    body_markup = "".join(_block(kind, payload) for kind, payload in lesson["body"])
-    parts.append(
-        '    <section class="section reading-col" id="read">\n'
-        "      <h2>%s</h2>\n"
-        '      <article class="prose reading">%s</article>\n'
-        "    </section>\n"
-        % (esc_inline(lesson.get("read_title", lesson["title"])), body_markup)
-    )
-
-    # -- the lab ------------------------------------------------------------
-    legend = ""
-    parts.append(
-        '    <section class="section" id="lab">\n'
-        '      <div class="section-head"><div><p class="kicker">Interactive</p>'
+    # -- the reading, with the lab where the text first uses it --------------
+    lab_markup = (
+        '      <section class="lab-block" id="lab">\n'
+        '        <div class="section-head"><div><p class="kicker">Try it</p>'
         "<h2>%s</h2></div><p>%s</p></div>\n"
-        '      <div class="lab-layout">\n'
-        '        <article class="card lab-main">\n%s\n        </article>\n'
-        '        <aside class="card side-panel" aria-live="polite">\n'
-        "          <h3>%s</h3>\n          <p>%s</p>\n%s\n        </aside>\n"
-        "      </div>\n"
-        "    </section>\n"
+        '        <div class="lab-layout">\n'
+        '          <article class="card lab-main">\n%s\n          </article>\n'
+        '          <aside class="card side-panel" aria-live="polite">\n'
+        "            <h3>%s</h3>\n            <p>%s</p>\n%s\n          </aside>\n"
+        "        </div>\n"
+        "      </section>\n"
         % (
             esc(lab.title),
             esc(lab.subtitle),
@@ -379,18 +386,34 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
             lab.controls,
         )
     )
+    blocks = lesson["body"]
+    split = lab_position(blocks)
+    before = "".join(_block(kind, payload) for kind, payload in blocks[:split])
+    after = "".join(_block(kind, payload) for kind, payload in blocks[split:])
+    parts.append(
+        '    <section class="section lesson-reading" id="read">\n'
+        '      <div class="reading-col"><h2>%s</h2>'
+        '<div class="prose reading">%s</div></div>\n'
+        "%s"
+        "%s"
+        "    </section>\n"
+        % (
+            esc_inline(lesson.get("read_title", lesson["title"])), before, lab_markup,
+            '      <div class="reading-col"><div class="prose reading">%s</div></div>\n' % after
+            if after else "",
+        )
+    )
 
-    # -- how to use it ------------------------------------------------------
+    # -- method: the steps as a numbered list in the reading column ----------
     steps = "".join(
-        '<article class="card concept-card"><div class="icon">%d</div><h3>%s</h3><p>%s</p></article>'
-        % (i + 1, esc_inline(t), inline(body))
-        for i, (t, body) in enumerate(lesson["steps"])
+        "<li><strong>%s.</strong> %s</li>" % (esc_inline(t).rstrip("."), inline(body))
+        for t, body in lesson["steps"]
     )
     parts.append(
-        '    <section class="section" id="process">\n'
-        '      <div class="section-head"><div><p class="kicker">Method</p>'
-        "<h2>%s</h2></div><p>%s</p></div>\n"
-        '      <div class="grid-4">%s</div>\n'
+        '    <section class="section reading-col" id="process">\n'
+        "      <h2>%s</h2>\n"
+        '      <p class="lead-in">%s</p>\n'
+        '      <ol class="key-ideas method">%s</ol>\n'
         "    </section>\n"
         % (
             esc_inline(lesson.get("steps_title", "How to work with this")),
@@ -399,7 +422,7 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         )
     )
 
-    # -- practice + worked example -----------------------------------------
+    # -- practice + worked example: the quiz keeps its panel, it is a tool ----
     worked = lesson["worked"]
     parts.append(
         '    <section class="section" id="practice">\n'
@@ -416,7 +439,7 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
         )
     )
 
-    # -- mistakes + completion ---------------------------------------------
+    # -- mistakes and the check, as plain sections (L-11) ---------------------
     mistakes = "".join(
         '<div class="lesson-row"><div class="num">%d</div><div><strong>%s</strong><span>%s</span></div></div>'
         % (i + 1, esc_inline(t), inline(body))
@@ -424,33 +447,34 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
     )
     standard_head, standard_body = lesson["standard"]
     parts.append(
-        '    <section class="section">\n'
-        '      <div class="grid-2">\n'
-        '        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3>'
-        '<div class="lesson-list">%s</div></article>\n'
-        '        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3>'
+        '    <section class="section reading-col" id="check">\n'
+        '      <h3>Common mistakes</h3><div class="lesson-list">%s</div>\n'
+        '      <h3>Check your understanding</h3>'
         '<div class="callout"><div class="mark">&#10003;</div><div><strong>%s</strong><p>%s</p></div></div>'
-        '<div class="note" style="margin-top:12px;"><strong>Note:</strong> %s</div></article>\n'
-        "      </div>\n"
+        '<div class="note"><strong>Note:</strong> %s</div>\n'
         "    </section>\n"
         % (mistakes, esc_inline(standard_head), inline(standard_body), inline(lesson["note"]))
     )
 
-    # -- the summary: the long description, the three key ideas in full and
-    # the key block, after the reader has met the material they summarise ----
-    ideas = "".join(
-        "<li><strong>%s.</strong> %s</li>" % (esc_inline(t).rstrip("."), inline(body))
+    # -- recap: the key ideas to recall, then the summary (L-9) ---------------
+    # Recalling an idea before seeing it again strengthens it more than
+    # re-reading it (retrieval practice), so each idea is a disclosure: its
+    # name first, its statement on demand.
+    recall = "".join(
+        '<details class="recall"><summary>%s</summary><p>%s</p></details>'
+        % (esc_inline(t), inline(body))
         for t, body in lesson["concepts"]
     )
     parts.append(
-        '    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">\n'
-        '      <h2 id="lessonSummary">Summary</h2>\n'
+        '    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">\n'
+        '      <h2 id="lessonRecap">Before you go</h2>\n'
+        '      <p class="lead-in">Say each idea in your own words, then open it to check.</p>\n'
+        '      <div class="recall-list">%s</div>\n'
+        "      <h3>Summary</h3>\n"
         "      <p>%s</p>\n"
-        "      <h3>Key ideas</h3>\n"
-        '      <ul class="key-ideas">%s</ul>\n'
         '      <figure class="key-figure">%s<figcaption>%s</figcaption></figure>\n'
         "    </section>\n"
-        % (inline(lesson["summary"]), ideas, _mathblock(lesson["key"]),
+        % (recall, inline(lesson["summary"]), _mathblock(lesson["key"]),
            esc_inline(lesson.get("key_label", "The statement in symbols")))
     )
 
@@ -503,8 +527,44 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
                              + progress.LESSON_JS % json.dumps(lesson_id)
                              + feedback.STORE_JS
                              + feedback.LESSON_JS
+                             + LESSON_BAR_JS
                              + readout.READOUT_JS))
     return chrome.name_horizontal_scrollers("".join(parts)), lab
+
+
+# The lesson bar's "you are here": the part whose top has passed a line a third
+# of the way down the screen is current, except that the lab, which sits inside
+# the reading, is current only while it is on that line.
+LESSON_BAR_JS = """
+  (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+"""
 
 
 def _first_upper(text):

@@ -1331,6 +1331,51 @@
     body[data-page-kind] .outcome p { margin: 0; }
     body[data-page-kind] .more-part p { line-height: 1.7; }
 
+    /* Reading mode (Release 2): the slim lesson bar is the one thing that
+       stays on screen, so the masthead scrolls away on a lesson. */
+    body[data-page-kind="lesson"] [data-ui="masthead"] { position: static; }
+    body[data-page-kind] .lesson-bar {
+      position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px;
+      max-width: 46rem; margin: 0 auto 10px; padding: 4px 8px 4px 14px;
+      border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px;
+      background: color-mix(in srgb, var(--panel-solid) 92%, transparent); backdrop-filter: blur(14px);
+    }
+    body[data-page-kind] .lesson-bar .bar-course {
+      display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      line-height: 44px; font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; flex: none; }
+    body[data-page-kind] .lesson-bar .bar-steps a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 9px;
+      font-size: .88rem; font-weight: 650; color: var(--text); text-decoration: none;
+    }
+    body[data-page-kind] .lesson-bar .bar-steps a[aria-current] { background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .lesson-bar .bar-actions { flex: none; }
+    body[data-page-kind] .lesson-bar .bar-actions:empty { display: none; }
+    body[data-page-kind] .lesson-bar .bar-actions .btn { min-height: 44px; padding: 6px 12px; }
+    body[data-page-kind="lesson"] :is(#read, #lab, #process, #practice, #check, #recap) { scroll-margin-top: 64px; }
+    body[data-page-kind] .lesson-reading .lab-block { margin: 30px 0; }
+    body[data-page-kind] .lesson-reading .reading-col + .reading-col { margin-top: 0; }
+    body[data-page-kind] .reading-col > .lead-in { margin: 0 0 12px; font-size: 1rem; line-height: 1.65; }
+    body[data-page-kind] #check h3 { margin: 0 0 12px; font-size: 1.2rem; letter-spacing: -.01em; }
+    body[data-page-kind] #check h3 ~ h3 { margin-top: 28px; }
+    body[data-page-kind] #check .note { margin-top: 12px; }
+    body[data-page-kind] .recall-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 6px; }
+    body[data-page-kind] .recall { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    body[data-page-kind] .recall > summary {
+      display: flex; align-items: center; gap: 10px; min-height: 48px; cursor: pointer; list-style: none; font-weight: 650;
+    }
+    body[data-page-kind] .recall > summary::-webkit-details-marker { display: none; }
+    body[data-page-kind] .recall > summary::before { content: "+"; width: 1em; text-align: center; font-weight: 700; }
+    body[data-page-kind] .recall[open] > summary::before { content: "\2212"; }
+    body[data-page-kind] .recall > p { margin: 0 0 14px; font-size: 1.0625rem; line-height: 1.75; }
+    @media (max-width: 560px) {
+      body[data-page-kind] .lesson-bar { padding: 4px 6px; gap: 4px; }
+      body[data-page-kind] .lesson-bar .bar-course { display: none; }
+      body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
+      body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
+    }
+
     /* A phone shows the lesson's course as a back link and nothing else: the
        four-level trail wrapped to three lines above every lesson. */
     @media (max-width: 720px) {
@@ -1379,34 +1424,32 @@
     </noscript>
 
     <main id="main">
+    <nav class="lesson-bar" id="lessonBar" aria-label="In this lesson">
+      <a class="bar-course" href="../">Ground Rent</a>
+      <ol class="bar-steps"><li><a href="#read">Read</a></li><li><a href="#lab">Try</a></li><li><a href="#process">Practise</a></li><li><a href="#check">Check</a></li></ol>
+      <div class="bar-actions"></div>
+    </nav>
     <section class="lesson-head" data-ui="hero">
       <p class="lesson-kind"><span data-ui="page-kind">Lesson</span> &middot; Chapter 38 · Differential Rent. General Remarks</p>
       <h1>Differential Rent: General Remarks</h1>
       <p class="lesson-lede">A factory with a waterfall sells at the price set by factories on steam and pockets the difference; whoever owns the waterfall can take that difference as rent.</p>
-      <div class="hero-actions" data-ui="primary-actions"></div>
     </section>
-    <section class="section reading-col in-brief" aria-labelledby="inBrief">
-      <h2 id="inBrief">In brief</h2>
-      <ul><li>Surplus profit</li><li>A monopolisable natural power</li><li>Differential rent</li></ul>
-    </section>
-    <section class="section reading-col" id="read">
-      <h2>The passage first, then the waterfall step by step</h2>
-      <article class="prose reading"><p><strong>Volume III, Chapter 38.</strong> &ldquo;Hence private property in land does not create that portion of value, which is transformed into surplus profit, but it merely enables the landowner, who has possession of the waterfall, to coax this surplus profit out of the pocket of the industrial capitalist into his own.&rdquo;</p><p>Marx starts the theory of rent away from the farm, on purpose. Most of a country's factories run on steam, a few on natural waterfalls. On steam, a capital of 100 makes goods that sell at 115, the cost plus the average profit of 15%, and that 115 is the regulating price for the whole branch. The factory on the waterfall has a cost price of only 90, because the water costs less materialised labour and less living labour: &ldquo;the water wheel need not be heated&rdquo;. It still sells at 115. Its profit is 25 against the steam user's 15: a surplus profit of 10. The marx preset prints £115 for the price and both of Marx's measures in the surplus tile.</p><p>Why two measures? Marx's text holds both, though it writes out only the first. His figure is the one above, 10, the water user's profit less the steam user's. But he also defines the surplus profit as the difference between the general price and the water user's own individual price of production, and computes that price: if 100 becomes 115, then 90 becomes 103½, and 115 less 103½ is 11½. The first measure treats the water user as entitled to 15, the steam user's profit in money; the second gives him 15% on his own smaller cost. The lab prints both, and the lessons that follow use the first, which is the one Marx carries forward.</p><p>So far this is ordinary. Any capitalist with a better machine or a bigger plant makes a surplus profit, and Marx has analysed it already in the chapters on prices of production. What is different here? An ordinary surplus profit comes from the capital itself, from its size or its method, and competition removes it as the method spreads. The waterfall's comes from a natural power that capital cannot make: water power &ldquo;is found only locally in nature, and wherever it does not exist, it cannot be created by any investment of capital&rdquo;. It is &ldquo;a monopolised natural power&rdquo;, attached to particular pieces of the globe.</p><p>Now let someone own those pieces. The industrial capitalist pays the owner of the waterfall 10 pounds a year, keeps 15 on his 100 like everyone else, and the surplus profit has become ground rent. It would make no difference if the manufacturer owned the waterfall himself; he would collect the 10 &ldquo;in his capacity as a landowner&rdquo;.</p><p><strong>Volume III, Chapter 38.</strong> &ldquo;The natural power is not the source of the surplus profit, but only its natural basis, because this natural basis permits an increase in the productive power of labor.&rdquo;</p><p>This is the claim the rest of the Part leans on, so take it phrase by phrase. First, it is &ldquo;not the source&rdquo;: the water adds no value, for on Marx's definitions nothing that is not labour does; the goods made with it contain less labour and so less value. It is &ldquo;only its natural basis&rdquo;: the water lets the same labour make more. The surplus profit exists because the goods sell at the general price of production set by steam, not at their own lower one. Marx's test is the steam-cheapens preset. If some new method cuts the steam users' cost from 100 to 90, the price falls to 103½ and the waterfall's surplus is nothing by either measure. The waterfall has not changed; the rent is gone.</p><p>The two-falls preset puts the water user's cost at 80 instead of 90. At the same 115 the surplus profit is 20 against the steam user's profit and 23 against its own price of production of 92. A better natural advantage makes a larger difference, which is what &ldquo;differential&rdquo; means: the rent is measured by a difference in productivity, &ldquo;the greater relative fertility&rdquo; of one capital against the others in its branch.</p><p>The waterfall even has a price, and you can compute it with the last lesson's rule. The 10 a year at 5% interest is the income of a capital of 200 pounds, and 200 pounds &ldquo;appears then as the capital-value of the waterfall itself&rdquo;. It is a strange price, Marx notes: the owner collects the 10 for as long as the conditions last, not for twenty years.</p><p>The objection is the one that runs through the whole Part. An economist after the 1870s would agree with every number here and still say the waterfall is productive: remove it and output falls, so it earns its rent as machines earn theirs. What the chapter says bears on that claim: the natural power raises the productivity of labour, value on Marx's definitions is labour, and the rent is a share of a surplus that exists only because the price is set elsewhere. Which description is the better one is the question the Subject leaves open.</p><p>The waterfall is the model; the field is the case Marx cares about. The next lesson, “Differential Rent I”, applies the same rule to four soils of unequal fertility, and to Ricardo, who had done so first.</p></article>
-    </section>
-    <section class="section" id="lab">
-      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Ground rent</h2></div><p>surplus profit fixed on land, and land priced at the rate of interest</p></div>
-      <div class="lab-layout">
-        <article class="card lab-main">
+    <section class="section lesson-reading" id="read">
+      <div class="reading-col"><h2>The passage first, then the waterfall step by step</h2><div class="prose reading"><p><strong>Volume III, Chapter 38.</strong> &ldquo;Hence private property in land does not create that portion of value, which is transformed into surplus profit, but it merely enables the landowner, who has possession of the waterfall, to coax this surplus profit out of the pocket of the industrial capitalist into his own.&rdquo;</p><p>Marx starts the theory of rent away from the farm, on purpose. Most of a country's factories run on steam, a few on natural waterfalls. On steam, a capital of 100 makes goods that sell at 115, the cost plus the average profit of 15%, and that 115 is the regulating price for the whole branch. The factory on the waterfall has a cost price of only 90, because the water costs less materialised labour and less living labour: &ldquo;the water wheel need not be heated&rdquo;. It still sells at 115. Its profit is 25 against the steam user's 15: a surplus profit of 10. The marx preset prints £115 for the price and both of Marx's measures in the surplus tile.</p><p>Why two measures? Marx's text holds both, though it writes out only the first. His figure is the one above, 10, the water user's profit less the steam user's. But he also defines the surplus profit as the difference between the general price and the water user's own individual price of production, and computes that price: if 100 becomes 115, then 90 becomes 103½, and 115 less 103½ is 11½. The first measure treats the water user as entitled to 15, the steam user's profit in money; the second gives him 15% on his own smaller cost. The lab prints both, and the lessons that follow use the first, which is the one Marx carries forward.</p></div></div>
+      <section class="lab-block" id="lab">
+        <div class="section-head"><div><p class="kicker">Try it</p><h2>Ground rent</h2></div><p>surplus profit fixed on land, and land priced at the rate of interest</p></div>
+        <div class="lab-layout">
+          <article class="card lab-main">
       <div class="lab-toolbar">
         <div class="lab-title"><strong>Ground rent</strong><span>surplus profit fixed on land, and land priced at the rate of interest</span></div>
       </div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rtTable"></table></div>
       <div class="status-banner" id="rtStatus" style="margin-top:12px;"></div>
 
-        </article>
-        <aside class="card side-panel" aria-live="polite">
-          <h3>The factory on the waterfall</h3>
-          <p>The steam users' cost, the water user's cost and the average rate of profit go in. The steam users set the price; the second tile gives the water user's surplus profit by Marx's two measures. Choose steam-cheapens and watch the surplus go while the waterfall stays.</p>
+          </article>
+          <aside class="card side-panel" aria-live="polite">
+            <h3>The factory on the waterfall</h3>
+            <p>The steam users' cost, the water user's cost and the average rate of profit go in. The steam users set the price; the second tile gives the water user's surplus profit by Marx's two measures. Choose steam-cheapens and watch the surplus go while the waterfall stays.</p>
         <div class="field">
           <label for="rtPreset">Worked example</label>
           <select id="rtPreset"><option value="marx" selected>Marx's figures: cost 100 on steam, 90 on water, profit 15%</option><option value="two-falls">A better fall: cost 80 on water</option><option value="steam-cheapens">Marx's case: steam's cost falls from 100 to 90</option></select>
@@ -1428,12 +1471,15 @@
           <div class="kpi"><span>Surplus profit</span><strong id="rtSurplusProfit">&mdash;</strong></div>
         </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </section>
+      <div class="reading-col"><div class="prose reading"><p>So far this is ordinary. Any capitalist with a better machine or a bigger plant makes a surplus profit, and Marx has analysed it already in the chapters on prices of production. What is different here? An ordinary surplus profit comes from the capital itself, from its size or its method, and competition removes it as the method spreads. The waterfall's comes from a natural power that capital cannot make: water power &ldquo;is found only locally in nature, and wherever it does not exist, it cannot be created by any investment of capital&rdquo;. It is &ldquo;a monopolised natural power&rdquo;, attached to particular pieces of the globe.</p><p>Now let someone own those pieces. The industrial capitalist pays the owner of the waterfall 10 pounds a year, keeps 15 on his 100 like everyone else, and the surplus profit has become ground rent. It would make no difference if the manufacturer owned the waterfall himself; he would collect the 10 &ldquo;in his capacity as a landowner&rdquo;.</p><p><strong>Volume III, Chapter 38.</strong> &ldquo;The natural power is not the source of the surplus profit, but only its natural basis, because this natural basis permits an increase in the productive power of labor.&rdquo;</p><p>This is the claim the rest of the Part leans on, so take it phrase by phrase. First, it is &ldquo;not the source&rdquo;: the water adds no value, for on Marx's definitions nothing that is not labour does; the goods made with it contain less labour and so less value. It is &ldquo;only its natural basis&rdquo;: the water lets the same labour make more. The surplus profit exists because the goods sell at the general price of production set by steam, not at their own lower one. Marx's test is the steam-cheapens preset. If some new method cuts the steam users' cost from 100 to 90, the price falls to 103½ and the waterfall's surplus is nothing by either measure. The waterfall has not changed; the rent is gone.</p><p>The two-falls preset puts the water user's cost at 80 instead of 90. At the same 115 the surplus profit is 20 against the steam user's profit and 23 against its own price of production of 92. A better natural advantage makes a larger difference, which is what &ldquo;differential&rdquo; means: the rent is measured by a difference in productivity, &ldquo;the greater relative fertility&rdquo; of one capital against the others in its branch.</p><p>The waterfall even has a price, and you can compute it with the last lesson's rule. The 10 a year at 5% interest is the income of a capital of 200 pounds, and 200 pounds &ldquo;appears then as the capital-value of the waterfall itself&rdquo;. It is a strange price, Marx notes: the owner collects the 10 for as long as the conditions last, not for twenty years.</p><p>The objection is the one that runs through the whole Part. An economist after the 1870s would agree with every number here and still say the waterfall is productive: remove it and output falls, so it earns its rent as machines earn theirs. What the chapter says bears on that claim: the natural power raises the productivity of labour, value on Marx's definitions is labour, and the rent is a share of a surplus that exists only because the price is set elsewhere. Which description is the better one is the question the Subject leaves open.</p><p>The waterfall is the model; the field is the case Marx cares about. The next lesson, “Differential Rent I”, applies the same rule to four soils of unequal fertility, and to Ricardo, who had done so first.</p></div></div>
     </section>
-    <section class="section" id="process">
-      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a surplus profit and its rent</h2></div><p>Four steps, for any natural advantage inside one branch of production.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Find the regulating price</h3><p>Take the cost price under the conditions that supply most of the market, here steam, and add the average profit on it.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute Marx&#x27;s measure</h3><p>Subtract the favoured producer's cost and the regulating producer's profit from the price: what is left is the surplus profit Marx carries forward.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Compute the second measure</h3><p>Raise the favoured cost by the average rate of profit for its own price of production, and subtract that from the regulating price.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Turn it into rent</h3><p>If the advantage is a natural power attached to land that others own, the surplus profit is paid to the owner as rent; capitalised at the rate of interest it becomes the price of the waterfall.</p></article></div>
+    <section class="section reading-col" id="process">
+      <h2>Computing a surplus profit and its rent</h2>
+      <p class="lead-in">Four steps, for any natural advantage inside one branch of production.</p>
+      <ol class="key-ideas method"><li><strong>Find the regulating price.</strong> Take the cost price under the conditions that supply most of the market, here steam, and add the average profit on it.</li><li><strong>Compute Marx&#x27;s measure.</strong> Subtract the favoured producer's cost and the regulating producer's profit from the price: what is left is the surplus profit Marx carries forward.</li><li><strong>Compute the second measure.</strong> Raise the favoured cost by the average rate of profit for its own price of production, and subtract that from the regulating price.</li><li><strong>Turn it into rent.</strong> If the advantage is a natural power attached to land that others own, the surplus profit is paid to the owner as rent; capitalised at the rate of interest it becomes the price of the waterfall.</li></ol>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1452,17 +1498,16 @@ against its own price:  115 − 103½ = 11½
 price of the waterfall:  10 / (1/20) = 200</div><p>The owner of the fall collects the 10 as rent. Cut the steam users' cost to 90 and the price falls to 103½; the 10 and the 11½ both become 0, and so does the price of the waterfall.</p></article>
       </div>
     </section>
-    <section class="section">
-      <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the waterfall creates the surplus profit</strong><span>The water is free and powerful, so it is natural to credit it with the extra 10. Marx's answer is in the steam-cheapens preset: the same waterfall makes nothing extra once steam's cost falls to 90, because the surplus is a difference between two prices of production. The fall lets labour produce more; the surplus exists because the goods sell at a price set by steam.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the landowner&#x27;s title creates the rent&#x27;s substance</strong><span>Marx says the reverse: the surplus profit &ldquo;would also exist, if private property did not prevail&rdquo;. Ownership decides who gets it, not whether it exists.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing up the two measures</strong><span>Ten is Marx's figure, and 11½ follows from his definition and his 103½. Ten measures against the steam user's profit, 11½ against the water user's own price of production. Say which one a figure is; the later lessons use the first.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a natural advantage&#x27;s surplus profit both ways.</strong><p>Given the regulating cost price, the favoured producer's cost price and the average rate of profit, compute the regulating price of production and the surplus profit against the regulating producer's profit and against the favoured producer's own price of production.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The figures 100, 90 and 15% are Marx's, and he says &ldquo;definite figures are immaterial&rdquo;; the two-falls preset's 80 is illustrative. The lab assumes the steam users regulate the price because they supply most of the market, as the chapter does; if the waterfalls supplied most of it, the regulating price would be theirs and there would be no surplus to pay.</div></article>
-      </div>
+    <section class="section reading-col" id="check">
+      <h3>Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Thinking the waterfall creates the surplus profit</strong><span>The water is free and powerful, so it is natural to credit it with the extra 10. Marx's answer is in the steam-cheapens preset: the same waterfall makes nothing extra once steam's cost falls to 90, because the surplus is a difference between two prices of production. The fall lets labour produce more; the surplus exists because the goods sell at a price set by steam.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Thinking the landowner&#x27;s title creates the rent&#x27;s substance</strong><span>Marx says the reverse: the surplus profit &ldquo;would also exist, if private property did not prevail&rdquo;. Ownership decides who gets it, not whether it exists.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing up the two measures</strong><span>Ten is Marx's figure, and 11½ follows from his definition and his 103½. Ten measures against the steam user's profit, 11½ against the water user's own price of production. Say which one a figure is; the later lessons use the first.</span></div></div></div>
+      <h3>Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can compute a natural advantage&#x27;s surplus profit both ways.</strong><p>Given the regulating cost price, the favoured producer's cost price and the average rate of profit, compute the regulating price of production and the surplus profit against the regulating producer's profit and against the favoured producer's own price of production.</p></div></div><div class="note"><strong>Note:</strong> The figures 100, 90 and 15% are Marx's, and he says &ldquo;definite figures are immaterial&rdquo;; the two-falls preset's 80 is illustrative. The lab assumes the steam users regulate the price because they supply most of the market, as the chapter does; if the waterfalls supplied most of it, the regulating price would be theirs and there would be no surplus to pay.</div>
     </section>
-    <section class="section reading-col lesson-summary" aria-labelledby="lessonSummary">
-      <h2 id="lessonSummary">Summary</h2>
+    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
+      <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Say each idea in your own words, then open it to check.</p>
+      <div class="recall-list"><details class="recall"><summary>Surplus profit</summary><p>Profit above the average, made by a capital that produces more cheaply than the conditions that regulate the price. Every industry has it; normally competition wears it away as the better method spreads.</p></details><details class="recall"><summary>A monopolisable natural power</summary><p>A force of nature, like a waterfall, that raises the productivity of labour, is attached to particular pieces of land, and cannot be made by capital. Steam, by contrast, is at the command of any capital that buys an engine.</p></details><details class="recall"><summary>Differential rent</summary><p>The surplus profit that such a natural advantage makes lasting, transferred to the owner of the land that holds it. It is differential because it arises from a difference between individual and general prices of production.</p></details></div>
+      <h3>Summary</h3>
       <p>Before he turns to farming, Marx explains differential rent with a factory driven by a natural waterfall, competing with factories driven by steam. Compute the water-driven factory's surplus profit both ways Marx does, against the steam user's profit and against its own price of production, and see why the surplus becomes the owner's rent and vanishes when steam cheapens.</p>
-      <h3>Key ideas</h3>
-      <ul class="key-ideas"><li><strong>Surplus profit.</strong> Profit above the average, made by a capital that produces more cheaply than the conditions that regulate the price. Every industry has it; normally competition wears it away as the better method spreads.</li><li><strong>A monopolisable natural power.</strong> A force of nature, like a waterfall, that raises the productivity of labour, is attached to particular pieces of land, and cannot be made by capital. Steam, by contrast, is at the command of any capital that buys an engine.</li><li><strong>Differential rent.</strong> The surplus profit that such a natural advantage makes lasting, transferred to the owner of the land that holds it. It is differential because it arises from a difference between individual and general prices of production.</li></ul>
       <figure class="key-figure"><div class="mathblock" data-say="price set by the steam users, cost plus profit. surplus profit equals price minus cost minus profit. Marx, 115 minus 90 minus 15 equals 10. against own price, 115 minus 103 one half equals 11 one half. a waterfall is the basis, not the source" tabindex="0" role="region" aria-label="Mathematical notation">price set by the steam users: cost + profit
 surplus profit = price − cost − profit
 Marx: 115 − 90 − 15 = 10
@@ -2368,11 +2413,40 @@ a waterfall is the basis, not the source</div><figcaption>The waterfall in five 
   })();
 
   (function () {
+    var bar = document.getElementById('lessonBar');
+    if (!bar) return;
+    var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
+    var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var lab = document.getElementById('lab');
+    function paint() {
+      var line = window.innerHeight / 3, current = -1;
+      parts.forEach(function (el, i) {
+        if (el && el !== lab && el.getBoundingClientRect().top <= line) current = i;
+      });
+      if (lab) {
+        var r = lab.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) current = parts.indexOf(lab);
+      }
+      links.forEach(function (a, i) {
+        if (i === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(function () { queued = false; paint(); });
+    }, { passive: true });
+    paint();
+  })();
+
+  (function () {
     var synth = window.speechSynthesis, main = document.getElementById('main');
     if (!synth || !window.SpeechSynthesisUtterance || !main) return;
     var SKIP = '#lab,.quiz,.feedback,.hero-actions,.hero-card,.eyebrow,.kicker,.float-label,'
       + 'nav,form,button,script,style,svg,canvas,[aria-hidden=true],[data-listen=skip]';
-    var BLOCK = 'h1,h2,h3,h4,p,li,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
+    var BLOCK = 'h1,h2,h3,h4,p,li,.recall>summary,.mathblock,.lesson-row,.note,.callout>div,table,pre,'
       + '.defbox>.label,.thm>.label,.example>.label';
     var css = document.createElement('style');
     css.textContent = '.listen-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;'
@@ -2440,7 +2514,7 @@ a waterfall is the basis, not the source</div><figcaption>The waterfall in five 
     }
     var start = btn('Listen', 'Listen to this lesson');
     start.classList.add('listen-start');
-    var actions = main.querySelector('.hero-actions');
+    var actions = main.querySelector('.lesson-bar .bar-actions') || main.querySelector('.hero-actions');
     if (actions) actions.appendChild(start);
     else { var h1 = main.querySelector('h1'); if (!h1) return; h1.insertAdjacentElement('afterend', start); }
 
