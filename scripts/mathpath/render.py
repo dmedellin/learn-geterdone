@@ -538,7 +538,7 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
 LESSON_BAR_JS = """
   (function () {
     var bar = document.getElementById('lessonBar');
-    if (!bar) return;
+    if (!bar || typeof bar.querySelectorAll !== 'function') return;
     var links = Array.prototype.slice.call(bar.querySelectorAll('.bar-steps a'));
     var parts = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
     var lab = document.getElementById('lab');
