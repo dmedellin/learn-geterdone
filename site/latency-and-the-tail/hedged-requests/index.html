@@ -1257,6 +1257,15 @@
       [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
       [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
     }
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson.
+       Generated and Trading lessons share the trail's shape, so the rule is
+       in UI_CSS and reaches both (LESSON-LAYOUT-BACKLOG L-5, L-12). */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
 
     body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
     body[data-page-kind] .reading p, body[data-page-kind] .reading li,
@@ -1374,14 +1383,6 @@
       body[data-page-kind] .lesson-bar .bar-course { display: none; }
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
-    }
-
-    /* A phone shows the lesson's course as a back link and nothing else: the
-       four-level trail wrapped to three lines above every lesson. */
-    @media (max-width: 720px) {
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
     }
   </style>
 
@@ -1519,6 +1520,7 @@ compare    d = 12 ms (the median):  load 35.0%,  hedged p99 30 ms</div><p>The fi
     </section>
     <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
       <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">The hard idea is that the same independence that made a fan-out worse makes a duplicate better, and that the cost of the duplicate is decided entirely by when you send it.</p>
       <p class="lead-in">Say each idea in your own words, then open it to check.</p>
       <div class="recall-list"><details class="recall"><summary>A hedge turns one call into the faster of two</summary><p>Issue the call. If no answer has arrived by <span class="math" data-say="d">d</span> milliseconds, issue a second copy and use whichever finishes first. The request finishes at <span class="math" data-say="the min of X and d plus Y">min(X, d + Y)</span> with <span class="math" data-say="Y">Y</span> an independent copy of the same service, so a request is slow only when both copies are slow at once.</p></details><details class="recall"><summary>The tail past the delay is multiplied, not added</summary><p><span class="math" data-say="P of hedged is greater than t equals P of X is greater than t times P of X is greater than t minus d">P(hedged > t) = P(X > t) · P(X > t − d)</span>. Just past <span class="math" data-say="d">d</span> that is roughly the tail squared: on the lab&rsquo;s service, a <span class="math" data-say="1 over 20">1/20</span> tail at <span class="math" data-say="30 milliseconds">30 ms</span> becomes <span class="math" data-say="1 over 400">1/400</span>. Squaring a small probability is a large change, and it is the same multiplication rule that made a fan-out of sixty-nine calls miss its p99 half the time.</p></details><details class="recall"><summary>The cost is exactly the tail you hedge past</summary><p>The second copy is sent only for requests still running at <span class="math" data-say="d">d</span>, so the extra load is <span class="math" data-say="P of X is greater than d">P(X > d)</span> and nothing else. Hedge at the p95 and that is <span class="math" data-say="5 percent">5%</span>. Hedge nearer the median and the figure climbs fast: at the lab&rsquo;s <span class="math" data-say="12 milliseconds">12 ms</span> median the backup goes out for <span class="math" data-say="35 percent">35%</span> of requests, seven times the traffic for a worse result.</p></details></div>
       <h3>Summary</h3>

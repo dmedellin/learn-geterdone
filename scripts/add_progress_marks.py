@@ -42,6 +42,30 @@ from mathpath.theme import UI_CSS  # noqa: E402
 SITE = pathlib.Path(__file__).resolve().parent.parent / "site"
 PATH_PAGE = "paths/trading/index.html"
 
+# Reading pass for the hand-written Trading lessons (LESSON-LAYOUT-BACKLOG
+# L-12). The generated lessons were rebuilt by the renderer; these pages are
+# authored one by one, so this is the part of reading mode that CSS can reach
+# without touching their content: the hero's jump links go (the sections are
+# right below, as on generated lessons, L-2), the decorative hero illustration
+# leaves the phone layout where it pushed the reading below the first screen,
+# and the section lead-ins keep a readable measure. Buttons in the hero stay:
+# on these pages they start or reset a lab. A hero-card is authored content and
+# stays too. Lesson pages only; course homes and the Trading Subject page keep
+# their layout.
+TRADING_LESSON_CSS = """
+    body[data-page-kind="lesson"] [data-ui="primary-actions"] a.btn[href^="#"] { display: none; }
+    body[data-page-kind="lesson"] [data-ui="primary-actions"]:not(:has(> :not(a[href^="#"]))) { display: none; }
+    body[data-page-kind="lesson"] .section-head p { max-width: 68ch; }
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="hero"] { gap: 14px; margin: 8px 0 24px; padding: 18px 16px; }
+      body[data-page-kind="lesson"] [data-ui="hero"] .hero-visual { display: none; }
+      body[data-page-kind="lesson"] [data-ui="hero"] .eyebrow { padding: 0; border: 0; background: none; }
+      body[data-page-kind="lesson"] [data-ui="hero"] h1 { margin: 8px 0 12px; font-size: 1.85rem; }
+      body[data-page-kind="lesson"] [data-ui="hero"] > div:first-child > p { font-size: 1rem; line-height: 1.65; }
+      body[data-page-kind="lesson"] [data-ui="primary-actions"] { margin-top: 14px; }
+    }
+"""
+
 CSS_BEGIN = "/* progress-marks:begin */"
 CSS_END = "/* progress-marks:end */"
 SCRIPT_OPEN = "<script data-progress-marks>"
@@ -328,7 +352,7 @@ def ensure_css(text):
         # its ink keeps the legacy palette coherent without adding a second
         # light declaration or overriding an authored palette value.
         palette += ':root { --on-accent: var(--bg); }\n'
-    block = "%s\n%s%s    %s" % (CSS_BEGIN, palette, CSS + UI_CSS, CSS_END)
+    block = "%s\n%s%s    %s" % (CSS_BEGIN, palette, CSS + UI_CSS + TRADING_LESSON_CSS, CSS_END)
     # The FIRST style block -- the page's own stylesheet. NOT the last: every
     # one of these pages ends with a <noscript><style> that hides the theme
     # toggle, and rules put there apply only when scripting is OFF. The first

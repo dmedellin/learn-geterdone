@@ -1257,6 +1257,15 @@
       [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
       [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
     }
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson.
+       Generated and Trading lessons share the trail's shape, so the rule is
+       in UI_CSS and reaches both (LESSON-LAYOUT-BACKLOG L-5, L-12). */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
 
     body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
     body[data-page-kind] .reading p, body[data-page-kind] .reading li,
@@ -1374,14 +1383,6 @@
       body[data-page-kind] .lesson-bar .bar-course { display: none; }
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
-    }
-
-    /* A phone shows the lesson's course as a back link and nothing else: the
-       four-level trail wrapped to three lines above every lesson. */
-    @media (max-width: 720px) {
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
     }
   </style>
 
@@ -1561,6 +1562,7 @@ count [20, 70]   = (keys ≤ 70) − (keys &lt; 20)
     </section>
     <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
       <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">One mechanism, one criterion, and one maintenance obligation. The criterion is what makes this a technique rather than a trick, and the obligation is where it breaks in practice.</p>
       <p class="lead-in">Say each idea in your own words, then open it to check.</p>
       <div class="recall-list"><details class="recall"><summary>Subtree size turns a search into counting</summary><p>At a node, the size of the left subtree tells you how many keys are smaller than this one within this subtree. That single number converts the search-tree walk into an arithmetic walk: <span class="math" data-say="select">select</span> subtracts as it goes right, <span class="math" data-say="rank">rank</span> accumulates as it goes right, and both finish in one root-to-leaf path.</p></details><details class="recall"><summary>An attribute can ride along if a node can compute it from its children</summary><p>The criterion is constant-time computability from the node&rsquo;s own key and the attribute values at its two children. Size qualifies: <span class="math" data-say="1 plus left plus right">1 + left + right</span>. So do sum, min, max, and the count of keys satisfying a fixed predicate. A median does not: knowing the medians of two subtrees and one key does not determine the median of the whole, so maintaining it would cost more than a constant per node and the technique gives nothing.</p></details><details class="recall"><summary>Every structural change must update the attribute</summary><p>An insertion increments the size at each node on its path. A rotation rearranges three subtrees and must recompute the sizes at the two nodes involved, bottom-up. Forget it and the field is wrong while the tree is correct, which means <span class="math" data-say="select">select</span> returns the wrong key and nothing complains. The lab rotates a size-annotated tree and prints the sizes before and after for exactly that reason.</p></details></div>
       <h3>Summary</h3>

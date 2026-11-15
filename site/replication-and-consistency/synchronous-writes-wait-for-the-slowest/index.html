@@ -1257,6 +1257,15 @@
       [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
       [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
     }
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson.
+       Generated and Trading lessons share the trail's shape, so the rule is
+       in UI_CSS and reaches both (LESSON-LAYOUT-BACKLOG L-5, L-12). */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
 
     body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
     body[data-page-kind] .reading p, body[data-page-kind] .reading li,
@@ -1374,14 +1383,6 @@
       body[data-page-kind] .lesson-bar .bar-course { display: none; }
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
-    }
-
-    /* A phone shows the lesson's course as a back link and nothing else: the
-       four-level trail wrapped to three lines above every lesson. */
-    @media (max-width: 720px) {
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
     }
   </style>
 
@@ -1542,6 +1543,7 @@ asynchronous instead, at 2000 writes/s and 400 B a write
     </section>
     <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
       <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">One rule, one arithmetic fact about powers, and one honest account of what the alternative costs instead.</p>
       <p class="lead-in">Say each idea in your own words, then open it to check.</p>
       <div class="recall-list"><details class="recall"><summary>The write waits for the last follower, not the typical one</summary><p>A synchronous write is acknowledged when every follower has acked, so its wait is the <em>maximum</em> of <span class="math" data-say="N minus 1">N − 1</span> reply times. Under independence, <span class="math" data-say="P of max at most t equals F of t to the power the quantity N minus 1">P(max ≤ t) = F(t)^(N − 1)</span>, because all <span class="math" data-say="N minus 1">N − 1</span> must land by <span class="math" data-say="t">t</span>. The median follower is irrelevant; the write is held by whichever one is slow this time, and which one that is changes every request.</p></details><details class="recall"><summary>A maximum is a power, and a power is not a product</summary><p>Raising a number below one to a power pushes it down, but nothing like as fast as multiplying a time by <span class="math" data-say="N">N</span> pushes that up. Here <span class="math" data-say="F of 16 equals 0.992">F(16) = 0.992</span> for one replica and <span class="math" data-say="0.992 squared equals 0.984064">0.992² = 0.984064</span> for two, which is still close to one — so the p99 moves from <span class="math" data-say="16 milliseconds">16 ms</span> to <span class="math" data-say="24 milliseconds">24 ms</span>, not to <span class="math" data-say="48 milliseconds">48 ms</span>. The penalty for replication is real and it is a fraction of the one intuition charges.</p></details><details class="recall"><summary>Asynchronous does not remove the cost, it changes the currency</summary><p>Replicating in the background removes the wait entirely and puts acknowledged-but-unreplicated data at risk instead: <span class="math" data-say="write rate times mean l A g times bytes per write">write rate × mean lag × bytes per write</span>. At <span class="math" data-say="2000">2000</span> writes/s, a mean lag of <span class="math" data-say="3.536 milliseconds">3.536 ms</span> and <span class="math" data-say="400">400</span> bytes a write that is about <span class="math" data-say="2.83 kB">2.83 kB</span> living on the leader and nowhere else. The trade is latency against a durability window, and both sides of it are computable.</p></details></div>
       <h3>Summary</h3>

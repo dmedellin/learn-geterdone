@@ -1257,6 +1257,15 @@
       [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
       [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
     }
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson.
+       Generated and Trading lessons share the trail's shape, so the rule is
+       in UI_CSS and reaches both (LESSON-LAYOUT-BACKLOG L-5, L-12). */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
 
     body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
     body[data-page-kind] .reading p, body[data-page-kind] .reading li,
@@ -1374,14 +1383,6 @@
       body[data-page-kind] .lesson-bar .bar-course { display: none; }
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
-    }
-
-    /* A phone shows the lesson's course as a back link and nothing else: the
-       four-level trail wrapped to three lines above every lesson. */
-    @media (max-width: 720px) {
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
     }
   </style>
 
@@ -1525,6 +1526,7 @@ B-tree           read    height at N = 10⁹, B = 500 =      4
     </section>
     <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
       <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Three ratios that describe any storage engine, and the observation that pushing any one of them down pushes another up.</p>
       <p class="lead-in">Say each idea in your own words, then open it to check.</p>
       <div class="recall-list"><details class="recall"><summary>Three amplifications describe an engine</summary><p><strong>Read</strong> amplification is the storage reads one logical lookup performs. <strong>Update</strong> amplification is the bytes written per byte ingested. <strong>Memory</strong> amplification is the bytes stored per byte of unique data. Every engine has all three, all three are ratios, and a design is a choice about which of them to make small.</p></details><details class="recall"><summary>Each shape&#x27;s strength causes its weakness</summary><p>A tiered tree writes each byte only <span class="math" data-say="5">5</span> times, the least of the three, and pays by probing <span class="math" data-say="50">50</span> runs on a lookup and keeping <span class="math" data-say="10">10</span> copies of a key. A levelled tree buys the reads back to <span class="math" data-say="5">5</span> and writes <span class="math" data-say="25">25</span>. A B-tree reads in <span class="math" data-say="4">4</span> and writes <span class="math" data-say="31.25">31.25</span> bytes to change one row. The connection is causal rather than coincidental: merging less means keeping more, and keeping more means searching more.</p></details><details class="recall"><summary>The bandwidth a device needs is ingest <span data-say="times">×</span> update amplification</summary><p>At <span class="math" data-say="50 megabytes per second">50 MB/s</span> of ingest the three engines demand <span class="math" data-say="1.25 gigabytes per second">1.25 GB/s</span>, <span class="math" data-say="250.00 megabytes per second">250.00 MB/s</span> and <span class="math" data-say="1.56 gigabytes per second">1.56 GB/s</span> of sustained write bandwidth. None of those is <span class="math" data-say="50 megabytes per second">50 MB/s</span>. Sizing the disk to what the application hands the engine is the misconception this page exists to kill, and it is off by between five and thirty-one times.</p></details></div>
       <h3>Summary</h3>

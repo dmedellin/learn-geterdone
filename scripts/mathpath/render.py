@@ -277,12 +277,20 @@ _LAB_WORD = re.compile(r"\blabs?\b", re.I)
 
 
 def lab_position(body):
-    """Where the lab goes in a lesson's body: the index of the block it follows.
+    """Where the lab goes in a lesson's body: how many reading blocks precede it.
 
-    docs/LESSON-LAYOUT-BACKLOG.md L-10. The lab sits right after the first
-    paragraph or list that mentions it, which is where the text starts to use
-    it; a lesson whose text never mentions the lab gets it after the reading.
+    docs/LESSON-LAYOUT-BACKLOG.md L-10, L-14. An author who wants the lab at a
+    particular place writes the marker block ("lab", None) there; at most one.
+    Otherwise the lab sits right after the first paragraph or list that
+    mentions it, which is where the text starts to use it, and a lesson whose
+    text never mentions the lab gets it after the reading. The count is of the
+    blocks that are drawn, so the marker itself is not one of them.
     """
+    markers = [i for i, (kind, _payload) in enumerate(body) if kind == "lab"]
+    if len(markers) > 1:
+        raise ValueError("a lesson places its lab once; found %d (\"lab\", None) blocks" % len(markers))
+    if markers:
+        return markers[0]
     for i, (kind, payload) in enumerate(body):
         if kind in ("p", "ul", "ol") and _LAB_WORD.search(
                 payload if isinstance(payload, str) else " ".join(payload)):
@@ -386,8 +394,8 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
             lab.controls,
         )
     )
-    blocks = lesson["body"]
-    split = lab_position(blocks)
+    split = lab_position(lesson["body"])
+    blocks = [(kind, payload) for kind, payload in lesson["body"] if kind != "lab"]
     before = "".join(_block(kind, payload) for kind, payload in blocks[:split])
     after = "".join(_block(kind, payload) for kind, payload in blocks[split:])
     parts.append(
@@ -468,13 +476,20 @@ def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesso
     parts.append(
         '    <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">\n'
         '      <h2 id="lessonRecap">Before you go</h2>\n'
+        # concepts_intro introduced the three ideas when they were cards at
+        # the top; it reads as well, or better, as the way into recalling them
+        # (LESSON-LAYOUT-BACKLOG L-15). read_intro, the reading's side note,
+        # stays unrendered: it was the fourth preview.
+        '%s'
         '      <p class="lead-in">Say each idea in your own words, then open it to check.</p>\n'
         '      <div class="recall-list">%s</div>\n'
         "      <h3>Summary</h3>\n"
         "      <p>%s</p>\n"
         '      <figure class="key-figure">%s<figcaption>%s</figcaption></figure>\n'
         "    </section>\n"
-        % (recall, inline(lesson["summary"]), _mathblock(lesson["key"]),
+        % ('      <p class="lead-in">%s</p>\n' % inline(lesson["concepts_intro"])
+           if lesson.get("concepts_intro") else "",
+           recall, inline(lesson["summary"]), _mathblock(lesson["key"]),
            esc_inline(lesson.get("key_label", "The statement in symbols")))
     )
 

@@ -1257,6 +1257,15 @@
       [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
       [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
     }
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson.
+       Generated and Trading lessons share the trail's shape, so the rule is
+       in UI_CSS and reaches both (LESSON-LAYOUT-BACKLOG L-5, L-12). */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
 
     body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
     body[data-page-kind] .reading p, body[data-page-kind] .reading li,
@@ -1374,14 +1383,6 @@
       body[data-page-kind] .lesson-bar .bar-course { display: none; }
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
-    }
-
-    /* A phone shows the lesson's course as a back link and nothing else: the
-       four-level trail wrapped to three lines above every lesson. */
-    @media (max-width: 720px) {
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
     }
   </style>
 
@@ -1515,6 +1516,7 @@ with single-flight coalescing:   1 request       a factor of 500</div><p>Read th
     </section>
     <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
       <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">Three ideas, and the first one is a change of timescale: everything so far on this course was an average over a long window, and this is about one hundred-millisecond window.</p>
       <p class="lead-in">Say each idea in your own words, then open it to check.</p>
       <div class="recall-list"><details class="recall"><summary>At expiry, there is no cache</summary><p>A cache entry expires. The next request misses and starts a fill that takes <span class="math" data-say="d">d</span> milliseconds. Every request for that key arriving before the fill lands also finds nothing, also misses, and is also forwarded. For <span class="math" data-say="d">d</span> milliseconds the hit rate for that key is zero, and <span class="math" data-say="1 minus h lambda">(1 − h)λ</span> describes none of it.</p></details><details class="recall"><summary>The burst is <span class="math" data-say="lambda times d">λ·d</span>, and that is Little’s Law</summary><p>The number of requests in flight is the arrival rate times the time each spends in flight &mdash; the identity of &ldquo;Little&rsquo;s Law from a Trace&rdquo;, applied to one key over one window. At <span class="math" data-say="5000">5 000</span> reads a second and a <span class="math" data-say="100 milliseconds">100 ms</span> fill that is <span class="math" data-say="500">500</span> requests, all asking the backend for the same value at the same moment.</p></details><details class="recall"><summary>Coalescing, not caching, is what stops it</summary><p>Single-flight coalescing lets the first miss start the fill and makes every subsequent request for that key wait on the same in-flight fill. The backend sees exactly one request per key instead of <span class="math" data-say="lambda times d">λ·d</span>. Nothing about the cache changed; what changed is what happens to the requests that miss together.</p></details></div>
       <h3>Summary</h3>

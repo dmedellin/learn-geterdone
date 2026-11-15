@@ -1257,6 +1257,15 @@
       [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
       [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
     }
+    /* A phone shows the lesson's course as a back link and nothing else: the
+       four-level trail wrapped to three lines above every lesson.
+       Generated and Trading lessons share the trail's shape, so the rule is
+       in UI_CSS and reaches both (LESSON-LAYOUT-BACKLOG L-5, L-12). */
+    @media (max-width: 720px) {
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
+      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
+    }
 
     body[data-page-kind] .reading-col { max-width: 38rem; margin-inline: auto; }
     body[data-page-kind] .reading p, body[data-page-kind] .reading li,
@@ -1374,14 +1383,6 @@
       body[data-page-kind] .lesson-bar .bar-course { display: none; }
       body[data-page-kind] .lesson-bar .bar-steps { flex: 1 1 auto; justify-content: space-between; }
       body[data-page-kind] .lesson-bar .bar-steps a { padding: 0 8px; }
-    }
-
-    /* A phone shows the lesson's course as a back link and nothing else: the
-       four-level trail wrapped to three lines above every lesson. */
-    @media (max-width: 720px) {
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > :not(:nth-child(5)) { display: none; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] > a:nth-child(5)::before { content: "\2039\00a0"; }
-      body[data-page-kind="lesson"] [data-ui="breadcrumbs"] { margin: 12px 0 4px; }
     }
   </style>
 
@@ -1535,6 +1536,7 @@ salt into s = 8, back at N = 16
     </section>
     <section class="section reading-col lesson-summary" id="recap" aria-labelledby="lessonRecap">
       <h2 id="lessonRecap">Before you go</h2>
+      <p class="lead-in">One expression with two terms, and everything on this page follows from which of the two terms contains <span class="math" data-say="N">N</span>.</p>
       <p class="lead-in">Say each idea in your own words, then open it to check.</p>
       <div class="recall-list"><details class="recall"><summary>The hot term does not contain <span class="math" data-say="N">N</span></summary><p>Split the load in two: the hot key's <span class="math" data-say="f times lambda">f·λ</span> and everybody else's <span class="math" data-say="1 minus f lambda">(1 − f)λ</span>. The second is spread over the fleet and becomes <span class="math" data-say="1 minus f lambda over N">(1 − f)λ/N</span> on each shard. The first goes wherever that one key hashes and stays there, whole. So the hottest shard carries <span class="math" data-say="f times lambda plus 1 minus f lambda over N">f·λ + (1 − f)λ/N</span>, and taking <span class="math" data-say="N">N</span> to infinity drives the second term to zero and leaves the first exactly where it was.</p></details><details class="recall"><summary>Salting splits the key, not the traffic</summary><p>Write the key as <span class="math" data-say="key number 0">key#0</span> through <span class="math" data-say="key number s minus 1">key#(s−1)</span>, choosing the suffix at random on each write. Those are <span class="math" data-say="s">s</span> distinct keys, so they hash to <span class="math" data-say="s">s</span> places and the hot term becomes <span class="math" data-say="the quantity f over s, times lambda">(f/s)·λ</span> on each of them. At <span class="math" data-say="f equals 12 percent">f = 12%</span> and <span class="math" data-say="s equals 8">s = 8</span> the hottest shard falls from <span class="math" data-say="17500 per second">17 500 /s</span> to <span class="math" data-say="7000 per second">7 000 /s</span>, which is close to the mean of <span class="math" data-say="6250 per second">6 250 /s</span>.</p></details><details class="recall"><summary>The price is on every read of that key</summary><p>A read of a salted key has to visit all <span class="math" data-say="s">s</span> pieces and combine them, so reads of that key are multiplied by <span class="math" data-say="s">s</span>. Over the whole read stream the multiplier is <span class="math" data-say="1 minus f plus f times s">1 − f + f·s</span>, because only the <span class="math" data-say="f">f</span> share fans out: at <span class="math" data-say="f equals 12 percent">f = 12%</span> and <span class="math" data-say="s equals 8">s = 8</span> that is <span class="math" data-say="1.84">1.84</span> times the reads overall. Salting is a write-side fix bought with read-side work, and it is only worth it when reads of that key are rare or cheap.</p></details></div>
       <h3>Summary</h3>
