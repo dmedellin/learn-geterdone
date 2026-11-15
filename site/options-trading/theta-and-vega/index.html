@@ -1214,12 +1214,19 @@ a.brand { text-decoration: none; }
 
     .lesson-feedback {
       margin-top: 18px;
-      padding: 17px 19px;
+      padding: 4px 16px;
       border: 1px solid var(--line);
       border-radius: 13px;
       background: var(--panel);
     }
     .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .lesson-feedback .fb-summary { display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none; min-height: 44px; }
+    .lesson-feedback .fb-summary::-webkit-details-marker { display: none; }
+    .lesson-feedback .fb-summary::before { content: "+"; font-weight: 700; color: var(--muted); width: 1em; text-align: center; }
+    .lesson-feedback details[open] > .fb-summary::before { content: "\2212"; }
+    .lesson-feedback .fb-summary h2 { margin: 0; font-size: .98rem; }
+    .lesson-feedback details[open] > .fb-summary { margin-bottom: 8px; }
+    .lesson-feedback details[open] { padding-bottom: 13px; }
     .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
     .fb-sr {
       position: absolute; width: 1px; height: 1px;
@@ -1690,7 +1697,8 @@ a.brand { text-decoration: none; }
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
              data-lesson-id="options-trading/theta-and-vega" data-lesson-title="Theta and Vega" data-course-title="Options Trading">
-      <h2>Feedback and recommendations</h2>
+      <details class="fb-disclosure" id="fbDisclosure">
+      <summary class="fb-summary"><h2>Feedback and recommendations</h2></summary>
       <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
         is handled, and export the list when you want to act on it. Kept in this browser only:
         nothing is sent anywhere, and nobody is notified.</p>
@@ -1706,6 +1714,7 @@ a.brand { text-decoration: none; }
       </form>
       <ul class="fb-list" id="fbList"></ul>
       <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+      </details>
     </section>
 
 
@@ -1986,6 +1995,11 @@ setupTheme();renderTV();
       var open = items.filter(function (i) { return !i.done; }).length;
       emptyEl.hidden = items.length > 0;
       listEl.hidden = items.length === 0;
+      /* Closed by default: the form is an editor's tool, not part of the lesson
+         (docs/LESSON-LAYOUT-BACKLOG.md L-6). A lesson that already has notes
+         opens it, so the editor's own list is never hidden from them. */
+      var disclosure = document.getElementById('fbDisclosure');
+      if (disclosure && items.length) disclosure.open = true;
       countEl.textContent = items.length
         ? open + ' open \u00b7 ' + (items.length - open) + ' done'
         : '';

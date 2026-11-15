@@ -343,18 +343,19 @@ def footer(lead_html, material):
     footer link there would walk the reader off the library from every page at
     once; the only host any footer names is learn.geterdone.io.
 
+    `lead_html` None leaves the lead out (a lesson, whose course home carries it).
     `material` is the owning path's hazard clause; it is required rather than
     defaulted, so a new path cannot inherit another subject's disclaimer by
     forgetting to state its own.
     """
+    lead = "" if lead_html is None else "\n      <p>%s</p>" % lead_html
     return """
-    <footer class="footer" data-ui="footer">
-      <p>{lead}</p>
+    <footer class="footer" data-ui="footer">{lead}
       <p>{licence}</p>
       <p><a href="{origin}">learn.geterdone.io</a></p>
     </footer>
   </div>
-""".format(lead=lead_html, licence=licence(material), origin=CANONICAL_ORIGIN)
+""".format(lead=lead, licence=licence(material), origin=CANONICAL_ORIGIN)
 
 
 def close(scripts):
